@@ -13,6 +13,7 @@
 
       ./nvidia.nix
 
+      ./docker.nix
       ./plex.nix
       ./vscode.nix
       ./zfs.nix
