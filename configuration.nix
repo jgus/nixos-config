@@ -11,9 +11,7 @@
       ./host.nix
       ./users.nix
 
-      #./docker.nix
-      #./plex.nix
-      ./samba.nix
+      ./plex.nix
       ./vscode.nix
       ./zfs.nix
       ./clamav.nix
