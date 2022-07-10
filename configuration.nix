@@ -11,6 +11,8 @@
       ./host.nix
       ./users.nix
 
+      ./nvidia.nix
+
       ./plex.nix
       ./vscode.nix
       ./zfs.nix
