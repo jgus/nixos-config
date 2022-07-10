@@ -16,5 +16,6 @@
       ./samba.nix
       ./vscode.nix
       ./zfs.nix
+      ./clamav.nix
     ];
 }
