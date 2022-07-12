@@ -18,5 +18,7 @@
       ./vscode.nix
       ./zfs.nix
       ./clamav.nix
+
+      ./offsite-jarvis.nix
     ];
 }
