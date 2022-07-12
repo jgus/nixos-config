@@ -20,5 +20,6 @@
       ./clamav.nix
 
       ./offsite-jarvis.nix
+      ./offsite-gustafson-nas.nix
     ];
 }
