@@ -4,6 +4,7 @@
   imports =
     [
       #./syncthing.nix
+      ./landing.nix
     ];
 
   virtualisation = {
