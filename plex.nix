@@ -40,7 +40,14 @@
       options = let
         # this line prevents hanging on network split
         automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s";
-
+      in ["${automount_opts},credentials=/etc/.secrets/plex-smb,uid=${toString(config.users.users.plex.uid)},gid=${toString(config.users.groups.plex.gid)}"];
+  };
+  fileSystems."/shares/photos" = {
+      device = "//nas/Photos";
+      fsType = "cifs";
+      options = let
+        # this line prevents hanging on network split
+        automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s";
       in ["${automount_opts},credentials=/etc/.secrets/plex-smb,uid=${toString(config.users.users.plex.uid)},gid=${toString(config.users.groups.plex.gid)}"];
   };
 }
