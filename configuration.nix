@@ -13,6 +13,7 @@
 
       ./nvidia.nix
 
+      ./wireguard.nix
       ./docker.nix
       ./plex.nix
       ./vscode.nix
