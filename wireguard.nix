@@ -46,6 +46,10 @@
             publicKey = "MhTvktvI9KXTHqdB6J4Z/KEgfS/R5hiX8oIAJyzZfDo=";
             allowedIPs = [ "172.23.0.2/32" ];
           }
+          { # Josh-Phone
+            publicKey = "5SLctJEBhIjU/uRRxHEal3W48Yp4dbLF7J5IKvfLSgk=";
+            allowedIPs = [ "172.23.0.3/32" ];
+          }
         ];
       };
     };
