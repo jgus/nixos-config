@@ -46,6 +46,7 @@
         enable = true;
         description = "Landing";
         wantedBy = [ "multi-user.target" ];
+        requires = [ "network-online.target" ];
         path = [ pkgs.docker pkgs.rsync ];
         script = ''
           rsync -arPL /etc/landing /tmp/

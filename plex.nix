@@ -55,6 +55,7 @@
         enable = true;
         description = "Plex Media Server";
         wantedBy = [ "multi-user.target" ];
+        requires = [ "network-online.target" ];
         path = [ pkgs.docker ];
         script = ''
           docker run --rm --name plex \
@@ -71,6 +72,9 @@
             --tmpfs /tmp \
             lscr.io/linuxserver/plex
           '';
+        serviceConfig = {
+          Restart = "on-failure";
+        };
       };
     };
   };

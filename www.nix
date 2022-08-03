@@ -65,7 +65,7 @@
         enable = true;
         description = "Web Service & Proxy";
         wantedBy = [ "multi-user.target" ];
-        requires = [ "web-db.service" ];
+        requires = [ "network-online.target" "web-db.service" ];
         path = [ pkgs.docker ];
         script = ''
           docker run --rm --name web-proxy \
@@ -86,6 +86,9 @@
             -p 443:443 \
             lscr.io/linuxserver/swag
           '';
+        serviceConfig = {
+          Restart = "on-failure";
+        };
       };
     };
   };

@@ -9,6 +9,7 @@
         enable = true;
         description = "Syncthing";
         wantedBy = [ "multi-user.target" ];
+        requires = [ "network-online.target" ];
         path = [ pkgs.docker ];
         script = ''
           /bin/sh -c "docker run --rm --name syncthing \
@@ -22,12 +23,8 @@
           -v /var/lib/syncthing/config:/config \
           lscr.io/linuxserver/syncthing"
           '';
-        unitConfig = {
-          StartLimitIntervalSec = 0;
-        };
         serviceConfig = {
-          Restart = "always";
-          RestartSec = 10;
+          Restart = "on-failure";
         };
       };
     };
