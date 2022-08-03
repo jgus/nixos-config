@@ -1,19 +1,15 @@
 { config, pkgs, ... }:
 
 {
-  nixpkgs.config.allowUnfree = true;
+  imports = [ ./docker.nix ];
 
-  services = {
-    plex = let
-      master = import
-          (builtins.fetchTarball https://github.com/nixos/nixpkgs/tarball/master)
-          { config = config.nixpkgs.config; };
-      in {
-        enable = true;
-        openFirewall = true;
-        package = master.plex;
-        dataDir = "/var/lib/plex";
-      };
+  users = {
+    groups.plex = { gid = 193; };
+    users.plex = {
+      uid = 193;
+      isSystemUser = true;
+      group = "plex";
+    };
   };
 
   system.activationScripts = {
@@ -34,7 +30,7 @@
     ".secrets/plex-smb".source = ./.secrets/plex-smb;
   };
 
-  fileSystems."/media" = {
+  fileSystems."/shares/plex/media" = {
       device = "//nas/Media";
       fsType = "cifs";
       options = let
@@ -42,12 +38,40 @@
         automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s";
       in ["${automount_opts},credentials=/etc/.secrets/plex-smb,uid=${toString(config.users.users.plex.uid)},gid=${toString(config.users.groups.plex.gid)}"];
   };
-  fileSystems."/shares/photos" = {
+  fileSystems."/shares/plex/photos" = {
       device = "//nas/Photos";
       fsType = "cifs";
       options = let
         # this line prevents hanging on network split
         automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s";
       in ["${automount_opts},credentials=/etc/.secrets/plex-smb,uid=${toString(config.users.users.plex.uid)},gid=${toString(config.users.groups.plex.gid)}"];
+  };
+
+  networking.firewall.allowedTCPPorts = [ 32400 ];
+
+  systemd = {
+    services = {
+      plex = {
+        enable = true;
+        description = "Plex Media Server";
+        wantedBy = [ "multi-user.target" ];
+        path = [ pkgs.docker ];
+        script = ''
+          docker run --rm --name plex \
+            --net host \
+            --gpus all \
+            --device /dev/dri:/dev/dri \
+            -e PUID=$(id -u plex) \
+            -e PGID=$(id -g plex) \
+            -e TZ=$(timedatectl show -p Timezone --value) \
+            -e VERSION=latest \
+            -v /var/lib/plex:/config \
+            -v /shares/plex/media:/media \
+            -v /shares/plex/photos:/shares/photos \
+            --tmpfs /tmp \
+            lscr.io/linuxserver/plex
+          '';
+      };
+    };
   };
 }
