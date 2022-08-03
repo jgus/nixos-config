@@ -1,11 +1,6 @@
 { ... }:
 
 {
-  imports =
-    [
-      #./syncthing.nix
-    ];
-
   virtualisation = {
     docker = {
       enable = true;

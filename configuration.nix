@@ -12,11 +12,11 @@
       ./users.nix
 
       #./nvidia.nix
-
-      #./docker.nix
-      ./samba.nix
       ./vscode.nix
       ./zfs.nix
       ./clamav.nix
+
+      #./syncthing.nix
+      ./samba.nix
     ];
 }
