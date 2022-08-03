@@ -1,6 +1,8 @@
 { pkgs, ... }:
 
 {
+  imports = [ ./docker.nix ];
+
   environment.etc = {
     "landing/docker/Dockerfile".text = ''
       FROM alpine

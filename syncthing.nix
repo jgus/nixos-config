@@ -1,6 +1,8 @@
 { pkgs, ... }:
 
 {
+  imports = [ ./docker.nix ];
+
   systemd = {
     services = {
       syncthing = {

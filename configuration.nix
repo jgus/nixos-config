@@ -12,13 +12,14 @@
       ./users.nix
 
       ./nvidia.nix
-
-      ./wireguard.nix
-      ./docker.nix
-      ./plex.nix
       ./vscode.nix
       ./zfs.nix
       ./clamav.nix
+
+      ./wireguard.nix
+      ./landing.nix
+      #./syncthing.nix
+      ./plex.nix
 
       ./offsite-jarvis.nix
       ./offsite-gustafson-nas.nix
