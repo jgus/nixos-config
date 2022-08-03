@@ -6,4 +6,5 @@
   hardware.opengl.enable = true;
   hardware.opengl.driSupport32Bit = true;
   hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.stable;
+  virtualisation.docker.enableNvidia = true;
 }
