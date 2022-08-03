@@ -19,6 +19,7 @@
       ./wireguard.nix
       ./landing.nix
       #./syncthing.nix
+      ./www.nix
       ./plex.nix
 
       ./offsite-jarvis.nix
