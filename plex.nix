@@ -14,15 +14,10 @@
 
   system.activationScripts = {
     plexSetup.text = ''
-      BASE=rpool
-      if ! ${pkgs.zfs}/bin/zfs list rpool/plex >/dev/null 2>&1
-      then
-        ${pkgs.zfs}/bin/zfs create rpool/plex -o mountpoint=/var/lib/plex -o autobackup:offsite-$(${pkgs.hostname}/bin/hostname)=true -o autobackup:snap-$(${pkgs.hostname}/bin/hostname)=true
-        ${pkgs.zfs}/bin/zfs create rpool/plex/media -o mountpoint="/var/lib/plex/Plex Media Server/Media" -o autobackup:offsite-$(${pkgs.hostname}/bin/hostname)=false -o autobackup:snap-$(${pkgs.hostname}/bin/hostname)=false
-        ${pkgs.zfs}/bin/zfs create rpool/plex/metadata -o mountpoint="/var/lib/plex/Plex Media Server/Metadata" -o autobackup:offsite-$(${pkgs.hostname}/bin/hostname)=false -o autobackup:snap-$(${pkgs.hostname}/bin/hostname)=false
-        ${pkgs.zfs}/bin/zfs create d/transcode -o autobackup:offsite-$(${pkgs.hostname}/bin/hostname)=false -o autobackup:snap-$(${pkgs.hostname}/bin/hostname)=false
-        chown -R plex:plex /var/lib/plex
-      fi
+      ${pkgs.zfs}/bin/zfs list rpool/varlib/plex >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create rpool/varlib/plex -o mountpoint=/var/lib/plex -o autobackup:offsite-$(${pkgs.hostname}/bin/hostname)=true -o autobackup:snap-$(${pkgs.hostname}/bin/hostname)=true
+      ${pkgs.zfs}/bin/zfs list rpool/varlib/plex/media >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create rpool/varlib/plex/media -o mountpoint="/var/lib/plex/Library/Application Support/Plex Media Server/Media" -o autobackup:offsite-$(${pkgs.hostname}/bin/hostname)=false -o autobackup:snap-$(${pkgs.hostname}/bin/hostname)=false
+      ${pkgs.zfs}/bin/zfs list rpool/varlib/plex/metadata >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create rpool/varlib/plex/metadata -o mountpoint="/var/lib/plex/Library/Application Support/Plex Media Server/Metadata" -o autobackup:offsite-$(${pkgs.hostname}/bin/hostname)=false -o autobackup:snap-$(${pkgs.hostname}/bin/hostname)=false
+      chown -R plex:plex /var/lib/plex
     '';
   };
 
