@@ -34,22 +34,22 @@
     };
 
   fileSystems."/boot" =
-    { device = "/dev/disk/by-uuid/A72E-2E77";
+    { device = "/dev/disk/by-uuid/2B56-F406";
       fsType = "vfat";
     };
 
   fileSystems."/boot/1" =
-    { device = "/dev/disk/by-uuid/A737-BDBC";
+    { device = "/dev/disk/by-uuid/2B60-711B";
       fsType = "vfat";
     };
 
   fileSystems."/boot/2" =
-    { device = "/dev/disk/by-uuid/A741-0F5E";
+    { device = "/dev/disk/by-uuid/2B64-0EB5";
       fsType = "vfat";
     };
 
   fileSystems."/boot/3" =
-    { device = "/dev/disk/by-uuid/A749-F651";
+    { device = "/dev/disk/by-uuid/2B66-E13C";
       fsType = "vfat";
     };
 
