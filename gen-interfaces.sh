@@ -2,9 +2,12 @@
 
 (
     echo "{ ... }: {"
-    for i in $(ip link | awk -F: '$0 !~ "lo|vir|wl|wg|docker|^[^0-9]"{print $2;getline}')
+    echo "  networking.bridges.br0.interfaces = ["
+    for i in $(ip link | awk -F: '$0 ~ "enp"{print $2;getline}')
     do
-        echo "  networking.interfaces.${i}.useDHCP = true;"
+        echo "    \"${i}\""
     done
+    echo "  ];"
+    echo "  networking.interfaces.br0.useDHCP = true;"
     echo "}"
 ) >/etc/nixos/interfaces.nix
