@@ -22,6 +22,7 @@
       ./www.nix
       ./plex.nix
 
+      ./offsite-pihole.nix
       ./offsite-jarvis.nix
       ./offsite-gustafson-nas.nix
     ];
