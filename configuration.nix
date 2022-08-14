@@ -21,6 +21,7 @@
       #./syncthing.nix
       ./www.nix
       ./plex.nix
+      ./minecraft.nix
 
       ./offsite-pihole.nix
       ./offsite-jarvis.nix
