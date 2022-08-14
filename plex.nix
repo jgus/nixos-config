@@ -14,7 +14,7 @@
 
   system.activationScripts = {
     plexSetup.text = ''
-      ${pkgs.zfs}/bin/zfs list rpool/varlib/plex >/dev/null 2>&1 || ( ${pkgs.zfs}/bin/zfs create rpool/varlib/plex -o mountpoint=/var/lib/plex -o autobackup:offsite-$(${pkgs.hostname}/bin/hostname)=true -o autobackup:snap-$(${pkgs.hostname}/bin/hostname)=true && chown plex:plex /var/lib/plex )
+      ${pkgs.zfs}/bin/zfs list rpool/varlib/plex >/dev/null 2>&1 || ( ${pkgs.zfs}/bin/zfs create rpool/varlib/plex && chown plex:plex /var/lib/plex )
     '';
   };
 
