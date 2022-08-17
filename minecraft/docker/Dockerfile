@@ -14,12 +14,13 @@ RUN apt update && \
     sudo \
     openjdk-$java_ver-jre-headless \
     openssh-server
-#RUN ssh-keygen -A
-#RUN echo "PasswordAuthentication no" >> /etc/ssh/sshd_config
+COPY auth.conf /etc/ssh/sshd_config.d/
 
 COPY entrypoint.sh /
+RUN chmod a+x /*.sh
 COPY start.sh /usr/local/bin
 COPY stop.sh /usr/local/bin
+RUN chmod a+x /usr/local/bin/*.sh
 
 RUN groupadd --gid $gid minecraft && \
     useradd --uid $uid --gid $gid --password $pw --create-home --shell /bin/bash minecraft && \
@@ -37,7 +38,4 @@ EXPOSE 22/tcp \
        25565/tcp \
        25565/udp
 
-#CMD ["/usr/sbin/sshd", "-D", "-e"]
-#ENTRYPOINT ["tini", "--", "/entrypoint.sh"]
-#CMD []
-CMD ["/bin/sh", "-c", "/entrypoint.sh"]
+CMD ["/bin/bash", "-c", "/entrypoint.sh"]
