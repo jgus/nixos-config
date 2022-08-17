@@ -3,6 +3,8 @@
 {
   imports = [ ./docker.nix ];
 
+  networking.firewall.allowedTCPPorts = [ 22022 ];
+
   environment.etc = {
     "landing/docker/Dockerfile".text = ''
       FROM alpine
