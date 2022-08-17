@@ -58,7 +58,7 @@
             -p 19133:19133/udp \
             -p 25565:25565/udp \
             -p 25565:25565/tcp \
-            -v /var/volumes/minecraft_config:/home/minecraft/config \
+            -v /var/lib/minecraft:/home/minecraft/config \
             minecraft
           '';
         unitConfig = {

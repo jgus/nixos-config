@@ -9,4 +9,4 @@ function cleanup()
 trap cleanup EXIT
 
 mkdir -p /var/run/sshd
-/usr/sbin/sshd -D -d -e
+/usr/sbin/sshd -D -e
