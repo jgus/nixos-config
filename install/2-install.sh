@@ -11,9 +11,7 @@ git config --global init.defaultBranch main
 git config --global user.email root@localhost
 git config --global user.name root
 cp /root/.gitconfig /mnt/root/.gitconfig
-cd /mnt/etc
-git clone https://github.com/jgus/nixos-config.git
-mv nixos-config nixos
+git clone https://github.com/jgus/nixos-config.git /mnt/etc/nixos
 "
 
 echo "### Generating hardware configuration"
