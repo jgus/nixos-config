@@ -13,6 +13,7 @@ git config --global user.name root
 cp /root/.gitconfig /mnt/root/.gitconfig
 cd /mnt/etc
 git clone https://github.com/jgus/nixos-config.git
+mv nixos-config nixos
 "
 
 echo "### Generating hardware configuration"
