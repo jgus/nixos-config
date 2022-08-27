@@ -3,7 +3,7 @@
 (
     echo "{ ... }: {"
     echo "  networking.bridges.br0.interfaces = ["
-    for i in $(ip link | awk -F: '$0 ~ "enp"{print $2;getline}')
+    for i in $(ip --brief link | cut -d ' ' -f1 | grep "eth\|enp")
     do
         echo "    \"${i}\""
     done
