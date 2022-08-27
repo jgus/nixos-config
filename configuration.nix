@@ -11,6 +11,8 @@
       ./host.nix
       ./users.nix
 
+      #./nvidia.nix
+
       #./docker.nix
       ./samba.nix
       ./vscode.nix
