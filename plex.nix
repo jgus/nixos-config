@@ -50,6 +50,7 @@
         requires = [ "network-online.target" ];
         path = [ pkgs.docker ];
         script = ''
+          docker pull lscr.io/linuxserver/plex
           docker run --rm --name plex \
             --net host \
             --gpus all \
