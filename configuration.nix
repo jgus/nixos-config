@@ -17,6 +17,5 @@
       ./clamav.nix
 
       #./syncthing.nix
-      ./samba.nix
     ];
 }

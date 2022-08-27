@@ -30,6 +30,8 @@ sed -i 's/fsType = "zfs"/fsType = "zfs"; options = [ "zfsutil" ]/' /mnt/etc/nixo
     echo "}"
 ) >/mnt/etc/nixos/interfaces.nix
 
+sed -i "s/HOSTID/$(head -c4 /dev/urandom | od -A none -t x4)/g" /mnt/etc/nixos/host.nix
+
 echo "### Setting up SSH..."
 mkdir -p /mnt/root/.ssh || true
 curl https://github.com/jgus.keys >> /mnt/root/.ssh/authorized_keys
