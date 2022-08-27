@@ -12,7 +12,6 @@
       ./users.nix
 
       #./docker.nix
-      #./plex.nix
       ./samba.nix
       ./vscode.nix
       ./zfs.nix
