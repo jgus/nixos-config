@@ -3,7 +3,7 @@
 (
     echo "{ ... }: {"
     echo "  networking.bridges.br0.interfaces = ["
-    for i in $(ip --brief link | cut -d ' ' -f1 | grep "eth\|eno\|enp")
+    for i in $(ip --brief link | cut -d ' ' -f1 | grep "^eth\|^en")
     do
         echo "    \"${i}\""
     done
