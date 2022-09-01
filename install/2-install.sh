@@ -21,7 +21,7 @@ sed -i 's/fsType = "zfs"/fsType = "zfs"; options = [ "zfsutil" ]/' /mnt/etc/nixo
 (
     echo "{ ... }: {"
     echo "  networking.bridges.br0.interfaces = ["
-    for i in $(ip --brief link | cut -d ' ' -f1 | grep "eth\|enp")
+    for i in $(ip --brief link | cut -d ' ' -f1 | grep "eth\|eno\|enp")
     do
         echo "    \"${i}\""
     done
