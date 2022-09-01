@@ -22,11 +22,6 @@ sed -i 's/fsType = "zfs"/fsType = "zfs"; options = [ "zfsutil" ]/' /mnt/etc/nixo
 
 sed -i "s/HOSTID/$(head -c4 /dev/urandom | od -A none -t x4 | xargs)/g" /mnt/etc/nixos/host.nix
 
-echo "### Setting up SSH..."
-mkdir -p /mnt/root/.ssh || true
-curl https://github.com/jgus.keys >> /mnt/root/.ssh/authorized_keys
-chmod 400 /mnt/root/.ssh/authorized_keys
-
 echo "### Installing"
 nixos-install
 
