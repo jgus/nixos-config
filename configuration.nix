@@ -14,7 +14,7 @@
       #./nvidia.nix
       ./vscode.nix
       ./zfs.nix
-      #./clamav.nix # needs .secrets/gmail-password.nix
+      ./clamav.nix
 
       #./syncthing.nix
     ];
