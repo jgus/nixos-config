@@ -1,5 +1,7 @@
 { config, pkgs, ... }:
 
+# smbpasswd -a josh
+
 {
   imports =
     [ # Include the results of the hardware scan.
@@ -16,6 +18,9 @@
       ./zfs.nix
       ./clamav.nix
 
+      ./user-plex.nix
+      ./user-www.nix
+      ./samba.nix
       #./syncthing.nix
     ];
 }
