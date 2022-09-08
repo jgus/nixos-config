@@ -23,7 +23,6 @@
       ./plex.nix
       ./minecraft.nix
 
-      ./offsite-pihole.nix
       ./offsite-s3k1.nix
       ./offsite-gustafson-nas.nix
     ];
