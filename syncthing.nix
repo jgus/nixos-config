@@ -3,6 +3,11 @@
 {
   imports = [ ./docker.nix ];
 
+  networking.firewall = {
+    allowedTCPPorts = [ 8384 22000 ];
+    allowedUDPPorts = [ 21027 ];
+  };
+
   systemd = {
     services = {
       syncthing = {
@@ -20,7 +25,7 @@
           -e PGID=$(id -g josh) \
           -e TZ=$(timedatectl show -p Timezone --value) \
           -e UMASK_SET=002 \
-          -v /var/lib/syncthing/config:/config \
+          -v /var/lib/syncthing:/config \
           lscr.io/linuxserver/syncthing"
           '';
         serviceConfig = {
