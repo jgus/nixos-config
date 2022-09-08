@@ -24,6 +24,5 @@
       ./minecraft.nix
 
       ./offsite-s3k1.nix
-      ./offsite-gustafson-nas.nix
     ];
 }
