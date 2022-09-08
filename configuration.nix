@@ -21,6 +21,6 @@
       ./user-plex.nix
       ./user-www.nix
       ./samba.nix
-      #./syncthing.nix
+      ./syncthing.nix
     ];
 }

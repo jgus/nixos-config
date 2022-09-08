@@ -26,6 +26,11 @@
           -e TZ=$(timedatectl show -p Timezone --value) \
           -e UMASK_SET=002 \
           -v /var/lib/syncthing:/config \
+          -v /home/josh/sync:/shares/Sync \
+          -v /d/photos:/shares/Photos \
+          -v /d/software/Tools:/shares/Tools \
+          -v /d/media/Comics:/shares/Comics \
+          -v /d/media/Music:/shares/Music \
           lscr.io/linuxserver/syncthing"
           '';
         serviceConfig = {
