@@ -24,7 +24,7 @@
       ./minecraft.nix
 
       ./offsite-pihole.nix
-      ./offsite-jarvis.nix
+      ./offsite-s3k1.nix
       ./offsite-gustafson-nas.nix
     ];
 }
