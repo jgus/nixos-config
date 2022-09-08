@@ -25,14 +25,14 @@
     shares = {
       Media = { path = "/d/media"; browseable = "yes"; "read only" = "no"; };
       Backup = { path = "/d/backup"; browseable = "yes"; "read only" = "no"; };
-      # Peer = { path = "/d/scratch/peer"; browseable = "yes"; "read only" = "no"; };
+      Peer = { path = "/d/scratch/peer"; browseable = "yes"; "read only" = "no"; };
       Photos = { path = "/d/photos"; browseable = "yes"; "read only" = "no"; };
       Projects = { path = "/d/projects"; browseable = "yes"; "read only" = "no"; };
       Software = { path = "/d/software"; browseable = "yes"; "read only" = "no"; };
-      # Storage = { path = "/home/josh/Storage"; browseable = "yes"; "read only" = "no"; };
+      Storage = { path = "/home/josh/Storage"; browseable = "yes"; "read only" = "no"; };
       Temp = { path = "/tmp/share"; browseable = "yes"; "read only" = "no"; };
-      # Brown = { path = "/d/external/brown"; browseable = "yes"; "read only" = "no"; };
-      # Gustafson = { path = "/d/external/Gustafson"; browseable = "yes"; "read only" = "no"; };
+      Brown = { path = "/d/external/brown"; browseable = "yes"; "read only" = "no"; };
+      Gustafson = { path = "/d/external/Gustafson"; browseable = "yes"; "read only" = "no"; };
     };
   };
 }
