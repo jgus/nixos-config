@@ -22,5 +22,7 @@
       ./user-www.nix
       ./samba.nix
       ./syncthing.nix
+      ./transmission.nix
+      ./sonarr.nix
     ];
 }
