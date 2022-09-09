@@ -20,7 +20,7 @@
     };
     timers = {
       sync-to-cloud = {
-        enable = true;
+        enable = false;
         wantedBy = [ "timers.target" ];
         partOf = [ "sync-to-cloud.service" ];
         timerConfig = {
