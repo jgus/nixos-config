@@ -28,5 +28,6 @@
       ./offsite-c240m3.nix
       ./offsite-pihole.nix
       ./offsite-gustafson-nas.nix
+      ./sync-to-cloud.nix
     ];
 }
