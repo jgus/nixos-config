@@ -16,7 +16,7 @@ trap onexit EXIT
 
 set -o pipefail
 
-EMAIL_TO=("j@gustafson.me" "mike.gus73@gmail.com")
+EMAIL_TO=("j@gustafson.me")
 EXCLUDE_FILES=(
 )
 SCAN_MOUNT=/mnt/clam-scan
