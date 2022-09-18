@@ -16,18 +16,18 @@
       #./nvidia.nix
       ./vscode.nix
       ./zfs.nix
-      ./clamav.nix
+      #./clamav.nix
 
       ./user-plex.nix
       ./user-www.nix
       ./samba.nix
-      ./syncthing.nix
-      ./transmission.nix
-      ./sonarr.nix
+      #./syncthing.nix
+      #./transmission.nix
+      #./sonarr.nix
 
-      ./offsite-c240m3.nix
-      ./offsite-pihole.nix
-      ./offsite-gustafson-nas.nix
-      ./sync-to-cloud.nix
+      #./offsite-c240m3.nix
+      #./offsite-pihole.nix
+      #./offsite-gustafson-nas.nix
+      #./sync-to-cloud.nix
     ];
 }

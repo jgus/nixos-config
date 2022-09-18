@@ -4,7 +4,7 @@
   time.timeZone = "America/Denver";
 
   networking = {
-    hostName = "s3k1";
-    hostId = "876d1607"; # head -c4 /dev/urandom | od -A none -t x4
+    hostName = "sm1";
+    hostId = "e7818f0a"; # head -c4 /dev/urandom | od -A none -t x4
   };
 }
