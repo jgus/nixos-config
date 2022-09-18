@@ -1,5 +1,7 @@
 { config, pkgs, ... }:
 
+# smbpasswd -a josh
+
 {
   imports =
     [ # Include the results of the hardware scan.
@@ -14,8 +16,18 @@
       #./nvidia.nix
       ./vscode.nix
       ./zfs.nix
-      #./clamav.nix # needs .secrets/gmail-password.nix
+      ./clamav.nix
 
-      #./syncthing.nix
+      ./user-plex.nix
+      ./user-www.nix
+      ./samba.nix
+      ./syncthing.nix
+      ./transmission.nix
+      ./sonarr.nix
+
+      ./offsite-c240m3.nix
+      ./offsite-pihole.nix
+      ./offsite-gustafson-nas.nix
+      ./sync-to-cloud.nix
     ];
 }
