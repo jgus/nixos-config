@@ -21,9 +21,9 @@
       ./user-plex.nix
       ./user-www.nix
       ./samba.nix
-      #./syncthing.nix
-      #./transmission.nix
-      #./sonarr.nix
+      ./syncthing.nix
+      ./transmission.nix
+      ./sonarr.nix
 
       #./offsite-c240m3.nix
       #./offsite-pihole.nix
