@@ -16,7 +16,7 @@
       #./nvidia.nix
       ./vscode.nix
       ./zfs.nix
-      #./clamav.nix
+      ./clamav.nix
 
       ./user-plex.nix
       ./user-www.nix
