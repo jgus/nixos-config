@@ -2,10 +2,13 @@
 
 {
   boot = {
-    loader.systemd-boot.enable = true;
-    loader.efi.canTouchEfiVariables = true;
+    loader = {
+      systemd-boot.enable = true;
+      efi.canTouchEfiVariables = true;
+      timeout = 1;
+    };
     tmpOnTmpfs = true;
-    loader.timeout = 1;
+    supportedFilesystems = [ "ntfs" ];
   };
 
   # Select internationalisation properties.
