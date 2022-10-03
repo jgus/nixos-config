@@ -5,33 +5,33 @@
 
   system.activationScripts = {
     docker-setup.text = ''
-      ${pkgs.zfs}/bin/zfs list d/varlib/sonarr >/dev/null 2>&1 || ( ${pkgs.zfs}/bin/zfs create d/varlib/sonarr && chown josh:plex /var/lib/sonarr )
+      ${pkgs.zfs}/bin/zfs list d/varlib/lidarr >/dev/null 2>&1 || ( ${pkgs.zfs}/bin/zfs create d/varlib/lidarr && chown josh:plex /var/lib/lidarr )
     '';
   };
 
   networking.firewall = {
-    allowedTCPPorts = [ 8989 ];
+    allowedTCPPorts = [ 8686 ];
   };
 
   systemd = {
     services = {
-      sonarr = {
+      lidarr = {
         enable = true;
-        description = "Sonarr";
+        description = "Lidarr";
         wantedBy = [ "multi-user.target" ];
         requires = [ "network-online.target" ];
         path = [ pkgs.docker ];
         script = ''
-          docker pull lscr.io/linuxserver/sonarr
-          docker run --rm --name sonarr \
-            -p 8989:8989 \
+          docker pull lscr.io/linuxserver/lidarr
+          docker run --rm --name lidarr \
+            -p 8686:8686 \
             -e PUID=$(id -u josh) \
             -e PGID=$(id -g plex) \
             -e TZ=$(timedatectl show -p Timezone --value) \
-            -v /var/lib/sonarr:/config \
+            -v /var/lib/lidarr:/config \
             -v /d/scratch/peer:/peer \
             -v /d/media:/media \
-            lscr.io/linuxserver/sonarr
+            lscr.io/linuxserver/lidarr
           '';
         serviceConfig = {
           Restart = "on-failure";

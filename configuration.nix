@@ -23,6 +23,8 @@
       ./samba.nix
       ./syncthing.nix
       ./transmission.nix
+      ./lidarr.nix
+      ./radarr.nix
       ./sonarr.nix
 
       ./offsite-c240m3.nix
