@@ -23,6 +23,8 @@
       ./plex.nix
       ./minecraft.nix
 
+      ./libvirt.nix
+
       ./offsite-s3k1.nix
     ];
 }
