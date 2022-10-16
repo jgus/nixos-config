@@ -242,13 +242,14 @@
         while [ $COUNT -le 60 ]
         do
           STATE=$(${pkgs.libvirt}/bin/virsh domstate vm1 2>&1)
-          if [ "$STATE" = "running" ]
+          if [[ "$STATE" == "shut off" ]] || [[ "''${STATE::27}" == "error: failed to get domain" ]]
+          then
+            exit 0
+          fi
+          if [[ "$STATE" == "running" ]]
           then
             [ $(($COUNT % 15)) -eq 0 ] && ${pkgs.libvirt}/bin/virsh shutdown vm1
             ((COUNT++))
-          elif [ "$STATE" = "shut off" ] || [ "${STATE::27}" = "error: failed to get domain" ]
-          then
-            exit 0
           fi
           sleep 1
         done
