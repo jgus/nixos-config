@@ -261,7 +261,7 @@
       vm-vm1 = {
         enable = true;
         description = "Virtual Machine vm1";
-        wantedBy = [ "multi-user.target" ];
+        # wantedBy = [ "multi-user.target" ];
         requires = [ "network-online.target" ];
         path = with pkgs; [ bash libvirt zfs ];
         environment = {
