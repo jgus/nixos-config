@@ -8,9 +8,38 @@
       <domain type='kvm'>
         <name>vm1</name>
         <uuid>99fefcc4-d5aa-4717-8dde-4fe5f0552d87</uuid>
-        <memory unit='GiB'>16</memory>
-        <currentMemory unit='GiB'>16</currentMemory>
-        <vcpu placement='static'>8</vcpu>
+        <memory unit='GiB'>96</memory>
+        <currentMemory unit='GiB'>96</currentMemory>
+        <vcpu placement='static'>24</vcpu>
+        <iothreads>4</iothreads>
+        <cputune>
+          <vcpupin vcpu='0' cpuset='12'/>
+          <vcpupin vcpu='1' cpuset='36'/>
+          <vcpupin vcpu='2' cpuset='13'/>
+          <vcpupin vcpu='3' cpuset='37'/>
+          <vcpupin vcpu='4' cpuset='14'/>
+          <vcpupin vcpu='5' cpuset='38'/>
+          <vcpupin vcpu='6' cpuset='15'/>
+          <vcpupin vcpu='7' cpuset='39'/>
+          <vcpupin vcpu='8' cpuset='16'/>
+          <vcpupin vcpu='9' cpuset='40'/>
+          <vcpupin vcpu='10' cpuset='17'/>
+          <vcpupin vcpu='11' cpuset='41'/>
+          <vcpupin vcpu='12' cpuset='18'/>
+          <vcpupin vcpu='13' cpuset='42'/>
+          <vcpupin vcpu='14' cpuset='19'/>
+          <vcpupin vcpu='15' cpuset='43'/>
+          <vcpupin vcpu='16' cpuset='20'/>
+          <vcpupin vcpu='17' cpuset='44'/>
+          <vcpupin vcpu='18' cpuset='21'/>
+          <vcpupin vcpu='19' cpuset='45'/>
+          <vcpupin vcpu='20' cpuset='22'/>
+          <vcpupin vcpu='21' cpuset='46'/>
+          <vcpupin vcpu='22' cpuset='23'/>
+          <vcpupin vcpu='23' cpuset='47'/>
+          <emulatorpin cpuset='0,24'/>
+          <iothreadpin iothread='1' cpuset='2,4,26,28'/>
+        </cputune>
         <os>
           <type arch='x86_64' machine='pc-q35-7.0'>hvm</type>
           <loader readonly='yes' type='pflash'>/run/libvirt/nix-ovmf/OVMF_CODE.fd</loader>
@@ -21,7 +50,9 @@
           <apic/>
           <vmport state='off'/>
         </features>
-        <cpu mode='host-model' check='partial'/>
+        <cpu mode='host-passthrough'>
+          <topology sockets='1' cores='12' threads='2'/>
+        </cpu>
         <clock offset='utc'>
           <timer name='rtc' tickpolicy='catchup'/>
           <timer name='pit' tickpolicy='delay'/>
