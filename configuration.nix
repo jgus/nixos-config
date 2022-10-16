@@ -18,5 +18,7 @@
       #./clamav.nix # needs .secrets/gmail-password.nix
 
       #./syncthing.nix
+
+      ./libvirt.nix
     ];
 }
