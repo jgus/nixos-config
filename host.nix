@@ -25,6 +25,5 @@
   networking = {
     hostName = "c240m3";
     hostId = "04b22318"; # head -c4 /dev/urandom | od -A none -t x4
-    interfaces.br0.macAddress = "A0:36:9F:51:D6:12";
   };
 }
