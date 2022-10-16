@@ -201,6 +201,59 @@
         </devices>
       </domain>
     '';
+    "vm/vm1/startpre.sh" = {
+      text = ''
+        #! /usr/bin/env bash
+        COUNT=0
+        while [ $COUNT -le 10 ]
+        do
+          ((COUNT++))
+          ${pkgs.libvirt}/bin/virsh connect 2>/dev/null
+          [ $? -eq 0 ] && exit 0 || sleep 1
+        done
+        exit 1
+      '';
+      mode = "0555";
+    };
+    "vm/vm1/start.sh" = {
+      text = ''
+        #! /usr/bin/env bash
+        ${pkgs.zfs}/bin/zfs list rpool/varlib/vm/vm1 >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create rpool/varlib/vm/vm1
+        ${pkgs.zfs}/bin/zfs list rpool/varlib/vm/vm1/system >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create -b 8k -s -V 64G rpool/varlib/vm/vm1/system
+        ${pkgs.libvirt}/bin/virsh create /etc/vm/vm1.xml
+        for x in system.slice user.slice init.scope
+        do
+          systemctl set-property --runtime -- $x AllowedCPUs=0-11,24-35
+        done
+      '';
+      mode = "0555";
+    };
+    "vm/vm1/stop.sh" = {
+      text = ''
+        #! /usr/bin/env bash
+        for x in system.slice user.slice init.scope
+        do
+          systemctl set-property --runtime -- $x AllowedCPUs=0-47
+        done
+        export LANG=C
+        COUNT=0
+        while [ $COUNT -le 60 ]
+        do
+          STATE=$(${pkgs.libvirt}/bin/virsh domstate vm1 2>&1)
+          if [ "$STATE" = "running" ]
+          then
+            [ $(($COUNT % 15)) -eq 0 ] && ${pkgs.libvirt}/bin/virsh shutdown vm1
+            ((COUNT++))
+          elif [ "$STATE" = "shut off" ] || [ "${STATE::27}" = "error: failed to get domain" ]
+          then
+            exit 0
+          fi
+          sleep 1
+        done
+        exit 1
+      '';
+      mode = "0555";
+    };
   };
 
   systemd = {
@@ -210,7 +263,7 @@
         description = "Virtual Machine vm1";
         wantedBy = [ "multi-user.target" ];
         requires = [ "network-online.target" ];
-        path = with pkgs; [ libvirt zfs ];
+        path = with pkgs; [ bash libvirt zfs ];
         environment = {
           DOMAIN_DIR = "/etc/libvirt/qemu";
           DOMAIN = "vm1";
@@ -220,15 +273,11 @@
           PIDFile = "/run/libvirt/qemu/vm1.pid";
 
           # Check if libvirtd is responsive by connecting to it. This is not allowed to fail.
-          ExecStartPre = "${pkgs.bash}/bin/bash -c 'COUNT=0; while [ $COUNT -le 10 ]; do ((COUNT++)); ${pkgs.libvirt}/bin/virsh connect 2>/dev/null; [ $? -eq 0 ] && exit 0 || sleep 1; done; exit 1'";
+          ExecStartPre = "${pkgs.bash}/bin/bash -c /etc/vm/vm1/startpre.sh";
           # Create the domain.
-          ExecStart = ''
-            ${pkgs.bash}/bin/bash -c '${pkgs.zfs}/bin/zfs list rpool/varlib/vm/vm1 >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create rpool/varlib/vm/vm1; ${pkgs.zfs}/bin/zfs list rpool/varlib/vm/vm1/system >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create -b 8k -s -V 64G rpool/varlib/vm/vm1/system; ${pkgs.libvirt}/bin/virsh create /etc/vm/vm1.xml'
-            '';
+          ExecStart = "${pkgs.bash}/bin/bash -c /etc/vm/vm1/start.sh";
           # Shutdown the domain gracefully by sending ACPI shutdown event.
-          ExecStop = ''
-            ${pkgs.bash}/bin/bash -c 'export LANG=C; COUNT=0; while [ $COUNT -le 60 ]; do STATE=$(${pkgs.libvirt}/bin/virsh domstate vm1 2>&1); if [ "$STATE" = "running" ]; then [ $(($COUNT % 15)) -eq 0 ] && ${pkgs.libvirt}/bin/virsh shutdown vm1; ((COUNT++)); elif [ "$STATE" = "shut off" ] || [ "${STATE::27}" = "error: failed to get domain" ]; then exit 0; fi; sleep 1; done; exit 1'
-            '';
+          ExecStop = "${pkgs.bash}/bin/bash -c /etc/vm/vm1/stop.sh";
           # Set higher timeouts to allow for Exec commands to take longer.
           TimeoutStartSec = 90;
           TimeoutStopSec = 180;
