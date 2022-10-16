@@ -68,12 +68,13 @@
         <devices>
           <emulator>/run/libvirt/nix-emulators/qemu-system-x86_64</emulator>
           <disk type='block' device='disk'>
-            <driver name='qemu' type='raw'/>
+            <driver name='qemu' type='raw' discard="unmap"/>
             <source dev='/dev/zvol/rpool/varlib/vm/vm1/system'/>
             <target dev='sda' bus='scsi'/>
             <boot order='1'/>
             <address type='drive' controller='0' bus='0' target='0' unit='0'/>
           </disk>
+          <!--
           <disk type='file' device='cdrom'>
             <driver name='qemu' type='raw'/>
             <source file='/var/lib/images/Win11_22H2_English_x64v1.iso'/>
@@ -89,6 +90,7 @@
             <readonly/>
             <address type='drive' controller='0' bus='0' target='0' unit='2'/>
           </disk>
+          -->
           <controller type='usb' index='0' model='ich9-ehci1'>
             <address type='pci' domain='0x0000' bus='0x00' slot='0x1d' function='0x7'/>
           </controller>
