@@ -53,7 +53,7 @@
         <cpu mode='host-passthrough'>
           <topology sockets='1' cores='12' threads='2'/>
         </cpu>
-        <clock offset='utc'>
+        <clock offset='localtime'>
           <timer name='rtc' tickpolicy='catchup'/>
           <timer name='pit' tickpolicy='delay'/>
           <timer name='hpet' present='no'/>
