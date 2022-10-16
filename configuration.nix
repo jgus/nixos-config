@@ -20,5 +20,6 @@
       #./syncthing.nix
 
       ./libvirt.nix
+      ./vm-vm1.nix
     ];
 }
