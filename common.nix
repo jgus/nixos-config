@@ -34,8 +34,6 @@
   # $ nix search wget
   environment.systemPackages = with pkgs; [
     parted
-    git
-    tmux
   ];
 
   services = {
@@ -45,6 +43,15 @@
       enable = true;
       openFirewall = true;
     };
+  };
+
+  programs = {
+    command-not-found.enable = true;
+    git.enable = true;
+    git.lfs.enable = true;
+    htop.enable = true;
+    mosh.enable = true;
+    tmux.enable = true;
   };
 
   system = {
