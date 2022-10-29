@@ -34,18 +34,7 @@
         serviceConfig = {
           Type = "oneshot";
         };
-      };
-    };
-    timers = {
-      clamav-scan-all = {
-        enable = true;
-        wantedBy = [ "timers.target" ];
-        partOf = [ "clamav-scan-all.service" ];
-        timerConfig = {
-          OnCalendar = "daily";
-          Persistent = true;
-          Unit = "clamav-scan-all.service";
-        };
+        startAt = "daily";
       };
     };
   };

@@ -26,17 +26,7 @@
         serviceConfig = {
           Type = "oneshot";
         };
-      };
-    };
-    timers = {
-     zfs-auto-snapshot = {
-        wantedBy = [ "timers.target" ];
-        partOf = [ "zfs-auto-snapshot.service" ];
-        timerConfig = {
-          OnCalendar = "hourly";
-          Persistent = true;
-          Unit = "zfs-auto-snapshot.service";
-        };
+        startAt = "hourly";
       };
     };
   };
