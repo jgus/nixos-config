@@ -15,18 +15,7 @@
         serviceConfig = {
           Type = "oneshot";
         };
-      };
-    };
-    timers = {
-      offsite-c240m3 = {
-        enable = true;
-        wantedBy = [ "timers.target" ];
-        partOf = [ "offsite-c240m3.service" ];
-        timerConfig = {
-          OnCalendar = "daily";
-          Persistent = true;
-          Unit = "offsite-c240m3.service";
-        };
+        startAt = "daily";
       };
     };
   };

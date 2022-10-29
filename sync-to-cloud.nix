@@ -16,18 +16,7 @@
         serviceConfig = {
           Type = "oneshot";
         };
-      };
-    };
-    timers = {
-      sync-to-cloud = {
-        enable = false;
-        wantedBy = [ "timers.target" ];
-        partOf = [ "sync-to-cloud.service" ];
-        timerConfig = {
-          OnCalendar = "Sun 4:00";
-          Persistent = true;
-          Unit = "sync-to-cloud.service";
-        };
+        startAt = "Sun 4:00";
       };
     };
   };

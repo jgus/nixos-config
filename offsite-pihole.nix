@@ -17,18 +17,7 @@
         serviceConfig = {
           Type = "oneshot";
         };
-      };
-    };
-    timers = {
-      offsite-pihole = {
-        enable = true;
-        wantedBy = [ "timers.target" ];
-        partOf = [ "offsite-pihole.service" ];
-        timerConfig = {
-          OnCalendar = "daily";
-          Persistent = true;
-          Unit = "offsite-pihole.service";
-        };
+        startAt = "daily";
       };
     };
   };

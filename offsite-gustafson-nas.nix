@@ -15,18 +15,7 @@
         serviceConfig = {
           Type = "oneshot";
         };
-      };
-    };
-    timers = {
-      offsite-gustafson-nas = {
-        enable = true;
-        wantedBy = [ "timers.target" ];
-        partOf = [ "offsite-gustafson-nas.service" ];
-        timerConfig = {
-          OnCalendar = "daily";
-          Persistent = true;
-          Unit = "offsite-gustafson-nas.service";
-        };
+        startAt = "daily";
       };
     };
   };
