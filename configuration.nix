@@ -16,6 +16,7 @@
       ./zfs.nix
       ./clamav.nix
 
+      ./ddclient.nix
       ./wireguard.nix
       ./landing.nix
       #./syncthing.nix
