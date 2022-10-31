@@ -25,5 +25,9 @@
   networking = {
     hostName = "c240m3";
     hostId = "04b22318"; # head -c4 /dev/urandom | od -A none -t x4
+    defaultGateway = {
+      address = "172.22.0.1";
+      interface = "enp5s0f1";
+    };
   };
 }
