@@ -27,6 +27,6 @@
       ./libvirt.nix
       ./vm-vm1.nix
 
-      ./offsite-s3k1.nix
+      ./offsite-sm1.nix
     ];
 }
