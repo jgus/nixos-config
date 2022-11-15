@@ -8,7 +8,7 @@
   networking = {
     nat = {
       enable = true;
-      externalInterface = "enp5s0f1";
+      externalInterface = "enp10s0f1";
       internalInterfaces = [ "wg0" ];
     };
     firewall.allowedUDPPorts = [ 51820 ];

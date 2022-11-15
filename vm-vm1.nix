@@ -167,7 +167,7 @@
           </controller>
           <interface type='direct'>
             <mac address='52:54:00:6e:b4:bc'/>
-            <source dev='enp5s0f1' mode='bridge'/>
+            <source dev='enp10s0f1' mode='bridge'/>
             <model type='virtio'/>
             <address type='pci' domain='0x0000' bus='0x02' slot='0x00' function='0x0'/>
           </interface>
