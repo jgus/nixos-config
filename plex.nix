@@ -50,7 +50,6 @@
         requires = [ "network-online.target" ];
         path = [ pkgs.docker ];
         script = ''
-          docker pull lscr.io/linuxserver/plex
           docker run --rm --name plex \
             --net host \
             --gpus all \
@@ -68,6 +67,19 @@
         serviceConfig = {
           Restart = "on-failure";
         };
+      };
+      plex-update = {
+        path = [ pkgs.docker ];
+        script = ''
+          if docker pull lscr.io/linuxserver/plex | grep "Status: Downloaded"
+          then
+            systemctl restart plex
+          fi
+        '';
+        serviceConfig = {
+          Type = "oneshot";
+        };
+        startAt = "hourly";
       };
     };
   };

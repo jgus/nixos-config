@@ -47,6 +47,19 @@
             mysql:5.7
           '';
       };
+      web-db-update = {
+        path = [ pkgs.docker ];
+        script = ''
+          if docker pull mysql:5.7 | grep "Status: Downloaded"
+          then
+            systemctl restart web-db
+          fi
+        '';
+        serviceConfig = {
+          Type = "oneshot";
+        };
+        startAt = "hourly";
+      };
       web-db-admin = {
         enable = false;
         description = "Web DB Admin";
@@ -60,6 +73,19 @@
             -p 8101:80 \
             phpmyadmin/phpmyadmin
           '';
+      };
+      web-db-admin-update = {
+        path = [ pkgs.docker ];
+        script = ''
+          if docker pull phpmyadmin/phpmyadmin | grep "Status: Downloaded"
+          then
+            systemctl restart web-db-admin
+          fi
+        '';
+        serviceConfig = {
+          Type = "oneshot";
+        };
+        startAt = "hourly";
       };
       web-proxy = {
         enable = true;
@@ -89,6 +115,19 @@
         serviceConfig = {
           Restart = "on-failure";
         };
+      };
+      web-proxy-update = {
+        path = [ pkgs.docker ];
+        script = ''
+          if docker pull lscr.io/linuxserver/swag | grep "Status: Downloaded"
+          then
+            systemctl restart web-proxy
+          fi
+        '';
+        serviceConfig = {
+          Type = "oneshot";
+        };
+        startAt = "hourly";
       };
     };
   };

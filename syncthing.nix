@@ -17,7 +17,6 @@
         requires = [ "network-online.target" ];
         path = [ pkgs.docker ];
         script = ''
-          docker pull lscr.io/linuxserver/syncthing
           docker run --rm --name syncthing \
             -p 8384:8384 \
             -p 22000:22000 \
@@ -32,6 +31,19 @@
         serviceConfig = {
           Restart = "on-failure";
         };
+      };
+      syncthing-update = {
+        path = [ pkgs.docker ];
+        script = ''
+          if docker pull lscr.io/linuxserver/syncthing | grep "Status: Downloaded"
+          then
+            systemctl restart syncthing
+          fi
+        '';
+        serviceConfig = {
+          Type = "oneshot";
+        };
+        startAt = "hourly";
       };
     };
   };

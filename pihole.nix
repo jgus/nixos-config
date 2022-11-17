@@ -26,7 +26,6 @@
         requires = [ "network-online.target" ];
         path = [ pkgs.docker ];
         script = ''
-          docker pull pihole/pihole || true
           docker stop pihole || true
           docker rm pihole || true
           docker create --name pihole \
@@ -49,6 +48,19 @@
         serviceConfig = {
           Restart = "on-failure";
         };
+      };
+      pihole-update = {
+        path = [ pkgs.docker ];
+        script = ''
+          if docker pull pihole/pihole | grep "Status: Downloaded"
+          then
+            systemctl restart pihole
+          fi
+        '';
+        serviceConfig = {
+          Type = "oneshot";
+        };
+        startAt = "hourly";
       };
     };
   };
