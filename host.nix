@@ -29,5 +29,6 @@
       address = "172.22.0.1";
       interface = "enp10s0f1";
     };
+    nameservers = [ "172.22.0.2" "172.22.0.3" ];
   };
 }
