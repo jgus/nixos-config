@@ -29,6 +29,15 @@
       address = "172.22.0.1";
       interface = "enp10s0f1";
     };
-    nameservers = [ "172.22.0.2" "172.22.0.3" ];
+    nameservers = [
+      "192.168.22.2"
+      "1.1.1.1"
+      "1.0.0.1"
+    ];
+    hosts = {
+      "172.22.0.1" = [ "gateway.gustafson.me" "gateway" "router.gustafson.me" "router" ];
+      "192.168.22.2" = [ "pi.hole" "dhcp" "dhcp.gustafson.me" "dns" "dns.gustafson.me" ];
+      "172.22.1.3" = [ "sm1.gustafson.me" "sm1" "nas.gustafson.me" "syncthing" "syncthing.gustafson.me" "nas" ];
+    };
   };
 }
