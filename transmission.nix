@@ -16,7 +16,6 @@
         requires = [ "network-online.target" ];
         path = [ pkgs.docker ];
         script = ''
-          docker pull haugene/transmission-openvpn
           docker run --rm --name transmission \
             -p 9091:9091 \
             -e PUID=$(id -u josh) \
@@ -39,6 +38,19 @@
         serviceConfig = {
           Restart = "on-failure";
         };
+      };
+      transmission-update = {
+        path = [ pkgs.docker ];
+        script = ''
+          if docker pull haugene/transmission-openvpn | grep "Status: Downloaded"
+          then
+            systemctl restart transmission
+          fi
+        '';
+        serviceConfig = {
+          Type = "oneshot";
+        };
+        startAt = "hourly";
       };
     };
   };

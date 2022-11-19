@@ -22,7 +22,6 @@
         requires = [ "network-online.target" ];
         path = [ pkgs.docker ];
         script = ''
-          docker pull lscr.io/linuxserver/sonarr
           docker run --rm --name sonarr \
             -p 8989:8989 \
             -e PUID=$(id -u josh) \
@@ -36,6 +35,19 @@
         serviceConfig = {
           Restart = "on-failure";
         };
+      };
+      sonarr-update = {
+        path = [ pkgs.docker ];
+        script = ''
+          if docker pull lscr.io/linuxserver/sonarr | grep "Status: Downloaded"
+          then
+            systemctl restart sonarr
+          fi
+        '';
+        serviceConfig = {
+          Type = "oneshot";
+        };
+        startAt = "hourly";
       };
     };
   };

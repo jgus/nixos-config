@@ -22,7 +22,6 @@
         requires = [ "network-online.target" ];
         path = [ pkgs.docker ];
         script = ''
-          docker pull lscr.io/linuxserver/radarr
           docker run --rm --name radarr \
             -p 7878:7878 \
             -e PUID=$(id -u josh) \
@@ -36,6 +35,19 @@
         serviceConfig = {
           Restart = "on-failure";
         };
+      };
+      radarr-update = {
+        path = [ pkgs.docker ];
+        script = ''
+          if docker pull lscr.io/linuxserver/radarr | grep "Status: Downloaded"
+          then
+            systemctl restart radarr
+          fi
+        '';
+        serviceConfig = {
+          Type = "oneshot";
+        };
+        startAt = "hourly";
       };
     };
   };

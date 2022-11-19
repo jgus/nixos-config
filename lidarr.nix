@@ -22,7 +22,6 @@
         requires = [ "network-online.target" ];
         path = [ pkgs.docker ];
         script = ''
-          docker pull lscr.io/linuxserver/lidarr
           docker run --rm --name lidarr \
             -p 8686:8686 \
             -e PUID=$(id -u josh) \
@@ -36,6 +35,19 @@
         serviceConfig = {
           Restart = "on-failure";
         };
+      };
+      lidarr-update = {
+        path = [ pkgs.docker ];
+        script = ''
+          if docker pull lscr.io/linuxserver/lidarr | grep "Status: Downloaded"
+          then
+            systemctl restart lidarr
+          fi
+        '';
+        serviceConfig = {
+          Type = "oneshot";
+        };
+        startAt = "hourly";
       };
     };
   };
