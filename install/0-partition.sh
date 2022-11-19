@@ -50,7 +50,7 @@ then
     exit 0
 fi
 
-if [[ "${BOOT_SIZE}" == "100%" ]]
+if [[ "${SWAP_SIZE}" == "100%" ]]
 then
     echo "### Partitioning ${DEVICE} with swap partion only"
     parted ${DEVICE} -- mklabel gpt
