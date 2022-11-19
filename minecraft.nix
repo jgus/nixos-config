@@ -42,7 +42,7 @@
         requires = [ "network-online.target" ];
         path = [ pkgs.docker pkgs.zfs ];
         script = ''
-          zfs list rpool/varlib/minecraft >/dev/null 2>&1 || ( zfs create rpool/varlib/minecraft && chown minecraft:minecraft /var/lib/minecraft )
+          zfs list s/varlib/minecraft >/dev/null 2>&1 || ( zfs create s/varlib/minecraft && chown minecraft:minecraft /var/lib/minecraft )
 
           docker build \
             --build-arg uid=$(id -u minecraft) \

@@ -7,7 +7,7 @@
     piholeSetup.text = ''
       ${pkgs.docker}/bin/docker network create -d macvlan --subnet=172.22.0.0/15 --gateway=172.22.0.1 --ip-range=172.22.202.0/16 -o parent=enp10s0f1 macnet >/dev/null 2>&1 || true
       ${pkgs.docker}/bin/docker network create -d bridge --subnet=192.168.22.0/24 bridge2 >/dev/null 2>&1 || true
-      ${pkgs.zfs}/bin/zfs list rpool/varlib/pihole >/dev/null 2>&1 || ( ${pkgs.zfs}/bin/zfs create rpool/varlib/pihole )
+      ${pkgs.zfs}/bin/zfs list s/varlib/pihole >/dev/null 2>&1 || ( ${pkgs.zfs}/bin/zfs create s/varlib/pihole )
       mkdir -p /var/lib/pihole/etc-pihole
       mkdir -p /var/lib/pihole/etc-dnsmasq.d
     '';

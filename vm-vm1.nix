@@ -69,7 +69,7 @@
           <emulator>/run/libvirt/nix-emulators/qemu-system-x86_64</emulator>
           <disk type='block' device='disk'>
             <driver name='qemu' type='raw' discard="unmap"/>
-            <source dev='/dev/zvol/rpool/varlib/vm/vm1/system'/>
+            <source dev='/dev/zvol/s/varlib/vm/vm1/system'/>
             <target dev='sda' bus='scsi'/>
             <boot order='1'/>
             <address type='drive' controller='0' bus='0' target='0' unit='0'/>
@@ -220,8 +220,8 @@
     "vm/vm1/start.sh" = {
       text = ''
         #! /usr/bin/env bash
-        ${pkgs.zfs}/bin/zfs list rpool/varlib/vm/vm1 >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create rpool/varlib/vm/vm1
-        ${pkgs.zfs}/bin/zfs list rpool/varlib/vm/vm1/system >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create -b 8k -s -V 64G rpool/varlib/vm/vm1/system
+        ${pkgs.zfs}/bin/zfs list s/varlib/vm/vm1 >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create s/varlib/vm/vm1
+        ${pkgs.zfs}/bin/zfs list s/varlib/vm/vm1/system >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create -b 8k -s -V 64G s/varlib/vm/vm1/system
         ${pkgs.libvirt}/bin/virsh create /etc/vm/vm1.xml
         for x in system.slice user.slice init.scope
         do

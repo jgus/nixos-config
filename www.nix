@@ -14,10 +14,10 @@
 
   system.activationScripts = {
     web-proxy-setup.text = ''
-      ${pkgs.zfs}/bin/zfs list rpool/varlib/web_db_data >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create rpool/varlib/web_db_data
-      ${pkgs.zfs}/bin/zfs list rpool/varlib/web_db_admin_sessions >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create rpool/varlib/web_db_admin_sessions
-      ${pkgs.zfs}/bin/zfs list rpool/varlib/web_proxy_config >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create rpool/varlib/web_proxy_config
-      ${pkgs.zfs}/bin/zfs list rpool/varlib/www >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create rpool/varlib/www
+      ${pkgs.zfs}/bin/zfs list s/varlib/web_db_data >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create s/varlib/web_db_data
+      ${pkgs.zfs}/bin/zfs list s/varlib/web_db_admin_sessions >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create s/varlib/web_db_admin_sessions
+      ${pkgs.zfs}/bin/zfs list s/varlib/web_proxy_config >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create s/varlib/web_proxy_config
+      ${pkgs.zfs}/bin/zfs list s/varlib/www >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create s/varlib/www
     '';
   };
 

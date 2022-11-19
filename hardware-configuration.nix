@@ -33,23 +33,13 @@
       fsType = "zfs"; options = [ "zfsutil" ];
     };
 
+  fileSystems."/nix" =
+    { device = "rpool/nix";
+      fsType = "zfs"; options = [ "zfsutil" ];
+    };
+
   fileSystems."/boot" =
-    { device = "/dev/disk/by-uuid/2B56-F406";
-      fsType = "vfat";
-    };
-
-  fileSystems."/boot/1" =
-    { device = "/dev/disk/by-uuid/2B60-711B";
-      fsType = "vfat";
-    };
-
-  fileSystems."/boot/2" =
-    { device = "/dev/disk/by-uuid/2B64-0EB5";
-      fsType = "vfat";
-    };
-
-  fileSystems."/boot/3" =
-    { device = "/dev/disk/by-uuid/2B66-E13C";
+    { device = "/dev/disk/by-uuid/E068-AA67";
       fsType = "vfat";
     };
 
