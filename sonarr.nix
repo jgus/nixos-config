@@ -33,7 +33,7 @@
             lscr.io/linuxserver/sonarr
           '';
         serviceConfig = {
-          Restart = "on-failure";
+          Restart = "always";
         };
       };
       sonarr-update = {

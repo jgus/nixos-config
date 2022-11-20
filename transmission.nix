@@ -36,7 +36,7 @@
             haugene/transmission-openvpn
           '';
         serviceConfig = {
-          Restart = "on-failure";
+          Restart = "always";
         };
       };
       transmission-update = {

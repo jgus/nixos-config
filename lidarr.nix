@@ -33,7 +33,7 @@
             lscr.io/linuxserver/lidarr
           '';
         serviceConfig = {
-          Restart = "on-failure";
+          Restart = "always";
         };
       };
       lidarr-update = {
