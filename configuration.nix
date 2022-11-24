@@ -11,11 +11,13 @@
       ./host.nix
       ./users.nix
 
-      #./nvidia.nix
+      ./backup-gateway-client.nix
+      ./dyndns.nix
+      ./plex.nix
+      ./samba.nix
       ./vscode.nix
       ./zfs.nix
-      #./clamav.nix # needs .secrets/gmail-password.nix
 
-      #./syncthing.nix
+      ./clamav.nix
     ];
 }

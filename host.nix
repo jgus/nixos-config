@@ -1,10 +1,10 @@
 { ... }:
 
 {
-  time.timeZone = "America/Denver";
+  time.timeZone = "America/Los_Angeles";
 
   networking = {
-    hostName = "TODO";
-    hostId = "HOSTID"; # head -c4 /dev/urandom | od -A none -t x4
+    hostName = "gustafson-nas";
+    hostId = "98c0a40d"; # head -c4 /dev/urandom | od -A none -t x4
   };
 }
