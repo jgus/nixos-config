@@ -9,7 +9,7 @@
 
   services = {
     clamav = {
-      daemon.enable = true;
+      daemon.enable = flase; # use clamscan instead of clamdscan
       updater.enable = true;
     };
   };
