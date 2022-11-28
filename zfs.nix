@@ -7,7 +7,7 @@
     ];
     zfs = {
       devNodes = "/dev/disk/by-path";
-      extraPools = [ "rpool" "s" "d" ];
+      extraPools = [ "rpool" "n" "s" "d" ];
     };
   };
 

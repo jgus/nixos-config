@@ -34,7 +34,7 @@
     };
 
   fileSystems."/nix" =
-    { device = "rpool/nix";
+    { device = "n/nix";
       fsType = "zfs"; options = [ "zfsutil" ];
     };
 
