@@ -21,7 +21,7 @@
       ${pkgs.zfs}/bin/zfs list s/varlib/dav >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create s/varlib/dav
       mkdir -p /var/lib/dav/tmp
       mkdir -p /var/lib/dav/files
-      chmod -R www:www /var/lib/dav
+      chown -R www:www /var/lib/dav
     '';
   };
 
