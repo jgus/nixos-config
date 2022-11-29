@@ -18,6 +18,10 @@
       ${pkgs.zfs}/bin/zfs list s/varlib/web_db_admin_sessions >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create s/varlib/web_db_admin_sessions
       ${pkgs.zfs}/bin/zfs list s/varlib/web_proxy_config >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create s/varlib/web_proxy_config
       ${pkgs.zfs}/bin/zfs list s/varlib/www >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create s/varlib/www
+      ${pkgs.zfs}/bin/zfs list s/varlib/dav >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create s/varlib/dav
+      mkdir -p /var/lib/dav/tmp
+      mkdir -p /var/lib/dav/files
+      chmod -R www:www /var/lib/dav
     '';
   };
 
@@ -106,6 +110,7 @@
             -v /var/lib/web_proxy_config:/config \
             -v /var/lib/www:/config/www \
             -v /shares/www/photos/Published:/config/www/published:ro \
+            -v /var/lib/dav:/config/www/dav \
             --tmpfs /config/www/Photos/cache \
             --link web-db:db \
             -p 80:80 \
