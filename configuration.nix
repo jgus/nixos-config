@@ -16,7 +16,7 @@
       ./zfs.nix
       ./clamav.nix
 
-      ./pihole.nix
+      #./pihole.nix
       ./ddclient.nix
       ./wireguard.nix
       ./landing.nix

@@ -9,7 +9,7 @@
     ipv4.addresses = [
       {
         address = "172.22.1.9";
-        prefixLength = 15;
+        prefixLength = 16;
       }
     ];
   };
