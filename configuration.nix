@@ -22,6 +22,7 @@
       ./landing.nix
       #./syncthing.nix
       ./www.nix
+      ./ntp.nix
       ./plex.nix
       ./minecraft.nix
 
