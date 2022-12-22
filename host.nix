@@ -23,7 +23,7 @@
   };
 
   networking = {
-    hostName = "c240m3";
+    hostName = "c1";
     hostId = "04b22318"; # head -c4 /dev/urandom | od -A none -t x4
   };
 }
