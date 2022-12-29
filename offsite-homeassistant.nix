@@ -10,7 +10,7 @@
   systemd = {
     services = {
       offsite-homeassistant = {
-        enable = false;
+        enable = true;
         path = with pkgs; [
           openssh
           rsync
@@ -22,7 +22,7 @@
             --exclude=/dev \
             --exclude=/proc \
             --exclude=/sys \
-            root@homeassistant:/ /d/offsite/homeassistant
+            root@ha:/ /d/offsite/homeassistant
         '';
         serviceConfig = {
           Type = "oneshot";
