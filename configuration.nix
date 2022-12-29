@@ -22,6 +22,7 @@
       ./landing.nix
       ./samba.nix
       ./syncthing.nix
+      ./transmission.nix
       ./www.nix
       ./ntp.nix
       ./plex.nix
