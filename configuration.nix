@@ -35,5 +35,8 @@
       ./vm-vm1.nix
 
       ./offsite-sm1.nix
+      ./offsite-homeassistant.nix
+      #./offsite-gustafson-nas.nix
+      #./sync-to-cloud.nix
     ];
 }
