@@ -85,4 +85,6 @@
       done
     '';
   };
+
+  security.polkit.enable = true;
 }
