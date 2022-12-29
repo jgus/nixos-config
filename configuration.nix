@@ -20,16 +20,8 @@
 
       ./user-plex.nix
       ./user-www.nix
-      ./samba.nix
-      ./syncthing.nix
-      ./transmission.nix
-      ./lidarr.nix
-      ./radarr.nix
-      ./sonarr.nix
 
       ./offsite-c1.nix
-      ./offsite-homeassistant.nix
       ./offsite-gustafson-nas.nix
-      #./sync-to-cloud.nix
     ];
 }

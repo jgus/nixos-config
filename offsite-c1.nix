@@ -4,6 +4,7 @@
   systemd = {
     services = {
       offsite-c1 = {
+        enable = false;
         path = with pkgs; [
           openssh
           zfs

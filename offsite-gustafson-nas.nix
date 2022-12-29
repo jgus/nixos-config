@@ -4,6 +4,7 @@
   systemd = {
     services = {
       offsite-gustafson-nas = {
+        enable = false;
         path = with pkgs; [
           openssh
           zfs
