@@ -20,6 +20,7 @@
       ./ddclient.nix
       ./wireguard.nix
       ./landing.nix
+      ./samba.nix
       #./syncthing.nix
       ./www.nix
       ./ntp.nix
