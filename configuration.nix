@@ -21,7 +21,7 @@
       ./wireguard.nix
       ./landing.nix
       ./samba.nix
-      #./syncthing.nix
+      ./syncthing.nix
       ./www.nix
       ./ntp.nix
       ./plex.nix

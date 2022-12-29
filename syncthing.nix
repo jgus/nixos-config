@@ -8,6 +8,13 @@
     allowedUDPPorts = [ 21027 ];
   };
 
+  system.activationScripts = {
+    syncthingSetup.text = ''
+      ${pkgs.zfs}/bin/zfs list s/varlib/syncthing >/dev/null 2>&1 || ( ${pkgs.zfs}/bin/zfs create s/varlib/syncthing && chown josh:users /var/lib/syncthing )
+      ${pkgs.zfs}/bin/zfs list s/varlib/syncthing/index-v0.14.0.db >/dev/null 2>&1 || ( ${pkgs.zfs}/bin/zfs create s/varlib/syncthing/index-v0.14.0.db && chown josh:users /var/lib/syncthing/index-v0.14.0.db )
+    '';
+  };
+
   systemd = {
     services = {
       syncthing = {
@@ -26,10 +33,15 @@
             -e TZ=$(timedatectl show -p Timezone --value) \
             -e UMASK_SET=002 \
             -v /var/lib/syncthing:/config \
+            -v /home/josh/sync:/shares/Sync \
+            -v /d/photos:/shares/Photos \
+            -v /d/software/Tools:/shares/Tools \
+            -v /d/media/Comics:/shares/Comics \
+            -v /d/media/Music:/shares/Music \
             lscr.io/linuxserver/syncthing
           '';
         serviceConfig = {
-          Restart = "on-failure";
+          Restart = "always";
         };
       };
       syncthing-update = {
