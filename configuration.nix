@@ -22,11 +22,14 @@
       ./landing.nix
       ./samba.nix
       ./syncthing.nix
-      ./transmission.nix
       ./www.nix
       ./ntp.nix
       ./plex.nix
       ./minecraft.nix
+      ./transmission.nix
+      ./lidarr.nix
+      ./radarr.nix
+      ./sonarr.nix
 
       ./libvirt.nix
       ./vm-vm1.nix
