@@ -18,27 +18,6 @@
     '';
   };
 
-  environment.etc = {
-    ".secrets/plex-smb".source = ./.secrets/plex-smb;
-  };
-
-  fileSystems."/shares/plex/media" = {
-      device = "//nas/Media";
-      fsType = "cifs";
-      options = let
-        # this line prevents hanging on network split
-        automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s";
-      in ["${automount_opts},credentials=/etc/.secrets/plex-smb,uid=${toString(config.users.users.plex.uid)},gid=${toString(config.users.groups.plex.gid)}"];
-  };
-  fileSystems."/shares/plex/photos" = {
-      device = "//nas/Photos";
-      fsType = "cifs";
-      options = let
-        # this line prevents hanging on network split
-        automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s";
-      in ["${automount_opts},credentials=/etc/.secrets/plex-smb,uid=${toString(config.users.users.plex.uid)},gid=${toString(config.users.groups.plex.gid)}"];
-  };
-
   networking.firewall.allowedTCPPorts = [ 32400 ];
 
   systemd = {
@@ -59,8 +38,8 @@
             -e TZ="$(timedatectl show -p Timezone --value)" \
             -e VERSION=latest \
             -v /var/lib/plex:/config \
-            -v /shares/plex/media:/media \
-            -v /shares/plex/photos:/shares/photos \
+            -v /d/media:/media \
+            -v /d/photos:/shares/photos \
             --tmpfs /tmp \
             lscr.io/linuxserver/plex
           '';

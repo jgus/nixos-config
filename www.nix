@@ -25,19 +25,6 @@
     '';
   };
 
-  environment.etc = {
-    ".secrets/www-smb".source = ./.secrets/www-smb;
-  };
-
-  fileSystems."/shares/www/photos" = {
-      device = "//nas/Photos";
-      fsType = "cifs";
-      options = let
-        # this line prevents hanging on network split
-        automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s";
-      in ["${automount_opts},credentials=/etc/.secrets/www-smb,uid=${toString(config.users.users.www.uid)},gid=${toString(config.users.groups.www.gid)}"];
-  };
-
   systemd = {
     services = {
       web-db = {
@@ -109,7 +96,7 @@
             -e TZ=$(timedatectl show -p Timezone --value) \
             -v /var/lib/web_proxy_config:/config \
             -v /var/lib/www:/config/www \
-            -v /shares/www/photos/Published:/config/www/published:ro \
+            -v /d/photos/Published:/config/www/published:ro \
             -v /var/lib/dav:/config/www/dav \
             --tmpfs /config/www/Photos/cache \
             --link web-db:db \
