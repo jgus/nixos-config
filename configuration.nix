@@ -27,6 +27,7 @@
       ./plex.nix
       ./minecraft.nix
       ./transmission.nix
+      ./sabnzbd.nix
       ./prowlarr.nix
       ./lidarr.nix
       ./radarr.nix

@@ -29,6 +29,7 @@
             -e TZ=$(timedatectl show -p Timezone --value) \
             -v /var/lib/sonarr:/config \
             -v /d/scratch/peer:/peer \
+            -v /d/scratch/usenet:/usenet \
             -v /d/media:/media \
             lscr.io/linuxserver/sonarr
           '';
