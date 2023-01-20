@@ -25,7 +25,7 @@
     shares = {
       Media = { path = "/d/media"; browseable = "yes"; "read only" = "no"; };
       Backup = { path = "/d/backup"; browseable = "yes"; "read only" = "no"; };
-      Peer = { path = "/d/scratch/peer"; browseable = "yes"; "read only" = "no"; };
+      Scratch = { path = "/d/scratch"; browseable = "yes"; "read only" = "no"; };
       Photos = { path = "/d/photos"; browseable = "yes"; "read only" = "no"; };
       Projects = { path = "/d/projects"; browseable = "yes"; "read only" = "no"; };
       Software = { path = "/d/software"; browseable = "yes"; "read only" = "no"; };
