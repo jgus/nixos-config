@@ -33,6 +33,7 @@
       Temp = { path = "/tmp/share"; browseable = "yes"; "read only" = "no"; };
       Brown = { path = "/d/external/brown"; browseable = "yes"; "read only" = "no"; };
       Gustafson = { path = "/d/external/Gustafson"; browseable = "yes"; "read only" = "no"; };
+      www = { path = "/var/lib/www"; browseable = "yes"; "read only" = "no"; };
     };
   };
 }
