@@ -13,7 +13,7 @@
   };
 
   system.activationScripts = {
-    web-proxy-setup.text = ''
+    web-swag-setup.text = ''
       ${pkgs.zfs}/bin/zfs list s/varlib/web_db_data >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create s/varlib/web_db_data
       ${pkgs.zfs}/bin/zfs list s/varlib/web_db_admin_sessions >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create s/varlib/web_db_admin_sessions
       ${pkgs.zfs}/bin/zfs list s/varlib/web_proxy_config >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create s/varlib/web_proxy_config
@@ -78,23 +78,25 @@
         };
         startAt = "hourly";
       };
-      web-proxy = {
+      web-swag = {
         enable = true;
         description = "Web Service & Proxy";
         wantedBy = [ "multi-user.target" ];
         requires = [ "network-online.target" "web-db.service" ];
         path = [ pkgs.docker ];
         script = ''
-          docker run --rm --name web-proxy \
+          docker run --rm --name web-swag \
             -e URL=gustafson.me \
             -e EXTRA_DOMAINS=gushome.org \
             -e SUBDOMAINS=www, \
             -e VALIDATION=http \
-            -e EMAIL=j@gustafson.me \
+            -e EMAIL=joshgstfsn@gmail.com \
             -e PUID=$(id -u www) \
             -e PGID=$(id -g www) \
             -e TZ=$(timedatectl show -p Timezone --value) \
-            -v /var/lib/web_proxy_config:/config \
+            --tmpfs /config \
+            -v /etc/nixos/www/site-confs/default.conf:/config/nginx/site-confs/default.conf \
+            -v /etc/nixos/www/location-confs:/config/nginx/location-confs \
             -v /var/lib/www:/config/www \
             -v /d/photos/Published:/config/www/published:ro \
             -v /var/lib/dav:/config/www/dav \
@@ -108,12 +110,12 @@
           Restart = "on-failure";
         };
       };
-      web-proxy-update = {
+      web-swag-update = {
         path = [ pkgs.docker ];
         script = ''
           if docker pull lscr.io/linuxserver/swag | grep "Status: Downloaded"
           then
-            systemctl restart web-proxy
+            systemctl restart web-swag
           fi
         '';
         serviceConfig = {
