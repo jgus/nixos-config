@@ -34,6 +34,7 @@
       Brown = { path = "/d/external/brown"; browseable = "yes"; "read only" = "no"; };
       Gustafson = { path = "/d/external/Gustafson"; browseable = "yes"; "read only" = "no"; };
       www = { path = "/var/lib/www"; browseable = "yes"; "read only" = "no"; };
+      dav = { path = "/var/lib/dav"; browseable = "yes"; "read only" = "no"; };
     };
   };
 }
