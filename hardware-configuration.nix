@@ -14,22 +14,22 @@
   boot.extraModulePackages = [ ];
 
   fileSystems."/" =
-    { device = "rpool";
+    { device = "r";
       fsType = "zfs"; options = [ "zfsutil" ];
     };
 
   fileSystems."/etc/nixos" =
-    { device = "rpool/nixos";
+    { device = "r/nixos";
       fsType = "zfs"; options = [ "zfsutil" ];
     };
 
   fileSystems."/home" =
-    { device = "rpool/home";
+    { device = "r/home";
       fsType = "zfs"; options = [ "zfsutil" ];
     };
 
   fileSystems."/root" =
-    { device = "rpool/home/root";
+    { device = "r/home/root";
       fsType = "zfs"; options = [ "zfsutil" ];
     };
 
