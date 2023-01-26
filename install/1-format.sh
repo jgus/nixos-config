@@ -22,9 +22,9 @@ done
 
 zpool create -f "${ZPOOL_OPTS[@]}" r mirror "${DEVS[@]}"
 
-zfs create                                   -o mountpoint=/etc/nixos               r/nixos
-zfs create                                                                          r/home
-zfs create                                   -o mountpoint=/root                    r/home/root
+zfs create -o mountpoint=/etc/nixos r/nixos
+zfs create                          r/home
+zfs create -o mountpoint=/root      r/home/root
 
 echo "### Formatting boot"
 mkfs.fat -F 32 -n boot0 /dev/disk/by-partlabel/boot0
