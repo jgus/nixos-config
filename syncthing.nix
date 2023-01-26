@@ -10,8 +10,8 @@
 
   system.activationScripts = {
     syncthingSetup.text = ''
-      ${pkgs.zfs}/bin/zfs list s/varlib/syncthing >/dev/null 2>&1 || ( ${pkgs.zfs}/bin/zfs create s/varlib/syncthing && chown josh:users /var/lib/syncthing )
-      ${pkgs.zfs}/bin/zfs list s/varlib/syncthing/index-v0.14.0.db >/dev/null 2>&1 || ( ${pkgs.zfs}/bin/zfs create s/varlib/syncthing/index-v0.14.0.db && chown josh:users /var/lib/syncthing/index-v0.14.0.db )
+      ${pkgs.zfs}/bin/zfs list r/varlib/syncthing >/dev/null 2>&1 || ( ${pkgs.zfs}/bin/zfs create r/varlib/syncthing && chown josh:users /var/lib/syncthing )
+      ${pkgs.zfs}/bin/zfs list r/varlib/syncthing/index-v0.14.0.db >/dev/null 2>&1 || ( ${pkgs.zfs}/bin/zfs create r/varlib/syncthing/index-v0.14.0.db && chown josh:users /var/lib/syncthing/index-v0.14.0.db )
     '';
   };
 

@@ -5,7 +5,7 @@
 
   system.activationScripts = {
     docker-setup.text = ''
-      ${pkgs.zfs}/bin/zfs list s/varlib/lidarr >/dev/null 2>&1 || ( ${pkgs.zfs}/bin/zfs create s/varlib/lidarr && chown josh:plex /var/lib/lidarr )
+      ${pkgs.zfs}/bin/zfs list r/varlib/lidarr >/dev/null 2>&1 || ( ${pkgs.zfs}/bin/zfs create r/varlib/lidarr && chown josh:plex /var/lib/lidarr )
     '';
   };
 

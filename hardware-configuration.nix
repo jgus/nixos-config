@@ -33,11 +33,6 @@
       fsType = "zfs"; options = [ "zfsutil" ];
     };
 
-  fileSystems."/nix" =
-    { device = "n/nix";
-      fsType = "zfs"; options = [ "zfsutil" ];
-    };
-
   fileSystems."/boot" =
     { device = "/dev/disk/by-uuid/E068-AA67";
       fsType = "vfat";

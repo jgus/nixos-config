@@ -14,11 +14,11 @@
 
   system.activationScripts = {
     web-swag-setup.text = ''
-      ${pkgs.zfs}/bin/zfs list s/varlib/web_db_data >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create s/varlib/web_db_data
-      ${pkgs.zfs}/bin/zfs list s/varlib/web_db_admin_sessions >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create s/varlib/web_db_admin_sessions
-      ${pkgs.zfs}/bin/zfs list s/varlib/web_proxy_config >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create s/varlib/web_proxy_config
-      ${pkgs.zfs}/bin/zfs list s/varlib/www >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create s/varlib/www
-      ${pkgs.zfs}/bin/zfs list s/varlib/dav >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create s/varlib/dav
+      ${pkgs.zfs}/bin/zfs list r/varlib/web_db_data >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create r/varlib/web_db_data
+      ${pkgs.zfs}/bin/zfs list r/varlib/web_db_admin_sessions >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create r/varlib/web_db_admin_sessions
+      ${pkgs.zfs}/bin/zfs list r/varlib/web_proxy_config >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create r/varlib/web_proxy_config
+      ${pkgs.zfs}/bin/zfs list r/varlib/www >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create r/varlib/www
+      ${pkgs.zfs}/bin/zfs list r/varlib/dav >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create r/varlib/dav
       mkdir -p /var/lib/dav/tmp
       mkdir -p /var/lib/dav/files
       chown -R www:www /var/lib/dav
