@@ -34,8 +34,18 @@
     };
 
   fileSystems."/boot" =
-    { device = "/dev/disk/by-uuid/E068-AA67";
+    { device = "/dev/disk/by-uuid/396D-D483";
       fsType = "vfat";
+    };
+
+  fileSystems."/boot/1" =
+    { device = "/dev/disk/by-uuid/3978-B8DD";
+      fsType = "vfat";
+    };
+
+  fileSystems."/etc/nixos/.secrets" =
+    { device = "/boot/.secrets";
+      options = [ "bind" ];
     };
 
   # swapDevices =
