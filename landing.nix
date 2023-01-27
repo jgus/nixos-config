@@ -53,6 +53,7 @@
         script = ''
           rsync -arPL /etc/landing /tmp/
           rsync -arPL /etc/nixos/.secrets/landing /tmp/
+          chmod -R 400 /tmp/landing/etc/ssh
           chmod a+x /tmp/landing/docker/entrypoint.sh
           docker build -t ssh /tmp/landing/docker
           /bin/sh -c "docker run --rm --name landing \
