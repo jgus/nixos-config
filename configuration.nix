@@ -39,7 +39,7 @@
       ./offsite-sm1.nix
       ./offsite-homeassistant.nix
       #./offsite-gustafson-nas.nix
-      #./sync-to-cloud.nix
+      ./sync-to-cloud.nix
 
       ./python.nix
     ];

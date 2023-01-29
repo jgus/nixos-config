@@ -95,22 +95,29 @@ zfs_rclone_restore() {
 
 
 DATASETS=()
+DIRECTORIES=()
 for f in $(zfs list -H -o name -t filesystem)
 do
-    [[ "$(zfs get -H -o value autobackup:cloud-s3k1 ${f})" == "true" ]] || continue
+    [[ "$(zfs get -H -o value autobackup:cloud-$(hostname) ${f})" == "true" ]] || continue
     [[ "$(zfs get -H -o value canmount ${f})" != "off" ]] || continue
     DATASETS+=(${f})
 done
 
 for x in "${DATASETS[@]}"
 do
-    zfs_rclone_backup ${x}
+    # zfs_rclone_backup ${x}
+    zfs destroy ${x}@cloud >/dev/null 2>&1 || true
+    zfs snapshot ${x}@cloud
+    DIRECTORIES+=("$(zfs get -H -o value mountpoint ${x})/.zfs/snapshot/cloud")
 done
 
-DIRECTORIES=(/d/backup)
+# DIRECTORIES+=(/d/backup)
 for x in "${DIRECTORIES[@]}"
 do
-    rclone --config /etc/nixos/.secrets/rclone.conf sync -v "${x}" "backup-archive:sync${x}"
+    echo "##########"
+    echo "Pushing directory ${x%/.zfs/snapshot/cloud}"
+    echo "##########"
+    rclone --config /etc/nixos/.secrets/rclone.conf sync -v "${x}" "backup-archive:sync/$(hostname)/${x%/.zfs/snapshot/cloud}/_"
 done
 
 # zfs_rclone_restore bpool znap_2022-05-15-0900_daily d/scratch/bpool-test

@@ -4,10 +4,11 @@
   systemd = {
     services = {
       sync-to-cloud = {
-        enable = false;
+        enable = true;
         path = with pkgs; [
           bash
           gawk
+          hostname
           rclone
           zfs
         ];
