@@ -75,7 +75,7 @@
             <boot order="1"/>
             <address type="drive" controller="0" bus="0" target="0" unit="0"/>
           </disk>
-          <!-- -->
+          <!--
           <disk type="file" device="cdrom">
             <driver name="qemu" type="raw"/>
             <source file="/d/software/MSDN/Windows/Windows 11/Win11_22H2_English_x64v1.iso"/>
@@ -91,7 +91,7 @@
             <readonly/>
             <address type="drive" controller="0" bus="0" target="0" unit="2"/>
           </disk>
-          <!-- -->
+          -->
           <controller type="scsi" index="0" model="virtio-scsi"/>
           <controller type="sata" index="0"/>
           <controller type="virtio-serial" index="0"/>
