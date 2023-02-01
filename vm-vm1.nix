@@ -146,7 +146,7 @@
       text = ''
         #! /usr/bin/env bash
         ${pkgs.zfs}/bin/zfs list r/varlib/vm/vm1 >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create r/varlib/vm/vm1
-        ${pkgs.zfs}/bin/zfs list r/varlib/vm/vm1/system >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create -b 8k -s -V 256G r/varlib/vm/vm1/system
+        ${pkgs.zfs}/bin/zfs list r/varlib/vm/vm1/system >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create -b 8k -s -V 128G r/varlib/vm/vm1/system
         ${pkgs.libvirt}/bin/virsh create /etc/vm/vm1.xml
         for x in system.slice user.slice init.scope
         do
