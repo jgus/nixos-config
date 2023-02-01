@@ -100,6 +100,11 @@
             <source dev="enp5s0f1" mode="bridge"/>
             <model type="virtio"/>
           </interface>
+          <interface type="network">
+            <mac address="d4:7b:31:69:c4:1d"/>
+            <source network="local"/>
+            <model type="virtio"/>
+          </interface>
           <channel type="spicevmc">
             <target type="virtio" name="com.redhat.spice.0"/>
             <address type="virtio-serial" controller="0" bus="0" port="1"/>
