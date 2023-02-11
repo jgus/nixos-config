@@ -44,6 +44,8 @@
         script = ''
           zfs list r/varlib/minecraft >/dev/null 2>&1 || ( zfs create r/varlib/minecraft && chown minecraft:minecraft /var/lib/minecraft )
 
+          docker container stop minecraft >/dev/null 2>&1 || true ; \
+
           docker build \
             --build-arg uid=$(id -u minecraft) \
             --build-arg gid=$(id -g minecraft) \

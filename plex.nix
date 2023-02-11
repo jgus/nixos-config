@@ -29,6 +29,7 @@
         requires = [ "network-online.target" ];
         path = [ pkgs.docker ];
         script = ''
+          docker container stop plex >/dev/null 2>&1 || true ; \
           docker run --rm --name plex \
             --net host \
             --gpus all \

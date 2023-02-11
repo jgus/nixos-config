@@ -22,6 +22,7 @@
         requires = [ "network-online.target" ];
         path = [ pkgs.docker ];
         script = ''
+          docker container stop radarr >/dev/null 2>&1 || true ; \
           docker run --rm --name radarr \
             -p 7878:7878 \
             -e PUID=$(id -u josh) \

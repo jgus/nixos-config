@@ -22,6 +22,7 @@
         requires = [ "network-online.target" ];
         path = [ pkgs.docker ];
         script = ''
+          docker container stop prowlarr >/dev/null 2>&1 || true ; \
           docker run --rm --name prowlarr \
             -p 9696:9696 \
             -e PUID=$(id -u josh) \

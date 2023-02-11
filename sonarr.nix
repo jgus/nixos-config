@@ -22,6 +22,7 @@
         requires = [ "network-online.target" ];
         path = [ pkgs.docker ];
         script = ''
+          docker container stop sonarr >/dev/null 2>&1 || true ; \
           docker run --rm --name sonarr \
             -p 8989:8989 \
             -e PUID=$(id -u josh) \

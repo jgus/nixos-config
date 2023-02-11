@@ -22,6 +22,7 @@
         requires = [ "network-online.target" ];
         path = [ pkgs.docker ];
         script = ''
+          docker container stop sabnzbd >/dev/null 2>&1 || true ; \
           docker run --rm --name sabnzbd \
             -p 8080:8080 \
             -e PUID=$(id -u josh) \

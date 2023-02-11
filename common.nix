@@ -69,10 +69,15 @@
     };
   };
 
-  nix.gc = {
-    automatic = true;
-    persistent = true;
-    options = "--delete-older-than 30d";
+  nix = {
+    gc = {
+      automatic = true;
+      persistent = true;
+      options = "--delete-older-than 30d";
+    };
+    extraOptions = ''
+        experimental-features = nix-command flakes
+    '';
   };
 
   system.activationScripts = {
