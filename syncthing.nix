@@ -17,6 +17,7 @@
         requires = [ "network-online.target" ];
         path = [ pkgs.docker ];
         script = ''
+          docker container stop syncthing >/dev/null 2>&1 || true ; \
           docker run --rm --name syncthing \
             -p 8384:8384 \
             -p 22000:22000 \
