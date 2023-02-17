@@ -2,11 +2,6 @@
 
 {
   boot = {
-    loader = {
-      systemd-boot.enable = true;
-      efi.canTouchEfiVariables = true;
-      timeout = 1;
-    };
     tmpOnTmpfs = true;
     supportedFilesystems = [ "ntfs" ];
   };
@@ -61,7 +56,7 @@
     # this value at the release version of the first install of this system.
     # Before changing this value read the documentation for this option
     # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-    stateVersion = "22.05"; # Did you read the comment?
+    stateVersion = "22.11"; # Did you read the comment?
 
     autoUpgrade = {
       enable = true;
@@ -77,17 +72,6 @@
     };
     extraOptions = ''
         experimental-features = nix-command flakes
-    '';
-  };
-
-  system.activationScripts = {
-    syncBoot.text = ''
-      i=1
-      while mountpoint -q /boot/''${i}
-      do
-          ${pkgs.rsync}/bin/rsync -arqx --delete /boot/ /boot/''${i}/
-          ((i+=1))
-      done
     '';
   };
 }
