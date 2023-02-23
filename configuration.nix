@@ -8,6 +8,7 @@
       ./interfaces.nix
 
       ./common.nix
+      ./x86.nix
       ./host.nix
       ./users.nix
 
