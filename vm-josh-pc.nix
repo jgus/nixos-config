@@ -73,6 +73,13 @@
           <apic/>
           <vmport state="off"/>
           <smm state="on"/>
+          <hyperv>
+            <vendor_id state='on' value='randomid'/>
+          </hyperv>
+          <kvm>
+            <hidden state='on'/>
+          </kvm>
+          <ioapic driver='kvm'/>
         </features>
         <cpu mode="host-passthrough">
           <topology sockets="1" cores="16" threads="2"/>
@@ -134,26 +141,51 @@
             <source network="local"/>
             <model type="virtio"/>
           </interface>
+          <tpm model="tpm-tis">
+            <backend type="emulator" version="2.0"/>
+          </tpm>
+          <memballoon model="virtio"/>
+          <!-- -->
+          <video>
+            <model type="qxl" ram="65536" vram="65536" vgamem="16384" heads="1" primary="yes"/>
+          </video>
+          <graphics type="spice" autoport="yes">
+            <listen type="address"/>
+          </graphics>
           <channel type="spicevmc">
             <target type="virtio" name="com.redhat.spice.0"/>
             <address type="virtio-serial" controller="0" bus="0" port="1"/>
           </channel>
+          <redirdev bus="usb" type="spicevmc"/>
+          <!-- -->
+          <!--
           <input type="tablet" bus="usb"/>
           <input type="mouse" bus="ps2"/>
           <input type="keyboard" bus="ps2"/>
-          <tpm model="tpm-tis">
-            <backend type="emulator" version="2.0"/>
-          </tpm>
-          <graphics type="spice" autoport="yes">
-            <listen type="address"/>
-          </graphics>
           <sound model="ich6"/>
           <audio id="1" type="spice"/>
-          <video>
-            <model type="qxl" ram="65536" vram="65536" vgamem="16384" heads="1" primary="yes"/>
-          </video>
-          <redirdev bus="usb" type="spicevmc"/>
-          <memballoon model="virtio"/>
+          -->
+          <hostdev mode="subsystem" type="pci" managed="yes">
+            <driver name="vfio"/>
+            <source>
+              <address domain="0x0000" bus="0x65" slot="0x00" function="0x0"/>
+            </source>
+            <address type="pci" domain="0x0000" bus="0x07" slot="0x00" function="0x0"/>
+          </hostdev>
+          <hostdev mode="subsystem" type="pci" managed="yes">
+            <driver name="vfio"/>
+            <source>
+              <address domain="0x0000" bus="0x65" slot="0x00" function="0x1"/>
+            </source>
+            <address type="pci" domain="0x0000" bus="0x07" slot="0x00" function="0x1"/>
+          </hostdev>
+          <hostdev mode="subsystem" type="pci" managed="yes">
+            <driver name="vfio"/>
+            <source>
+              <address domain="0x0000" bus="0x09" slot="0x00" function="0x0"/>
+            </source>
+            <address type="pci" domain="0x0000" bus="0x08" slot="0x00" function="0x0"/>
+          </hostdev>
         </devices>
       </domain>
     '';
