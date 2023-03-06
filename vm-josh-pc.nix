@@ -3,6 +3,20 @@
 {
   imports = [ ./libvirt.nix ];
 
+  boot = {
+    initrd.kernelModules = [
+      "vfio_pci"
+      "vfio"
+      "vfio_iommu_type1"
+      "vfio_virqfd"
+    ];
+    kernelParams = [
+      "intel_iommu=on"
+      "iommu=pt"
+      "vfio-pci.ids=10de:1b06,10de:10ef,1912:0014"
+    ];
+  };
+
   environment.etc = {
     "vm/josh-pc.xml".text = ''
       <domain type="kvm">
@@ -10,7 +24,7 @@
         <uuid>99fefcc4-d5aa-4717-8dde-4fe5f0552d87</uuid>
         <memory unit="GiB">96</memory>
         <currentMemory unit="GiB">96</currentMemory>
-        <vcpu placement="static">24</vcpu>
+        <vcpu placement="static">32</vcpu>
         <iothreads>2</iothreads>
         <cputune>
           <vcpupin vcpu="0" cpuset="2"/>
@@ -88,13 +102,12 @@
             <driver name="qemu" type="raw" discard="unmap"/>
             <source dev="/dev/zvol/r/varlib/vm/josh-pc/data"/>
             <target dev="sdb" bus="scsi"/>
-            <boot order="1"/>
             <address type="drive" controller="0" bus="0" target="0" unit="1"/>
           </disk>
-          <!--
+          <!-- -->
           <disk type="file" device="cdrom">
             <driver name="qemu" type="raw"/>
-            <source file="/d/software/MSDN/Windows/Windows 11/Win11_22H2_English_x64v1.iso"/>
+            <source file="/nas/Software/MSDN/Windows/Windows 11/Win11_22H2_English_x64v1.iso"/>
             <target dev="sdc" bus="sata"/>
             <readonly/>
             <boot order="2"/>
@@ -102,18 +115,18 @@
           </disk>
           <disk type="file" device="cdrom">
             <driver name="qemu" type="raw"/>
-            <source file="/d/software/Drivers/virtio-win-0.1.229.iso"/>
+            <source file="/nas/Software/Drivers/virtio-win-0.1.229.iso"/>
             <target dev="sdd" bus="sata"/>
             <readonly/>
             <address type="drive" controller="0" bus="0" target="0" unit="3"/>
           </disk>
-          -->
+          <!-- -->
           <controller type="scsi" index="0" model="virtio-scsi"/>
           <controller type="sata" index="0"/>
           <controller type="virtio-serial" index="0"/>
           <interface type="direct">
             <mac address="52:54:00:6e:b4:bc"/>
-            <source dev="enp5s0f1" mode="bridge"/>
+            <source dev="enp7s0" mode="bridge"/>
             <model type="virtio"/>
           </interface>
           <interface type="network">
