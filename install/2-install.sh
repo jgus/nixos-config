@@ -2,6 +2,8 @@
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" ; pwd)"
 
+BRANCH="${BRANCH:-main}"
+
 mountpoint -q /mnt || ( echo "!!! Root not mounted at /mnt"; exit 1 )
 mountpoint -q /mnt/boot || ( echo "!!! Boot not mounted at /mnt/boot"; exit 1 )
 
@@ -11,7 +13,7 @@ git config --global init.defaultBranch main
 git config --global user.email root@localhost
 git config --global user.name root
 cp /root/.gitconfig /mnt/root/.gitconfig
-git clone https://github.com/jgus/nixos-config.git /mnt/etc/nixos
+git clone -b ${BRANCH} https://github.com/jgus/nixos-config.git /mnt/etc/nixos
 "
 
 echo "### Generating hardware configuration"
