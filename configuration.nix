@@ -11,6 +11,7 @@
       ./x86.nix
       ./host.nix
       ./users.nix
+      ./nas.nix
 
       #./nvidia.nix
       ./vscode.nix
