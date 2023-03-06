@@ -4,46 +4,55 @@
   imports = [ ./libvirt.nix ];
 
   environment.etc = {
-    "vm/vm1.xml".text = ''
+    "vm/josh-pc.xml".text = ''
       <domain type="kvm">
-        <name>vm1</name>
+        <name>josh-pc</name>
         <uuid>99fefcc4-d5aa-4717-8dde-4fe5f0552d87</uuid>
         <memory unit="GiB">96</memory>
         <currentMemory unit="GiB">96</currentMemory>
         <vcpu placement="static">24</vcpu>
-        <iothreads>4</iothreads>
+        <iothreads>2</iothreads>
         <cputune>
-          <vcpupin vcpu="0" cpuset="12"/>
-          <vcpupin vcpu="1" cpuset="36"/>
-          <vcpupin vcpu="2" cpuset="13"/>
-          <vcpupin vcpu="3" cpuset="37"/>
-          <vcpupin vcpu="4" cpuset="14"/>
-          <vcpupin vcpu="5" cpuset="38"/>
-          <vcpupin vcpu="6" cpuset="15"/>
-          <vcpupin vcpu="7" cpuset="39"/>
-          <vcpupin vcpu="8" cpuset="16"/>
-          <vcpupin vcpu="9" cpuset="40"/>
-          <vcpupin vcpu="10" cpuset="17"/>
-          <vcpupin vcpu="11" cpuset="41"/>
-          <vcpupin vcpu="12" cpuset="18"/>
-          <vcpupin vcpu="13" cpuset="42"/>
-          <vcpupin vcpu="14" cpuset="19"/>
-          <vcpupin vcpu="15" cpuset="43"/>
-          <vcpupin vcpu="16" cpuset="20"/>
-          <vcpupin vcpu="17" cpuset="44"/>
-          <vcpupin vcpu="18" cpuset="21"/>
-          <vcpupin vcpu="19" cpuset="45"/>
-          <vcpupin vcpu="20" cpuset="22"/>
-          <vcpupin vcpu="21" cpuset="46"/>
-          <vcpupin vcpu="22" cpuset="23"/>
-          <vcpupin vcpu="23" cpuset="47"/>
-          <emulatorpin cpuset="0,24"/>
-          <iothreadpin iothread="1" cpuset="2,4,26,28"/>
+          <vcpupin vcpu="0" cpuset="2"/>
+          <vcpupin vcpu="1" cpuset="20"/>
+          <vcpupin vcpu="2" cpuset="3"/>
+          <vcpupin vcpu="3" cpuset="21"/>
+          <vcpupin vcpu="4" cpuset="4"/>
+          <vcpupin vcpu="5" cpuset="22"/>
+          <vcpupin vcpu="6" cpuset="5"/>
+          <vcpupin vcpu="7" cpuset="23"/>
+          <vcpupin vcpu="8" cpuset="6"/>
+          <vcpupin vcpu="9" cpuset="24"/>
+          <vcpupin vcpu="10" cpuset="7"/>
+          <vcpupin vcpu="11" cpuset="25"/>
+          <vcpupin vcpu="12" cpuset="8"/>
+          <vcpupin vcpu="13" cpuset="26"/>
+          <vcpupin vcpu="14" cpuset="9"/>
+          <vcpupin vcpu="15" cpuset="27"/>
+          <vcpupin vcpu="16" cpuset="10"/>
+          <vcpupin vcpu="17" cpuset="28"/>
+          <vcpupin vcpu="18" cpuset="11"/>
+          <vcpupin vcpu="19" cpuset="29"/>
+          <vcpupin vcpu="20" cpuset="12"/>
+          <vcpupin vcpu="21" cpuset="30"/>
+          <vcpupin vcpu="22" cpuset="13"/>
+          <vcpupin vcpu="23" cpuset="31"/>
+          <vcpupin vcpu="24" cpuset="14"/>
+          <vcpupin vcpu="25" cpuset="32"/>
+          <vcpupin vcpu="26" cpuset="15"/>
+          <vcpupin vcpu="27" cpuset="33"/>
+          <vcpupin vcpu="28" cpuset="16"/>
+          <vcpupin vcpu="29" cpuset="34"/>
+          <vcpupin vcpu="30" cpuset="17"/>
+          <vcpupin vcpu="31" cpuset="35"/>
+          <emulatorpin cpuset="0,1"/>
+          <iothreadpin iothread="1" cpuset="18"/>
+          <iothreadpin iothread="2" cpuset="19"/>
         </cputune>
         <os>
           <type arch="x86_64" machine="q35">hvm</type>
           <loader readonly="yes" secure="yes" type="pflash">/run/libvirt/nix-ovmf/OVMF_CODE.fd</loader>
-          <nvram template="/run/libvirt/nix-ovmf/OVMF_VARS.fd">/var/lib/vm/vm1/VARS.fd</nvram>
+          <nvram template="/run/libvirt/nix-ovmf/OVMF_VARS.fd">/var/lib/vm/josh-pc/VARS.fd</nvram>
         </os>
         <features>
           <acpi/>
@@ -52,7 +61,7 @@
           <smm state="on"/>
         </features>
         <cpu mode="host-passthrough">
-          <topology sockets="1" cores="12" threads="2"/>
+          <topology sockets="1" cores="16" threads="2"/>
         </cpu>
         <clock offset="localtime">
           <timer name="rtc" tickpolicy="catchup"/>
@@ -70,26 +79,33 @@
           <emulator>/run/libvirt/nix-emulators/qemu-system-x86_64</emulator>
           <disk type="block" device="disk">
             <driver name="qemu" type="raw" discard="unmap"/>
-            <source dev="/dev/zvol/r/varlib/vm/vm1/system"/>
+            <source dev="/dev/zvol/r/varlib/vm/josh-pc/system"/>
             <target dev="sda" bus="scsi"/>
             <boot order="1"/>
             <address type="drive" controller="0" bus="0" target="0" unit="0"/>
+          </disk>
+          <disk type="block" device="disk">
+            <driver name="qemu" type="raw" discard="unmap"/>
+            <source dev="/dev/zvol/r/varlib/vm/josh-pc/data"/>
+            <target dev="sdb" bus="scsi"/>
+            <boot order="1"/>
+            <address type="drive" controller="0" bus="0" target="0" unit="1"/>
           </disk>
           <!--
           <disk type="file" device="cdrom">
             <driver name="qemu" type="raw"/>
             <source file="/d/software/MSDN/Windows/Windows 11/Win11_22H2_English_x64v1.iso"/>
-            <target dev="sdb" bus="sata"/>
+            <target dev="sdc" bus="sata"/>
             <readonly/>
             <boot order="2"/>
-            <address type="drive" controller="0" bus="0" target="0" unit="1"/>
+            <address type="drive" controller="0" bus="0" target="0" unit="2"/>
           </disk>
           <disk type="file" device="cdrom">
             <driver name="qemu" type="raw"/>
             <source file="/d/software/Drivers/virtio-win-0.1.229.iso"/>
-            <target dev="sdc" bus="sata"/>
+            <target dev="sdd" bus="sata"/>
             <readonly/>
-            <address type="drive" controller="0" bus="0" target="0" unit="2"/>
+            <address type="drive" controller="0" bus="0" target="0" unit="3"/>
           </disk>
           -->
           <controller type="scsi" index="0" model="virtio-scsi"/>
@@ -128,7 +144,7 @@
         </devices>
       </domain>
     '';
-    "vm/vm1/startpre.sh" = {
+    "vm/josh-pc/startpre.sh" = {
       text = ''
         #! /usr/bin/env bash
         COUNT=0
@@ -142,38 +158,39 @@
       '';
       mode = "0555";
     };
-    "vm/vm1/start.sh" = {
+    "vm/josh-pc/start.sh" = {
       text = ''
         #! /usr/bin/env bash
-        ${pkgs.zfs}/bin/zfs list r/varlib/vm/vm1 >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create r/varlib/vm/vm1
-        ${pkgs.zfs}/bin/zfs list r/varlib/vm/vm1/system >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create -b 8k -s -V 128G r/varlib/vm/vm1/system
-        ${pkgs.libvirt}/bin/virsh create /etc/vm/vm1.xml
+        ${pkgs.zfs}/bin/zfs list r/varlib/vm/josh-pc >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create r/varlib/vm/josh-pc
+        ${pkgs.zfs}/bin/zfs list r/varlib/vm/josh-pc/system >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create -b 8k -s -V 512G r/varlib/vm/josh-pc/system
+        ${pkgs.zfs}/bin/zfs list r/varlib/vm/josh-pc/data >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create -b 8k -s -V 2048G r/varlib/vm/josh-pc/data
+        ${pkgs.libvirt}/bin/virsh create /etc/vm/josh-pc.xml
         for x in system.slice user.slice init.scope
         do
-          systemctl set-property --runtime -- $x AllowedCPUs=0-11,24-35
+          systemctl set-property --runtime -- $x AllowedCPUs=0-1,18-19
         done
       '';
       mode = "0555";
     };
-    "vm/vm1/stop.sh" = {
+    "vm/josh-pc/stop.sh" = {
       text = ''
         #! /usr/bin/env bash
         for x in system.slice user.slice init.scope
         do
-          systemctl set-property --runtime -- $x AllowedCPUs=0-47
+          systemctl set-property --runtime -- $x AllowedCPUs=0-35
         done
         export LANG=C
         COUNT=0
         while [ $COUNT -le 60 ]
         do
-          STATE=$(${pkgs.libvirt}/bin/virsh domstate vm1 2>&1)
+          STATE=$(${pkgs.libvirt}/bin/virsh domstate josh-pc 2>&1)
           if [[ "$STATE" == "shut off" ]] || [[ "''${STATE::27}" == "error: failed to get domain" ]]
           then
             exit 0
           fi
           if [[ "$STATE" == "running" ]]
           then
-            [ $(($COUNT % 15)) -eq 0 ] && ${pkgs.libvirt}/bin/virsh shutdown vm1
+            [ $(($COUNT % 15)) -eq 0 ] && ${pkgs.libvirt}/bin/virsh shutdown josh-pc
             ((COUNT++))
           fi
           sleep 1
@@ -186,26 +203,26 @@
 
   systemd = {
     services = {
-      vm-vm1 = {
+      vm-josh-pc = {
         enable = true;
-        description = "Virtual Machine vm1";
+        description = "Virtual Machine Josh-PC";
         # wantedBy = [ "multi-user.target" ];
         requires = [ "network-online.target" ];
         path = with pkgs; [ bash libvirt zfs ];
         environment = {
           DOMAIN_DIR = "/etc/libvirt/qemu";
-          DOMAIN = "vm1";
+          DOMAIN = "josh-pc";
         };
         serviceConfig = {
           Type = "forking";
-          PIDFile = "/run/libvirt/qemu/vm1.pid";
+          PIDFile = "/run/libvirt/qemu/josh-pc.pid";
 
           # Check if libvirtd is responsive by connecting to it. This is not allowed to fail.
-          ExecStartPre = "${pkgs.bash}/bin/bash -c /etc/vm/vm1/startpre.sh";
+          ExecStartPre = "${pkgs.bash}/bin/bash -c /etc/vm/josh-pc/startpre.sh";
           # Create the domain.
-          ExecStart = "${pkgs.bash}/bin/bash -c /etc/vm/vm1/start.sh";
+          ExecStart = "${pkgs.bash}/bin/bash -c /etc/vm/josh-pc/start.sh";
           # Shutdown the domain gracefully by sending ACPI shutdown event.
-          ExecStop = "${pkgs.bash}/bin/bash -c /etc/vm/vm1/stop.sh";
+          ExecStop = "${pkgs.bash}/bin/bash -c /etc/vm/josh-pc/stop.sh";
           # Set higher timeouts to allow for Exec commands to take longer.
           TimeoutStartSec = 90;
           TimeoutStopSec = 180;
