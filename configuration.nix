@@ -13,7 +13,7 @@
       ./users.nix
 
       ./vscode.nix
-      #./home-assistant.nix
+      ./home-assistant.nix
       #./clamav.nix # needs .secrets/gmail-password.nix
     ];
 }
