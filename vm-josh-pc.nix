@@ -111,7 +111,7 @@
             <target dev="sdb" bus="scsi"/>
             <address type="drive" controller="0" bus="0" target="0" unit="1"/>
           </disk>
-          <!-- -->
+          <!--
           <disk type="file" device="cdrom">
             <driver name="qemu" type="raw"/>
             <source file="/nas/Software/MSDN/Windows/Windows 11/Win11_22H2_English_x64v1.iso"/>
@@ -127,7 +127,7 @@
             <readonly/>
             <address type="drive" controller="0" bus="0" target="0" unit="3"/>
           </disk>
-          <!-- -->
+          -->
           <controller type="scsi" index="0" model="virtio-scsi"/>
           <controller type="sata" index="0"/>
           <controller type="virtio-serial" index="0"/>
@@ -189,6 +189,18 @@
         </devices>
       </domain>
     '';
+    "vm/local-net.xml".text = ''
+      <network>
+        <name>local</name>
+        <domain name="local"/>
+        <ip address="192.168.100.1" netmask="255.255.255.0">
+          <dhcp>
+            <range start="192.168.100.128" end="192.168.100.254"/>
+            <host mac="d4:7b:31:69:c4:1d" name="josh-pc" ip="192.168.100.2"/>
+          </dhcp>
+        </ip>
+      </network>
+    '';
     "vm/josh-pc/startpre.sh" = {
       text = ''
         #! /usr/bin/env bash
@@ -206,6 +218,7 @@
     "vm/josh-pc/start.sh" = {
       text = ''
         #! /usr/bin/env bash
+        ${pkgs.libvirt}/bin/virsh net-info local >/dev/null 2>&1 || ${pkgs.libvirt}/bin/virsh net-create /etc/vm/local-net.xml
         ${pkgs.zfs}/bin/zfs list r/varlib/vm/josh-pc >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create r/varlib/vm/josh-pc
         ${pkgs.zfs}/bin/zfs list r/varlib/vm/josh-pc/system >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create -b 8k -s -V 512G r/varlib/vm/josh-pc/system
         ${pkgs.zfs}/bin/zfs list r/varlib/vm/josh-pc/data >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create -b 8k -s -V 2048G r/varlib/vm/josh-pc/data
@@ -251,7 +264,7 @@
       vm-josh-pc = {
         enable = true;
         description = "Virtual Machine Josh-PC";
-        # wantedBy = [ "multi-user.target" ];
+        wantedBy = [ "multi-user.target" ];
         requires = [ "network-online.target" ];
         path = with pkgs; [ bash libvirt zfs ];
         environment = {
