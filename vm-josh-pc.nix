@@ -127,11 +127,16 @@
           <tpm model="tpm-tis">
             <backend type="emulator" version="2.0"/>
           </tpm>
-          <rng>
+          <rng model="virtio">
             <backend model="random">/dev/urandom</backend>
           </rng>
           <panic model="hyperv"/>
           <memballoon model="virtio"/>
+          <controller type="virtio-serial" index="0"/>
+          <channel type='unix'>
+            <target type='virtio' name='org.qemu.guest_agent.0'/>
+            <address type='virtio-serial' controller='0' bus='0' port='1'/>
+          </channel>
           <!-- -->
           <video>
             <model type="qxl" ram="65536" vram="65536" vgamem="16384" heads="1" primary="yes"/>
@@ -141,7 +146,7 @@
           </graphics>
           <channel type="spicevmc">
             <target type="virtio" name="com.redhat.spice.0"/>
-            <address type="virtio-serial" controller="0" bus="0" port="1"/>
+            <address type="virtio-serial" controller="0" bus="0" port="2"/>
           </channel>
           <redirdev bus="usb" type="spicevmc"/>
           <!-- -->
@@ -170,6 +175,12 @@
             <driver name="vfio"/>
             <source>
               <address domain="0x0000" bus="0x09" slot="0x00" function="0x0"/>
+            </source>
+          </hostdev>
+          <hostdev mode="subsystem" type="pci" managed="yes">
+            <driver name="vfio"/>
+            <source>
+              <address domain="0x0000" bus="0x00" slot="0x17" function="0x0"/>
             </source>
           </hostdev>
         </devices>
@@ -208,6 +219,7 @@
         ${pkgs.zfs}/bin/zfs list r/varlib/vm/josh-pc >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create r/varlib/vm/josh-pc
         ${pkgs.zfs}/bin/zfs list r/varlib/vm/josh-pc/system >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create -b 8k -s -V 512G r/varlib/vm/josh-pc/system
         ${pkgs.zfs}/bin/zfs list r/varlib/vm/josh-pc/data >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create -b 8k -s -V 2048G r/varlib/vm/josh-pc/data
+        ${pkgs.libvirt}/bin/virsh destroy josh-pc || true
         ${pkgs.libvirt}/bin/virsh create /etc/vm/josh-pc.xml
         # for x in system.slice user.slice init.scope
         # do
@@ -234,7 +246,7 @@
           fi
           if [[ "$STATE" == "running" ]]
           then
-            [ $(($COUNT % 15)) -eq 0 ] && ${pkgs.libvirt}/bin/virsh shutdown josh-pc
+            [ $(($COUNT % 15)) -eq 0 ] && ${pkgs.libvirt}/bin/virsh shutdown josh-pc --mode agent
             ((COUNT++))
           fi
           sleep 1
