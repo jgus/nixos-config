@@ -13,7 +13,7 @@
   systemd = {
     services = {
       home-assistant = {
-        enable = true;
+        enable = false;
         description = "Home Assistant";
         wantedBy = [ "multi-user.target" ];
         requires = [ "network-online.target" ];
