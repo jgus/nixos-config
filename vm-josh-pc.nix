@@ -171,7 +171,6 @@
             <source>
               <address domain="0x0000" bus="0x09" slot="0x00" function="0x0"/>
             </source>
-            <address type="pci" domain="0x0000" bus="0x08" slot="0x00" function="0x0"/>
           </hostdev>
         </devices>
       </domain>
