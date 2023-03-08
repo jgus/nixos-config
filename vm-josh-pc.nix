@@ -113,26 +113,7 @@
             <target dev="sdb" bus="scsi"/>
             <address type="drive" controller="0" bus="0" target="0" unit="1"/>
           </disk>
-          <!--
-          <disk type="file" device="cdrom">
-            <driver name="qemu" type="raw"/>
-            <source file="/nas/Software/MSDN/Windows/Windows 11/Win11_22H2_English_x64v1.iso"/>
-            <target dev="sdc" bus="sata"/>
-            <readonly/>
-            <boot order="2"/>
-            <address type="drive" controller="0" bus="0" target="0" unit="2"/>
-          </disk>
-          <disk type="file" device="cdrom">
-            <driver name="qemu" type="raw"/>
-            <source file="/nas/Software/Drivers/virtio-win-0.1.229.iso"/>
-            <target dev="sdd" bus="sata"/>
-            <readonly/>
-            <address type="drive" controller="0" bus="0" target="0" unit="3"/>
-          </disk>
-          -->
           <controller type="scsi" index="0" model="virtio-scsi"/>
-          <controller type="sata" index="0"/>
-          <controller type="virtio-serial" index="0"/>
           <interface type="direct">
             <mac address="52:54:00:6e:b4:bc"/>
             <source dev="enp7s0" mode="bridge"/>
@@ -146,6 +127,10 @@
           <tpm model="tpm-tis">
             <backend type="emulator" version="2.0"/>
           </tpm>
+          <rng>
+            <backend model="random">/dev/urandom</backend>
+          </rng>
+          <panic model="hyperv"/>
           <memballoon model="virtio"/>
           <!-- -->
           <video>
