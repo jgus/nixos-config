@@ -14,6 +14,8 @@
       "intel_iommu=on"
       "iommu=pt"
       "vfio-pci.ids=10de:1b06,10de:10ef,1912:0014"
+      "isolcpus=2-17,20-35"
+      "nohz_full=2-17,20-35"
     ];
   };
 
@@ -223,20 +225,20 @@
         ${pkgs.zfs}/bin/zfs list r/varlib/vm/josh-pc/system >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create -b 8k -s -V 512G r/varlib/vm/josh-pc/system
         ${pkgs.zfs}/bin/zfs list r/varlib/vm/josh-pc/data >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create -b 8k -s -V 2048G r/varlib/vm/josh-pc/data
         ${pkgs.libvirt}/bin/virsh create /etc/vm/josh-pc.xml
-        for x in system.slice user.slice init.scope
-        do
-          systemctl set-property --runtime -- $x AllowedCPUs=0-1,18-19
-        done
+        # for x in system.slice user.slice init.scope
+        # do
+        #   systemctl set-property --runtime -- $x AllowedCPUs=0-1,18-19
+        # done
       '';
       mode = "0555";
     };
     "vm/josh-pc/stop.sh" = {
       text = ''
         #! /usr/bin/env bash
-        for x in system.slice user.slice init.scope
-        do
-          systemctl set-property --runtime -- $x AllowedCPUs=0-35
-        done
+        # for x in system.slice user.slice init.scope
+        # do
+        #   systemctl set-property --runtime -- $x AllowedCPUs=0-35
+        # done
         export LANG=C
         COUNT=0
         while [ $COUNT -le 60 ]
