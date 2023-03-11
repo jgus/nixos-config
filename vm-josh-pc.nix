@@ -141,6 +141,8 @@
           <video>
             <model type="qxl" ram="65536" vram="65536" vgamem="16384" heads="1" primary="yes"/>
           </video>
+          <!-- -->
+	        <!--
           <graphics type="spice" autoport="yes">
             <listen type="address"/>
           </graphics>
@@ -149,7 +151,7 @@
             <address type="virtio-serial" controller="0" bus="0" port="2"/>
           </channel>
           <redirdev bus="usb" type="spicevmc"/>
-          <!-- -->
+          -->
           <!--
           <input type="tablet" bus="usb"/>
           <input type="mouse" bus="ps2"/>
