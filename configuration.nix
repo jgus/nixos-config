@@ -18,6 +18,8 @@
       ./zfs.nix
       ./clamav.nix # needs .secrets/gmail-password.nix
 
+      ./docker.nix
+
       #./syncthing.nix
 
       ./libvirt.nix
