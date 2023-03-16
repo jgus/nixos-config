@@ -1,6 +1,12 @@
 { pkgs, ... }:
 
 {
+  system.activationScripts = {
+    offsite-josh-ws.text = ''
+      ${pkgs.zfs}/bin/zfs list d/offsite/josh-ws >/dev/null || ${pkgs.zfs}/bin/zfs create d/offsite/josh-ws
+    '';
+  };
+
   systemd = {
     services = {
       offsite-josh-ws = {
@@ -18,11 +24,5 @@
         startAt = "daily";
       };
     };
-  };
-
-  system.activationScripts = {
-    offsite-josh-ws.text = ''
-      ${pkgs.zfs}/bin/zfs list d/offsite/josh-ws >/dev/null || ${pkgs.zfs}/bin/zfs create d/offsite/josh-ws
-    '';
   };
 }
