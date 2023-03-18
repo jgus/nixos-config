@@ -36,7 +36,7 @@ ZPOOL_OPTS=(
     -O com.sun:auto-snapshot=true
     -O encryption=aes-256-gcm
     -O keyformat=raw
-    -O keylocation=file:///boot/vkey
+    -O keylocation=file:///etc/nixos/.secrets/vkey
 )
 
 zpool create -f "${ZPOOL_OPTS[@]}" d raidz3 "${Z_DEVS[@]}"
