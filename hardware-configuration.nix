@@ -44,8 +44,21 @@
     };
 
   fileSystems."/boot" =
-    { device = "/dev/disk/by-uuid/48C1-654B";
+    { device = "/dev/disk/by-uuid/FB8D-1EBD";
       fsType = "vfat";
+      options = [ "nofail" ];
+    };
+
+  fileSystems."/boot/1" =
+    { device = "/dev/disk/by-uuid/7552-8E03";
+      fsType = "vfat";
+      options = [ "nofail" ];
+    };
+
+  fileSystems."/boot/2" =
+    { device = "/dev/disk/by-uuid/6B5A-B04D";
+      fsType = "vfat";
+      options = [ "nofail" ];
     };
 
   swapDevices = [
