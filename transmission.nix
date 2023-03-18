@@ -7,6 +7,12 @@
     allowedTCPPorts = [ 9091 ];
   };
 
+  system.activationScripts = {
+    transmissionSetup.text = ''
+      ${pkgs.zfs}/bin/zfs list r/varlib/transmission >/dev/null 2>&1 || ( ${pkgs.zfs}/bin/zfs create r/varlib/transmission && chown josh:plex /var/lib/transmission )
+    '';
+  };
+
   systemd = {
     services = {
       transmission = {
