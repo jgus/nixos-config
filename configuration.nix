@@ -23,7 +23,6 @@
 
       #./syncthing.nix
 
-      ./libvirt.nix
       ./vm-josh-pc.nix
     ];
 }

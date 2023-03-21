@@ -13,7 +13,7 @@
     kernelParams = [
       "intel_iommu=on"
       "iommu=pt"
-      "vfio-pci.ids=10de:1b06,10de:10ef,1912:0014"
+      "vfio-pci.ids=10de:2704,10de:22bb,1912:0014,8086:a282"
       "isolcpus=2-17,20-35"
       "nohz_full=2-17,20-35"
     ];
@@ -116,7 +116,7 @@
           <controller type="scsi" index="0" model="virtio-scsi"/>
           <interface type="direct">
             <mac address="52:54:00:6e:b4:bc"/>
-            <source dev="enp7s0" mode="bridge"/>
+            <source dev="enp8s0" mode="bridge"/>
             <model type="virtio"/>
           </interface>
           <interface type="network">
@@ -142,7 +142,7 @@
             <model type="qxl" ram="65536" vram="65536" vgamem="16384" heads="1" primary="yes"/>
           </video>
           <!-- -->
-	        <!--
+          <!--
           <graphics type="spice" autoport="yes">
             <listen type="address"/>
           </graphics>
@@ -176,7 +176,7 @@
           <hostdev mode="subsystem" type="pci" managed="yes">
             <driver name="vfio"/>
             <source>
-              <address domain="0x0000" bus="0x09" slot="0x00" function="0x0"/>
+              <address domain="0x0000" bus="0xb3" slot="0x00" function="0x0"/>
             </source>
           </hostdev>
           <hostdev mode="subsystem" type="pci" managed="yes">
