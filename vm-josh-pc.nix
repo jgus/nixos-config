@@ -4,6 +4,7 @@
   imports = [ ./libvirt.nix ];
 
   boot = {
+    kernelPackages = pkgs.linuxPackages_6_1;
     initrd.kernelModules = [
       "vfio_pci"
       "vfio"
@@ -19,9 +20,19 @@
     ];
   };
 
+  services.udev.extraRules = ''
+    ACTION=="add", SUBSYSTEM=="pci", ATTR{vendor}=="0x10de", ATTR{device}=="0x2704", ATTR{resource0_resize}="4"
+    ACTION=="add", SUBSYSTEM=="pci", ATTR{vendor}=="0x10de", ATTR{device}=="0x2704", ATTR{resource1_resize}="14"
+    ACTION=="add", SUBSYSTEM=="pci", ATTR{vendor}=="0x10de", ATTR{device}=="0x2704", ATTR{resource3_resize}="5"
+  '';
+
   environment.etc = {
     "vm/josh-pc.xml".text = ''
-      <domain type="kvm">
+      <domain type='kvm' xmlns:qemu='http://libvirt.org/schemas/domain/qemu/1.0'>
+        <qemu:commandline>
+          <qemu:arg value='-fw_cfg'/>
+          <qemu:arg value='opt/ovmf/X-PciMmio64Mb,string=65536'/>
+        </qemu:commandline>
         <name>josh-pc</name>
         <uuid>99fefcc4-d5aa-4717-8dde-4fe5f0552d87</uuid>
         <memory unit="GiB">96</memory>
@@ -67,8 +78,8 @@
         </cputune>
         <os>
           <type arch="x86_64" machine="q35">hvm</type>
-          <loader readonly="yes" secure="yes" type="pflash">/run/libvirt/nix-ovmf/OVMF_CODE.fd</loader>
-          <nvram template="/run/libvirt/nix-ovmf/OVMF_VARS.fd">/var/lib/vm/josh-pc/VARS.fd</nvram>
+          <loader readonly="yes" secure="yes" type="pflash">/etc/nixos/vm/OVMF_CODE-pure-efi.fd</loader>
+          <nvram template="/etc/nixos/vm/OVMF_VARS-pure-efi.fd">/var/lib/vm/josh-pc/VARS.fd</nvram>
         </os>
         <features>
           <acpi/>
@@ -142,7 +153,7 @@
             <model type="qxl" ram="65536" vram="65536" vgamem="16384" heads="1" primary="yes"/>
           </video>
           <!-- -->
-          <!--
+          <!-- -->
           <graphics type="spice" autoport="yes">
             <listen type="address"/>
           </graphics>
@@ -151,7 +162,7 @@
             <address type="virtio-serial" controller="0" bus="0" port="2"/>
           </channel>
           <redirdev bus="usb" type="spicevmc"/>
-          -->
+          <!-- -->
           <!--
           <input type="tablet" bus="usb"/>
           <input type="mouse" bus="ps2"/>
@@ -164,6 +175,7 @@
             <source>
               <address domain="0x0000" bus="0x65" slot="0x00" function="0x0"/>
             </source>
+            <rom file='/etc/nixos/vm/PNY.RTX4080.16384.220927.rom'/>
             <address type="pci" domain="0x0000" bus="0x07" slot="0x00" function="0x0"/>
           </hostdev>
           <hostdev mode="subsystem" type="pci" managed="yes">
