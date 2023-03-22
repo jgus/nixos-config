@@ -148,12 +148,10 @@
             <target type='virtio' name='org.qemu.guest_agent.0'/>
             <address type='virtio-serial' controller='0' bus='0' port='1'/>
           </channel>
-          <!-- -->
+          <!--
           <video>
             <model type="qxl" ram="65536" vram="65536" vgamem="16384" heads="1" primary="yes"/>
           </video>
-          <!-- -->
-          <!-- -->
           <graphics type="spice" autoport="yes">
             <listen type="address"/>
           </graphics>
@@ -162,7 +160,7 @@
             <address type="virtio-serial" controller="0" bus="0" port="2"/>
           </channel>
           <redirdev bus="usb" type="spicevmc"/>
-          <!-- -->
+          -->
           <!--
           <input type="tablet" bus="usb"/>
           <input type="mouse" bus="ps2"/>
@@ -251,7 +249,7 @@
         # done
         export LANG=C
         COUNT=0
-        while [ $COUNT -le 60 ]
+        while [ $COUNT -le 150 ]
         do
           STATE=$(${pkgs.libvirt}/bin/virsh domstate josh-pc 2>&1)
           if [[ "$STATE" == "shut off" ]] || [[ "''${STATE::27}" == "error: failed to get domain" ]]
@@ -260,7 +258,7 @@
           fi
           if [[ "$STATE" == "running" ]]
           then
-            [ $(($COUNT % 15)) -eq 0 ] && ${pkgs.libvirt}/bin/virsh shutdown josh-pc --mode agent
+            [ $(($COUNT % 30)) -eq 0 ] && ${pkgs.libvirt}/bin/virsh shutdown josh-pc --mode agent
             ((COUNT++))
           fi
           sleep 1
