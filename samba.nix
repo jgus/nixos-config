@@ -24,6 +24,7 @@
     '';
     shares = {
       josh = { path = "/home/josh"; browseable = "yes"; "read only" = "no"; };
+      ventoy = { path = "/mnt/ventoy"; browseable = "yes"; "read only" = "no"; };
     };
   };
 }

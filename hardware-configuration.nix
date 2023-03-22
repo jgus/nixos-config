@@ -53,6 +53,12 @@
       fsType = "vfat";
     };
 
+  fileSystems."/mnt/ventoy" =
+    { device = "/dev/disk/by-uuid/4E21-0000";
+      fsType = "exfat";
+      options = [ "umask=000" ];
+    };
+
   swapDevices = [ ];
 
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
