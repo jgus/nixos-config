@@ -173,7 +173,7 @@
             <source>
               <address domain="0x0000" bus="0x65" slot="0x00" function="0x0"/>
             </source>
-            <rom file='/etc/nixos/vm/PNY.RTX4080.16384.220927.rom'/>
+            <!-- <rom file='/etc/nixos/vm/PNY.RTX4080.16384.220927.rom'/> -->
             <address type="pci" domain="0x0000" bus="0x07" slot="0x00" function="0x0"/>
           </hostdev>
           <hostdev mode="subsystem" type="pci" managed="yes">
