@@ -15,8 +15,11 @@
       "intel_iommu=on"
       "iommu=pt"
       "vfio-pci.ids=10de:2704,10de:22bb,1912:0014,8086:a282"
-      "isolcpus=2-17,20-35"
-      "nohz_full=2-17,20-35"
+      "isolcpus=6-17,24-35"
+      "nohz_full=6-17,24-35"
+      "default_hugepagesz=1G"
+      "hugepagesz=1G"
+      "hugepages=96"
     ];
   };
 
@@ -29,52 +32,53 @@
   environment.etc = {
     "vm/josh-pc.xml".text = ''
       <domain type='kvm' xmlns:qemu='http://libvirt.org/schemas/domain/qemu/1.0'>
+        <!--
         <qemu:commandline>
           <qemu:arg value='-fw_cfg'/>
           <qemu:arg value='opt/ovmf/X-PciMmio64Mb,string=65536'/>
         </qemu:commandline>
+        -->
         <name>josh-pc</name>
         <uuid>99fefcc4-d5aa-4717-8dde-4fe5f0552d87</uuid>
         <memory unit="GiB">96</memory>
         <currentMemory unit="GiB">96</currentMemory>
-        <vcpu placement="static">32</vcpu>
+        <memoryBacking>
+          <hugepages/>
+          <nosharepages/>
+          <locked/>
+          <access mode="private"/>
+          <allocation mode="immediate"/>
+        </memoryBacking>
+        <vcpu placement="static">24</vcpu>
         <iothreads>2</iothreads>
         <cputune>
-          <vcpupin vcpu="0" cpuset="2"/>
-          <vcpupin vcpu="1" cpuset="20"/>
-          <vcpupin vcpu="2" cpuset="3"/>
-          <vcpupin vcpu="3" cpuset="21"/>
-          <vcpupin vcpu="4" cpuset="4"/>
-          <vcpupin vcpu="5" cpuset="22"/>
-          <vcpupin vcpu="6" cpuset="5"/>
-          <vcpupin vcpu="7" cpuset="23"/>
-          <vcpupin vcpu="8" cpuset="6"/>
-          <vcpupin vcpu="9" cpuset="24"/>
-          <vcpupin vcpu="10" cpuset="7"/>
-          <vcpupin vcpu="11" cpuset="25"/>
-          <vcpupin vcpu="12" cpuset="8"/>
-          <vcpupin vcpu="13" cpuset="26"/>
-          <vcpupin vcpu="14" cpuset="9"/>
-          <vcpupin vcpu="15" cpuset="27"/>
-          <vcpupin vcpu="16" cpuset="10"/>
-          <vcpupin vcpu="17" cpuset="28"/>
-          <vcpupin vcpu="18" cpuset="11"/>
-          <vcpupin vcpu="19" cpuset="29"/>
-          <vcpupin vcpu="20" cpuset="12"/>
-          <vcpupin vcpu="21" cpuset="30"/>
-          <vcpupin vcpu="22" cpuset="13"/>
-          <vcpupin vcpu="23" cpuset="31"/>
-          <vcpupin vcpu="24" cpuset="14"/>
-          <vcpupin vcpu="25" cpuset="32"/>
-          <vcpupin vcpu="26" cpuset="15"/>
-          <vcpupin vcpu="27" cpuset="33"/>
-          <vcpupin vcpu="28" cpuset="16"/>
-          <vcpupin vcpu="29" cpuset="34"/>
-          <vcpupin vcpu="30" cpuset="17"/>
-          <vcpupin vcpu="31" cpuset="35"/>
-          <emulatorpin cpuset="0,1"/>
-          <iothreadpin iothread="1" cpuset="18"/>
-          <iothreadpin iothread="2" cpuset="19"/>
+          <vcpupin vcpu="0" cpuset="6"/>
+          <vcpupin vcpu="1" cpuset="24"/>
+          <vcpupin vcpu="2" cpuset="7"/>
+          <vcpupin vcpu="3" cpuset="25"/>
+          <vcpupin vcpu="4" cpuset="8"/>
+          <vcpupin vcpu="5" cpuset="26"/>
+          <vcpupin vcpu="6" cpuset="9"/>
+          <vcpupin vcpu="7" cpuset="27"/>
+          <vcpupin vcpu="8" cpuset="10"/>
+          <vcpupin vcpu="9" cpuset="28"/>
+          <vcpupin vcpu="10" cpuset="11"/>
+          <vcpupin vcpu="11" cpuset="29"/>
+          <vcpupin vcpu="12" cpuset="12"/>
+          <vcpupin vcpu="13" cpuset="30"/>
+          <vcpupin vcpu="14" cpuset="13"/>
+          <vcpupin vcpu="15" cpuset="31"/>
+          <vcpupin vcpu="16" cpuset="14"/>
+          <vcpupin vcpu="17" cpuset="32"/>
+          <vcpupin vcpu="18" cpuset="15"/>
+          <vcpupin vcpu="19" cpuset="33"/>
+          <vcpupin vcpu="20" cpuset="16"/>
+          <vcpupin vcpu="21" cpuset="34"/>
+          <vcpupin vcpu="22" cpuset="17"/>
+          <vcpupin vcpu="23" cpuset="35"/>
+          <emulatorpin cpuset="0-1,18-19"/>
+          <iothreadpin iothread="1" cpuset="3,21"/>
+          <iothreadpin iothread="2" cpuset="4,22"/>
         </cputune>
         <os>
           <type arch="x86_64" machine="q35">hvm</type>
@@ -95,7 +99,7 @@
           <ioapic driver='kvm'/>
         </features>
         <cpu mode="host-passthrough">
-          <topology sockets="1" cores="16" threads="2"/>
+          <topology sockets="1" cores="12" threads="2"/>
         </cpu>
         <clock offset="localtime">
           <timer name="rtc" tickpolicy="catchup"/>
