@@ -26,6 +26,7 @@
       ./www.nix
       ./ntp.nix
       ./plex.nix
+      ./frigate.nix
       ./minecraft.nix
       ./transmission.nix
       ./sabnzbd.nix
