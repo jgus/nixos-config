@@ -17,6 +17,9 @@
         host: mqtt
         user: mqtt
         password: CWPRbirZT2zAhtW3kUyt
+      ffmpeg:
+        output_args:
+          record: -f segment -segment_time 10 -segment_format mp4 -reset_timestamps 1 -strftime 1 -c copy
       cameras:
         cam1: # <------ Name the camera
           ffmpeg:
