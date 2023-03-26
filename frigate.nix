@@ -17,6 +17,10 @@
         host: mqtt
         user: mqtt
         password: CWPRbirZT2zAhtW3kUyt
+      record:
+        retain:
+          days: 365
+          mode: motion
       ffmpeg:
         output_args:
           record: -f segment -segment_time 10 -segment_format mp4 -reset_timestamps 1 -strftime 1 -c copy
@@ -41,6 +45,9 @@
           detect:
             width: 1920
             height: 1080
+          motion:
+            mask:
+              - 1392,0,1920,0,1920,48,1392,48
     '';
   };
 
