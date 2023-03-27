@@ -28,6 +28,23 @@
         };
         startAt = "hourly";
       };
+      zfs-pool-status = {
+        path = with pkgs; [ hostname zfs sharutils msmtp ];
+        script = ''
+          EMAIL_TO=("j@gustafson.me")
+          if zpool status | grep DEGRADED
+          then
+            for to in "''${EMAIL_TO[@]}"
+            do
+              (echo "subject: Degraded ZFS Pool on $(hostname)" && uuencode <(zpool status) status.txt) | msmtp "''${to}"
+            done
+          fi
+        '';
+        serviceConfig = {
+          Type = "oneshot";
+        };
+        startAt = "daily";
+      };
     };
   };
 }
