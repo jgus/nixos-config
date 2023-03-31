@@ -34,6 +34,7 @@
       ./lidarr.nix
       ./radarr.nix
       ./sonarr.nix
+      ./mylar.nix
       ./komga.nix
 
       ./libvirt.nix
