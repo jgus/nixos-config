@@ -93,7 +93,7 @@
           docker container stop web-swag >/dev/null 2>&1 || true ; \
           docker run --rm --name web-swag \
             -e URL=gustafson.me \
-            -e SUBDOMAINS=www,homeassistant, \
+            -e SUBDOMAINS=www,homeassistant,komga, \
             -e EXTRA_DOMAINS=gushome.org,www.gushome.org \
             -e VALIDATION=http \
             -e EMAIL=joshgstfsn@gmail.com \
@@ -106,6 +106,7 @@
             -v /etc/nixos/www/site-confs/default.conf:/config/nginx/site-confs/default.conf \
             -v /etc/nixos/www/location-confs:/config/nginx/location-confs \
             -v /etc/nixos/www/proxy-confs/homeassistant.subdomain.conf:/config/nginx/proxy-confs/homeassistant.subdomain.conf \
+            -v /etc/nixos/www/proxy-confs/komga.subdomain.conf:/config/nginx/proxy-confs/komga.subdomain.conf \
             -v /var/lib/www:/config/www \
             -v /d/photos/Published:/config/www/published:ro \
             -v /var/lib/dav:/config/www/dav \
