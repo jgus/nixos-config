@@ -29,7 +29,7 @@
             -e PGID=$(id -g plex) \
             -e TZ=$(timedatectl show -p Timezone --value) \
             -e OPENVPN_PROVIDER=PRIVADO \
-            -e LOCAL_NETWORK=172.22.0.0/16 \
+            -e LOCAL_NETWORK=172.22.0.0/16,192.168.2.0/24 \
             -e TRANSMISSION_DOWNLOAD_DIR=/peer/Complete \
             -e TRANSMISSION_INCOMPLETE_DIR=/peer/Incomplete \
             -e TRANSMISSION_INCOMPLETE_DIR_ENABLED=true \
