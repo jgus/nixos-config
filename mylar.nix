@@ -30,6 +30,7 @@
             -e TZ=$(timedatectl show -p Timezone --value) \
             -v /var/lib/mylar:/config \
             -v /d/media/Comics:/comics \
+            -v /d/media/Comics.import:/import \
             -v /d/scratch/peer:/peer \
             -v /d/scratch/usenet:/usenet \
             lscr.io/linuxserver/mylar3
