@@ -27,6 +27,7 @@
           days: 365
           mode: motion
       ffmpeg:
+        hwaccel_args: -hwaccel cuda
         output_args:
           record: -f segment -segment_time 10 -segment_format mp4 -reset_timestamps 1 -strftime 1 -c copy
       cameras:
@@ -72,6 +73,7 @@
           docker container stop frigate >/dev/null 2>&1 || true ; \
           docker run --rm --name frigate \
             --shm-size=1024m \
+            --gpus all \
             --privileged \
             -v /dev/bus/usb/004:/dev/bus/usb/004 \
             -v /var/lib/frigate:/media/frigate \
