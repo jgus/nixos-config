@@ -3,6 +3,11 @@
 {
   imports = [ ./docker.nix ];
 
+  services.udev.extraRules = ''
+    SUBSYSTEM=="usb",ATTRS{idVendor}=="1a6e",ATTRS{idProduct}=="089a",GROUP="plugdev"
+    SUBSYSTEM=="usb",ATTRS{idVendor}=="18d1",ATTRS{idProduct}=="9302",GROUP="plugdev"
+  '';
+
   system.activationScripts = {
     frigateSetup.text = ''
       ${pkgs.zfs}/bin/zfs list d/varlib/frigate >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create d/varlib/frigate
@@ -48,6 +53,13 @@
           motion:
             mask:
               - 1392,0,1920,0,1920,48,1392,48
+      detectors:
+        coral1:
+          type: edgetpu
+          device: usb:0
+        coral2:
+          type: edgetpu
+          device: usb:1
     '';
   };
 
@@ -58,11 +70,13 @@
         description = "Frigate NVR";
         wantedBy = [ "multi-user.target" ];
         requires = [ "network-online.target" ];
-        path = [ pkgs.docker ];
+        path = with pkgs; [ docker wget ];
         script = ''
           docker container stop frigate >/dev/null 2>&1 || true ; \
           docker run --rm --name frigate \
             --shm-size=1024m \
+            --privileged \
+            -v /dev/bus/usb/004:/dev/bus/usb/004 \
             -v /var/lib/frigate:/media/frigate \
             -v /etc/frigate/config.yml:/config/config.yml:ro \
             -v /etc/localtime:/etc/localtime:ro \
