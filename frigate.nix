@@ -40,9 +40,6 @@
               - path: rtsp://viewer:sV7yekLozuvDGD8XP9fE@cam1:554/cam/realmonitor?channel=1&subtype=2
                 roles:
                   - detect
-                  - rtmp
-          rtmp:
-            enabled: True
           record:
             enabled: True
           snapshots:
