@@ -23,6 +23,7 @@
       map to guest = bad user
     '';
     shares = {
+      josh = { path = "/home/josh"; browseable = "yes"; "read only" = "no"; };
       Media = { path = "/d/media"; browseable = "yes"; "read only" = "no"; };
       Backup = { path = "/d/backup"; browseable = "yes"; "read only" = "no"; };
       Scratch = { path = "/d/scratch"; browseable = "yes"; "read only" = "no"; };
