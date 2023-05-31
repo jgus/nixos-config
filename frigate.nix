@@ -20,7 +20,7 @@
     "frigate/config.yml".text = ''
       mqtt:
         host: mqtt
-        user: mqtt
+        user: frigate
         password: CWPRbirZT2zAhtW3kUyt
       record:
         retain:
@@ -31,26 +31,48 @@
         output_args:
           record: -f segment -segment_time 10 -segment_format mp4 -reset_timestamps 1 -strftime 1 -c copy
       cameras:
-        cam1: # <------ Name the camera
+        # cam1: # <------ Name the camera
+        #   ffmpeg:
+        #     inputs:
+        #       - path: rtsp://viewer:sV7yekLozuvDGD8XP9fE@cam1:554/cam/realmonitor?channel=1&subtype=0
+        #         roles:
+        #           - record
+        #     inputs:
+        #       - path: rtsp://viewer:sV7yekLozuvDGD8XP9fE@cam1:554/cam/realmonitor?channel=1&subtype=2
+        #         roles:
+        #           - detect
+        #   record:
+        #     enabled: True
+        #   snapshots:
+        #     enabled: True
+        #   detect:
+        #     width: 1920
+        #     height: 1080
+        #   motion:
+        #     mask:
+        #       - 1392,0,1920,0,1920,48,1392,48
+        front-doorbell:
           ffmpeg:
             inputs:
-              - path: rtsp://viewer:sV7yekLozuvDGD8XP9fE@cam1:554/cam/realmonitor?channel=1&subtype=0
-                roles:
-                  - record
-            inputs:
-              - path: rtsp://viewer:sV7yekLozuvDGD8XP9fE@cam1:554/cam/realmonitor?channel=1&subtype=2
+              - path: rtsp://admin:T8EgVFbyiMXGDJhZFkVb@front-doorbell.home.gustafson.me:554
                 roles:
                   - detect
+                  - record
           record:
             enabled: True
           snapshots:
             enabled: True
           detect:
-            width: 1920
-            height: 1080
+            width: 2560
+            height: 1920
           motion:
             mask:
-              - 1392,0,1920,0,1920,48,1392,48
+              - 1972,0,2560,0,2560,56,1972,56
+          zones:
+            yard:
+              coordinates: 2560,1920,0,1920,0,1086,901,1106,1228,1101,1296,1192,1865,1288,2560,1200
+            porch:
+              coordinates: 1221,1634,1963,1688,2119,1920,0,1920,678,1532
       detectors:
         coral1:
           type: edgetpu
