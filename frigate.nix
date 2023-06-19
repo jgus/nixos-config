@@ -31,26 +31,6 @@
         output_args:
           record: -f segment -segment_time 10 -segment_format mp4 -reset_timestamps 1 -strftime 1 -c copy
       cameras:
-        # cam1: # <------ Name the camera
-        #   ffmpeg:
-        #     inputs:
-        #       - path: rtsp://viewer:sV7yekLozuvDGD8XP9fE@cam1:554/cam/realmonitor?channel=1&subtype=0
-        #         roles:
-        #           - record
-        #     inputs:
-        #       - path: rtsp://viewer:sV7yekLozuvDGD8XP9fE@cam1:554/cam/realmonitor?channel=1&subtype=2
-        #         roles:
-        #           - detect
-        #   record:
-        #     enabled: True
-        #   snapshots:
-        #     enabled: True
-        #   detect:
-        #     width: 1920
-        #     height: 1080
-        #   motion:
-        #     mask:
-        #       - 1392,0,1920,0,1920,48,1392,48
         front-doorbell:
           ffmpeg:
             inputs:
@@ -80,6 +60,11 @@
         coral2:
           type: edgetpu
           device: usb:1
+      go2rtc:
+        streams:
+          front-doorbell:
+            # - rtsp://admin:T8EgVFbyiMXGDJhZFkVb@front-doorbell.home.gustafson.me:554/cam/realmonitor?channel=1&subtype=0#backchannel=0
+            - rtsp://admin:T8EgVFbyiMXGDJhZFkVb@front-doorbell.home.gustafson.me:554/cam/realmonitor?channel=1&subtype=0
     '';
   };
 
@@ -91,6 +76,9 @@
         wantedBy = [ "multi-user.target" ];
         requires = [ "network-online.target" ];
         path = with pkgs; [ docker wget ];
+        # 1984 - go2rtc API
+        # 8554 - go2rtc RTSP
+        # 8555 - go2rtc WebRTC
         script = ''
           docker container stop frigate >/dev/null 2>&1 || true ; \
           docker run --rm --name frigate \
@@ -104,7 +92,11 @@
             -e FRIGATE_RTSP_PASSWORD='password' \
             -p 5000:5000 \
             -p 1935:1935 \
-            blakeblackshear/frigate:stable
+            -p 1984:1984 \
+            -p 8554:8554 \
+            -p 8555:8555 \
+            -p 8555:8555/udp \
+            ghcr.io/blakeblackshear/frigate:stable
           '';
         serviceConfig = {
           Restart = "on-failure";
@@ -113,7 +105,7 @@
       frigate-update = {
         path = [ pkgs.docker ];
         script = ''
-          if docker pull blakeblackshear/frigate:stable | grep "Status: Downloaded"
+          if docker pull ghcr.io/blakeblackshear/frigate:stable | grep "Status: Downloaded"
           then
             systemctl restart frigate
           fi
