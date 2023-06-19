@@ -26,6 +26,7 @@
       josh = { path = "/home/josh"; browseable = "yes"; "read only" = "no"; };
       Media = { path = "/d/media"; browseable = "yes"; "read only" = "no"; };
       Backup = { path = "/d/backup"; browseable = "yes"; "read only" = "no"; };
+      BackupHA = { path = "/d/backup/Home Assistant"; browseable = "yes"; "read only" = "no"; };
       Scratch = { path = "/d/scratch"; browseable = "yes"; "read only" = "no"; };
       Photos = { path = "/d/photos"; browseable = "yes"; "read only" = "no"; };
       Projects = { path = "/d/projects"; browseable = "yes"; "read only" = "no"; };
