@@ -12,37 +12,37 @@
       ./host.nix
       ./users.nix
 
-      ./nvidia.nix
+#      ./nvidia.nix
       ./vscode.nix
       ./zfs.nix
-      ./clamav.nix
+#      ./clamav.nix
 
       #./pihole.nix
-      ./ddclient.nix
-      ./wireguard.nix
-      ./landing.nix
-      ./samba.nix
-      ./syncthing.nix
-      ./www.nix
-      ./ntp.nix
-      ./plex.nix
-      ./frigate.nix
-      ./minecraft.nix
-      ./transmission.nix
-      ./sabnzbd.nix
-      ./prowlarr.nix
-      ./lidarr.nix
-      ./radarr.nix
-      ./sonarr.nix
-      ./mylar.nix
-      ./komga.nix
+#      ./ddclient.nix
+#      ./wireguard.nix
+#      ./landing.nix
+#      ./samba.nix
+#      ./syncthing.nix
+#      ./www.nix
+#      ./ntp.nix
+#      ./plex.nix
+#      ./frigate.nix
+#      ./minecraft.nix
+#      ./transmission.nix
+#      ./sabnzbd.nix
+#      ./prowlarr.nix
+#      ./lidarr.nix
+#      ./radarr.nix
+#      ./sonarr.nix
+#      ./mylar.nix
+#      ./komga.nix
 
-      ./libvirt.nix
-      ./vm-vm1.nix
+#      ./libvirt.nix
+#      ./vm-vm1.nix
 
-      ./offsite-josh-ws.nix
-      ./offsite-homeassistant.nix
-      ./offsite-gustafson-nas.nix
+#      ./offsite-josh-ws.nix
+#      ./offsite-homeassistant.nix
+#      ./offsite-gustafson-nas.nix
       # ./sync-to-cloud.nix
 
       ./python.nix
