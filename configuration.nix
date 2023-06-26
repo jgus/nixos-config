@@ -15,7 +15,7 @@
       ./nvidia.nix
       ./vscode.nix
       ./zfs.nix
-#      ./clamav.nix
+      ./clamav.nix
 
       #./pihole.nix
       #./ddclient.nix
