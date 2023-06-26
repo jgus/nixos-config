@@ -18,7 +18,7 @@
 #      ./clamav.nix
 
       #./pihole.nix
-      ./ddclient.nix
+      #./ddclient.nix
 #      ./wireguard.nix
       ./landing.nix
 #      ./samba.nix
