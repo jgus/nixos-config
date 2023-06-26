@@ -12,7 +12,7 @@
       ./host.nix
       ./users.nix
 
-#      ./nvidia.nix
+      ./nvidia.nix
       ./vscode.nix
       ./zfs.nix
 #      ./clamav.nix
