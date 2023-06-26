@@ -18,13 +18,13 @@
 #      ./clamav.nix
 
       #./pihole.nix
-#      ./ddclient.nix
+      ./ddclient.nix
 #      ./wireguard.nix
-#      ./landing.nix
+      ./landing.nix
 #      ./samba.nix
 #      ./syncthing.nix
 #      ./www.nix
-#      ./ntp.nix
+      ./ntp.nix
 #      ./plex.nix
 #      ./frigate.nix
 #      ./minecraft.nix
