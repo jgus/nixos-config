@@ -20,7 +20,7 @@
       #./pihole.nix
       #./ddclient.nix
       ./landing.nix
-#      ./samba.nix
+      ./samba.nix
 #      ./syncthing.nix
 #      ./www.nix
       ./ntp.nix
