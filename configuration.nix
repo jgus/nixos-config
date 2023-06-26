@@ -34,7 +34,7 @@
       ./sonarr.nix
       ./mylar.nix
       ./komga.nix
-#      ./minecraft.nix
+      ./minecraft.nix
 
 #      ./libvirt.nix
 #      ./vm-vm1.nix
