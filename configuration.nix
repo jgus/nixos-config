@@ -21,20 +21,20 @@
       #./ddclient.nix
       ./landing.nix
       ./samba.nix
-#      ./syncthing.nix
-#      ./www.nix
+      ./syncthing.nix
+      ./www.nix
       ./ntp.nix
-#      ./plex.nix
-#      ./frigate.nix
+      ./frigate.nix
+      ./plex.nix
+      ./transmission.nix
+      ./sabnzbd.nix
+      ./prowlarr.nix
+      ./lidarr.nix
+      ./radarr.nix
+      ./sonarr.nix
+      ./mylar.nix
+      ./komga.nix
 #      ./minecraft.nix
-#      ./transmission.nix
-#      ./sabnzbd.nix
-#      ./prowlarr.nix
-#      ./lidarr.nix
-#      ./radarr.nix
-#      ./sonarr.nix
-#      ./mylar.nix
-#      ./komga.nix
 
 #      ./libvirt.nix
 #      ./vm-vm1.nix

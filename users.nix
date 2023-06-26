@@ -13,6 +13,7 @@
   ];
 
   users.users.josh = {
+    uid = 1001;
     isNormalUser = true;
     extraGroups = [ "wheel" "www" ];
     openssh.authorizedKeys.keys = [
@@ -22,6 +23,7 @@
   };
 
   users.users.gustafson = {
+    uid = 1000;
     isNormalUser = true;
   };
 }
