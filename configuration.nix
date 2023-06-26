@@ -19,7 +19,6 @@
 
       #./pihole.nix
       #./ddclient.nix
-#      ./wireguard.nix
       ./landing.nix
 #      ./samba.nix
 #      ./syncthing.nix
