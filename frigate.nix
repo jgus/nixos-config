@@ -53,6 +53,11 @@
               coordinates: 2560,1920,0,1920,0,1086,901,1106,1228,1101,1296,1192,1865,1288,2560,1200
             porch:
               coordinates: 1221,1634,1963,1688,2119,1920,0,1920,678,1532
+      objects:
+        filters:
+          person:
+            min_score: 0.5
+            threshold: 0.8
       detectors:
         coral1:
           type: edgetpu
