@@ -41,7 +41,7 @@
 
 #      ./offsite-josh-ws.nix
 #      ./offsite-homeassistant.nix
-#      ./offsite-gustafson-nas.nix
+      ./offsite-gustafson-nas.nix
       # ./sync-to-cloud.nix
 
       ./python.nix
