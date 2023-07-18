@@ -19,10 +19,11 @@
         enable = true;
         description = "Sonarr";
         wantedBy = [ "multi-user.target" ];
-        requires = [ "network-online.target" ];
+        requires = [ "prowlarr.target" ];
         path = [ pkgs.docker ];
         script = ''
           docker container stop sonarr >/dev/null 2>&1 || true ; \
+          docker container rm -f sonarr >/dev/null 2>&1 || true ; \
           docker run --rm --name sonarr \
             -p 8989:8989 \
             -e PUID=$(id -u josh) \

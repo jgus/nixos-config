@@ -34,9 +34,11 @@
         enable = true;
         description = "Web DB";
         wantedBy = [ "multi-user.target" ];
+        requires = [ "docker.service" ];
         path = [ pkgs.docker ];
         script = ''
           docker container stop web-db >/dev/null 2>&1 || true ; \
+          docker container rm -f web-db >/dev/null 2>&1 || true ; \
           docker run --rm --name web-db \
             -v /var/lib/web_db_data:/var/lib/mysql \
             mysql:5.7
@@ -63,6 +65,7 @@
         path = [ pkgs.docker ];
         script = ''
           docker container stop web-db-admin >/dev/null 2>&1 || true ; \
+          docker container rm -f web-db-admin >/dev/null 2>&1 || true ; \
           docker run --rm --name web-db-admin \
             -v /var/lib/web_db_admin_sessions:/sessions \
             --link web-db:db \
@@ -91,6 +94,7 @@
         path = [ pkgs.docker ];
         script = ''
           docker container stop web-swag >/dev/null 2>&1 || true ; \
+          docker container rm -f web-swag >/dev/null 2>&1 || true ; \
           docker run --rm --name web-swag \
             -e URL=gustafson.me \
             -e SUBDOMAINS=www,homeassistant,komga, \

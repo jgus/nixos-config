@@ -19,10 +19,11 @@
         enable = true;
         description = "Lidarr";
         wantedBy = [ "multi-user.target" ];
-        requires = [ "network-online.target" ];
+        requires = [ "prowlarr.target" ];
         path = [ pkgs.docker ];
         script = ''
           docker container stop lidarr >/dev/null 2>&1 || true ; \
+          docker container rm -f lidarr >/dev/null 2>&1 || true ; \
           docker run --rm --name lidarr \
             -p 8686:8686 \
             -e PUID=$(id -u josh) \

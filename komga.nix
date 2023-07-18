@@ -23,6 +23,7 @@
         path = [ pkgs.docker ];
         script = ''
           docker container stop komga >/dev/null 2>&1 || true ; \
+          docker container rm -f komga >/dev/null 2>&1 || true ; \
           docker run --rm --name komga \
             -p 25600:25600 \
             --user $(id -u josh):$(id -g plex) \

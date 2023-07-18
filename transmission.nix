@@ -23,6 +23,7 @@
         path = [ pkgs.docker ];
         script = ''
           docker container stop transmission >/dev/null 2>&1 || true ; \
+          docker container rm -f transmission >/dev/null 2>&1 || true ; \
           docker run --rm --name transmission \
             -p 9091:9091 \
             -e PUID=$(id -u josh) \

@@ -19,8 +19,8 @@
 
       #./pihole.nix
       #./ddclient.nix
-      ./landing.nix
       ./samba.nix
+      ./landing.nix
       ./syncthing.nix
       ./www.nix
       ./ntp.nix

@@ -51,6 +51,8 @@
         requires = [ "network-online.target" ];
         path = [ pkgs.docker pkgs.rsync ];
         script = ''
+          docker container stop landing >/dev/null 2>&1 || true ; \
+          docker container rm -f landing >/dev/null 2>&1 || true ; \
           rsync -arPL /etc/landing /tmp/
           rsync -arPL /etc/nixos/.secrets/landing /tmp/
           chmod -R 400 /tmp/landing/etc/ssh

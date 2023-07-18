@@ -15,6 +15,7 @@
         path = [ pkgs.docker ];
         script = ''
           docker container stop ntp >/dev/null 2>&1 || true ; \
+          docker container rm -f ntp >/dev/null 2>&1 || true ; \
           docker run --rm --name ntp \
             -p 123/udp \
             --read-only                          \

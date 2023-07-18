@@ -19,10 +19,11 @@
         enable = true;
         description = "Prowlarr";
         wantedBy = [ "multi-user.target" ];
-        requires = [ "network-online.target" ];
+        requires = [ "sabnzbd.target" "transmission.target" ];
         path = [ pkgs.docker ];
         script = ''
           docker container stop prowlarr >/dev/null 2>&1 || true ; \
+          docker container rm -f prowlarr >/dev/null 2>&1 || true ; \
           docker run --rm --name prowlarr \
             -p 9696:9696 \
             -e PUID=$(id -u josh) \

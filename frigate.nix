@@ -86,6 +86,7 @@
         # 8555 - go2rtc WebRTC
         script = ''
           docker container stop frigate >/dev/null 2>&1 || true ; \
+          docker container rm -f frigate >/dev/null 2>&1 || true ; \
           docker run --rm --name frigate \
             --shm-size=1024m \
             --gpus all \

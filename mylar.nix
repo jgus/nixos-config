@@ -19,10 +19,11 @@
         enable = true;
         description = "Mylar";
         wantedBy = [ "multi-user.target" ];
-        requires = [ "network-online.target" ];
+        requires = [ "prowlarr.target" ];
         path = [ pkgs.docker ];
         script = ''
           docker container stop mylar >/dev/null 2>&1 || true ; \
+          docker container rm -f mylar >/dev/null 2>&1 || true ; \
           docker run --rm --name mylar \
             -p 8090:8090 \
             -e PUID=$(id -u josh) \

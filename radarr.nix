@@ -19,10 +19,11 @@
         enable = true;
         description = "Radarr";
         wantedBy = [ "multi-user.target" ];
-        requires = [ "network-online.target" ];
+        requires = [ "prowlarr.target" ];
         path = [ pkgs.docker ];
         script = ''
           docker container stop radarr >/dev/null 2>&1 || true ; \
+          docker container rm -f radarr >/dev/null 2>&1 || true ; \
           docker run --rm --name radarr \
             -p 7878:7878 \
             -e PUID=$(id -u josh) \
