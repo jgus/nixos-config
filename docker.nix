@@ -13,6 +13,9 @@
       enableOnBoot = true;
       autoPrune.enable = true;
       storageDriver = "zfs";
+      daemon.settings = {
+        dns = ["172.22.0.1"];
+      };
     };
   };
 }
