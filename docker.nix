@@ -1,13 +1,21 @@
 { pkgs, ... }:
 
 {
-  # Workaround for Docker break https://github.com/NixOS/nixpkgs/issues/244159
-  nix.nixPath = [
-    "nixpkgs=https://github.com/NixOS/nixpkgs/archive/b6bbc53029a31f788ffed9ea2d459f0bb0f0fbfc.tar.gz"
-    "nixos-config=/etc/nixos/configuration.nix"
-    "/nix/var/nix/profiles/per-user/root/channels"
+  # pin docker to older nixpkgs: https://github.com/NixOS/nixpkgs/issues/244159
+  nixpkgs.overlays = [
+    (let
+      pinnedPkgs = import(pkgs.fetchFromGitHub {
+        owner = "NixOS";
+        repo = "nixpkgs";
+        rev = "b6bbc53029a31f788ffed9ea2d459f0bb0f0fbfc";
+        sha256 = "sha256-JVFoTY3rs1uDHbh0llRb1BcTNx26fGSLSiPmjojT+KY=";
+      }) {};
+    in
+    final: prev: {
+      docker = pinnedPkgs.docker;
+    })
   ];
-
+  
   system.activationScripts = {
     docker-setup.text = ''
       ${pkgs.zfs}/bin/zfs list r/varlib/docker >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create r/varlib/docker
