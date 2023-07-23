@@ -36,6 +36,7 @@
       BackupHA = { path = "/d/backup/Home Assistant"; browseable = "yes"; "read only" = "no"; };
       TimeMachine = { path = "/d/backup/timemachine"; browseable = "yes"; "read only" = "no"; "fruit:time machine" = "yes"; "fruit:time machine max size" = "1T"; };
       Scratch = { path = "/d/scratch"; browseable = "yes"; "read only" = "no"; };
+      Scan = { path = "/d/scratch/scan"; browseable = "yes"; "read only" = "no"; };
       Photos = { path = "/d/photos"; browseable = "yes"; "read only" = "no"; };
       Projects = { path = "/d/projects"; browseable = "yes"; "read only" = "no"; };
       Software = { path = "/d/software"; browseable = "yes"; "read only" = "no"; };
