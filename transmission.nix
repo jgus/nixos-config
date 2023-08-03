@@ -4,7 +4,8 @@
   imports = [ ./docker.nix ];
 
   networking.firewall = {
-    allowedTCPPorts = [ 9091 ];
+    allowedTCPPorts = [ 9091 51413 ];
+    allowedUDPPorts = [ 9091 51413 ];
   };
 
   system.activationScripts = {
@@ -26,6 +27,7 @@
           docker container rm -f transmission >/dev/null 2>&1 || true ; \
           docker run --rm --name transmission \
             -p 9091:9091 \
+            -p 51413:51413 \
             -e PUID=$(id -u josh) \
             -e PGID=$(id -g plex) \
             -e TZ=$(timedatectl show -p Timezone --value) \
@@ -36,6 +38,9 @@
             -e TRANSMISSION_INCOMPLETE_DIR_ENABLED=true \
             -e TRANSMISSION_WATCH_DIR=/peer/Watch \
             -e TRANSMISSION_WATCH_DIR_ENABLED=true \
+            -e TRANSMISSION_DOWNLOAD_QUEUE_ENABLED=false \
+            -e TRANSMISSION_BLOCKLIST_ENABLED=true \
+            -e TRANSMISSION_BLOCKLIST_URL="https://github.com/Naunter/BT_BlockLists/raw/master/bt_blocklists.gz" \
             --env-file /etc/nixos/.secrets/privadovpn.env \
             --cap-add NET_ADMIN \
             -v /etc/localtime:/etc/localtime:ro \
