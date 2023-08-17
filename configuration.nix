@@ -24,6 +24,7 @@
       ./syncthing.nix
       ./www.nix
       ./ntp.nix
+      ./home-assistant-record.nix
       ./frigate.nix
       ./plex.nix
       ./transmission.nix
