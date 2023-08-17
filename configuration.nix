@@ -25,6 +25,7 @@
       ./www.nix
       ./ntp.nix
       ./home-assistant-record.nix
+      ./esphome.nix
       ./frigate.nix
       ./plex.nix
       ./transmission.nix
