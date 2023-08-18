@@ -29,6 +29,7 @@
   # $ nix search wget
   environment.systemPackages = with pkgs; [
     parted
+    clang-tools # TODO
   ];
 
   services = {
