@@ -29,6 +29,7 @@
             -e PLATFORMIO_GLOBALLIB_DIR=/cache/.plattformioLibs \
             -v /var/lib/esphome:/config \
             --tmpfs /cache:exec,uid=$(id -u josh),gid=$(id -g josh) \
+            --tmpfs /.cache/pip:exec,uid=$(id -u josh),gid=$(id -g josh) \
             --tmpfs /config/.esphome/build:exec,uid=$(id -u josh),gid=$(id -g josh) \
             --tmpfs /config/.esphome/external_components:exec,uid=$(id -u josh),gid=$(id -g josh) \
             ghcr.io/esphome/esphome
