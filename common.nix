@@ -42,6 +42,7 @@
 
   programs = {
     command-not-found.enable = true;
+    direnv.enable = true;
     git.enable = true;
     git.lfs.enable = true;
     htop.enable = true;
