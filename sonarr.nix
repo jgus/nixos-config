@@ -19,7 +19,7 @@
         enable = true;
         description = "Sonarr";
         wantedBy = [ "multi-user.target" ];
-        requires = [ "prowlarr.target" ];
+        requires = [ "prowlarr.service" ];
         path = [ pkgs.docker ];
         script = ''
           docker container stop sonarr >/dev/null 2>&1 || true ; \

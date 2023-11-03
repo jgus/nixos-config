@@ -19,7 +19,7 @@
         enable = true;
         description = "Radarr";
         wantedBy = [ "multi-user.target" ];
-        requires = [ "prowlarr.target" ];
+        requires = [ "prowlarr.service" ];
         path = [ pkgs.docker ];
         script = ''
           docker container stop radarr >/dev/null 2>&1 || true ; \

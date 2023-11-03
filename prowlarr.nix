@@ -19,7 +19,7 @@
         enable = true;
         description = "Prowlarr";
         wantedBy = [ "multi-user.target" ];
-        requires = [ "sabnzbd.target" "transmission.target" ];
+        requires = [ "sabnzbd.service" "transmission.service" ];
         path = [ pkgs.docker ];
         script = ''
           docker container stop prowlarr >/dev/null 2>&1 || true ; \
