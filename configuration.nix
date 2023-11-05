@@ -47,6 +47,8 @@
       ./offsite-gustafson-nas.nix
       # ./sync-to-cloud.nix
 
+      ./userbox.nix
+
       ./python.nix
     ];
 }
