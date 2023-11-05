@@ -30,11 +30,12 @@
   environment.systemPackages = with pkgs; [
     parted
     clang-tools # TODO
+    nixpkgs-fmt
   ];
 
   services = {
     ntp.enable = true;
-    
+
     openssh = {
       enable = true;
       openFirewall = true;
@@ -68,7 +69,7 @@
       options = "--delete-older-than 30d";
     };
     extraOptions = ''
-        experimental-features = nix-command flakes
+      experimental-features = nix-command flakes
     '';
   };
 

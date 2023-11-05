@@ -63,7 +63,7 @@
             -p 25565:25565/tcp \
             -v /var/lib/minecraft:/home/minecraft/config \
             minecraft
-          '';
+        '';
         unitConfig = {
           StartLimitIntervalSec = 0;
         };

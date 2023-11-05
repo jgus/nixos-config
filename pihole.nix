@@ -40,11 +40,11 @@
             pihole/pihole
           docker network connect --ip 192.168.22.2 bridge2 pihole
           docker start pihole -ia
-          '';
+        '';
         preStop = ''
           docker stop pihole
           docker rm pihole
-          '';
+        '';
         serviceConfig = {
           Restart = "on-failure";
         };

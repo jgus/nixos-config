@@ -32,7 +32,7 @@
             -v /var/lib/sabnzbd:/config \
             -v /d/scratch/usenet:/config/Downloads \
             lscr.io/linuxserver/sabnzbd
-          '';
+        '';
         serviceConfig = {
           Restart = "always";
         };

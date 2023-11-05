@@ -31,7 +31,7 @@
             -e TZ=$(timedatectl show -p Timezone --value) \
             -v /var/lib/prowlarr:/config \
             lscr.io/linuxserver/prowlarr
-          '';
+        '';
         serviceConfig = {
           Restart = "always";
         };

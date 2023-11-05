@@ -14,7 +14,7 @@
       autoPrune.enable = true;
       storageDriver = "zfs";
       daemon.settings = {
-        dns = ["172.22.0.1"];
+        dns = [ "172.22.0.1" ];
       };
     };
   };

@@ -103,7 +103,7 @@
             -p 8555:8555 \
             -p 8555:8555/udp \
             ghcr.io/blakeblackshear/frigate:stable
-          '';
+        '';
         serviceConfig = {
           Restart = "on-failure";
         };

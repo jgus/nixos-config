@@ -5,7 +5,8 @@
 
 {
   imports =
-    [ (modulesPath + "/installer/scan/not-detected.nix")
+    [
+      (modulesPath + "/installer/scan/not-detected.nix")
     ];
 
   boot.initrd.availableKernelModules = [ "ahci" "xhci_pci" "ehci_pci" "megaraid_sas" "usbhid" "usb_storage" "sd_mod" "sr_mod" ];
@@ -14,42 +15,55 @@
   boot.extraModulePackages = [ ];
 
   fileSystems."/" =
-    { device = "r";
-      fsType = "zfs"; options = [ "zfsutil" ];
+    {
+      device = "r";
+      fsType = "zfs";
+      options = [ "zfsutil" ];
     };
 
   fileSystems."/etc/nixos" =
-    { device = "r/nixos";
-      fsType = "zfs"; options = [ "zfsutil" ];
+    {
+      device = "r/nixos";
+      fsType = "zfs";
+      options = [ "zfsutil" ];
     };
 
   fileSystems."/home" =
-    { device = "r/home";
-      fsType = "zfs"; options = [ "zfsutil" ];
+    {
+      device = "r/home";
+      fsType = "zfs";
+      options = [ "zfsutil" ];
     };
 
   fileSystems."/root" =
-    { device = "r/home/root";
-      fsType = "zfs"; options = [ "zfsutil" ];
+    {
+      device = "r/home/root";
+      fsType = "zfs";
+      options = [ "zfsutil" ];
     };
 
   fileSystems."/var/lib" =
-    { device = "r/varlib";
-      fsType = "zfs"; options = [ "zfsutil" ];
+    {
+      device = "r/varlib";
+      fsType = "zfs";
+      options = [ "zfsutil" ];
     };
 
   fileSystems."/boot" =
-    { device = "/dev/disk/by-uuid/951F-042C";
+    {
+      device = "/dev/disk/by-uuid/951F-042C";
       fsType = "vfat";
     };
 
   fileSystems."/boot/1" =
-    { device = "/dev/disk/by-uuid/9523-82A9";
+    {
+      device = "/dev/disk/by-uuid/9523-82A9";
       fsType = "vfat";
     };
 
   fileSystems."/etc/nixos/.secrets" =
-    { device = "/boot/.secrets";
+    {
+      device = "/boot/.secrets";
       options = [ "bind" ];
     };
 

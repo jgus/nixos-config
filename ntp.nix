@@ -23,7 +23,7 @@
             --tmpfs=/run/chrony:rw,mode=1750     \
             --tmpfs=/var/lib/chrony:rw,mode=1750 \
             cturra/ntp
-          '';
+        '';
         serviceConfig = {
           Restart = "always";
         };

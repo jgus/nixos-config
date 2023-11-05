@@ -63,7 +63,7 @@
             -e AUTHORIZED_KEYS='$(cat /root/.ssh/id_rsa-backup.pub)' \
             -v /tmp/landing/etc/ssh:/etc/ssh \
             ssh"
-          '';
+        '';
         unitConfig = {
           StartLimitIntervalSec = 0;
         };

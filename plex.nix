@@ -44,7 +44,7 @@
             -v /d/photos:/shares/photos \
             --tmpfs /tmp \
             lscr.io/linuxserver/plex
-          '';
+        '';
         serviceConfig = {
           Restart = "on-failure";
         };

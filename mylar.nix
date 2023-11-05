@@ -35,7 +35,7 @@
             -v /d/scratch/peer:/peer \
             -v /d/scratch/usenet:/usenet \
             lscr.io/linuxserver/mylar3
-          '';
+        '';
         serviceConfig = {
           Restart = "always";
         };

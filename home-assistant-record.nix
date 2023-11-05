@@ -27,7 +27,7 @@
             -p 13306:3306 \
             -v /var/lib/home-assistant-record:/var/lib/mysql \
             mariadb:latest
-          '';
+        '';
       };
       home-assistant-record-update = {
         path = [ pkgs.docker ];

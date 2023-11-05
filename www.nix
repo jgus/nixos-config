@@ -42,7 +42,7 @@
           docker run --rm --name web-db \
             -v /var/lib/web_db_data:/var/lib/mysql \
             mysql:5.7
-          '';
+        '';
       };
       web-db-update = {
         path = [ pkgs.docker ];
@@ -71,7 +71,7 @@
             --link web-db:db \
             -p 8101:80 \
             phpmyadmin/phpmyadmin
-          '';
+        '';
       };
       web-db-admin-update = {
         path = [ pkgs.docker ];
@@ -119,7 +119,7 @@
             -p 80:80 \
             -p 443:443 \
             lscr.io/linuxserver/swag
-          '';
+        '';
         serviceConfig = {
           Restart = "on-failure";
         };

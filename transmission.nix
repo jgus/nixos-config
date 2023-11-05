@@ -47,7 +47,7 @@
             -v /var/lib/transmission:/data \
             -v /d/scratch/peer:/peer \
             haugene/transmission-openvpn
-          '';
+        '';
         serviceConfig = {
           Restart = "always";
         };

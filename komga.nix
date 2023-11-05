@@ -32,7 +32,7 @@
             -v /var/lib/komga:/config \
             -v /d/media/Comics:/data \
             gotson/komga
-          '';
+        '';
         serviceConfig = {
           Restart = "always";
         };

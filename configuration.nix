@@ -2,7 +2,8 @@
 
 {
   imports =
-    [ # Include the results of the hardware scan.
+    [
+      # Include the results of the hardware scan.
       ./hardware-configuration.nix
 
       ./interfaces.nix
@@ -38,11 +39,11 @@
       ./komga.nix
       ./minecraft.nix
 
-#      ./libvirt.nix
-#      ./vm-vm1.nix
+      #      ./libvirt.nix
+      #      ./vm-vm1.nix
 
-#      ./offsite-josh-ws.nix
-#      ./offsite-homeassistant.nix
+      #      ./offsite-josh-ws.nix
+      #      ./offsite-homeassistant.nix
       ./offsite-gustafson-nas.nix
       # ./sync-to-cloud.nix
 

@@ -34,7 +34,7 @@
             -v /d/scratch/usenet:/usenet \
             -v /d/media:/media \
             lscr.io/linuxserver/radarr
-          '';
+        '';
         serviceConfig = {
           Restart = "always";
         };

@@ -41,7 +41,7 @@
             -v /d/media/Comics:/shares/Comics \
             -v /d/media/Music:/shares/Music \
             lscr.io/linuxserver/syncthing
-          '';
+        '';
         serviceConfig = {
           Restart = "always";
         };
