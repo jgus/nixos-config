@@ -2,6 +2,9 @@
 
 let
   devices = {
+    pi-67cba1 = "/dev/serial/by-id/usb-Zooz_800_Z-Wave_Stick_533D004242-if00";
+    pi-67db40 = "/dev/serial/by-id/usb-Zooz_800_Z-Wave_Stick_533D004242-if00";
+    pi-67dbcd = "/dev/serial/by-id/usb-Zooz_800_Z-Wave_Stick_533D004242-if00";
     pi-67dc75 = "/dev/serial/by-id/usb-Zooz_800_Z-Wave_Stick_533D004242-if00";
   };
 in
