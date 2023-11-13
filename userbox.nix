@@ -19,7 +19,7 @@ in
     "userbox-${user}/docker/Dockerfile".text = ''
       FROM alpine
 
-      RUN apk add --no-cache openssh tini
+      RUN apk add --no-cache openssh tini rsync nano
       RUN rm -rf /etc/ssh
       COPY entrypoint.sh /
 
@@ -42,7 +42,6 @@ in
       PermitRootLogin no
       AuthorizedKeysFile .ssh/authorized_keys
       PasswordAuthentication no
-      AllowTcpForwarding yes
       Subsystem sftp /usr/lib/ssh/sftp-server
     '';
   };
@@ -64,6 +63,7 @@ in
           /bin/sh -c "docker run --rm --name userbox-${user} \
             -p ${toString port}:22/tcp \
             -v /home/${user}:/home/${user} \
+            -v /d/external/${user}:/home/${user}/data \
             -v /var/lib/userbox-${user}:/etc/ssh \
             -v /etc/userbox-${user}/etc/ssh/sshd_config:/etc/ssh/sshd_config \
             userbox-${user}"
