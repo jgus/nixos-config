@@ -14,5 +14,7 @@
 
       ./vscode.nix
       #./clamav.nix # needs .secrets/gmail-password.nix
+
+      ./unifi.nix
     ];
 }
