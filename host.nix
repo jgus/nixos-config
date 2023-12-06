@@ -6,6 +6,7 @@ in
 {
   time.timeZone = "America/Denver";
 
+  # mkdir .secrets/ssh ; cp /etc/ssh/ssh_host_* .secrets/ssh/
   environment.etc = {
     "ssh/ssh_host_ed25519_key" = {
       source = ./.secrets/ssh/ssh_host_ed25519_key;
