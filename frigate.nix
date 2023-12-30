@@ -31,10 +31,10 @@
         output_args:
           record: -f segment -segment_time 10 -segment_format mp4 -reset_timestamps 1 -strftime 1 -c copy
       cameras:
-        front-doorbell:
+        doorbell-front:
           ffmpeg:
             inputs:
-              - path: rtsp://admin:T8EgVFbyiMXGDJhZFkVb@front-doorbell.home.gustafson.me:554
+              - path: rtsp://admin:T8EgVFbyiMXGDJhZFkVb@doorbell-front.home.gustafson.me:554
                 roles:
                   - detect
                   - record
@@ -45,14 +45,20 @@
           detect:
             width: 2560
             height: 1920
-          motion:
-            mask:
-              - 1972,0,2560,0,2560,56,1972,56
-          zones:
-            yard:
-              coordinates: 2560,1920,0,1920,0,1086,901,1106,1228,1101,1296,1192,1865,1288,2560,1200
-            porch:
-              coordinates: 1221,1634,1963,1688,2119,1920,0,1920,678,1532
+        doorbell-basement:
+          ffmpeg:
+            inputs:
+              - path: rtsp://admin:T8EgVFbyiMXGDJhZFkVb@doorbell-basement.home.gustafson.me:554
+                roles:
+                  - detect
+                  - record
+          record:
+            enabled: True
+          snapshots:
+            enabled: True
+          detect:
+            width: 2560
+            height: 1920
       objects:
         filters:
           person:
@@ -67,9 +73,10 @@
           device: usb:1
       go2rtc:
         streams:
-          front-doorbell:
-            # - rtsp://admin:T8EgVFbyiMXGDJhZFkVb@front-doorbell.home.gustafson.me:554/cam/realmonitor?channel=1&subtype=0#backchannel=0
-            - rtsp://admin:T8EgVFbyiMXGDJhZFkVb@front-doorbell.home.gustafson.me:554/cam/realmonitor?channel=1&subtype=0
+          doorbell-front:
+            - rtsp://admin:T8EgVFbyiMXGDJhZFkVb@doorbell-front.home.gustafson.me:554/cam/realmonitor?channel=1&subtype=0
+          doorbell-basement:
+            - rtsp://admin:T8EgVFbyiMXGDJhZFkVb@doorbell-basement.home.gustafson.me:554/cam/realmonitor?channel=1&subtype=0
     '';
   };
 
