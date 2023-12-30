@@ -59,6 +59,20 @@
           detect:
             width: 2560
             height: 1920
+        camera-driveway:
+          ffmpeg:
+            inputs:
+              - path: rtsp://admin:JRW2BfmJrBMYJMda2FAT@camera-driveway.home.gustafson.me:554
+                roles:
+                  - detect
+                  - record
+          record:
+            enabled: True
+          snapshots:
+            enabled: True
+          detect:
+            width: 3840
+            height: 2160
       objects:
         filters:
           person:
@@ -77,6 +91,8 @@
             - rtsp://admin:T8EgVFbyiMXGDJhZFkVb@doorbell-front.home.gustafson.me:554/cam/realmonitor?channel=1&subtype=0
           doorbell-basement:
             - rtsp://admin:T8EgVFbyiMXGDJhZFkVb@doorbell-basement.home.gustafson.me:554/cam/realmonitor?channel=1&subtype=0
+          camera-driveway:
+            - rtsp://admin:JRW2BfmJrBMYJMda2FAT@camera-driveway.home.gustafson.me:554/cam/realmonitor?channel=1&subtype=0
     '';
   };
 
