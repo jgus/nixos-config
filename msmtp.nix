@@ -13,7 +13,7 @@
         port = 587;
         from = "joshgstfsn@gmail.com";
         user = "joshgstfsn";
-        password = import .secrets/gmail-password.nix;
+        password = (import .secrets/passwords.nix).gmail;
       };
     };
   };
