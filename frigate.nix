@@ -47,6 +47,9 @@ in
           detect:
             width: 2560
             height: 1920
+          motion:
+            mask:
+              - 2560,52,2560,0,1970,0,1970,52
         doorbell-basement:
           ffmpeg:
             inputs:
@@ -61,6 +64,9 @@ in
           detect:
             width: 2560
             height: 1920
+          motion:
+            mask:
+              - 2560,52,2560,0,1970,0,1970,52
         camera-driveway:
           ffmpeg:
             inputs:
