@@ -25,7 +25,8 @@
       ./syncthing.nix
       ./www.nix
       ./ntp.nix
-      ./home-assistant-record.nix
+      ./mosquitto.nix
+      #./home-assistant-record.nix
       ./home-assistant.nix
       ./esphome.nix
       ./frigate.nix

@@ -20,10 +20,12 @@ in
 
   environment.etc = {
     "frigate/config.yml".text = ''
+      # logger:
+      #   default: debug
       mqtt:
-        host: mqtt
+        host: mqtt.home.gustafson.me
         user: frigate
-        password: CWPRbirZT2zAhtW3kUyt
+        password: ${pw.mqtt.frigate}
       record:
         retain:
           days: 365
