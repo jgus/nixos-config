@@ -75,6 +75,146 @@ in
           detect:
             width: 3840
             height: 2160
+        camera-garage-n:
+          ffmpeg:
+            inputs:
+              - path: rtsp://admin:${pw.camera}@camera-garage-n.home.gustafson.me:554
+                roles:
+                  - detect
+                  - record
+          record:
+            enabled: True
+          snapshots:
+            enabled: True
+          detect:
+            width: 3840
+            height: 2160
+        camera-garage-s:
+          ffmpeg:
+            inputs:
+              - path: rtsp://admin:${pw.camera}@camera-garage-s.home.gustafson.me:554
+                roles:
+                  - detect
+                  - record
+          record:
+            enabled: True
+          snapshots:
+            enabled: True
+          detect:
+            width: 3840
+            height: 2160
+        camera-garage-rear:
+          ffmpeg:
+            inputs:
+              - path: rtsp://admin:${pw.camera}@camera-garage-rear.home.gustafson.me:554
+                roles:
+                  - detect
+                  - record
+          record:
+            enabled: True
+          snapshots:
+            enabled: True
+          detect:
+            width: 3840
+            height: 2160
+        camera-guest-patio:
+          ffmpeg:
+            inputs:
+              - path: rtsp://admin:${pw.camera}@camera-guest-patio.home.gustafson.me:554
+                roles:
+                  - detect
+                  - record
+          record:
+            enabled: True
+          snapshots:
+            enabled: True
+          detect:
+            width: 3840
+            height: 2160
+        camera-n-side:
+          ffmpeg:
+            inputs:
+              - path: rtsp://admin:${pw.camera}@camera-n-side.home.gustafson.me:554
+                roles:
+                  - detect
+                  - record
+          record:
+            enabled: True
+          snapshots:
+            enabled: True
+          detect:
+            width: 3840
+            height: 2160
+        camera-s-side:
+          ffmpeg:
+            inputs:
+              - path: rtsp://admin:${pw.camera}@camera-s-side.home.gustafson.me:554
+                roles:
+                  - detect
+                  - record
+          record:
+            enabled: True
+          snapshots:
+            enabled: True
+          detect:
+            width: 3840
+            height: 2160
+        camera-patio:
+          ffmpeg:
+            inputs:
+              - path: rtsp://admin:${pw.camera}@camera-patio.home.gustafson.me:554
+                roles:
+                  - detect
+                  - record
+          record:
+            enabled: True
+          snapshots:
+            enabled: True
+          detect:
+            width: 3840
+            height: 2160
+        camera-pool:
+          ffmpeg:
+            inputs:
+              - path: rtsp://admin:${pw.camera}@camera-pool.home.gustafson.me:554
+                roles:
+                  - detect
+                  - record
+          record:
+            enabled: True
+          snapshots:
+            enabled: True
+          detect:
+            width: 3840
+            height: 2160
+        camera-porch-n:
+          ffmpeg:
+            inputs:
+              - path: rtsp://admin:${pw.camera}@camera-porch-n.home.gustafson.me:554
+                roles:
+                  - detect
+                  - record
+          record:
+            enabled: True
+          snapshots:
+            enabled: True
+          detect:
+            width: 3840
+            height: 2160
+        camera-porch-s:
+          ffmpeg:
+            inputs:
+              - path: rtsp://admin:${pw.camera}@camera-porch-s.home.gustafson.me:554
+                roles:
+                  - detect
+                  - record
+          record:
+            enabled: True
+          snapshots:
+            enabled: True
+          detect:
+            width: 3840
+            height: 2160
       objects:
         filters:
           person:
@@ -95,6 +235,26 @@ in
             - rtsp://admin:${pw.doorbell}@doorbell-basement.home.gustafson.me:554/cam/realmonitor?channel=1&subtype=0
           camera-driveway:
             - rtsp://admin:${pw.camera}@camera-driveway.home.gustafson.me:554/cam/realmonitor?channel=1&subtype=0
+          camera-garage-n:
+            - rtsp://admin:${pw.camera}@camera-garage-n.home.gustafson.me:554/cam/realmonitor?channel=1&subtype=0
+          camera-garage-s:
+            - rtsp://admin:${pw.camera}@camera-garage-s.home.gustafson.me:554/cam/realmonitor?channel=1&subtype=0
+          camera-garage-rear:
+            - rtsp://admin:${pw.camera}@camera-garage-rear.home.gustafson.me:554/cam/realmonitor?channel=1&subtype=0
+          camera-guest-patio:
+            - rtsp://admin:${pw.camera}@camera-guest-patio.home.gustafson.me:554/cam/realmonitor?channel=1&subtype=0
+          camera-n-side:
+            - rtsp://admin:${pw.camera}@camera-n-side.home.gustafson.me:554/cam/realmonitor?channel=1&subtype=0
+          camera-s-side:
+            - rtsp://admin:${pw.camera}@camera-s-side.home.gustafson.me:554/cam/realmonitor?channel=1&subtype=0
+          camera-patio:
+            - rtsp://admin:${pw.camera}@camera-patio.home.gustafson.me:554/cam/realmonitor?channel=1&subtype=0
+          camera-pool:
+            - rtsp://admin:${pw.camera}@camera-pool.home.gustafson.me:554/cam/realmonitor?channel=1&subtype=0
+          camera-porch-n:
+            - rtsp://admin:${pw.camera}@camera-porch-n.home.gustafson.me:554/cam/realmonitor?channel=1&subtype=0
+          camera-porch-s:
+            - rtsp://admin:${pw.camera}@camera-porch-s.home.gustafson.me:554/cam/realmonitor?channel=1&subtype=0
     '';
   };
 
