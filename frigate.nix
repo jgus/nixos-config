@@ -75,6 +75,9 @@ in
           detect:
             width: 3840
             height: 2160
+          motion:
+            mask:
+              - 2596,188,3696,188,3696,80,2596,80
         camera-garage-n:
           ffmpeg:
             inputs:
@@ -89,6 +92,9 @@ in
           detect:
             width: 3840
             height: 2160
+          motion:
+            mask:
+              - 2596,188,3696,188,3696,80,2596,80
         camera-garage-s:
           ffmpeg:
             inputs:
@@ -103,6 +109,9 @@ in
           detect:
             width: 3840
             height: 2160
+          motion:
+            mask:
+              - 2596,188,3696,188,3696,80,2596,80
         camera-garage-rear:
           ffmpeg:
             inputs:
@@ -117,6 +126,9 @@ in
           detect:
             width: 3840
             height: 2160
+          motion:
+            mask:
+              - 2596,188,3696,188,3696,80,2596,80
         camera-guest-patio:
           ffmpeg:
             inputs:
@@ -131,6 +143,9 @@ in
           detect:
             width: 3840
             height: 2160
+          motion:
+            mask:
+              - 2596,188,3696,188,3696,80,2596,80
         camera-n-side:
           ffmpeg:
             inputs:
@@ -145,6 +160,9 @@ in
           detect:
             width: 3840
             height: 2160
+          motion:
+            mask:
+              - 2596,188,3696,188,3696,80,2596,80
         camera-s-side:
           ffmpeg:
             inputs:
@@ -159,6 +177,9 @@ in
           detect:
             width: 3840
             height: 2160
+          motion:
+            mask:
+              - 2596,188,3696,188,3696,80,2596,80
         camera-patio:
           ffmpeg:
             inputs:
@@ -173,6 +194,9 @@ in
           detect:
             width: 3840
             height: 2160
+          motion:
+            mask:
+              - 2596,188,3696,188,3696,80,2596,80
         camera-pool:
           ffmpeg:
             inputs:
@@ -187,6 +211,9 @@ in
           detect:
             width: 3840
             height: 2160
+          motion:
+            mask:
+              - 2596,188,3696,188,3696,80,2596,80
         camera-porch-n:
           ffmpeg:
             inputs:
@@ -201,6 +228,9 @@ in
           detect:
             width: 3840
             height: 2160
+          motion:
+            mask:
+              - 2596,188,3696,188,3696,80,2596,80
         camera-porch-s:
           ffmpeg:
             inputs:
@@ -215,6 +245,9 @@ in
           detect:
             width: 3840
             height: 2160
+          motion:
+            mask:
+              - 2596,188,3696,188,3696,80,2596,80
       objects:
         filters:
           person:
