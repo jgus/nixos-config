@@ -1,5 +1,7 @@
 { config, pkgs, ... }:
 
+let pw = import ./.secrets/passwords.nix;
+in
 {
   imports = [ ./docker.nix ];
 
@@ -34,7 +36,7 @@
         doorbell-front:
           ffmpeg:
             inputs:
-              - path: rtsp://admin:T8EgVFbyiMXGDJhZFkVb@doorbell-front.home.gustafson.me:554
+              - path: rtsp://admin:${pw.doorbell}@doorbell-front.home.gustafson.me:554
                 roles:
                   - detect
                   - record
@@ -48,7 +50,7 @@
         doorbell-basement:
           ffmpeg:
             inputs:
-              - path: rtsp://admin:T8EgVFbyiMXGDJhZFkVb@doorbell-basement.home.gustafson.me:554
+              - path: rtsp://admin:${pw.doorbell}@doorbell-basement.home.gustafson.me:554
                 roles:
                   - detect
                   - record
@@ -62,7 +64,7 @@
         camera-driveway:
           ffmpeg:
             inputs:
-              - path: rtsp://admin:JRW2BfmJrBMYJMda2FAT@camera-driveway.home.gustafson.me:554
+              - path: rtsp://admin:${pw.camera}@camera-driveway.home.gustafson.me:554
                 roles:
                   - detect
                   - record
@@ -88,11 +90,11 @@
       go2rtc:
         streams:
           doorbell-front:
-            - rtsp://admin:T8EgVFbyiMXGDJhZFkVb@doorbell-front.home.gustafson.me:554/cam/realmonitor?channel=1&subtype=0
+            - rtsp://admin:${pw.doorbell}@doorbell-front.home.gustafson.me:554/cam/realmonitor?channel=1&subtype=0
           doorbell-basement:
-            - rtsp://admin:T8EgVFbyiMXGDJhZFkVb@doorbell-basement.home.gustafson.me:554/cam/realmonitor?channel=1&subtype=0
+            - rtsp://admin:${pw.doorbell}@doorbell-basement.home.gustafson.me:554/cam/realmonitor?channel=1&subtype=0
           camera-driveway:
-            - rtsp://admin:JRW2BfmJrBMYJMda2FAT@camera-driveway.home.gustafson.me:554/cam/realmonitor?channel=1&subtype=0
+            - rtsp://admin:${pw.camera}@camera-driveway.home.gustafson.me:554/cam/realmonitor?channel=1&subtype=0
     '';
   };
 
