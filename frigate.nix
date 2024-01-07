@@ -31,7 +31,7 @@ in
           days: 365
           mode: motion
       ffmpeg:
-        hwaccel_args: -hwaccel cuda
+        hwaccel_args: preset-nvidia-h264
         output_args:
           record: -f segment -segment_time 10 -segment_format mp4 -reset_timestamps 1 -strftime 1 -c copy
       cameras:
@@ -52,6 +52,11 @@ in
           motion:
             mask:
               - 2560,52,2560,0,1970,0,1970,52
+          zones:
+            porch:
+              coordinates: 0,1920,0,1457,860,1465,1039,1335,1818,1291,2275,1280,2560,1164,2560,1920
+            front_yard:
+              coordinates: 2560,919,2428,909,2218,1047,1854,1078,1351,1112,738,1119,766,1436,849,1436,836,1304,1574,1283,1995,1249,2384,1205,2560,1143
         doorbell-basement:
           ffmpeg:
             inputs:
@@ -69,6 +74,9 @@ in
           motion:
             mask:
               - 2560,52,2560,0,1970,0,1970,52
+          zones:
+            basement_patio:
+              coordinates: 0,1920,2560,1920,2560,719,584,857,0,823
         camera-driveway:
           ffmpeg:
             inputs:
