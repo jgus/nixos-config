@@ -26,6 +26,21 @@ in
         host: mqtt.home.gustafson.me
         user: frigate
         password: ${pw.mqtt.frigate}
+      objects:
+        track:
+          - person
+          # - car
+        filters:
+          person:
+            min_score: 0.5
+            threshold: 0.8
+      detectors:
+        coral1:
+          type: edgetpu
+          device: usb:0
+        coral2:
+          type: edgetpu
+          device: usb:1
       record:
         retain:
           days: 365
@@ -264,18 +279,6 @@ in
           motion:
             mask:
               - 2596,188,3696,188,3696,80,2596,80
-      objects:
-        filters:
-          person:
-            min_score: 0.5
-            threshold: 0.8
-      detectors:
-        coral1:
-          type: edgetpu
-          device: usb:0
-        coral2:
-          type: edgetpu
-          device: usb:1
       go2rtc:
         streams:
           doorbell-front:
