@@ -49,6 +49,10 @@ in
         hwaccel_args: preset-nvidia-h264
         output_args:
           record: -f segment -segment_time 10 -segment_format mp4 -reset_timestamps 1 -strftime 1 -c copy
+      birdseye:
+        enabled: True
+        mode: objects
+        restream: True
       cameras:
         doorbell-front:
           ffmpeg:
