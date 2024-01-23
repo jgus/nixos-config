@@ -2,7 +2,7 @@
 
 {
   environment.systemPackages = with pkgs; [
-    python310Full
-    python310Packages.pip
+    python311Full
+    python311Packages.pip
   ];
 }
