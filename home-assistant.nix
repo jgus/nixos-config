@@ -31,25 +31,25 @@
             -e VERSION=latest \
             -v /var/lib/home-assistant:/config \
             -v /run/dbus:/run/dbus:ro \
-            ghcr.io/home-assistant/home-assistant:stable
+            ghcr.io/home-assistant/home-assistant:jgus-dev
         '';
         serviceConfig = {
           Restart = "on-failure";
         };
       };
-      home-assistant-update = {
-        path = [ pkgs.docker ];
-        script = ''
-          if docker pull ghcr.io/home-assistant/home-assistant:stable | grep "Status: Downloaded"
-          then
-            systemctl restart home-assistant
-          fi
-        '';
-        serviceConfig = {
-          Type = "oneshot";
-        };
-        startAt = "hourly";
-      };
+      # home-assistant-update = {
+      #   path = [ pkgs.docker ];
+      #   script = ''
+      #     if docker pull ghcr.io/home-assistant/home-assistant:stable | grep "Status: Downloaded"
+      #     then
+      #       systemctl restart home-assistant
+      #     fi
+      #   '';
+      #   serviceConfig = {
+      #     Type = "oneshot";
+      #   };
+      #   startAt = "hourly";
+      # };
     };
   };
 }
