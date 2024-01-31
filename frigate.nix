@@ -12,7 +12,8 @@ in
 
   system.activationScripts = {
     frigateSetup.text = ''
-      ${pkgs.zfs}/bin/zfs list d/varlib/frigate >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create d/varlib/frigate
+      ${pkgs.zfs}/bin/zfs list d/varlib/frigate-media >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create d/varlib/frigate-media;
+      ${pkgs.zfs}/bin/zfs list d/varlib/frigate-config >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create d/varlib/frigate-config;
     '';
   };
 
@@ -335,11 +336,12 @@ in
           docker container stop frigate >/dev/null 2>&1 || true ; \
           docker container rm -f frigate >/dev/null 2>&1 || true ; \
           docker run --rm --name frigate \
-            --shm-size=1024m \
+            --shm-size=2048m \
             --gpus all \
             --privileged \
             -v /dev/bus/usb/004:/dev/bus/usb/004 \
-            -v /var/lib/frigate:/media/frigate \
+            -v /var/lib/frigate-media:/media/frigate \
+            -v /var/lib/frigate-config:/config \
             -v /etc/frigate/config.yml:/config/config.yml:ro \
             -v /etc/localtime:/etc/localtime:ro \
             -e FRIGATE_RTSP_PASSWORD='password' \
