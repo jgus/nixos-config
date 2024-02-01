@@ -123,8 +123,8 @@ in
 
         automation ui: !include automations.yaml
         script ui: !include scripts.yaml
-        scene ui: !include scenes.yaml
-        template ui: !include template.yaml
+        scene: !include scenes.yaml
+        template: !include template.yaml
 
         amcrest: !include_dir_list  etc/amcrest
 
