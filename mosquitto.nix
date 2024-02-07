@@ -28,6 +28,12 @@ in
           ];
           password = "${pw.mqtt.frigate}";
         };
+        users.frodo = {
+          acl = [
+            "readwrite #"
+          ];
+          password = "${pw.mqtt.frodo}";
+        };
       }
     ];
   };
