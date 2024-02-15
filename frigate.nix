@@ -290,6 +290,25 @@ in
             mask:
               - 2596,188,3696,188,3696,80,2596,80
               - 826,0,245,0,401,284
+        camera-back-yard:
+          ffmpeg:
+            inputs:
+              - path: rtsp://admin:${pw.camera}@camera-back-yard.home.gustafson.me:554
+                roles:
+                  - detect
+                  - record
+          record:
+            enabled: True
+          snapshots:
+            enabled: True
+          detect:
+            width: 3840
+            height: 2160
+          motion:
+            mask:
+              - 2596,188,3696,188,3696,80,2596,80
+              - 866,0,0,609,0,0
+              - 2995,86,2608,0,3840,0,3840,730
       go2rtc:
         streams:
           doorbell-front:
@@ -318,6 +337,8 @@ in
             - rtsp://admin:${pw.camera}@camera-porch-n.home.gustafson.me:554/cam/realmonitor?channel=1&subtype=0
           camera-porch-s:
             - rtsp://admin:${pw.camera}@camera-porch-s.home.gustafson.me:554/cam/realmonitor?channel=1&subtype=0
+          camera-back-yard:
+            - rtsp://admin:${pw.camera}@camera-back-yard.home.gustafson.me:554/cam/realmonitor?channel=1&subtype=0
     '';
   };
 
