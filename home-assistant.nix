@@ -22,24 +22,122 @@ in
 
   networking.firewall.allowedTCPPorts = [ 8123 ];
 
-  environment.etc = let items = [ "x" "y" ]; in
+  environment.etc =
+    let
+      items = [
+        "basement_east_bedroom_shade"
+        "basement_living_room_shade_1"
+        "basement_living_room_shade_2"
+        "basement_master_bedroom_shade_1"
+        "basement_master_bedroom_shade_2"
+        "basement_west_bedroom_shade"
+        "boy_room_shade_1"
+        "boy_room_shade_2"
+        "boy_room_shade_3"
+        "boy_room_shade_4"
+        "boy_room_shade_5"
+        "craft_room_shade_1"
+        "craft_room_shade_2"
+        "dining_room_shade_1"
+        "dining_room_shade_2"
+        "dining_room_upper_shade"
+        "eden_hope_room_shade_1"
+        "eden_hope_room_shade_2"
+        "great_room_lower_left_shade"
+        "great_room_lower_right_shade"
+        "great_room_upper_left_shade"
+        "great_room_upper_right_shade"
+        "kayleigh_lyra_room_shade_1"
+        "kayleigh_lyra_room_shade_2"
+        "kayleigh_lyra_room_shade_3"
+        "kitchen_shade_1"
+        "kitchen_shade_2"
+        "kitchen_shade_3"
+        "loft_shade_1"
+        "loft_shade_2"
+        "loft_shade_3"
+        "loft_shade_4"
+        "master_bedroom_shade_1"
+        "master_bedroom_shade_2"
+        "master_bedroom_shade_3"
+        "master_bedroom_shade_4"
+        "master_bedroom_shade_5"
+        "music_room_shade_1"
+        "music_room_shade_2"
+        "office_shade_1"
+        "office_shade_2"
+        "office_shade_3"
+        "office_shade_4"
+        "office_shade_5"
+        "study_shade_1"
+        "study_shade_2"
+        "toy_room_shade_1"
+        "toy_room_shade_2"
+        "toy_room_shade_3"
+        "workshop_north_shade"
+      ];
+    in
     builtins.listToAttrs
       (lib.lists.flatten (map
         (i:
           [
             {
-              name = "home-assistant/${i}.1.yaml";
+              name = "home-assistant/input_number/cover_${i}_auto_target.yaml";
               value = {
                 text = ''
-                  ${i} 1
+                  min: 0
+                  max: 100
+
                 '';
               };
             }
             {
-              name = "home-assistant/${i}.2.yaml";
+              name = "home-assistant/automation/cover_${i}.yaml";
               value = {
                 text = ''
-                  ${i} 2
+                  - alias: cover ${i} auto set
+                    id: cover_${i}_auto_set
+                    mode: restart
+                    trigger:
+                      - platform: state
+                        entity_id:
+                          - input_number.cover_${i}_auto_target
+                    action:
+                      - service: automation.turn_off
+                        data:
+                          stop_actions: true
+                        target:
+                          entity_id: automation.cover_${i}_user_set
+                      - service: cover.set_cover_position
+                        target:
+                          entity_id: cover.${i}
+                        data:
+                          position: "{{ states('input_number.cover_${i}_auto_target') }}"
+                      - service: automation.turn_on
+                        target:
+                          entity_id: automation.cover_${i}_user_set
+                  - alias: cover ${i} user set
+                    id: cover_${i}_user_set
+                    mode: restart
+                    trigger:
+                      - platform: state
+                        entity_id:
+                          - cover.${i}
+                        attribute: current_position
+                    action:
+                      - service: automation.turn_off
+                        data:
+                          stop_actions: true
+                        target:
+                          entity_id: automation.cover_${i}_auto_set
+                      - delay:
+                          hours: 1
+                      - service: automation.turn_on
+                        target:
+                          entity_id: automation.cover_${i}_auto_set
+                      - service: automation.trigger
+                        target:
+                          entity_id: automation.cover_${i}_auto_set
                 '';
               };
             }
@@ -122,13 +220,16 @@ in
           themes: !include_dir_merge_named themes
 
         automation ui: !include automations.yaml
+        automation etc: !include_dir_merge_list etc/automation
         script ui: !include scripts.yaml
         scene: !include scenes.yaml
         template: !include template.yaml
 
+        wake_on_lan:
+
         amcrest: !include_dir_list  etc/amcrest
 
-        wake_on_lan:
+        input_number: !include_dir_named etc/input_number
 
         light:
           - platform: template
@@ -137,6 +238,10 @@ in
         fan:
           - platform: template
             fans: !include_dir_named etc/fan/template
+
+        cover:
+          - platform: template
+            covers: !include_dir_named etc/cover/template
 
         # lock:
         #   - platform: template
