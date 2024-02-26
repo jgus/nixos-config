@@ -144,6 +144,136 @@ in
           ]
         )
         items)) // {
+      "home-assistant/automation/Shades.yaml".text = ''
+        - alias: Shades
+          id: shades
+          description: ""
+          trigger:
+            - platform: sun
+              event: sunrise
+              offset: 0
+              id: sun_rise
+            - platform: sun
+              event: sunset
+              offset: 0
+              id: sun_set
+            - platform: state
+              entity_id:
+                - sensor.solar_shade_target
+          condition:
+            - condition: or
+              conditions:
+                - condition: trigger
+                  id:
+                    - sun_rise
+                - condition: trigger
+                  id:
+                    - sun_set
+                - condition: sun
+                  before: sunset
+                  after: sunrise
+          action:
+            - variables:
+                p: "{{ states('sensor.solar_shade_target') | float }}"
+                north_shade_ids:
+                  - input_number.cover_loft_shade_1_auto_target
+                  - input_number.cover_loft_shade_2_auto_target
+                  - input_number.cover_loft_shade_3_auto_target
+                east_shade_ids:
+                  - input_number.cover_basement_living_room_shade_1_auto_target
+                  - input_number.cover_basement_living_room_shade_2_auto_target
+                  - input_number.cover_dining_room_shade_1_auto_target
+                  - input_number.cover_dining_room_shade_2_auto_target
+                  - input_number.cover_dining_room_upper_shade_auto_target
+                  - input_number.cover_great_room_lower_left_shade_auto_target
+                  - input_number.cover_great_room_lower_right_shade_auto_target
+                  - input_number.cover_great_room_upper_left_shade_auto_target
+                  - input_number.cover_great_room_upper_right_shade_auto_target
+                  - input_number.cover_kitchen_shade_1_auto_target
+                  - input_number.cover_kitchen_shade_2_auto_target
+                  - input_number.cover_kitchen_shade_3_auto_target
+                  - input_number.cover_loft_shade_4_auto_target
+                south_shade_ids: []
+                west_shade_ids:
+                  - input_number.cover_craft_room_shade_1_auto_target
+                  - input_number.cover_craft_room_shade_2_auto_target
+                  - input_number.cover_music_room_shade_1_auto_target
+                  - input_number.cover_music_room_shade_2_auto_target
+                  - input_number.cover_office_shade_1_auto_target
+                  - input_number.cover_office_shade_2_auto_target
+            - choose:
+                - alias: Open at sunrise
+                  conditions:
+                    - condition: trigger
+                      id:
+                        - sun_rise
+                  sequence:
+                    - repeat:
+                        for_each:
+                          - "{{ north_shade_ids }}"
+                          - "{{ west_shade_ids }}"
+                        sequence:
+                          - service: input_number.set_value
+                            data:
+                              value: 100
+                            target:
+                              entity_id: "{{ repeat.item }}"
+                - alias: Close at sunset
+                  conditions:
+                    - condition: trigger
+                      id:
+                        - sun_set
+                  sequence:
+                    - repeat:
+                        for_each:
+                          - "{{ north_shade_ids }}"
+                          - "{{ east_shade_ids }}"
+                          - "{{ south_shade_ids }}"
+                          - "{{ west_shade_ids }}"
+                        sequence:
+                          - service: input_number.set_value
+                            data:
+                              value: 0
+                            target:
+                              entity_id: "{{ repeat.item }}"
+                - alias: Morning program
+                  conditions:
+                    - condition: state
+                      entity_id: sun.sun
+                      attribute: rising
+                      state: true
+                  sequence:
+                    - repeat:
+                        for_each:
+                          - "{{ east_shade_ids }}"
+                          - "{{ south_shade_ids }}"
+                        sequence:
+                          - service: input_number.set_value
+                            data:
+                              value: "{{ p | int }}"
+                            target:
+                              entity_id: "{{ repeat.item }}"
+                - alias: Afternoon program
+                  conditions:
+                    - condition: state
+                      entity_id: sun.sun
+                      attribute: rising
+                      state: false
+                  sequence:
+                    - repeat:
+                        for_each:
+                          - "{{ south_shade_ids }}"
+                          - "{{ west_shade_ids }}"
+                        sequence:
+                          - service: input_number.set_value
+                            data:
+                              value: "{{ p | int }}"
+                            target:
+                              entity_id: "{{ repeat.item }}"
+          trace:
+            stored_traces: 100
+          mode: single
+      '';
       "home-assistant/amcrest/front_doorbell.yaml".text = ''
         name: "Front Doorbell"
         host: doorbell-front.home.gustafson.me
