@@ -92,6 +92,14 @@ in
               };
             }
             {
+              name = "home-assistant/input_boolean/cover_${i}_auto_set_enable.yaml";
+              value = { text = "initial: true"; };
+            }
+            {
+              name = "home-assistant/input_boolean/cover_${i}_user_set_enable.yaml";
+              value = { text = "initial: true"; };
+            }
+            {
               name = "home-assistant/automation/cover_${i}.yaml";
               value = {
                 text = ''
@@ -102,20 +110,29 @@ in
                       - platform: state
                         entity_id:
                           - input_number.cover_${i}_auto_target
+                      - platform: state
+                        entity_id:
+                          - input_boolean.cover_${i}_auto_set_enable
+                        to: "on"
+                    condition:
+                      - condition: state
+                        entity_id: input_boolean.cover_${i}_auto_set_enable
+                        state: "on"
                     action:
-                      - service: automation.turn_off
-                        data:
-                          stop_actions: true
+                      - service: input_boolean.turn_off
                         target:
-                          entity_id: automation.cover_${i}_user_set
+                          entity_id: input_boolean.cover_${i}_user_set_enable
+                      - wait_template: "{{ is_state('input_boolean.cover_${i}_user_set_enable', 'off') }}"
                       - service: cover.set_cover_position
                         target:
                           entity_id: cover.${i}
                         data:
                           position: "{{ states('input_number.cover_${i}_auto_target') }}"
-                      - service: automation.turn_on
+                      - wait_template: "{{ state_attr('cover.${i}', 'current_position') == states('input_number.cover_${i}_auto_target') | int }}"
+                        timeout: "00:01:00"
+                      - service: input_boolean.turn_on
                         target:
-                          entity_id: automation.cover_${i}_user_set
+                          entity_id: input_boolean.cover_${i}_user_set_enable
                   - alias: cover ${i} user set
                     id: cover_${i}_user_set
                     mode: restart
@@ -124,20 +141,19 @@ in
                         entity_id:
                           - cover.${i}
                         attribute: current_position
+                    condition:
+                      - condition: state
+                        entity_id: input_boolean.cover_${i}_user_set_enable
+                        state: "on"
                     action:
-                      - service: automation.turn_off
-                        data:
-                          stop_actions: true
+                      - service: input_boolean.turn_off
                         target:
-                          entity_id: automation.cover_${i}_auto_set
+                          entity_id: input_boolean.cover_${i}_auto_set_enable
                       - delay:
                           hours: 1
-                      - service: automation.turn_on
+                      - service: input_boolean.turn_on
                         target:
-                          entity_id: automation.cover_${i}_auto_set
-                      - service: automation.trigger
-                        target:
-                          entity_id: automation.cover_${i}_auto_set
+                          entity_id: input_boolean.cover_${i}_auto_set_enable
                 '';
               };
             }
@@ -360,6 +376,7 @@ in
         amcrest: !include_dir_list  etc/amcrest
 
         input_number: !include_dir_named etc/input_number
+        input_boolean: !include_dir_named etc/input_boolean
 
         light:
           - platform: template
