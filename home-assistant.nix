@@ -195,6 +195,9 @@ in
                   - input_number.cover_loft_shade_1_auto_target
                   - input_number.cover_loft_shade_2_auto_target
                   - input_number.cover_loft_shade_3_auto_target
+                  - input_number.cover_office_shade_1_auto_target
+                  - input_number.cover_office_shade_2_auto_target
+                  - input_number.cover_office_shade_3_auto_target
                 east_shade_ids:
                   - input_number.cover_basement_living_room_shade_1_auto_target
                   - input_number.cover_basement_living_room_shade_2_auto_target
@@ -217,6 +220,11 @@ in
                   - input_number.cover_music_room_shade_2_auto_target
                   - input_number.cover_office_shade_1_auto_target
                   - input_number.cover_office_shade_2_auto_target
+                  - input_number.cover_study_shade_1_auto_target
+                  - input_number.cover_study_shade_2_auto_target
+                  - input_number.cover_toy_room_shade_1_auto_target
+                  - input_number.cover_toy_room_shade_2_auto_target
+                  - input_number.cover_toy_room_shade_3_auto_target
             - choose:
                 - alias: Open at sunrise
                   conditions:
