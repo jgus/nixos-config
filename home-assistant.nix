@@ -195,9 +195,9 @@ in
                   - input_number.cover_loft_shade_1_auto_target
                   - input_number.cover_loft_shade_2_auto_target
                   - input_number.cover_loft_shade_3_auto_target
-                  - input_number.cover_office_shade_1_auto_target
-                  - input_number.cover_office_shade_2_auto_target
                   - input_number.cover_office_shade_3_auto_target
+                  - input_number.cover_office_shade_4_auto_target
+                  - input_number.cover_office_shade_5_auto_target
                 east_shade_ids:
                   - input_number.cover_basement_living_room_shade_1_auto_target
                   - input_number.cover_basement_living_room_shade_2_auto_target
