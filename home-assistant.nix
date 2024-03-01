@@ -163,15 +163,15 @@ in
       "home-assistant/automation/Shades.yaml".text = ''
         - alias: Shades
           id: shades
-          description: ""
+          mode: single
+          trace:
+            stored_traces: 100
           trigger:
             - platform: sun
               event: sunrise
-              offset: 0
               id: sun_rise
             - platform: sun
               event: sunset
-              offset: 0
               id: sun_set
             - platform: state
               entity_id:
@@ -190,7 +190,7 @@ in
                   after: sunrise
           action:
             - variables:
-                p: "{{ states('sensor.solar_shade_target') | float }}"
+                p: "{{ states('sensor.solar_shade_target') | int }}"
                 north_shade_ids:
                   - input_number.cover_loft_shade_1_auto_target
                   - input_number.cover_loft_shade_2_auto_target
@@ -274,7 +274,7 @@ in
                         sequence:
                           - service: input_number.set_value
                             data:
-                              value: "{{ p | int }}"
+                              value: "{{ p }}"
                             target:
                               entity_id: "{{ repeat.item }}"
                 - alias: Afternoon program
@@ -291,12 +291,91 @@ in
                         sequence:
                           - service: input_number.set_value
                             data:
-                              value: "{{ p | int }}"
+                              value: "{{ p }}"
                             target:
                               entity_id: "{{ repeat.item }}"
+      '';
+      "home-assistant/automation/Bedroom_Shades.yaml".text = ''
+        - alias: Bedroom Shades
+          id: bedroom_shades
+          mode: single
           trace:
             stored_traces: 100
-          mode: single
+          trigger:
+            - platform: sun
+              event: sunrise
+              id: sun_rise
+            - platform: sun
+              event: sunset
+              id: sun_set
+            - platform: time
+              at: "10:00:00"
+              id: daytime
+          action:
+            - variables:
+                bedroom_shade_ids:
+                  - input_number.cover_basement_east_bedroom_shade_auto_target
+                  - input_number.cover_basement_master_bedroom_shade_1_auto_target
+                  - input_number.cover_basement_master_bedroom_shade_2_auto_target
+                  - input_number.cover_basement_west_bedroom_shade_auto_target
+                  - input_number.cover_boy_room_shade_1_auto_target
+                  - input_number.cover_boy_room_shade_2_auto_target
+                  - input_number.cover_boy_room_shade_3_auto_target
+                  - input_number.cover_boy_room_shade_4_auto_target
+                  - input_number.cover_boy_room_shade_5_auto_target
+                  - input_number.cover_eden_hope_room_shade_1_auto_target
+                  - input_number.cover_eden_hope_room_shade_2_auto_target
+                  - input_number.cover_kayleigh_lyra_room_shade_1_auto_target
+                  - input_number.cover_kayleigh_lyra_room_shade_2_auto_target
+                  - input_number.cover_kayleigh_lyra_room_shade_3_auto_target
+                  - input_number.cover_master_bedroom_shade_1_auto_target
+                  - input_number.cover_master_bedroom_shade_2_auto_target
+                  - input_number.cover_master_bedroom_shade_3_auto_target
+                  - input_number.cover_master_bedroom_shade_4_auto_target
+                  - input_number.cover_master_bedroom_shade_5_auto_target
+            - choose:
+                - alias: Crack open at sunrise
+                  conditions:
+                    - condition: trigger
+                      id:
+                        - sun_rise
+                  sequence:
+                    - repeat:
+                        for_each: "{{ bedroom_shade_ids }}"
+                        sequence:
+                          - service: input_number.set_value
+                            data:
+                              value: 20
+                            target:
+                              entity_id: "{{ repeat.item }}"
+                - alias: Open all the way in late morning
+                  conditions:
+                    - condition: trigger
+                      id:
+                        - daytime
+                  sequence:
+                    - repeat:
+                        for_each: "{{ bedroom_shade_ids }}"
+                        sequence:
+                          - service: input_number.set_value
+                            data:
+                              value: 100
+                            target:
+                              entity_id: "{{ repeat.item }}"
+                - alias: Close at sunset
+                  conditions:
+                    - condition: trigger
+                      id:
+                        - sun_set
+                  sequence:
+                    - repeat:
+                        for_each: "{{ bedroom_shade_ids }}"
+                        sequence:
+                          - service: input_number.set_value
+                            data:
+                              value: 0
+                            target:
+                              entity_id: "{{ repeat.item }}"
       '';
       "home-assistant/amcrest/front_doorbell.yaml".text = ''
         name: "Front Doorbell"
