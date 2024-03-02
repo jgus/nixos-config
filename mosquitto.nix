@@ -34,6 +34,24 @@ in
           ];
           password = "${pw.mqtt.frodo}";
         };
+        users.sam = {
+          acl = [
+            "readwrite #"
+          ];
+          password = "${pw.mqtt.sam}";
+        };
+        users.merry = {
+          acl = [
+            "readwrite #"
+          ];
+          password = "${pw.mqtt.merry}";
+        };
+        users.pippin = {
+          acl = [
+            "readwrite #"
+          ];
+          password = "${pw.mqtt.pippin}";
+        };
       }
     ];
   };
