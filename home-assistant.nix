@@ -1,6 +1,8 @@
 { config, pkgs, lib, ... }:
 
-let pw = import ./.secrets/passwords.nix;
+let
+  pw = import ./.secrets/passwords.nix;
+  image = "ghcr.io/home-assistant/home-assistant:stable";
 in
 {
   imports = [ ./docker.nix ];
@@ -87,7 +89,6 @@ in
                 text = ''
                   min: 0
                   max: 100
-
                 '';
               };
             }
@@ -517,25 +518,25 @@ in
             -v "$(readlink -f /etc/static)":/etc/static:ro \
             -v /nix/store:/nix/store:ro \
             -v /run/dbus:/run/dbus:ro \
-            ghcr.io/home-assistant/home-assistant:jgus-dev
+            ${image}
         '';
         serviceConfig = {
           Restart = "on-failure";
         };
       };
-      # home-assistant-update = {
-      #   path = [ pkgs.docker ];
-      #   script = ''
-      #     if docker pull ghcr.io/home-assistant/home-assistant:stable | grep "Status: Downloaded"
-      #     then
-      #       systemctl restart home-assistant
-      #     fi
-      #   '';
-      #   serviceConfig = {
-      #     Type = "oneshot";
-      #   };
-      #   startAt = "hourly";
-      # };
+      home-assistant-update = {
+        path = [ pkgs.docker ];
+        script = ''
+          if docker pull ${image} | grep "Status: Downloaded"
+          then
+            systemctl restart home-assistant
+          fi
+        '';
+        serviceConfig = {
+          Type = "oneshot";
+        };
+        startAt = "hourly";
+      };
     };
   };
 }
