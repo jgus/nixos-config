@@ -151,7 +151,7 @@ in
                         target:
                           entity_id: input_boolean.cover_${i}_auto_set_enable
                       - delay:
-                          hours: 1
+                          hours: 2
                       - service: input_boolean.turn_on
                         target:
                           entity_id: input_boolean.cover_${i}_auto_set_enable
