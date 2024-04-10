@@ -14,42 +14,31 @@ in
   services.mosquitto = {
     enable = true;
     dataDir = "/var/lib/mosquitto";
+    # logType = [ "all" ];
     listeners = [
       {
         users.ha = {
-          acl = [
-            "readwrite #"
-          ];
+          acl = [ "readwrite #" ];
           password = "${pw.mqtt.ha}";
         };
         users.frigate = {
-          acl = [
-            "readwrite #"
-          ];
+          acl = [ "readwrite #" ];
           password = "${pw.mqtt.frigate}";
         };
         users.frodo = {
-          acl = [
-            "readwrite #"
-          ];
+          acl = [ "readwrite valetudo/Frodo/#" ];
           password = "${pw.mqtt.frodo}";
         };
         users.sam = {
-          acl = [
-            "readwrite #"
-          ];
+          acl = [ "readwrite valetudo/Sam/#" ];
           password = "${pw.mqtt.sam}";
         };
         users.merry = {
-          acl = [
-            "readwrite #"
-          ];
+          acl = [ "readwrite valetudo/Merry/#" ];
           password = "${pw.mqtt.merry}";
         };
         users.pippin = {
-          acl = [
-            "readwrite #"
-          ];
+          acl = [ "readwrite valetudo/Pippin/#" ];
           password = "${pw.mqtt.pippin}";
         };
       }
