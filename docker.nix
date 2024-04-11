@@ -1,7 +1,8 @@
-{ pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 {
-  system.activationScripts = {
+  
+  system.activationScripts = lib.mkIf (lib.elem pkgs.zfs config.environment.systemPackages) {
     docker-setup.text = ''
       ${pkgs.zfs}/bin/zfs list r/varlib/docker >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create r/varlib/docker
     '';
@@ -12,7 +13,7 @@
       enable = true;
       enableOnBoot = true;
       autoPrune.enable = true;
-      storageDriver = "zfs";
+      storageDriver = if (lib.elem pkgs.zfs config.environment.systemPackages) then "zfs" else null;
       daemon.settings = {
         dns = [ "172.22.0.1" ];
       };
