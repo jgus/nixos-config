@@ -378,6 +378,72 @@ in
                             target:
                               entity_id: "{{ repeat.item }}"
       '';
+      "home-assistant/input_boolean/server_climate_lights.yaml".text = "initial: true";
+      "home-assistant/input_boolean/server_climate_xfan.yaml".text = "initial: true";
+      "home-assistant/input_boolean/server_climate_health.yaml".text = "initial: true";
+      "home-assistant/input_boolean/server_climate_sleep.yaml".text = "initial: true";
+      "home-assistant/input_boolean/server_climate_powersave.yaml".text = "initial: true";
+      "home-assistant/input_boolean/server_climate_eightdegheat.yaml".text = "initial: true";
+      "home-assistant/input_boolean/server_climate_air.yaml".text = "initial: true";
+      "home-assistant/climate/server_climate.yaml".text = ''
+        platform: gree
+        name: Server Climate
+        host: server-climate.home.gustafson.me
+        port: 7000
+        mac: 94:24:b8:6c:0f:41
+        target_temp_step: 1
+        lights: input_boolean.server_climate_lights
+        xfan: input_boolean.server_climate_xfan
+        health: input_boolean.server_climate_health
+        sleep: input_boolean.server_climate_sleep
+        powersave: input_boolean.server_climate_powersave
+        eightdegheat: input_boolean.server_climate_eightdegheat
+        air: input_boolean.server_climate_air
+      '';
+      "home-assistant/input_boolean/theater_climate_lights.yaml".text = "initial: true";
+      "home-assistant/input_boolean/theater_climate_xfan.yaml".text = "initial: true";
+      "home-assistant/input_boolean/theater_climate_health.yaml".text = "initial: true";
+      "home-assistant/input_boolean/theater_climate_sleep.yaml".text = "initial: true";
+      "home-assistant/input_boolean/theater_climate_powersave.yaml".text = "initial: true";
+      "home-assistant/input_boolean/theater_climate_eightdegheat.yaml".text = "initial: true";
+      "home-assistant/input_boolean/theater_climate_air.yaml".text = "initial: true";
+      "home-assistant/climate/theater_climate.yaml".text = ''
+        platform: gree
+        name: Theater Climate
+        host: theater-climate.home.gustafson.me
+        port: 7000
+        mac: 94:24:b8:6c:10:13
+        target_temp_step: 1
+        lights: input_boolean.theater_climate_lights
+        xfan: input_boolean.theater_climate_xfan
+        health: input_boolean.theater_climate_health
+        sleep: input_boolean.theater_climate_sleep
+        powersave: input_boolean.theater_climate_powersave
+        eightdegheat: input_boolean.theater_climate_eightdegheat
+        air: input_boolean.theater_climate_air
+      '';
+      "home-assistant/input_boolean/workshop_climate_lights.yaml".text = "initial: true";
+      "home-assistant/input_boolean/workshop_climate_xfan.yaml".text = "initial: true";
+      "home-assistant/input_boolean/workshop_climate_health.yaml".text = "initial: true";
+      "home-assistant/input_boolean/workshop_climate_sleep.yaml".text = "initial: true";
+      "home-assistant/input_boolean/workshop_climate_powersave.yaml".text = "initial: true";
+      "home-assistant/input_boolean/workshop_climate_eightdegheat.yaml".text = "initial: true";
+      "home-assistant/input_boolean/workshop_climate_air.yaml".text = "initial: true";
+      "home-assistant/climate/workshop_climate.yaml".text = ''
+        platform: gree
+        name: Workshop Climate
+        host: workshop-climate.home.gustafson.me
+        port: 7000
+        mac: 94:24:b8:6d:47:92
+        target_temp_step: 1
+        lights: input_boolean.workshop_climate_lights
+        xfan: input_boolean.workshop_climate_xfan
+        health: input_boolean.workshop_climate_health
+        sleep: input_boolean.workshop_climate_sleep
+        powersave: input_boolean.workshop_climate_powersave
+        eightdegheat: input_boolean.workshop_climate_eightdegheat
+        air: input_boolean.workshop_climate_air
+      '';
       "home-assistant/amcrest/front_doorbell.yaml".text = ''
         name: "Front Doorbell"
         host: doorbell-front.home.gustafson.me
@@ -460,6 +526,8 @@ in
         template: !include template.yaml
 
         wake_on_lan:
+
+        climate: !include_dir_list  etc/climate
 
         amcrest: !include_dir_list  etc/amcrest
 
