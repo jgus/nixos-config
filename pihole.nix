@@ -46,7 +46,7 @@
           docker rm pihole
         '';
         serviceConfig = {
-          Restart = "on-failure";
+          Restart = "no";
         };
       };
       pihole-update = {

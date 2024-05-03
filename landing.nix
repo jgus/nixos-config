@@ -68,7 +68,7 @@
           StartLimitIntervalSec = 0;
         };
         serviceConfig = {
-          Restart = "always";
+          Restart = "no";
           RestartSec = 10;
         };
       };

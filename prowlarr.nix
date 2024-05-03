@@ -33,7 +33,7 @@
             lscr.io/linuxserver/prowlarr
         '';
         serviceConfig = {
-          Restart = "always";
+          Restart = "no";
         };
       };
       prowlarr-update = {

@@ -40,7 +40,7 @@ in
             zwavejs/zwave-js-ui
           '';
         serviceConfig = {
-          Restart = "on-failure";
+          Restart = "no";
         };
       };
       zwave-js-ui-update = {

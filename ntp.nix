@@ -25,7 +25,7 @@
             cturra/ntp
         '';
         serviceConfig = {
-          Restart = "always";
+          Restart = "no";
         };
       };
       ntp-update = {

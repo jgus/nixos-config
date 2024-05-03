@@ -49,7 +49,7 @@
             haugene/transmission-openvpn
         '';
         serviceConfig = {
-          Restart = "always";
+          Restart = "no";
         };
       };
       transmission-update = {

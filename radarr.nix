@@ -36,7 +36,7 @@
             lscr.io/linuxserver/radarr
         '';
         serviceConfig = {
-          Restart = "always";
+          Restart = "no";
         };
       };
       radarr-update = {

@@ -121,7 +121,7 @@
             lscr.io/linuxserver/swag
         '';
         serviceConfig = {
-          Restart = "on-failure";
+          Restart = "no";
         };
       };
       web-swag-update = {

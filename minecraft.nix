@@ -5,7 +5,6 @@
 
   networking.firewall.allowedTCPPorts = [
     25522
-    8123
     19132
     19133
     25565
@@ -56,7 +55,6 @@
 
           docker run --rm --name minecraft \
             -p 25522:22/tcp \
-            # -p 8123:8123/tcp \
             -p 19132:19132/udp \
             -p 19133:19133/udp \
             -p 25565:25565/udp \
@@ -68,7 +66,7 @@
           StartLimitIntervalSec = 0;
         };
         serviceConfig = {
-          Restart = "always";
+          Restart = "no";
           RestartSec = 10;
         };
       };

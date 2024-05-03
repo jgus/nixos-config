@@ -34,7 +34,7 @@
             lscr.io/linuxserver/sabnzbd
         '';
         serviceConfig = {
-          Restart = "always";
+          Restart = "no";
         };
       };
       sabnzbd-update = {

@@ -43,7 +43,7 @@
             lscr.io/linuxserver/syncthing
         '';
         serviceConfig = {
-          Restart = "always";
+          Restart = "no";
         };
       };
       syncthing-update = {

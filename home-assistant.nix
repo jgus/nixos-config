@@ -521,7 +521,7 @@ in
             ${image}
         '';
         serviceConfig = {
-          Restart = "on-failure";
+          Restart = "no";
         };
       };
       home-assistant-update = {

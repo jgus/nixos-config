@@ -375,7 +375,7 @@ in
             ghcr.io/blakeblackshear/frigate:stable
         '';
         serviceConfig = {
-          Restart = "on-failure";
+          Restart = "no";
         };
       };
       frigate-update = {

@@ -47,7 +47,7 @@
             lscr.io/linuxserver/plex
         '';
         serviceConfig = {
-          Restart = "on-failure";
+          Restart = "no";
         };
       };
       plex-update = {

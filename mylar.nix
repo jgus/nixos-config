@@ -37,7 +37,7 @@
             lscr.io/linuxserver/mylar3
         '';
         serviceConfig = {
-          Restart = "always";
+          Restart = "no";
         };
       };
       mylar-update = {

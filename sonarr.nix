@@ -36,7 +36,7 @@
             lscr.io/linuxserver/sonarr
         '';
         serviceConfig = {
-          Restart = "always";
+          Restart = "no";
         };
       };
       sonarr-update = {

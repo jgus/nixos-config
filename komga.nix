@@ -34,7 +34,7 @@
             gotson/komga
         '';
         serviceConfig = {
-          Restart = "always";
+          Restart = "no";
         };
       };
       komga-update = {
