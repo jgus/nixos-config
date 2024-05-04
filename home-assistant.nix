@@ -511,11 +511,11 @@ in
             option: "{{ { 0: 'Off', 1: 'Low', 2: 'Medium', 3: 'High', 4: 'Boost' }[percentage / 25.0 | round | int] }}"
         speed_count: 4
       '';
-      "home-assistant/media_player/theater_bluray.yaml".text = ''
-        platform: sony
-        name: "Theater Blu-Ray"
-        host: theater-bluray.home.gustafson.me
-      '';
+      # "home-assistant/media_player/theater_bluray.yaml".text = ''
+      #   platform: sony
+      #   name: "Theater Blu-Ray"
+      #   host: theater-bluray.home.gustafson.me
+      # '';
       "home-assistant/configuration.yaml".text = ''
         # Loads default set of integrations. Do not remove.
         default_config:
