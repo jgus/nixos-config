@@ -516,6 +516,65 @@ in
       #   name: "Theater Blu-Ray"
       #   host: theater-bluray.home.gustafson.me
       # '';
+      "home-assistant/media_player/theater.yaml".text = ''
+        platform: universal
+        name: "Theater"
+        unique_id: theater
+        device_class: tv
+        children:
+          - media_player.theater_shield_remote
+          - media_player.theater_shield_cast
+          - media_player.theater_preamp_zone_1
+        browse_media_entity: media_player.theater_shield_cast
+        commands:
+          turn_off:
+            service: media_player.turn_off
+            data:
+              entity_id: media_player.theater_preamp_zone_1
+          turn_on:
+            service: media_player.turn_on
+            data:
+              entity_id: media_player.theater_preamp_zone_1
+          select_source:
+            service: input_select.select_option
+            target:
+              entity_id: input_select.theater_activity
+            data:
+              option: "{{ source }}"
+          volume_set:
+            service: media_player.volume_set
+            target:
+              entity_id: media_player.theater_preamp_zone_1
+            data:
+              volume_level: "{{ volume_level }}"
+          volume_up:
+            service: media_player.volume_up
+            data:
+              entity_id: media_player.theater_preamp_zone_1
+          volume_down:
+            service: media_player.volume_down
+            data:
+              entity_id: media_player.theater_preamp_zone_1
+          volume_mute:
+            service: media_player.volume_mute
+            data:
+              entity_id: media_player.theater_preamp_zone_1
+          select_sound_mode:
+            service: media_player.select_sound_mode
+            target:
+              entity_id: media_player.theater_preamp_zone_1
+            data:
+              sound_mode: "{{ sound_mode }}"
+        attributes:
+          state: media_player.theater_preamp_zone_1
+          source: input_select.theater_activity
+          source_list: input_select.theater_activity|options
+          is_volume_muted: media_player.theater_preamp_zone_1|is_volume_muted
+          volume_level: media_player.theater_preamp_zone_1|volume_level
+          sound_mode: media_player.theater_preamp_zone_1|sound_mode
+          sound_mode_raw: media_player.theater_preamp_zone_1|sound_mode_raw
+          sound_mode_list: media_player.theater_preamp_zone_1|sound_mode_list
+      '';
       "home-assistant/configuration.yaml".text = ''
         # Loads default set of integrations. Do not remove.
         default_config:
