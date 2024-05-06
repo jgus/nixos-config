@@ -78,89 +78,150 @@ in
         "toy_room_shade_3"
         "workshop_north_shade"
       ];
+      theater_devices = [
+        {
+          device = "bluray";
+          index = "4";
+        }
+        {
+          device = "shield";
+          index = "B";
+        }
+      ];
+      cec_map = [
+        { command = "select";         code = "00"; }
+        { command = "d_up";           code = "01"; }
+        { command = "d_down";         code = "02"; }
+        { command = "d_left";         code = "03"; }
+        { command = "d_right";        code = "04"; }
+        { command = "root_menu";      code = "09"; }
+        { command = "setup_menu";     code = "0A"; }
+        { command = "contents_menu";  code = "0B"; }
+        { command = "favorite_menu";  code = "0C"; }
+        { command = "exit";           code = "0D"; }
+        { command = "enter";          code = "2B"; }
+        { command = "clear";          code = "2C"; }
+        { command = "channel_up";     code = "30"; }
+        { command = "channel_down";   code = "31"; }
+        { command = "prev_channel";   code = "32"; }
+        { command = "display_info";   code = "35"; }
+        { command = "power";          code = "40"; }
+        { command = "volume_up";      code = "41"; }
+        { command = "volume_down";    code = "42"; }
+        { command = "mute";           code = "43"; }
+        { command = "play";           code = "44"; }
+        { command = "stop";           code = "45"; }
+        { command = "pause";          code = "46"; }
+        { command = "record";         code = "47"; }
+        { command = "rewind";         code = "48"; }
+        { command = "fast_forward";   code = "49"; }
+        { command = "eject";          code = "4A"; }
+        { command = "forward";        code = "4B"; }
+        { command = "backward";       code = "4C"; }
+        { command = "play_f";         code = "60"; }
+        { command = "pause_play_f";   code = "61"; }
+        { command = "power_toggle_f"; code = "6B"; }
+        { command = "power_off_f";    code = "6C"; }
+        { command = "power_on_f";     code = "6D"; }
+        { command = "f1";             code = "71"; }
+        { command = "f2";             code = "72"; }
+        { command = "f3";             code = "73"; }
+        { command = "f4";             code = "74"; }
+        { command = "f5";             code = "75"; }
+      ];
     in
-    builtins.listToAttrs
-      (lib.lists.flatten (map
-        (i:
-          [
-            {
-              name = "home-assistant/input_number/cover_${i}_auto_target.yaml";
-              value = {
-                text = ''
-                  min: 0
-                  max: 100
-                '';
-              };
-            }
-            {
-              name = "home-assistant/input_boolean/cover_${i}_auto_set_enable.yaml";
-              value = { text = "initial: true"; };
-            }
-            {
-              name = "home-assistant/input_boolean/cover_${i}_user_set_enable.yaml";
-              value = { text = "initial: true"; };
-            }
-            {
-              name = "home-assistant/automation/cover_${i}.yaml";
-              value = {
-                text = ''
-                  - alias: cover ${i} auto set
-                    id: cover_${i}_auto_set
-                    mode: restart
-                    trigger:
-                      - platform: state
-                        entity_id:
-                          - input_number.cover_${i}_auto_target
-                      - platform: state
-                        entity_id:
-                          - input_boolean.cover_${i}_auto_set_enable
-                        to: "on"
-                    condition:
-                      - condition: state
-                        entity_id: input_boolean.cover_${i}_auto_set_enable
-                        state: "on"
-                    action:
-                      - service: input_boolean.turn_off
-                        target:
-                          entity_id: input_boolean.cover_${i}_user_set_enable
-                      - wait_template: "{{ is_state('input_boolean.cover_${i}_user_set_enable', 'off') }}"
-                      - service: cover.set_cover_position
-                        target:
-                          entity_id: cover.${i}
-                        data:
-                          position: "{{ states('input_number.cover_${i}_auto_target') }}"
-                      - wait_template: "{{ state_attr('cover.${i}', 'current_position') == states('input_number.cover_${i}_auto_target') | int }}"
-                        timeout: "00:01:00"
-                      - service: input_boolean.turn_on
-                        target:
-                          entity_id: input_boolean.cover_${i}_user_set_enable
-                  - alias: cover ${i} user set
-                    id: cover_${i}_user_set
-                    mode: restart
-                    trigger:
-                      - platform: state
-                        entity_id:
-                          - cover.${i}
-                        attribute: current_position
-                    condition:
-                      - condition: state
-                        entity_id: input_boolean.cover_${i}_user_set_enable
-                        state: "on"
-                    action:
-                      - service: input_boolean.turn_off
-                        target:
-                          entity_id: input_boolean.cover_${i}_auto_set_enable
-                      - delay:
-                          hours: 2
-                      - service: input_boolean.turn_on
-                        target:
-                          entity_id: input_boolean.cover_${i}_auto_set_enable
-                '';
-              };
-            }
-          ]
-        )
-        items)) // {
+    builtins.listToAttrs(lib.lists.flatten(map(
+      i: [
+        {
+          name = "home-assistant/input_number/cover_${i}_auto_target.yaml";
+          value = {
+            text = ''
+              min: 0
+              max: 100
+            '';
+          };
+        }
+        {
+          name = "home-assistant/input_boolean/cover_${i}_auto_set_enable.yaml";
+          value = { text = "initial: true"; };
+        }
+        {
+          name = "home-assistant/input_boolean/cover_${i}_user_set_enable.yaml";
+          value = { text = "initial: true"; };
+        }
+        {
+          name = "home-assistant/automation/cover_${i}.yaml";
+          value = {
+            text = ''
+              - alias: cover ${i} auto set
+                id: cover_${i}_auto_set
+                mode: restart
+                trigger:
+                  - platform: state
+                    entity_id:
+                      - input_number.cover_${i}_auto_target
+                  - platform: state
+                    entity_id:
+                      - input_boolean.cover_${i}_auto_set_enable
+                    to: "on"
+                condition:
+                  - condition: state
+                    entity_id: input_boolean.cover_${i}_auto_set_enable
+                    state: "on"
+                action:
+                  - service: input_boolean.turn_off
+                    target:
+                      entity_id: input_boolean.cover_${i}_user_set_enable
+                  - wait_template: "{{ is_state('input_boolean.cover_${i}_user_set_enable', 'off') }}"
+                  - service: cover.set_cover_position
+                    target:
+                      entity_id: cover.${i}
+                    data:
+                      position: "{{ states('input_number.cover_${i}_auto_target') }}"
+                  - wait_template: "{{ state_attr('cover.${i}', 'current_position') == states('input_number.cover_${i}_auto_target') | int }}"
+                    timeout: "00:01:00"
+                  - service: input_boolean.turn_on
+                    target:
+                      entity_id: input_boolean.cover_${i}_user_set_enable
+              - alias: cover ${i} user set
+                id: cover_${i}_user_set
+                mode: restart
+                trigger:
+                  - platform: state
+                    entity_id:
+                      - cover.${i}
+                    attribute: current_position
+                condition:
+                  - condition: state
+                    entity_id: input_boolean.cover_${i}_user_set_enable
+                    state: "on"
+                action:
+                  - service: input_boolean.turn_off
+                    target:
+                      entity_id: input_boolean.cover_${i}_auto_set_enable
+                  - delay:
+                      hours: 2
+                  - service: input_boolean.turn_on
+                    target:
+                      entity_id: input_boolean.cover_${i}_auto_set_enable
+            '';
+          };
+        }
+      ]
+    ) items)) //
+    builtins.listToAttrs(lib.lists.flatten(map(
+      i: lib.lists.flatten(map(
+        j: [
+          {
+            name = "home-assistant/shell_command/cec_${i.device}_${j.command}.yaml";
+            value = {
+              text = "(echo 'tx 1${i.index}:44:${j.code}'; sleep 0.050s; echo 'tx 1${i.index}:45') | nc -uw1 theater-cec 9526";
+            };
+          }
+        ]
+      ) cec_map)
+    ) theater_devices)) //
+    {
       "home-assistant/automation/Shades.yaml".text = ''
         - alias: Shades
           id: shades
@@ -591,10 +652,6 @@ in
 
         wake_on_lan:
 
-        climate: !include_dir_list  etc/climate
-
-        amcrest: !include_dir_list  etc/amcrest
-
         input_number: !include_dir_named etc/input_number
         input_boolean: !include_dir_named etc/input_boolean
 
@@ -611,6 +668,12 @@ in
             covers: !include_dir_named etc/cover/template
 
         media_player: !include_dir_list  etc/media_player
+
+        climate: !include_dir_list  etc/climate
+
+        amcrest: !include_dir_list  etc/amcrest
+
+        shell_command: !include_dir_named etc/shell_command
 
         # lock:
         #   - platform: template
