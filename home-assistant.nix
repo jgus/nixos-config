@@ -661,16 +661,24 @@ in
         children:
           - media_player.theater_shield_remote
           - media_player.theater_shield_cast
-        browse_media_entity: media_player.livintheater_shield_castg_room_tv_cast
+        browse_media_entity: media_player.theater_shield_cast
+        state_template: >
+          {% if is_state('media_player.theater_shield_remote', 'off') -%}
+            off
+          {%- elif is_state('media_player.theater_shield_cast', 'off') -%}
+            idle
+          {%- else -%}
+            {{ states('media_player.theater_shield_cast') }}
+          {%- endif %}
         commands:
           turn_off:
-            service: script.theater_shield_remote
-            data:
-              action: turn_off
+            service: media_player.turn_off
+            target:
+              entity_id: media_player.theater_shield_remote
           turn_on:
-            service: script.theater_shield_remote
-            data:
-              action: turn_on
+            service: media_player.turn_on
+            target:
+              entity_id: media_player.theater_shield_remote
       '';
       # "home-assistant/script/theater.yaml".text = ''
       # '';
