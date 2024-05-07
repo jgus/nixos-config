@@ -572,10 +572,189 @@ in
             option: "{{ { 0: 'Off', 1: 'Low', 2: 'Medium', 3: 'High', 4: 'Boost' }[percentage / 25.0 | round | int] }}"
         speed_count: 4
       '';
-      # "home-assistant/media_player/theater_bluray.yaml".text = ''
-      #   platform: sony
-      #   name: "Theater Blu-Ray"
-      #   host: theater-bluray.home.gustafson.me
+      "home-assistant/media_player/theater_bluray_status.yaml".text = ''
+        platform: panasonic_bluray
+        host: theater-bluray.home.gustafson.me
+      '';
+      "home-assistant/input_select/theater_bluray_target_state.yaml".text = ''
+        options:
+          - off
+          - idle
+          - playing
+      '';
+      "home-assistant/automation/theater_bluray_state_update.yaml".text = ''
+        - alias: Theater Blu-Ray State Update
+          id: theater_bluray_state_update
+          mode: queued
+          trigger:
+            - platform: state
+              entity_id:
+                - media_player.panasonic_blu_ray
+              to: null
+          condition:
+            - condition: not
+              conditions:
+                - condition: state
+                  entity_id: input_select.theater_bluray_target_state
+                  state: "off"
+          action:
+            - service: input_select.select_option
+              target:
+                entity_id: input_select.theater_bluray_target_state
+              data:
+                option: >
+                  {% if is_state('media_player.panasonic_blu_ray', 'playing') -%}
+                    playing
+                  {%- else -%}
+                    idle
+                  {%- endif %}
+      '';
+      "home-assistant/script/theater_bluray.yaml".text = ''
+        alias: Theater Blu-Ray Command
+        mode: queue
+        fields:
+          action: {}
+        sequence:
+          - choose:
+              - conditions:
+                  - condition: template
+                    value_template: "{{ action == 'turn_off' }}"
+                sequence:
+                  - service: input_select.select_option
+                    target:
+                      entity_id: input_select.theater_bluray_target_state
+                    data:
+                      option: "off"
+                  - service: shell_command.cec_bluray_power_off_f
+              - conditions:
+                  - condition: template
+                    value_template: "{{ action == 'turn_on' }}"
+                sequence:
+                  - if:
+                      - condition: state
+                        entity_id: input_select.theater_bluray_target_state
+                        state: "off"
+                    then:
+                      - service: input_select.select_option
+                        target:
+                          entity_id: input_select.theater_bluray_target_state
+                        data:
+                          option: idle
+                  - service: shell_command.cec_bluray_power_on_f
+              - conditions:
+                  - condition: template
+                    value_template: "{{ action == 'media_play' }}"
+                sequence:
+                  - service: input_select.select_option
+                    target:
+                      entity_id: input_select.theater_bluray_target_state
+                    data:
+                      option: playing
+                  - service: shell_command.cec_bluray_play
+              - conditions:
+                  - condition: template
+                    value_template: "{{ action == 'media_pause' }}"
+                sequence:
+                  - service: input_select.select_option
+                    target:
+                      entity_id: input_select.theater_bluray_target_state
+                    data:
+                      option: idle
+                  - service: shell_command.cec_bluray_pause
+              - conditions:
+                  - condition: template
+                    value_template: "{{ action == 'media_play_pause' }}"
+                sequence:
+                  - if:
+                      - condition: state
+                        entity_id: input_select.theater_bluray_target_state
+                        state: playing
+                    then:
+                      - service: input_select.select_option
+                        target:
+                          entity_id: input_select.theater_bluray_target_state
+                        data:
+                          option: idle
+                      - service: shell_command.cec_bluray_pause
+                    else:
+                      - service: input_select.select_option
+                        target:
+                          entity_id: input_select.theater_bluray_target_state
+                        data:
+                          option: playing
+                      - service: shell_command.cec_bluray_play
+              - conditions:
+                  - condition: template
+                    value_template: "{{ action == 'media_stop' }}"
+                sequence:
+                  - service: input_select.select_option
+                    target:
+                      entity_id: input_select.theater_bluray_target_state
+                    data:
+                      option: idle
+                  - service: shell_command.cec_bluray_stop
+              - conditions:
+                  - condition: template
+                    value_template: "{{ action == 'media_next_track' }}"
+                sequence:
+                  - service: shell_command.cec_bluray_forward
+              - conditions:
+                  - condition: template
+                    value_template: "{{ action == 'media_previous_track' }}"
+                sequence:
+                  - service: shell_command.cec_bluray_backward
+      '';
+      "home-assistant/media_player/theater_bluray.yaml".text = ''
+        platform: universal
+        name: "Theater Blu-Ray"
+        unique_id: theater_bluray
+        device_class: tv
+        children:
+          - media_player.panasonic_blu_ray
+        commands:
+          turn_off:
+            service: script.theater_bluray
+            data:
+              action: turn_off
+          turn_on:
+            service: script.theater_bluray
+            data:
+              action: turn_on
+          media_play:
+            service: script.theater_bluray
+            data:
+              action: media_play
+          media_pause:
+            service: script.theater_bluray
+            data:
+              action: media_pause
+          media_play_pause:
+            service: script.theater_bluray
+            data:
+              action: media_play_pause
+          media_stop:
+            service: script.theater_bluray
+            data:
+              action: media_stop
+          media_next_track:
+            service: script.theater_bluray
+            data:
+              action: media_next_track
+          media_previous_track:
+            service: script.theater_bluray
+            data:
+              action: media_previous_track
+        attributes:
+          state: >
+            {% if is_state('input_select.theater_bluray_target_state', 'off') -%}
+              "off"
+            {%- elif is_state('input_select.theater_bluray_target_state', 'idle') -%}
+              idle
+            {%- else -%}
+              playing
+            {%- endif %}
+      '';
+      # "home-assistant/script/theater.yaml".text = ''
       # '';
       "home-assistant/media_player/theater.yaml".text = ''
         platform: universal
@@ -583,25 +762,29 @@ in
         unique_id: theater
         device_class: tv
         children:
+          - media_player.theater_bluray
           - media_player.theater_shield_remote
           - media_player.theater_shield_cast
           - media_player.theater_preamp_zone_1
+        active_child_template: >-
+          {% set is_shield = is_state('input_select.theater_activity', ['Plex', 'YouTube', 'Shield']) and not is_state('media_player.theater_shield_remote', 'off') %}
+          {% set is_bluray = is_state('input_select.theater_activity', ['Blu-Ray']) and not is_state('media_player.theater_bluray', 'off') %}
+          {{ 'media_player.theater_shield_remote' if is_shield else 'media_player.theater_bluray' if is_bluray else 'media_player.theater_preamp_zone_1' }}
         browse_media_entity: media_player.theater_shield_cast
         commands:
           turn_off:
-            service: media_player.turn_off
+            service: script.theater
             data:
-              entity_id: media_player.theater_preamp_zone_1
+              action: turn_off
           turn_on:
-            service: media_player.turn_on
+            service: script.theater
             data:
-              entity_id: media_player.theater_preamp_zone_1
+              action: turn_on
           select_source:
-            service: input_select.select_option
-            target:
-              entity_id: input_select.theater_activity
+            service: script.theater
             data:
-              option: "{{ source }}"
+              action: select_source
+              source: "{{ source }}"
           volume_set:
             service: media_player.volume_set
             target:
@@ -627,7 +810,11 @@ in
             data:
               sound_mode: "{{ sound_mode }}"
         attributes:
-          state: media_player.theater_preamp_zone_1
+          state: >-
+            {% set is_shield = is_state('input_select.theater_activity', ['Plex', 'YouTube', 'Shield']) and not is_state('media_player.theater_shield_remote', 'off') %}
+            {% set is_bluray = is_state('input_select.theater_activity', ['Blu-Ray']) and not is_state('media_player.theater_bluray', 'off') %}
+            {% set id = 'media_player.theater_shield_cast' if is_shield else 'media_player.theater_bluray' if is_bluray else 'media_player.theater_preamp_zone_1' %}
+            {{ states(id) }}
           source: input_select.theater_activity
           source_list: input_select.theater_activity|options
           is_volume_muted: media_player.theater_preamp_zone_1|is_volume_muted
@@ -647,6 +834,7 @@ in
         automation ui: !include automations.yaml
         automation etc: !include_dir_merge_list etc/automation
         script ui: !include scripts.yaml
+        script etc: !include_dir_merge_list etc/script
         scene: !include scenes.yaml
         template: !include template.yaml
 
@@ -654,6 +842,7 @@ in
 
         input_number: !include_dir_named etc/input_number
         input_boolean: !include_dir_named etc/input_boolean
+        input_select: !include_dir_named etc/input_select
 
         light:
           - platform: template
