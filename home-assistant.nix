@@ -26,19 +26,6 @@ in
 
   environment.etc =
     let
-      copy_files = [
-        "automation/Shades.yaml"
-        "automation/Bedroom_Shades.yaml"
-        "light/template/range_hood_light.yaml"
-        "fan/template/range_hood_fan.yaml"
-        "media_player/theater_bluray_status.yaml"
-        "input_select/theater_bluray_target_state.yaml"
-        "automation/theater_bluray_state_update.yaml"
-        "media_player/theater_bluray.yaml"
-        "media_player/theater_shield.yaml"
-        "media_player/theater.yaml"
-        "configuration.yaml"
-      ];
       shades = [
         "basement_east_bedroom_shade"
         "basement_living_room_shade_1"
@@ -146,11 +133,11 @@ in
     builtins.listToAttrs(lib.lists.flatten(map(
       i: [
         {
-          name = "home-assistant/${i}";
-          value = { source = home-assistant/${i}; };
+          name = lib.strings.removePrefix "/etc/nixos/" (toString i);
+          value = { source = i; };
         }
       ]
-    ) copy_files)) //
+    ) (lib.filesystem.listFilesRecursive(./home-assistant)))) //
     builtins.listToAttrs(lib.lists.flatten(map(
       i: [
         {
