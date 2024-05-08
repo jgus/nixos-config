@@ -1,0 +1,66 @@
+platform: universal
+name: "Theater"
+unique_id: theater
+device_class: tv
+children:
+  - media_player.theater_shield
+  - media_player.theater_bluray
+  - media_player.theater_preamp_zone_1
+active_child_template: >-
+  {% set is_shield = is_state('input_select.theater_activity', ['Plex', 'YouTube', 'Shield']) and not is_state('media_player.theater_shield', 'off') %}
+  {% set is_bluray = is_state('input_select.theater_activity', ['Blu-Ray']) and not is_state('media_player.theater_bluray', 'off') %}
+  {{ 'media_player.theater_shield' if is_shield else 'media_player.theater_bluray' if is_bluray else 'media_player.theater_preamp_zone_1' }}
+browse_media_entity: media_player.theater_shield
+state_template: >-
+  {% set is_shield = is_state('input_select.theater_activity', ['Plex', 'YouTube', 'Shield']) and not is_state('media_player.theater_shield', 'off') %}
+  {% set is_bluray = is_state('input_select.theater_activity', ['Blu-Ray']) and not is_state('media_player.theater_bluray', 'off') %}
+  {% set id = 'media_player.theater_shield' if is_shield else 'media_player.theater_bluray' if is_bluray else 'media_player.theater_preamp_zone_1' %}
+  {{ states(id) }}
+commands:
+  turn_off:
+    service: script.theater
+    data:
+      action: turn_off
+  turn_on:
+    service: script.theater
+    data:
+      action: turn_on
+  select_source:
+    service: script.theater
+    data:
+      action: select_source
+      source: "{{ source }}"
+  volume_set:
+    service: media_player.volume_set
+    target:
+      entity_id: media_player.theater_preamp_zone_1
+    data:
+      volume_level: "{{ volume_level }}"
+  volume_up:
+    service: media_player.volume_up
+    target:
+      entity_id: media_player.theater_preamp_zone_1
+  volume_down:
+    service: media_player.volume_down
+    target:
+      entity_id: media_player.theater_preamp_zone_1
+  volume_mute:
+    service: media_player.volume_mute
+    target:
+      entity_id: media_player.theater_preamp_zone_1
+    data:
+      is_volume_muted: "{{ not state_attr('media_player.theater_preamp_zone_1', 'is_volume_muted') }}"
+  select_sound_mode:
+    service: media_player.select_sound_mode
+    target:
+      entity_id: media_player.theater_preamp_zone_1
+    data:
+      sound_mode: "{{ sound_mode }}"
+attributes:
+  source: input_select.theater_activity
+  source_list: input_select.theater_activity|options
+  is_volume_muted: media_player.theater_preamp_zone_1|is_volume_muted
+  volume_level: media_player.theater_preamp_zone_1|volume_level
+  sound_mode: media_player.theater_preamp_zone_1|sound_mode
+  sound_mode_raw: media_player.theater_preamp_zone_1|sound_mode_raw
+  sound_mode_list: media_player.theater_preamp_zone_1|sound_mode_list

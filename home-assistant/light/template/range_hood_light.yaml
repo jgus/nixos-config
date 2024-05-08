@@ -1,0 +1,24 @@
+unique_id: range_hood_light
+friendly_name: "Range Hood Light"
+level_template: "{{ { 'Off': 0, 'Dim': 127, 'High': 255 }[states('select.range_hood_light_level')] }}"
+value_template: "{{ states('select.range_hood_light_level') != 'Off' }}"
+turn_on:
+  service: select.select_option
+  target:
+    entity_id: select.range_hood_light_level
+  data:
+    option: >-
+      {%if not brightness %} High {%elif brightness < 64 %} Off {%elif brightness < 192 %} Dim {%else%} High {%endif%}
+turn_off:
+  service: select.select_option
+  target:
+    entity_id: select.range_hood_light_level
+  data:
+    option: 'Off'
+set_level:
+  service: select.select_option
+  target:
+    entity_id: select.range_hood_light_level
+  data:
+    option: >-
+      {%if not brightness %} High {%elif brightness < 64 %} Off {%elif brightness < 192 %} Dim {%else%} High {%endif%}

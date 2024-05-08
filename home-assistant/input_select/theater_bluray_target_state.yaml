@@ -1,0 +1,4 @@
+options:
+  - "off"
+  - idle
+  - playing

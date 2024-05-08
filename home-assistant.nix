@@ -26,7 +26,20 @@ in
 
   environment.etc =
     let
-      items = [
+      copy_files = [
+        "automation/Shades.yaml"
+        "automation/Bedroom_Shades.yaml"
+        "light/template/range_hood_light.yaml"
+        "fan/template/range_hood_fan.yaml"
+        "media_player/theater_bluray_status.yaml"
+        "input_select/theater_bluray_target_state.yaml"
+        "automation/theater_bluray_state_update.yaml"
+        "media_player/theater_bluray.yaml"
+        "media_player/theater_shield.yaml"
+        "media_player/theater.yaml"
+        "configuration.yaml"
+      ];
+      shades = [
         "basement_east_bedroom_shade"
         "basement_living_room_shade_1"
         "basement_living_room_shade_2"
@@ -133,6 +146,14 @@ in
     builtins.listToAttrs(lib.lists.flatten(map(
       i: [
         {
+          name = "home-assistant/${i}";
+          value = { source = home-assistant/${i}; };
+        }
+      ]
+    ) copy_files)) //
+    builtins.listToAttrs(lib.lists.flatten(map(
+      i: [
+        {
           name = "home-assistant/input_number/cover_${i}_auto_target.yaml";
           value = {
             text = ''
@@ -208,7 +229,7 @@ in
           };
         }
       ]
-    ) items)) //
+    ) shades)) //
     builtins.listToAttrs(lib.lists.flatten(map(
       i: lib.lists.flatten(map(
         j: [
@@ -222,223 +243,6 @@ in
       ) cec_map)
     ) theater_devices)) //
     {
-      "home-assistant/automation/Shades.yaml".text = ''
-        - alias: Shades
-          id: shades
-          mode: single
-          trace:
-            stored_traces: 100
-          trigger:
-            - platform: sun
-              event: sunrise
-              id: sun_rise
-            - platform: sun
-              event: sunset
-              id: sun_set
-            - platform: state
-              entity_id:
-                - sensor.solar_shade_target
-          condition:
-            - condition: or
-              conditions:
-                - condition: trigger
-                  id:
-                    - sun_rise
-                - condition: trigger
-                  id:
-                    - sun_set
-                - condition: sun
-                  before: sunset
-                  after: sunrise
-          action:
-            - variables:
-                p: "{{ states('sensor.solar_shade_target') | int }}"
-                north_shade_ids:
-                  - input_number.cover_loft_shade_1_auto_target
-                  - input_number.cover_loft_shade_2_auto_target
-                  - input_number.cover_loft_shade_3_auto_target
-                  - input_number.cover_office_shade_3_auto_target
-                  - input_number.cover_office_shade_4_auto_target
-                  - input_number.cover_office_shade_5_auto_target
-                east_shade_ids:
-                  - input_number.cover_basement_living_room_shade_1_auto_target
-                  - input_number.cover_basement_living_room_shade_2_auto_target
-                  - input_number.cover_dining_room_shade_1_auto_target
-                  - input_number.cover_dining_room_shade_2_auto_target
-                  - input_number.cover_dining_room_upper_shade_auto_target
-                  - input_number.cover_great_room_lower_left_shade_auto_target
-                  - input_number.cover_great_room_lower_right_shade_auto_target
-                  - input_number.cover_great_room_upper_left_shade_auto_target
-                  - input_number.cover_great_room_upper_right_shade_auto_target
-                  - input_number.cover_kitchen_shade_1_auto_target
-                  - input_number.cover_kitchen_shade_2_auto_target
-                  - input_number.cover_kitchen_shade_3_auto_target
-                  - input_number.cover_loft_shade_4_auto_target
-                south_shade_ids: []
-                west_shade_ids:
-                  - input_number.cover_craft_room_shade_1_auto_target
-                  - input_number.cover_craft_room_shade_2_auto_target
-                  - input_number.cover_music_room_shade_1_auto_target
-                  - input_number.cover_music_room_shade_2_auto_target
-                  - input_number.cover_office_shade_1_auto_target
-                  - input_number.cover_office_shade_2_auto_target
-                  - input_number.cover_study_shade_1_auto_target
-                  - input_number.cover_study_shade_2_auto_target
-                  - input_number.cover_toy_room_shade_1_auto_target
-                  - input_number.cover_toy_room_shade_2_auto_target
-                  - input_number.cover_toy_room_shade_3_auto_target
-            - choose:
-                - alias: Open at sunrise
-                  conditions:
-                    - condition: trigger
-                      id:
-                        - sun_rise
-                  sequence:
-                    - repeat:
-                        for_each:
-                          - "{{ north_shade_ids }}"
-                          - "{{ west_shade_ids }}"
-                        sequence:
-                          - service: input_number.set_value
-                            data:
-                              value: 100
-                            target:
-                              entity_id: "{{ repeat.item }}"
-                - alias: Close at sunset
-                  conditions:
-                    - condition: trigger
-                      id:
-                        - sun_set
-                  sequence:
-                    - repeat:
-                        for_each:
-                          - "{{ north_shade_ids }}"
-                          - "{{ east_shade_ids }}"
-                          - "{{ south_shade_ids }}"
-                          - "{{ west_shade_ids }}"
-                        sequence:
-                          - service: input_number.set_value
-                            data:
-                              value: 0
-                            target:
-                              entity_id: "{{ repeat.item }}"
-                - alias: Morning program
-                  conditions:
-                    - condition: state
-                      entity_id: sun.sun
-                      attribute: rising
-                      state: true
-                  sequence:
-                    - repeat:
-                        for_each:
-                          - "{{ east_shade_ids }}"
-                          - "{{ south_shade_ids }}"
-                        sequence:
-                          - service: input_number.set_value
-                            data:
-                              value: "{{ p }}"
-                            target:
-                              entity_id: "{{ repeat.item }}"
-                - alias: Afternoon program
-                  conditions:
-                    - condition: state
-                      entity_id: sun.sun
-                      attribute: rising
-                      state: false
-                  sequence:
-                    - repeat:
-                        for_each:
-                          - "{{ south_shade_ids }}"
-                          - "{{ west_shade_ids }}"
-                        sequence:
-                          - service: input_number.set_value
-                            data:
-                              value: "{{ p }}"
-                            target:
-                              entity_id: "{{ repeat.item }}"
-      '';
-      "home-assistant/automation/Bedroom_Shades.yaml".text = ''
-        - alias: Bedroom Shades
-          id: bedroom_shades
-          mode: single
-          trace:
-            stored_traces: 100
-          trigger:
-            - platform: sun
-              event: sunrise
-              id: sun_rise
-            - platform: sun
-              event: sunset
-              id: sun_set
-            - platform: time
-              at: "10:00:00"
-              id: daytime
-          action:
-            - variables:
-                bedroom_shade_ids:
-                  - input_number.cover_basement_east_bedroom_shade_auto_target
-                  - input_number.cover_basement_master_bedroom_shade_1_auto_target
-                  - input_number.cover_basement_master_bedroom_shade_2_auto_target
-                  - input_number.cover_basement_west_bedroom_shade_auto_target
-                  - input_number.cover_boy_room_shade_1_auto_target
-                  - input_number.cover_boy_room_shade_2_auto_target
-                  - input_number.cover_boy_room_shade_3_auto_target
-                  - input_number.cover_boy_room_shade_4_auto_target
-                  - input_number.cover_boy_room_shade_5_auto_target
-                  - input_number.cover_eden_hope_room_shade_1_auto_target
-                  - input_number.cover_eden_hope_room_shade_2_auto_target
-                  - input_number.cover_kayleigh_lyra_room_shade_1_auto_target
-                  - input_number.cover_kayleigh_lyra_room_shade_2_auto_target
-                  - input_number.cover_kayleigh_lyra_room_shade_3_auto_target
-                  - input_number.cover_master_bedroom_shade_1_auto_target
-                  - input_number.cover_master_bedroom_shade_2_auto_target
-                  - input_number.cover_master_bedroom_shade_3_auto_target
-                  - input_number.cover_master_bedroom_shade_4_auto_target
-                  - input_number.cover_master_bedroom_shade_5_auto_target
-            - choose:
-                - alias: Crack open at sunrise
-                  conditions:
-                    - condition: trigger
-                      id:
-                        - sun_rise
-                  sequence:
-                    - repeat:
-                        for_each: "{{ bedroom_shade_ids }}"
-                        sequence:
-                          - service: input_number.set_value
-                            data:
-                              value: 20
-                            target:
-                              entity_id: "{{ repeat.item }}"
-                - alias: Open all the way in late morning
-                  conditions:
-                    - condition: trigger
-                      id:
-                        - daytime
-                  sequence:
-                    - repeat:
-                        for_each: "{{ bedroom_shade_ids }}"
-                        sequence:
-                          - service: input_number.set_value
-                            data:
-                              value: 100
-                            target:
-                              entity_id: "{{ repeat.item }}"
-                - alias: Close at sunset
-                  conditions:
-                    - condition: trigger
-                      id:
-                        - sun_set
-                  sequence:
-                    - repeat:
-                        for_each: "{{ bedroom_shade_ids }}"
-                        sequence:
-                          - service: input_number.set_value
-                            data:
-                              value: 0
-                            target:
-                              entity_id: "{{ repeat.item }}"
-      '';
       "home-assistant/input_boolean/server_climate_lights.yaml".text = "initial: true";
       "home-assistant/input_boolean/server_climate_xfan.yaml".text = "initial: true";
       "home-assistant/input_boolean/server_climate_health.yaml".text = "initial: true";
@@ -516,294 +320,6 @@ in
         host: doorbell-basement.home.gustafson.me
         username: admin
         password: ${pw.doorbell}
-      '';
-      "home-assistant/light/template/range_hood_light.yaml".text = ''
-        unique_id: range_hood_light
-        friendly_name: "Range Hood Light"
-        level_template: "{{ { 'Off': 0, 'Dim': 127, 'High': 255 }[states('select.range_hood_light_level')] }}"
-        value_template: "{{ states('select.range_hood_light_level') != 'Off' }}"
-        turn_on:
-          service: select.select_option
-          target:
-            entity_id: select.range_hood_light_level
-          data:
-            option: >-
-              {%if not brightness %} High {%elif brightness < 64 %} Off {%elif brightness < 192 %} Dim {%else%} High {%endif%}
-        turn_off:
-          service: select.select_option
-          target:
-            entity_id: select.range_hood_light_level
-          data:
-            option: 'Off'
-        set_level:
-          service: select.select_option
-          target:
-            entity_id: select.range_hood_light_level
-          data:
-            option: >-
-              {%if not brightness %} High {%elif brightness < 64 %} Off {%elif brightness < 192 %} Dim {%else%} High {%endif%}
-      '';
-      "home-assistant/fan/template/range_hood_fan.yaml".text = ''
-        unique_id: range_hood_fan
-        friendly_name: "Range Hood Fan"
-        value_template: "{{ states('select.range_hood_fan_speed') }}"
-        percentage_template: "{{ { 'Off': 0, 'Low': 25, 'Medium': 50, 'High': 75, 'Boost': 100 }[states('select.range_hood_fan_speed')] }}"
-        turn_on:
-          if:
-            - condition: template
-              value_template: "{{ not has_value('select.range_hood_fan_speed') or is_state('select.range_hood_fan_speed', 'Off') }}"
-          then:
-            - service: select.select_option
-              target:
-                entity_id: select.range_hood_fan_speed
-              data:
-                option: Low
-        turn_off:
-          service: select.select_option
-          target:
-            entity_id: select.range_hood_fan_speed
-          data:
-            option: 'Off'
-        set_percentage:
-          service: select.select_option
-          target:
-            entity_id: select.range_hood_fan_speed
-          data:
-            option: "{{ { 0: 'Off', 1: 'Low', 2: 'Medium', 3: 'High', 4: 'Boost' }[percentage / 25.0 | round | int] }}"
-        speed_count: 4
-      '';
-      "home-assistant/media_player/theater_bluray_status.yaml".text = ''
-        platform: panasonic_bluray
-        host: theater-bluray.home.gustafson.me
-      '';
-      "home-assistant/input_select/theater_bluray_target_state.yaml".text = ''
-        options:
-          - "off"
-          - idle
-          - playing
-      '';
-      "home-assistant/automation/theater_bluray_state_update.yaml".text = ''
-        - alias: Theater Blu-Ray State Update
-          id: theater_bluray_state_update
-          mode: queued
-          trigger:
-            - platform: state
-              entity_id:
-                - media_player.panasonic_blu_ray
-              to: null
-          condition:
-            - condition: not
-              conditions:
-                - condition: state
-                  entity_id: input_select.theater_bluray_target_state
-                  state: "off"
-          action:
-            - service: input_select.select_option
-              target:
-                entity_id: input_select.theater_bluray_target_state
-              data:
-                option: >
-                  {% if is_state('media_player.panasonic_blu_ray', 'playing') -%}
-                    playing
-                  {%- else -%}
-                    idle
-                  {%- endif %}
-      '';
-      # "home-assistant/script/theater_bluray.yaml".text = ''
-      # '';
-      "home-assistant/media_player/theater_bluray.yaml".text = ''
-        platform: universal
-        name: "Theater Blu-Ray"
-        unique_id: theater_bluray
-        device_class: tv
-        children:
-          - media_player.panasonic_blu_ray
-        state_template: "{{ states('input_select.theater_bluray_target_state') }}"
-        commands:
-          turn_off:
-            service: script.theater_bluray
-            data:
-              action: turn_off
-          turn_on:
-            service: script.theater_bluray
-            data:
-              action: turn_on
-          media_play:
-            service: script.theater_bluray
-            data:
-              action: media_play
-          media_pause:
-            service: script.theater_bluray
-            data:
-              action: media_pause
-          media_play_pause:
-            service: script.theater_bluray
-            data:
-              action: media_play_pause
-          media_stop:
-            service: script.theater_bluray
-            data:
-              action: media_stop
-          media_next_track:
-            service: script.theater_bluray
-            data:
-              action: media_next_track
-          media_previous_track:
-            service: script.theater_bluray
-            data:
-              action: media_previous_track
-      '';
-      "home-assistant/media_player/theater_shield.yaml".text = ''
-        platform: universal
-        name: "Theater Shield"
-        unique_id: theater_shield
-        device_class: tv
-        children:
-          - media_player.theater_shield_remote
-          - media_player.theater_shield_cast
-        browse_media_entity: media_player.theater_shield_cast
-        state_template: >
-          {% if is_state('media_player.theater_shield_remote', 'off') -%}
-            off
-          {%- elif is_state('media_player.theater_shield_cast', 'off') -%}
-            idle
-          {%- else -%}
-            {{ states('media_player.theater_shield_cast') }}
-          {%- endif %}
-        commands:
-          turn_off:
-            service: media_player.turn_off
-            target:
-              entity_id: media_player.theater_shield_remote
-          turn_on:
-            service: media_player.turn_on
-            target:
-              entity_id: media_player.theater_shield_remote
-      '';
-      # "home-assistant/script/theater.yaml".text = ''
-      # '';
-      "home-assistant/media_player/theater.yaml".text = ''
-        platform: universal
-        name: "Theater"
-        unique_id: theater
-        device_class: tv
-        children:
-          - media_player.theater_shield
-          - media_player.theater_bluray
-          - media_player.theater_preamp_zone_1
-        active_child_template: >-
-          {% set is_shield = is_state('input_select.theater_activity', ['Plex', 'YouTube', 'Shield']) and not is_state('media_player.theater_shield', 'off') %}
-          {% set is_bluray = is_state('input_select.theater_activity', ['Blu-Ray']) and not is_state('media_player.theater_bluray', 'off') %}
-          {{ 'media_player.theater_shield' if is_shield else 'media_player.theater_bluray' if is_bluray else 'media_player.theater_preamp_zone_1' }}
-        browse_media_entity: media_player.theater_shield
-        state_template: >-
-          {% set is_shield = is_state('input_select.theater_activity', ['Plex', 'YouTube', 'Shield']) and not is_state('media_player.theater_shield', 'off') %}
-          {% set is_bluray = is_state('input_select.theater_activity', ['Blu-Ray']) and not is_state('media_player.theater_bluray', 'off') %}
-          {% set id = 'media_player.theater_shield' if is_shield else 'media_player.theater_bluray' if is_bluray else 'media_player.theater_preamp_zone_1' %}
-          {{ states(id) }}
-        commands:
-          turn_off:
-            service: script.theater
-            data:
-              action: turn_off
-          turn_on:
-            service: script.theater
-            data:
-              action: turn_on
-          select_source:
-            service: script.theater
-            data:
-              action: select_source
-              source: "{{ source }}"
-          volume_set:
-            service: media_player.volume_set
-            target:
-              entity_id: media_player.theater_preamp_zone_1
-            data:
-              volume_level: "{{ volume_level }}"
-          volume_up:
-            service: media_player.volume_up
-            target:
-              entity_id: media_player.theater_preamp_zone_1
-          volume_down:
-            service: media_player.volume_down
-            target:
-              entity_id: media_player.theater_preamp_zone_1
-          volume_mute:
-            service: media_player.volume_mute
-            target:
-              entity_id: media_player.theater_preamp_zone_1
-            data:
-              is_volume_muted: "{{ not state_attr('media_player.theater_preamp_zone_1', 'is_volume_muted') }}"
-          select_sound_mode:
-            service: media_player.select_sound_mode
-            target:
-              entity_id: media_player.theater_preamp_zone_1
-            data:
-              sound_mode: "{{ sound_mode }}"
-        attributes:
-          source: input_select.theater_activity
-          source_list: input_select.theater_activity|options
-          is_volume_muted: media_player.theater_preamp_zone_1|is_volume_muted
-          volume_level: media_player.theater_preamp_zone_1|volume_level
-          sound_mode: media_player.theater_preamp_zone_1|sound_mode
-          sound_mode_raw: media_player.theater_preamp_zone_1|sound_mode_raw
-          sound_mode_list: media_player.theater_preamp_zone_1|sound_mode_list
-      '';
-      "home-assistant/configuration.yaml".text = ''
-        # Loads default set of integrations. Do not remove.
-        default_config:
-
-        # Load frontend themes from the themes folder
-        frontend:
-          themes: !include_dir_merge_named themes
-
-        automation ui: !include automations.yaml
-        automation etc: !include_dir_merge_list etc/automation
-        script ui: !include scripts.yaml
-        script etc: !include_dir_merge_list etc/script
-        scene: !include scenes.yaml
-        template: !include template.yaml
-
-        wake_on_lan:
-
-        input_number: !include_dir_named etc/input_number
-        input_boolean: !include_dir_named etc/input_boolean
-        input_select: !include_dir_named etc/input_select
-
-        light:
-          - platform: template
-            lights: !include_dir_named etc/light/template
-
-        fan:
-          - platform: template
-            fans: !include_dir_named etc/fan/template
-
-        cover:
-          - platform: template
-            covers: !include_dir_named etc/cover/template
-
-        media_player: !include_dir_list  etc/media_player
-
-        climate: !include_dir_list  etc/climate
-
-        amcrest: !include_dir_list  etc/amcrest
-
-        shell_command: !include_dir_named etc/shell_command
-
-        # lock:
-        #   - platform: template
-        #     name: Balcony South Lock
-        #     unique_id: balcony_south_lock
-        #     value_template: "{{ is_state('binary_sensor.balcony_south_lock_phys_current_status_of_the_bolt', 'off') }}"
-        #     lock:
-        #       service: lock.lock
-        #       target:
-        #         entity_id: lock.balcony_south_lock_phys
-        #     unlock:
-        #       service: lock.unlock
-        #       target:
-        #         entity_id: lock.balcony_south_lock_phys
       '';
     };
 

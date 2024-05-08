@@ -1,0 +1,53 @@
+# Loads default set of integrations. Do not remove.
+default_config:
+
+# Load frontend themes from the themes folder
+frontend:
+  themes: !include_dir_merge_named themes
+
+automation ui: !include automations.yaml
+automation etc: !include_dir_merge_list etc/automation
+script ui: !include scripts.yaml
+script etc: !include_dir_merge_list etc/script
+scene: !include scenes.yaml
+template: !include template.yaml
+
+wake_on_lan:
+
+input_number: !include_dir_named etc/input_number
+input_boolean: !include_dir_named etc/input_boolean
+input_select: !include_dir_named etc/input_select
+
+light:
+  - platform: template
+    lights: !include_dir_named etc/light/template
+
+fan:
+  - platform: template
+    fans: !include_dir_named etc/fan/template
+
+cover:
+  - platform: template
+    covers: !include_dir_named etc/cover/template
+
+media_player: !include_dir_list  etc/media_player
+
+climate: !include_dir_list  etc/climate
+
+amcrest: !include_dir_list  etc/amcrest
+
+shell_command: !include_dir_named etc/shell_command
+
+# lock:
+#   - platform: template
+#     name: Balcony South Lock
+#     unique_id: balcony_south_lock
+#     value_template: "{{ is_state('binary_sensor.balcony_south_lock_phys_current_status_of_the_bolt', 'off') }}"
+#     lock:
+#       service: lock.lock
+#       target:
+#         entity_id: lock.balcony_south_lock_phys
+#     unlock:
+#       service: lock.unlock
+#       target:
+#         entity_id: lock.balcony_south_lock_phys

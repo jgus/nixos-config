@@ -1,0 +1,27 @@
+unique_id: range_hood_fan
+friendly_name: "Range Hood Fan"
+value_template: "{{ states('select.range_hood_fan_speed') }}"
+percentage_template: "{{ { 'Off': 0, 'Low': 25, 'Medium': 50, 'High': 75, 'Boost': 100 }[states('select.range_hood_fan_speed')] }}"
+turn_on:
+  if:
+    - condition: template
+      value_template: "{{ not has_value('select.range_hood_fan_speed') or is_state('select.range_hood_fan_speed', 'Off') }}"
+  then:
+    - service: select.select_option
+      target:
+        entity_id: select.range_hood_fan_speed
+      data:
+        option: Low
+turn_off:
+  service: select.select_option
+  target:
+    entity_id: select.range_hood_fan_speed
+  data:
+    option: 'Off'
+set_percentage:
+  service: select.select_option
+  target:
+    entity_id: select.range_hood_fan_speed
+  data:
+    option: "{{ { 0: 'Off', 1: 'Low', 2: 'Medium', 3: 'High', 4: 'Boost' }[percentage / 25.0 | round | int] }}"
+speed_count: 4
