@@ -1,0 +1,209 @@
+- alias: Theater Remote Physical Key
+  id: theater_remote_physical_key
+  mode: restart
+  description: Handle Physical Keypresses from Theater Remote
+  trigger:
+  - platform: webhook
+    allowed_methods:
+    - POST
+    local_only: true
+    webhook_id: -i5mExbZfV-a-HDHmlM1jjpNE
+  condition:
+  - condition: template
+    value_template: "{{trigger.json.source == 'Theater Remote'}}"
+    alias: Only accept input from theater remote
+  action:
+  - if:
+    - condition: template
+      value_template: "{{trigger.json.action != 'down'}}"
+    then:
+    - stop: ""
+    alias: Ignore up actions
+  - choose:
+    - alias: Vol+
+      conditions:
+      - condition: template
+        value_template: "{{trigger.json.key == 'vol+'}}"
+      sequence:
+      - service: media_player.volume_up
+        target:
+          entity_id: media_player.theater
+      - delay:
+          milliseconds: 500
+      - repeat:
+          while:
+          - condition: template
+            value_template: "{{true}}"
+          sequence:
+          - service: media_player.volume_up
+            target:
+              entity_id: media_player.theater
+          - delay:
+              milliseconds: 100
+    - alias: Vol-
+      conditions:
+      - condition: template
+        value_template: "{{trigger.json.key == 'vol-'}}"
+      sequence:
+      - service: media_player.volume_down
+        target:
+          entity_id: media_player.theater
+      - delay:
+          milliseconds: 500
+      - repeat:
+          while:
+          - condition: template
+            value_template: "{{true}}"
+          sequence:
+          - service: media_player.volume_down
+            target:
+              entity_id: media_player.theater
+          - delay:
+              milliseconds: 100
+    - alias: Mute
+      conditions:
+      - condition: template
+        value_template: "{{trigger.json.key == 'mute'}}"
+      sequence:
+      - service: media_player.volume_mute
+        data:
+          is_volume_muted: false
+        target:
+          entity_id: media_player.theater
+    - alias: Play/Pause
+      conditions:
+      - condition: template
+        value_template: "{{trigger.json.key == 'play_pause'}}"
+      sequence:
+      - service: media_player.media_play_pause
+        target:
+          entity_id: media_player.theater
+    - alias: Stop
+      conditions:
+      - condition: template
+        value_template: "{{trigger.json.key == 'stop'}}"
+      sequence:
+      - service: media_player.media_stop
+        target:
+          entity_id: media_player.theater
+    - alias: Rewind
+      conditions:
+      - condition: template
+        value_template: "{{trigger.json.key == 'rewind'}}"
+      sequence:
+      - service: media_player.media_previous_track
+        target:
+          entity_id: media_player.theater
+    - alias: Fast Forward
+      conditions:
+      - condition: template
+        value_template: "{{trigger.json.key == 'fast_forward'}}"
+      sequence:
+      - service: media_player.media_next_track
+        target:
+          entity_id: media_player.theater
+    - alias: 'Device Key: Shield'
+      conditions:
+      - condition: template
+        value_template: "{{states('input_select.theater_activity') in ['Plex', 'YouTube', 'Shield']}}"
+      sequence:
+      - variables:
+          control_map:
+            d_up: DPAD_UP
+            d_down: DPAD_DOWN
+            d_left: DPAD_LEFT
+            d_right: DPAD_RIGHT
+            ok: DPAD_CENTER
+            ch+: CHANNEL_UP
+            ch-: CHANNEL_DOWN
+            back: BACK
+            power: GUIDE
+            home: HOME
+            mic: ASSIST
+            menu: MENU
+            more: INFO
+          repeat_controls:
+          - d_up
+          - d_down
+          - d_left
+          - d_right
+          - ch+
+          - ch-
+      - alias: Ignore unknown keys
+        if:
+        - condition: template
+          value_template: "{{ not trigger.json.key in control_map }}"
+        then:
+        - stop: ""
+      - service: remote.send_command
+        data:
+          command: "{{control_map[trigger.json.key]}}"
+        target:
+          entity_id: remote.theater_shield_remote
+      - alias: Repeat
+        if:
+        - condition: template
+          value_template: "{{trigger.json.key in repeat_controls}}"
+        then:
+        - delay:
+            milliseconds: 500
+        - repeat:
+            while:
+            - condition: template
+              value_template: "{{true}}"
+            sequence:
+            - service: remote.send_command
+              data:
+                command: "{{control_map[trigger.json.key]}}"
+              target:
+                entity_id: remote.theater_shield_remote
+            - delay:
+                milliseconds: 100
+    - alias: 'Device Key: Blu-Ray'
+      conditions:
+      - condition: template
+        value_template: "{{states('input_select.theater_activity') in ['Blu-Ray']}}"
+      sequence:
+      - variables:
+          device: bluray
+          control_map:
+            d_up: d_up
+            d_down: d_down
+            d_left: d_left
+            d_right: d_right
+            ok: select
+            ch+: channel_up
+            ch-: channel_down
+            back: exit
+            home: root_menu
+            menu: contents_menu
+            more: display_info
+          repeat_controls:
+          - d_up
+          - d_down
+          - d_left
+          - d_right
+          - ch+
+          - ch-
+      - alias: Ignore unknown keys
+        if:
+        - condition: template
+          value_template: "{{ not trigger.json.key in control_map }}"
+        then:
+        - stop: ""
+      - service: shell_command.cec_{{device}}_{{control_map[trigger.json.key]}}
+      - alias: Repeat
+        if:
+        - condition: template
+          value_template: "{{trigger.json.key in repeat_controls}}"
+        then:
+        - delay:
+            milliseconds: 500
+        - repeat:
+            while:
+            - condition: template
+              value_template: "{{true}}"
+            sequence:
+            - service: shell_command.cec_{{device}}_{{control_map[trigger.json.key]}}
+            - delay:
+                milliseconds: 100

@@ -1,0 +1,146 @@
+- alias: Theater Activity
+  id: theater_activity
+  mode: restart
+  trigger:
+  - platform: state
+    entity_id:
+    - input_select.theater_activity
+  condition:
+  - condition: template
+    value_template: "{{ not is_state('input_select.theater_activity', ['unavailable', 'unknown']) }}"
+  action:
+  - variables:
+      source: "{{ states('input_select.theater_activity') }}"
+  - if:
+    - condition: state
+      entity_id: input_select.theater_activity
+      state: All Off
+    then:
+    - service: script.theater_lights
+      data:
+        scene: Room
+    - service: climate.turn_off
+      target:
+        area_id: theater
+    - service: remote.turn_off
+      target:
+        entity_id: remote.theater_projector
+    - service: media_player.turn_off
+      target:
+        entity_id:
+        - media_player.theater
+    else:
+    - if:
+      - condition: state
+        entity_id: climate.theater_climate
+        state: 'off'
+      then:
+      - service: climate.turn_on
+        target:
+          area_id:
+          - theater
+      alias: Climate
+    - service: media_player.turn_on
+      target:
+        entity_id:
+        - media_player.theater
+    - service: script.theater_lights
+      data:
+        scene: Standby
+    - alias: Preamp
+      service: media_player.select_source
+      target:
+        entity_id: media_player.theater_preamp_zone_1
+      data:
+        source: >-
+          {% if source in ['Plex', 'YouTube', 'Shield'] -%}
+            UHD
+          {%- elif source in ['Blu-Ray'] -%}
+            BD
+          {%- elif source in ['Music'] -%}
+            NET
+          {%- elif source in ['AUX'] -%}
+            AUX
+          {%- else -%}
+            NET
+          {%- endif %}
+    - alias: Shield
+      choose:
+      - conditions:
+        - condition: template
+          value_template: "{{ source in ['Plex'] }}"
+        sequence:
+        - service: media_player.turn_on
+          target:
+            entity_id: media_player.theater_shield
+        - service: media_player.play_media
+          target:
+            entity_id: media_player.theater_shield_remote
+          data:
+            media_content_id: plex://
+            media_content_type: url
+        alias: Plex
+      - conditions:
+        - condition: template
+          value_template: "{{ source in ['YouTube'] }}"
+        sequence:
+        - service: media_player.turn_on
+          target:
+            entity_id: media_player.theater_shield
+        - service: media_player.play_media
+          target:
+            entity_id: media_player.theater_shield_remote
+          data:
+            media_content_id: vnd.youtube://
+            media_content_type: url
+        alias: YouTube
+      - conditions:
+        - condition: template
+          value_template: "{{ source in ['Shield'] }}"
+        sequence:
+        - service: media_player.turn_on
+          target:
+            entity_id: media_player.theater_shield
+        - service: remote.send_command
+          target:
+            entity_id: remote.theater_shield_remote
+          data:
+            command: HOME
+        alias: Shield
+      default:
+      - service: media_player.turn_off
+        target:
+          entity_id:
+          - media_player.theater_shield
+    - alias: Blu-ray
+      service: >-
+        {% if source in ['Blu-Ray'] -%}
+          media_player.turn_on
+        {%- else -%}
+          media_player.turn_off
+        {%- endif %}
+      target:
+        entity_id: media_player.theater_bluray
+    - alias: Projector
+      if:
+      - condition: template
+        value_template: "{{ source in ['Music'] }}"
+      then:
+      - if:
+        - condition: state
+          entity_id: remote.theater_projector
+          state: 'on'
+        then:
+        - service: remote.turn_off
+          target:
+            entity_id: remote.theater_projector
+      else:
+      - if:
+        - condition: state
+          entity_id: remote.theater_projector
+          state: 'off'
+        then:
+        - service: remote.turn_on
+          target:
+            entity_id:
+            - remote.theater_projector

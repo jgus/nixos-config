@@ -1,0 +1,93 @@
+alias: Theater Blu-Ray Command
+mode: queued
+fields:
+  action: {}
+sequence:
+- choose:
+  - conditions:
+    - condition: template
+      value_template: "{{ action == 'turn_off' }}"
+    sequence:
+    - service: input_select.select_option
+      target:
+        entity_id: input_select.theater_bluray_target_state
+      data:
+        option: 'off'
+    - service: shell_command.cec_bluray_power_off_f
+  - conditions:
+    - condition: template
+      value_template: "{{ action == 'turn_on' }}"
+    sequence:
+    - if:
+      - condition: state
+        entity_id: input_select.theater_bluray_target_state
+        state: 'off'
+      then:
+      - service: input_select.select_option
+        target:
+          entity_id: input_select.theater_bluray_target_state
+        data:
+          option: idle
+    - service: shell_command.cec_bluray_power_on_f
+  - conditions:
+    - condition: template
+      value_template: "{{ action == 'media_play' }}"
+    sequence:
+    - service: input_select.select_option
+      target:
+        entity_id: input_select.theater_bluray_target_state
+      data:
+        option: playing
+    - service: shell_command.cec_bluray_play
+  - conditions:
+    - condition: template
+      value_template: "{{ action == 'media_pause' }}"
+    sequence:
+    - service: input_select.select_option
+      target:
+        entity_id: input_select.theater_bluray_target_state
+      data:
+        option: idle
+    - service: shell_command.cec_bluray_pause
+  - conditions:
+    - condition: template
+      value_template: "{{ action == 'media_play_pause' }}"
+    sequence:
+    - if:
+      - condition: state
+        entity_id: input_select.theater_bluray_target_state
+        state: playing
+      then:
+      - service: input_select.select_option
+        target:
+          entity_id: input_select.theater_bluray_target_state
+        data:
+          option: idle
+      - service: shell_command.cec_bluray_pause
+      else:
+      - service: input_select.select_option
+        target:
+          entity_id: input_select.theater_bluray_target_state
+        data:
+          option: playing
+      - service: shell_command.cec_bluray_play
+  - conditions:
+    - condition: template
+      value_template: "{{ action == 'media_stop' }}"
+    sequence:
+    - service: input_select.select_option
+      target:
+        entity_id: input_select.theater_bluray_target_state
+      data:
+        option: idle
+    - service: shell_command.cec_bluray_stop
+  - conditions:
+    - condition: template
+      value_template: "{{ action == 'media_next_track' }}"
+    sequence:
+    - service: shell_command.cec_bluray_forward
+  - conditions:
+    - condition: template
+      value_template: "{{ action == 'media_previous_track' }}"
+    sequence:
+    - service: shell_command.cec_bluray_backward

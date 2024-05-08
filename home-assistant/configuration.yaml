@@ -8,7 +8,7 @@ frontend:
 automation ui: !include automations.yaml
 automation etc: !include_dir_merge_list etc/automation
 script ui: !include scripts.yaml
-script etc: !include_dir_merge_list etc/script
+script etc: !include_dir_named etc/script
 scene: !include scenes.yaml
 template: !include template.yaml
 
