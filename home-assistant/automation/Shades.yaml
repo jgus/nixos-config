@@ -28,40 +28,10 @@
   action:
     - variables:
         p: "{{ states('sensor.solar_shade_target') | int }}"
-        north_shade_ids:
-          - input_number.cover_loft_shade_1_auto_target
-          - input_number.cover_loft_shade_2_auto_target
-          - input_number.cover_loft_shade_3_auto_target
-          - input_number.cover_office_shade_3_auto_target
-          - input_number.cover_office_shade_4_auto_target
-          - input_number.cover_office_shade_5_auto_target
-        east_shade_ids:
-          - input_number.cover_basement_living_room_shade_1_auto_target
-          - input_number.cover_basement_living_room_shade_2_auto_target
-          - input_number.cover_dining_room_shade_1_auto_target
-          - input_number.cover_dining_room_shade_2_auto_target
-          - input_number.cover_dining_room_upper_shade_auto_target
-          - input_number.cover_great_room_lower_left_shade_auto_target
-          - input_number.cover_great_room_lower_right_shade_auto_target
-          - input_number.cover_great_room_upper_left_shade_auto_target
-          - input_number.cover_great_room_upper_right_shade_auto_target
-          - input_number.cover_kitchen_shade_1_auto_target
-          - input_number.cover_kitchen_shade_2_auto_target
-          - input_number.cover_kitchen_shade_3_auto_target
-          - input_number.cover_loft_shade_4_auto_target
-        south_shade_ids: []
-        west_shade_ids:
-          - input_number.cover_craft_room_shade_1_auto_target
-          - input_number.cover_craft_room_shade_2_auto_target
-          - input_number.cover_music_room_shade_1_auto_target
-          - input_number.cover_music_room_shade_2_auto_target
-          - input_number.cover_office_shade_1_auto_target
-          - input_number.cover_office_shade_2_auto_target
-          - input_number.cover_study_shade_1_auto_target
-          - input_number.cover_study_shade_2_auto_target
-          - input_number.cover_toy_room_shade_1_auto_target
-          - input_number.cover_toy_room_shade_2_auto_target
-          - input_number.cover_toy_room_shade_3_auto_target
+        north_shade_ids: "{{ label_entities('North Shade Auto Target') }}"
+        east_shade_ids: "{{ label_entities('East Shade Auto Target') }}"
+        south_shade_ids: "{{ label_entities('South Shade Auto Target') }}"
+        west_shade_ids: "{{ label_entities('West Shade Auto Target') }}"
     - choose:
         - alias: Open at sunrise
           conditions:
