@@ -28,16 +28,17 @@ sequence:
       value_template: "{{ scene == 'Standby' }}"
     sequence:
     - service: light.turn_on
-      data:
-        brightness_pct: 100
       target:
         entity_id:
-        - light.theater_led_left
-        - light.theater_led_stairs
-        - light.theater_led_under_bar
+          - light.theater_led_left
+          - light.theater_led_stairs
+          - light.theater_led_under_bar
+      data:
+        brightness_pct: 33
+        rgbw_color: [ 127, 0, 0, 255 ]
     - service: light.turn_on
       data:
-        brightness_pct: 20
+        brightness_pct: 5
       target:
         entity_id: light.theater_bar_switch
     - service: light.turn_off

@@ -18,6 +18,10 @@ input_number: !include_dir_named etc/input_number
 input_boolean: !include_dir_named etc/input_boolean
 input_select: !include_dir_named etc/input_select
 
+switch:
+  - platform: template
+    switches: !include_dir_named etc/switch/template
+
 light:
   - platform: template
     lights: !include_dir_named etc/light/template
