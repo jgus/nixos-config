@@ -25,6 +25,14 @@ in
           acl = [ "readwrite #" ];
           password = "${pw.mqtt.frigate}";
         };
+        users.zigbee2mqtt = {
+          acl = [ "readwrite #" ];
+          password = "${pw.mqtt.zigbee2mqtt}";
+        };
+        users.theater_remote = {
+          acl = [ "readwrite #" ];
+          password = "${pw.mqtt.theater_remote}";
+        };
         users.frodo = {
           acl = [ "readwrite valetudo/Frodo/#" ];
           password = "${pw.mqtt.frodo}";
