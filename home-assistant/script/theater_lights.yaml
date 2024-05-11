@@ -22,6 +22,8 @@ sequence:
     - service: light.turn_off
       target:
         area_id: theater
+      data:
+        transition: 1
   - alias: Standby
     conditions:
     - condition: template
@@ -30,20 +32,22 @@ sequence:
     - service: light.turn_on
       target:
         entity_id:
-          - light.theater_led_left
-          - light.theater_led_stairs
-          - light.theater_led_under_bar
+          - light.theater_led_all
       data:
-        brightness_pct: 33
-        rgbw_color: [ 127, 0, 0, 255 ]
+        brightness_pct: 10
+        rgbw_color: [ 0, 255, 0, 255 ]
+        transition: 1
     - service: light.turn_on
-      data:
-        brightness_pct: 5
       target:
         entity_id: light.theater_bar_switch
+      data:
+        brightness_pct: 5
+        transition: 1
     - service: light.turn_off
       target:
         entity_id: light.theater_switch
+      data:
+        transition: 1
   - alias: Room
     conditions:
     - condition: template
@@ -52,6 +56,7 @@ sequence:
     - service: light.turn_on
       data:
         brightness_pct: 100
+        transition: 1
       target:
         entity_id:
         - light.theater_switch
@@ -59,6 +64,6 @@ sequence:
     - service: light.turn_off
       target:
         entity_id:
-        - light.theater_led_left
-        - light.theater_led_stairs
-        - light.theater_led_under_bar
+        - light.theater_led_all
+      data:
+        transition: 1

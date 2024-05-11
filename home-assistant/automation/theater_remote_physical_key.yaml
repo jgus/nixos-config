@@ -10,7 +10,7 @@
     webhook_id: -i5mExbZfV-a-HDHmlM1jjpNE
   condition:
   - condition: template
-    value_template: "{{trigger.json.source == 'Theater Remote'}}"
+    value_template: "{{trigger.json.source == 'theater_remote'}}"
     alias: Only accept input from theater remote
   action:
   - if:
