@@ -32,72 +32,61 @@
         east_shade_ids: "{{ label_entities('East Shade Auto Target') }}"
         south_shade_ids: "{{ label_entities('South Shade Auto Target') }}"
         west_shade_ids: "{{ label_entities('West Shade Auto Target') }}"
-    - choose:
-        - alias: Open at sunrise
-          conditions:
-            - condition: trigger
-              id:
-                - sun_rise
-          sequence:
-            - repeat:
-                for_each:
-                  - "{{ north_shade_ids }}"
-                  - "{{ west_shade_ids }}"
-                sequence:
-                  - service: input_number.set_value
-                    data:
-                      value: 100
-                    target:
-                      entity_id: "{{ repeat.item }}"
-        - alias: Close at sunset
-          conditions:
-            - condition: trigger
-              id:
-                - sun_set
-          sequence:
-            - repeat:
-                for_each:
-                  - "{{ north_shade_ids }}"
-                  - "{{ east_shade_ids }}"
-                  - "{{ south_shade_ids }}"
-                  - "{{ west_shade_ids }}"
-                sequence:
-                  - service: input_number.set_value
-                    data:
-                      value: 0
-                    target:
-                      entity_id: "{{ repeat.item }}"
-        - alias: Morning program
-          conditions:
-            - condition: state
-              entity_id: sun.sun
-              attribute: rising
-              state: true
-          sequence:
-            - repeat:
-                for_each:
-                  - "{{ east_shade_ids }}"
-                  - "{{ south_shade_ids }}"
-                sequence:
-                  - service: input_number.set_value
-                    data:
-                      value: "{{ p }}"
-                    target:
-                      entity_id: "{{ repeat.item }}"
-        - alias: Afternoon program
-          conditions:
-            - condition: state
-              entity_id: sun.sun
-              attribute: rising
-              state: false
-          sequence:
-            - repeat:
-                for_each:
-                  - "{{ south_shade_ids }}"
-                  - "{{ west_shade_ids }}"
-                sequence:
-                  - service: input_number.set_value
-                    data:
-                      value: "{{ p }}"
-                    target:
-                      entity_id: "{{ repeat.item }}"
+    - if:
+        - condition: trigger
+          id:
+            - sun_set
+      then:
+        - repeat:
+            for_each:
+              - "{{ north_shade_ids }}"
+              - "{{ east_shade_ids }}"
+              - "{{ south_shade_ids }}"
+              - "{{ west_shade_ids }}"
+            sequence:
+              - service: input_number.set_value
+                data:
+                  value: 0
+                target:
+                  entity_id: "{{ repeat.item }}"
+      else:
+        - repeat:
+            for_each:
+              - "{{ north_shade_ids }}"
+            sequence:
+              - service: input_number.set_value
+                data:
+                  value: >-
+                    {{ p if ((state_attr('sun.sun', 'azimuth') <= 90) or
+                    (state_attr('sun.sun', 'azimuth') >= 270)) else 100 }}
+                target:
+                  entity_id: "{{ repeat.item }}"
+        - repeat:
+            for_each:
+              - "{{ east_shade_ids }}"
+            sequence:
+              - service: input_number.set_value
+                data:
+                  value: "{{ p if (state_attr('sun.sun', 'azimuth') <= 180) else 100 }}"
+                target:
+                  entity_id: "{{ repeat.item }}"
+        - repeat:
+            for_each:
+              - "{{ south_shade_ids }}"
+            sequence:
+              - service: input_number.set_value
+                data:
+                  value: >-
+                    {{ p if ((state_attr('sun.sun', 'azimuth') >= 90) and
+                    (state_attr('sun.sun', 'azimuth') <= 270)) else 100 }}
+                target:
+                  entity_id: "{{ repeat.item }}"
+        - repeat:
+            for_each:
+              - "{{ west_shade_ids }}"
+            sequence:
+              - service: input_number.set_value
+                data:
+                  value: "{{ p if (state_attr('sun.sun', 'azimuth') >= 180) else 100 }}"
+                target:
+                  entity_id: "{{ repeat.item }}"
