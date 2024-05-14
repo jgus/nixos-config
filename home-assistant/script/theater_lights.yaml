@@ -21,7 +21,11 @@ sequence:
     sequence:
     - service: light.turn_off
       target:
-        area_id: theater
+        entity_id:
+        - light.theater_switch
+        - light.theater_bar_switch
+        - light.theater_led_all
+        - light.theater_remote_screen_backlight
       data:
         transition: 1
   - alias: Standby
@@ -29,6 +33,12 @@ sequence:
     - condition: template
       value_template: "{{ scene == 'Standby' }}"
     sequence:
+    - service: light.turn_on
+      target:
+        entity_id:
+          - light.theater_remote_screen_backlight
+      data:
+        brightness_pct: 10
     - service: light.turn_on
       target:
         entity_id:
@@ -53,6 +63,12 @@ sequence:
     - condition: template
       value_template: "{{ scene == 'Room' }}"
     sequence:
+    - service: light.turn_on
+      target:
+        entity_id:
+          - light.theater_remote_screen_backlight
+      data:
+        brightness_pct: 100
     - service: light.turn_on
       data:
         brightness_pct: 100
