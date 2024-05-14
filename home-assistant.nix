@@ -170,6 +170,10 @@ in
           };
         }
         {
+          name = "home-assistant/input_boolean/cover_${i}_window_open.yaml";
+          value = { text = "initial: false"; };
+        }
+        {
           name = "home-assistant/input_boolean/cover_${i}_auto_set_enable.yaml";
           value = { text = "initial: true"; };
         }
@@ -192,6 +196,9 @@ in
                     entity_id:
                       - input_boolean.cover_${i}_auto_set_enable
                     to: "on"
+                  - platform: state
+                    entity_id:
+                      - input_number.cover_${i}_window_open
                 condition:
                   - condition: state
                     entity_id: input_boolean.cover_${i}_auto_set_enable
@@ -205,7 +212,7 @@ in
                     target:
                       entity_id: cover.${i}
                     data:
-                      position: "{{ states('input_number.cover_${i}_auto_target') }}"
+                      position: "{{ [states('input_number.cover_${i}_auto_target'), 50 if is_state('input_boolean.cover_${i}_window_open', 'on') else 0] | max }}"
                   - wait_template: "{{ state_attr('cover.${i}', 'current_position') == states('input_number.cover_${i}_auto_target') | int }}"
                     timeout: "00:01:00"
                   - service: input_boolean.turn_on
