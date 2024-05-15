@@ -212,7 +212,7 @@ in
                     target:
                       entity_id: cover.${i}
                     data:
-                      position: "{{ [states('input_number.cover_${i}_auto_target'), 50 if is_state('input_boolean.cover_${i}_window_open', 'on') else 0] | max }}"
+                      position: "{{ [states('input_number.cover_${i}_auto_target'), '50' if is_state('input_boolean.cover_${i}_window_open', 'on') else '0'] | max }}"
                   - wait_template: "{{ state_attr('cover.${i}', 'current_position') == states('input_number.cover_${i}_auto_target') | int }}"
                     timeout: "00:01:00"
                   - service: input_boolean.turn_on
