@@ -171,7 +171,7 @@ in
         }
         {
           name = "home-assistant/input_boolean/cover_${i}_window_open.yaml";
-          value = { text = "initial: false"; };
+          value = { text = ""; };
         }
         {
           name = "home-assistant/input_boolean/cover_${i}_auto_set_enable.yaml";
@@ -198,7 +198,7 @@ in
                     to: "on"
                   - platform: state
                     entity_id:
-                      - input_number.cover_${i}_window_open
+                      - input_boolean.cover_${i}_window_open
                 condition:
                   - condition: state
                     entity_id: input_boolean.cover_${i}_auto_set_enable
