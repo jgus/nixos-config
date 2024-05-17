@@ -204,6 +204,8 @@ in
                     entity_id: input_boolean.cover_${i}_auto_set_enable
                     state: "on"
                 action:
+                  - variables:
+                      p: "{{ [states('input_number.cover_${i}_auto_target') | int, 50 if is_state('input_boolean.cover_${i}_window_open', 'on') else 0] | max }}"
                   - service: input_boolean.turn_off
                     target:
                       entity_id: input_boolean.cover_${i}_user_set_enable
@@ -212,8 +214,8 @@ in
                     target:
                       entity_id: cover.${i}
                     data:
-                      position: "{{ [states('input_number.cover_${i}_auto_target'), '50' if is_state('input_boolean.cover_${i}_window_open', 'on') else '0'] | max }}"
-                  - wait_template: "{{ state_attr('cover.${i}', 'current_position') == states('input_number.cover_${i}_auto_target') | int }}"
+                      position: "{{ p }}"
+                  - wait_template: "{{ (state_attr('cover.${i}', 'current_position') | int) == (p | int) }}"
                     timeout: "00:01:00"
                   - service: input_boolean.turn_on
                     target:

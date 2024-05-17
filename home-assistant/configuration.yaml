@@ -10,7 +10,7 @@ automation etc: !include_dir_merge_list etc/automation
 script ui: !include scripts.yaml
 script etc: !include_dir_named etc/script
 scene: !include scenes.yaml
-template: !include template.yaml
+template: !include etc/template.yaml
 
 wake_on_lan:
 
