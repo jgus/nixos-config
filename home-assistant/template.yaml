@@ -10,5 +10,5 @@
         {% set h = 48 %}
         {% set oy = 14 %}
         {% set ox = 45 %}
-        {{ ([0, (tan(states('sensor.sun_solar_elevation') | float) * ox - oy) / h, 1]|sort)[1] * 100 }}
+        {{ ([0, (tan(states('sensor.sun_solar_elevation') | float * 3.14159 / 180) * ox - oy) / h, 1]|sort)[1] * 100 }}
       unit_of_measurement: "%"
