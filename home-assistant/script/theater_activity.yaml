@@ -9,9 +9,10 @@ fields:
           - Plex
           - YouTube
           - Shield Home
+          - Shield App
           - Blu-Ray
           - Music
-          - Aux
+          - AUX
     name: Activity
     required: true
     default: All Off
@@ -46,33 +47,36 @@ sequence:
                 target:
                   area_id:
                     - theater
-          - service: media_player.turn_on
-            target:
-              entity_id:
-                - media_player.theater
-          - service: script.theater_lights
+          - alias: Lights
+            service: script.theater_lights
             data:
               scene: Standby
           - alias: Preamp
-            service: media_player.select_source
-            target:
-              entity_id: media_player.theater_preamp_zone_1
-            data:
-              activity: |-
-                {% if activity in ['Plex', 'YouTube', 'Shield'] -%}
-                  UHD
-                {%- elif activity in ['Blu-Ray'] -%}
-                  BD
-                {%- elif activity in ['Music'] -%}
-                  NET
-                {%- elif activity in ['AUX'] -%}
-                  AUX
-                {%- else -%}
-                  NET
-                {%- endif %}
+            sequence:
+              - service: media_player.turn_on
+                target:
+                  entity_id:
+                    - media_player.theater
+              - service: media_player.select_source
+                target:
+                  entity_id: media_player.theater_preamp_zone_1
+                data:
+                  source: >-
+                    {{
+                      {
+                        'Plex' : 'UHD',
+                        'YouTube' : 'UHD',
+                        'Shield Home' : 'UHD',
+                        'Shield App' : 'UHD',
+                        'Blu-Ray' : 'BD',
+                        'Music' : 'NET',
+                        'AUX' : 'AUX',
+                      }[activity]
+                    }}
           - alias: Shield
             choose:
-              - conditions:
+              - alias: Plex
+                conditions:
                   - condition: template
                     value_template: "{{ activity in ['Plex'] }}"
                 sequence:
@@ -85,8 +89,8 @@ sequence:
                     data:
                       media_content_type: url
                       media_content_id: plex://
-                alias: Plex
-              - conditions:
+              - alias: YouTube
+                conditions:
                   - condition: template
                     value_template: "{{ activity in ['YouTube'] }}"
                 sequence:
@@ -99,10 +103,10 @@ sequence:
                     data:
                       media_content_type: url
                       media_content_id: vnd.youtube://
-                alias: YouTube
-              - conditions:
+              - alias: Shield Home
+                conditions:
                   - condition: template
-                    value_template: "{{ activity in ['Shield'] }}"
+                    value_template: "{{ activity in ['Shield Home'] }}"
                 sequence:
                   - service: media_player.turn_on
                     target:
@@ -112,7 +116,14 @@ sequence:
                       entity_id: remote.theater_shield_remote
                     data:
                       command: HOME
-                alias: Shield
+              - alias: Shield App
+                conditions:
+                  - condition: template
+                    value_template: "{{ activity in ['Shield App'] }}"
+                sequence:
+                  - service: media_player.turn_on
+                    target:
+                      entity_id: media_player.theater_shield
             default:
               - service: media_player.turn_off
                 target:

@@ -1,9 +1,33 @@
 select:
   - name: "Theater Activity"
     unique_id: theater_activity
-    state: "unknown"
-    options: "{{['All Off','Plex','YouTube','Shield Home','Blu-Ray','Music','Aux']}}"
+    options: "{{['All Off','Plex','YouTube','Shield Home','Shield App','Blu-Ray','Music','AUX']}}"
+    state: >-
+      {% if is_state('media_player.theater', 'off') %}
+        All Off
+      {% else %}
+        {% if is_state_attr('media_player.theater_preamp_zone_1', 'source', 'UHD') %}
+          {% if is_state_attr('media_player.theater_shield', 'app_id', 'com.google.android.tvlauncher') %}
+            Shield Home
+          {% elif is_state_attr('media_player.theater_shield', 'app_id', 'com.plexapp.android') %}
+            Plex
+          {% elif is_state_attr('media_player.theater_shield', 'app_id', 'com.google.android.youtube.tv') %}
+            YouTube
+          {% else %}
+            Shield App
+          {% endif %}
+        {% elif is_state_attr('media_player.theater_preamp_zone_1', 'source', 'BD') %}
+          Blu-Ray
+        {% elif is_state_attr('media_player.theater_preamp_zone_1', 'source', 'NET') %}
+          Music
+        {% elif is_state_attr('media_player.theater_preamp_zone_1', 'source', 'AUX') %}
+          AUX
+        {% else %}
+          unknown
+        {% endif %}
+      {% endif%}
     select_option:
       - service: script.theater_activity
         data:
-          activity: "{{ option }}"
+          activity: >-
+            {{ option }}
