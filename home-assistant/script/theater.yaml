@@ -4,48 +4,44 @@ fields:
   action: {}
   source: {}
 sequence:
-- choose:
-  - alias: turn_off
-    conditions:
-    - condition: template
-      value_template: "{{ action == 'turn_off' }}"
-    sequence:
-    - service: media_player.turn_off
-      target:
-        entity_id:
-        - media_player.theater_shield
-        - media_player.theater_bluray
-        - media_player.theater_preamp_zone_1
-    - service: input_select.select_option
-      target:
-        entity_id: input_select.theater_activity
-      data:
-        option: All Off
-  - alias: turn_on
-    conditions:
-    - condition: template
-      value_template: "{{ action == 'turn_on' }}"
-    sequence:
-    - if:
-      - condition: not
+  - choose:
+      - alias: turn_off
         conditions:
-        - condition: state
-          entity_id: media_player.theater_preamp_zone_1
-          state: 'on'
-      then:
-      - service: media_player.turn_on
-        target:
-          entity_id: media_player.theater_preamp_zone_1
-      - delay:
-          seconds: 5
-        alias: Wait for preamp to boot
-  - alias: select_source
-    conditions:
-    - condition: template
-      value_template: "{{ action == 'select_source' }}"
-    sequence:
-    - service: input_select.select_option
-      target:
-        entity_id: input_select.theater_activity
-      data:
-        option: "{{ source }}"
+          - condition: template
+            value_template: "{{ action == 'turn_off' }}"
+        sequence:
+          - service: media_player.turn_off
+            target:
+              entity_id:
+                - media_player.theater_shield
+                - media_player.theater_bluray
+                - media_player.theater_preamp_zone_1
+          - service: script.theater_activity
+            data:
+              activity: All Off
+      - alias: turn_on
+        conditions:
+          - condition: template
+            value_template: "{{ action == 'turn_on' }}"
+        sequence:
+          - if:
+              - condition: not
+                conditions:
+                  - condition: state
+                    entity_id: media_player.theater_preamp_zone_1
+                    state: "on"
+            then:
+              - service: media_player.turn_on
+                target:
+                  entity_id: media_player.theater_preamp_zone_1
+              - delay:
+                  seconds: 5
+                alias: Wait for preamp to boot
+      - alias: select_source
+        conditions:
+          - condition: template
+            value_template: "{{ action == 'select_source' }}"
+        sequence:
+          - service: script.theater_activity
+            data:
+              activity: "{{ source }}"

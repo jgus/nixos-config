@@ -2,25 +2,25 @@ alias: Theater Lights
 id: theater_lights
 mode: restart
 trigger:
-- platform: state
-  entity_id:
-  - media_player.theater
-  id: playing
-  to: playing
-- platform: state
-  entity_id:
-  - media_player.theater
-  id: playing
-  from: playing
+  - platform: state
+    entity_id:
+      - media_player.theater
+    id: playing
+    to: playing
+  - platform: state
+    entity_id:
+      - media_player.theater
+    id: playing
+    from: playing
 condition:
-- condition: template
-  value_template: "{{ not is_state('input_select.theater_activity', ['unavailable', 'unknown', 'off']) }}"
+  - condition: template
+    value_template: "{{ not is_state('select.theater_activity', ['unavailable', 'unknown', 'All Off']) }}"
 action:
-- service: script.theater_lights
-  data:
-    scene: >-
-      {% if is_state('media_player.theater', 'playing') -%}
-        Off
-      {%- else -%}
-        Standby
-      {%- endif %}
+  - service: script.theater_lights
+    data:
+      scene: >-
+        {% if is_state('media_player.theater', 'playing') -%}
+          Off
+        {%- else -%}
+          Standby
+        {%- endif %}

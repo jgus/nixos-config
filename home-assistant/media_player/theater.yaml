@@ -7,13 +7,13 @@ children:
   - media_player.theater_bluray
   - media_player.theater_preamp_zone_1
 active_child_template: >-
-  {% set is_shield = is_state('input_select.theater_activity', ['Plex', 'YouTube', 'Shield']) and not is_state('media_player.theater_shield', 'off') %}
-  {% set is_bluray = is_state('input_select.theater_activity', ['Blu-Ray']) and not is_state('media_player.theater_bluray', 'off') %}
+  {% set is_shield = is_state('select.theater_activity', ['Plex', 'YouTube', 'Shield']) and not is_state('media_player.theater_shield', 'off') %}
+  {% set is_bluray = is_state('select.theater_activity', ['Blu-Ray']) and not is_state('media_player.theater_bluray', 'off') %}
   {{ 'media_player.theater_shield' if is_shield else 'media_player.theater_bluray' if is_bluray else 'media_player.theater_preamp_zone_1' }}
 browse_media_entity: media_player.theater_shield
 state_template: >-
-  {% set is_shield = is_state('input_select.theater_activity', ['Plex', 'YouTube', 'Shield']) and not is_state('media_player.theater_shield', 'off') %}
-  {% set is_bluray = is_state('input_select.theater_activity', ['Blu-Ray']) and not is_state('media_player.theater_bluray', 'off') %}
+  {% set is_shield = is_state('select.theater_activity', ['Plex', 'YouTube', 'Shield']) and not is_state('media_player.theater_shield', 'off') %}
+  {% set is_bluray = is_state('select.theater_activity', ['Blu-Ray']) and not is_state('media_player.theater_bluray', 'off') %}
   {% set id = 'media_player.theater_shield' if is_shield else 'media_player.theater_bluray' if is_bluray else 'media_player.theater_preamp_zone_1' %}
   {{ states(id) }}
 commands:
@@ -57,8 +57,8 @@ commands:
     data:
       sound_mode: "{{ sound_mode }}"
 attributes:
-  source: input_select.theater_activity
-  source_list: input_select.theater_activity|options
+  source: select.theater_activity
+  source_list: select.theater_activity|options
   is_volume_muted: media_player.theater_preamp_zone_1|is_volume_muted
   volume_level: media_player.theater_preamp_zone_1|volume_level
   sound_mode: media_player.theater_preamp_zone_1|sound_mode

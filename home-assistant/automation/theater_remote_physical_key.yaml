@@ -104,7 +104,7 @@ action:
       - alias: "Device Key: Shield"
         conditions:
           - condition: template
-            value_template: "{{states('input_select.theater_activity') in ['Plex', 'YouTube', 'Shield']}}"
+            value_template: "{{ is_state('select.theater_activity', ['Plex', 'YouTube', 'Shield Home', 'Shield App']) }}"
         sequence:
           - variables:
               control_map:
@@ -161,7 +161,7 @@ action:
       - alias: "Device Key: Blu-Ray"
         conditions:
           - condition: template
-            value_template: "{{states('input_select.theater_activity') in ['Blu-Ray']}}"
+            value_template: "{{ is_state('select.theater_activity', ['Blu-Ray']) }}"
         sequence:
           - variables:
               device: bluray
