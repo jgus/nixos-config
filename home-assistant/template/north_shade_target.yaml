@@ -1,0 +1,21 @@
+trigger:
+  - platform: homeassistant
+    event: start
+  - platform: time_pattern
+    minutes: /10
+sensor:
+  - name: "North Shade Target"
+    unique_id: north_shade_target
+    state: >
+      {% set azimuth = state_attr('sun.sun', 'azimuth') | float %}
+      {% if is_state('sun.sun', 'below_horizon') %}
+        0
+      {% elif ((azimuth >= 90) and (azimuth <= 270)) %}
+        100
+      {% else %}
+        {% set h = 10 %}
+        {% set oy = -2 %}
+        {% set ox = 10 %}
+        {{ ([0, (tan(states('sensor.sun_solar_elevation') | float * 3.14159 / 180) * ox - oy) / h, 1]|sort)[1] * 100 }}
+      {% endif %}
+    unit_of_measurement: "%"

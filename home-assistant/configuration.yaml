@@ -6,11 +6,12 @@ frontend:
   themes: !include_dir_merge_named themes
 
 automation ui: !include automations.yaml
-automation etc: !include_dir_list etc/automation
 script ui: !include scripts.yaml
-script etc: !include_dir_named etc/script
 scene: !include scenes.yaml
-template: !include etc/template.yaml
+
+automation etc: !include_dir_list etc/automation
+script etc: !include_dir_named etc/script
+template: !include_dir_list etc/template
 
 wake_on_lan:
 
