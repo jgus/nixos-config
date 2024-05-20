@@ -182,65 +182,72 @@ in
           value = { text = "initial: true"; };
         }
         {
-          name = "home-assistant/automation/cover_${i}.yaml";
+          name = "home-assistant/automation/cover_${i}_auto_set.yaml";
           value = {
             text = ''
-              - alias: cover ${i} auto set
-                id: cover_${i}_auto_set
-                mode: restart
-                trigger:
-                  - platform: state
-                    entity_id:
-                      - input_number.cover_${i}_auto_target
-                  - platform: state
-                    entity_id:
-                      - input_boolean.cover_${i}_auto_set_enable
-                    to: "on"
-                  - platform: state
-                    entity_id:
-                      - input_boolean.cover_${i}_window_open
-                condition:
-                  - condition: state
-                    entity_id: input_boolean.cover_${i}_auto_set_enable
-                    state: "on"
-                action:
-                  - variables:
-                      p: "{{ [states('input_number.cover_${i}_auto_target') | int, 50 if is_state('input_boolean.cover_${i}_window_open', 'on') else 0] | max }}"
-                  - service: input_boolean.turn_off
-                    target:
-                      entity_id: input_boolean.cover_${i}_user_set_enable
-                  - wait_template: "{{ is_state('input_boolean.cover_${i}_user_set_enable', 'off') }}"
-                  - service: cover.set_cover_position
-                    target:
-                      entity_id: cover.${i}
-                    data:
-                      position: "{{ p }}"
-                  - wait_template: "{{ (state_attr('cover.${i}', 'current_position') | int) == (p | int) }}"
-                    timeout: "00:01:00"
-                  - service: input_boolean.turn_on
-                    target:
-                      entity_id: input_boolean.cover_${i}_user_set_enable
-              - alias: cover ${i} user set
-                id: cover_${i}_user_set
-                mode: restart
-                trigger:
-                  - platform: state
-                    entity_id:
-                      - cover.${i}
-                    attribute: current_position
-                condition:
-                  - condition: state
+              alias: cover ${i} auto set
+              id: cover_${i}_auto_set
+              mode: restart
+              trigger:
+                - platform: state
+                  entity_id:
+                    - input_number.cover_${i}_auto_target
+                - platform: state
+                  entity_id:
+                    - input_boolean.cover_${i}_auto_set_enable
+                  to: "on"
+                - platform: state
+                  entity_id:
+                    - input_boolean.cover_${i}_window_open
+              condition:
+                - condition: state
+                  entity_id: input_boolean.cover_${i}_auto_set_enable
+                  state: "on"
+              action:
+                - variables:
+                    p: "{{ [states('input_number.cover_${i}_auto_target') | int, 50 if is_state('input_boolean.cover_${i}_window_open', 'on') else 0] | max }}"
+                - service: input_boolean.turn_off
+                  target:
                     entity_id: input_boolean.cover_${i}_user_set_enable
-                    state: "on"
-                action:
-                  - service: input_boolean.turn_off
-                    target:
-                      entity_id: input_boolean.cover_${i}_auto_set_enable
-                  - delay:
-                      hours: 2
-                  - service: input_boolean.turn_on
-                    target:
-                      entity_id: input_boolean.cover_${i}_auto_set_enable
+                - wait_template: "{{ is_state('input_boolean.cover_${i}_user_set_enable', 'off') }}"
+                - service: cover.set_cover_position
+                  target:
+                    entity_id: cover.${i}
+                  data:
+                    position: "{{ p }}"
+                - wait_template: "{{ (state_attr('cover.${i}', 'current_position') | int) == (p | int) }}"
+                  timeout: "00:01:00"
+                - service: input_boolean.turn_on
+                  target:
+                    entity_id: input_boolean.cover_${i}_user_set_enable
+            '';
+          };
+        }
+        {
+          name = "home-assistant/automation/cover_${i}_user_set.yaml";
+          value = {
+            text = ''
+              alias: cover ${i} user set
+              id: cover_${i}_user_set
+              mode: restart
+              trigger:
+                - platform: state
+                  entity_id:
+                    - cover.${i}
+                  attribute: current_position
+              condition:
+                - condition: state
+                  entity_id: input_boolean.cover_${i}_user_set_enable
+                  state: "on"
+              action:
+                - service: input_boolean.turn_off
+                  target:
+                    entity_id: input_boolean.cover_${i}_auto_set_enable
+                - delay:
+                    hours: 2
+                - service: input_boolean.turn_on
+                  target:
+                    entity_id: input_boolean.cover_${i}_auto_set_enable
             '';
           };
         }
