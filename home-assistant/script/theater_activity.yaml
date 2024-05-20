@@ -1,0 +1,152 @@
+alias: Theater Activity
+mode: restart
+fields:
+  activity:
+    selector:
+      select:
+        options:
+          - All Off
+          - Plex
+          - YouTube
+          - Shield Home
+          - Blu-Ray
+          - Music
+          - Aux
+    name: Activity
+    required: true
+    default: All Off
+sequence:
+  - if:
+      - condition: template
+        value_template: "{{ activity in ['All Off'] }}"
+    then:
+      - parallel:
+          - service: script.theater_lights
+            data:
+              scene: Room
+          - service: climate.turn_off
+            target:
+              area_id: theater
+          - service: remote.turn_off
+            target:
+              entity_id: remote.theater_projector
+          - service: media_player.turn_off
+            target:
+              entity_id:
+                - media_player.theater
+    else:
+      - parallel:
+          - alias: Climate
+            if:
+              - condition: state
+                entity_id: climate.theater_climate
+                state: "off"
+            then:
+              - service: climate.turn_on
+                target:
+                  area_id:
+                    - theater
+          - service: media_player.turn_on
+            target:
+              entity_id:
+                - media_player.theater
+          - service: script.theater_lights
+            data:
+              scene: Standby
+          - alias: Preamp
+            service: media_player.select_source
+            target:
+              entity_id: media_player.theater_preamp_zone_1
+            data:
+              activity: |-
+                {% if activity in ['Plex', 'YouTube', 'Shield'] -%}
+                  UHD
+                {%- elif activity in ['Blu-Ray'] -%}
+                  BD
+                {%- elif activity in ['Music'] -%}
+                  NET
+                {%- elif activity in ['AUX'] -%}
+                  AUX
+                {%- else -%}
+                  NET
+                {%- endif %}
+          - alias: Shield
+            choose:
+              - conditions:
+                  - condition: template
+                    value_template: "{{ activity in ['Plex'] }}"
+                sequence:
+                  - service: media_player.turn_on
+                    target:
+                      entity_id: media_player.theater_shield
+                  - service: media_player.play_media
+                    target:
+                      entity_id: media_player.theater_shield_remote
+                    data:
+                      media_content_type: url
+                      media_content_id: plex://
+                alias: Plex
+              - conditions:
+                  - condition: template
+                    value_template: "{{ activity in ['YouTube'] }}"
+                sequence:
+                  - service: media_player.turn_on
+                    target:
+                      entity_id: media_player.theater_shield
+                  - service: media_player.play_media
+                    target:
+                      entity_id: media_player.theater_shield_remote
+                    data:
+                      media_content_type: url
+                      media_content_id: vnd.youtube://
+                alias: YouTube
+              - conditions:
+                  - condition: template
+                    value_template: "{{ activity in ['Shield'] }}"
+                sequence:
+                  - service: media_player.turn_on
+                    target:
+                      entity_id: media_player.theater_shield
+                  - service: remote.send_command
+                    target:
+                      entity_id: remote.theater_shield_remote
+                    data:
+                      command: HOME
+                alias: Shield
+            default:
+              - service: media_player.turn_off
+                target:
+                  entity_id:
+                    - media_player.theater_shield
+          - alias: Blu-ray
+            service: |-
+              {% if activity in ['Blu-Ray'] -%}
+                media_player.turn_on
+              {%- else -%}
+                media_player.turn_off
+              {%- endif %}
+            target:
+              entity_id: media_player.theater_bluray
+          - alias: Projector
+            if:
+              - condition: template
+                value_template: "{{ activity in ['Music'] }}"
+            then:
+              - if:
+                  - condition: state
+                    entity_id: remote.theater_projector
+                    state: "on"
+                then:
+                  - service: remote.turn_off
+                    target:
+                      entity_id: remote.theater_projector
+            else:
+              - if:
+                  - condition: state
+                    entity_id: remote.theater_projector
+                    state: "off"
+                then:
+                  - service: remote.turn_on
+                    target:
+                      entity_id:
+                        - remote.theater_projector

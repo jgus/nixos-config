@@ -1,0 +1,9 @@
+select:
+  - name: "Theater Activity"
+    unique_id: theater_activity
+    state: "unknown"
+    options: "{{['All Off','Plex','YouTube','Shield Home','Blu-Ray','Music','Aux']}}"
+    select_option:
+      - service: script.theater_activity
+        data:
+          activity: "{{ option }}"

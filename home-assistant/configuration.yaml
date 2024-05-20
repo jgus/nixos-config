@@ -35,14 +35,13 @@ cover:
   - platform: template
     covers: !include_dir_named etc/cover/template
 
-media_player: !include_dir_list  etc/media_player
+media_player: !include_dir_list etc/media_player
 
-climate: !include_dir_list  etc/climate
+climate: !include_dir_list etc/climate
 
-amcrest: !include_dir_list  etc/amcrest
+amcrest: !include_dir_list etc/amcrest
 
 shell_command: !include_dir_named etc/shell_command
-
 # lock:
 #   - platform: template
 #     name: Balcony South Lock
