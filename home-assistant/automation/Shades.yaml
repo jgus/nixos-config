@@ -1,57 +1,57 @@
-- alias: Shades
-  id: shades
-  mode: single
-  trace:
-    stored_traces: 100
-  trigger:
-    - platform: sun
-      event: sunrise
-      id: sun_rise
-    - platform: sun
-      event: sunset
-      id: sun_set
-      offset: "5:00"
-    - platform: state
-      entity_id:
-        - sensor.north_shade_target
-        - sensor.east_shade_target
-        - sensor.south_shade_target
-        - sensor.west_shade_target
-      id: timer
-  action:
-    - repeat:
-        for_each:
-          - "{{ label_entities('North Shade Auto Target') }}"
-        sequence:
-          - service: input_number.set_value
-            data:
-              value: "{{ states('sensor.north_shade_target') }}"
-            target:
-              entity_id: "{{ repeat.item }}"
-    - repeat:
-        for_each:
-          - "{{ label_entities('East Shade Auto Target') }}"
-        sequence:
-          - service: input_number.set_value
-            data:
-              value: "{{ states('sensor.east_shade_target') }}"
-            target:
-              entity_id: "{{ repeat.item }}"
-    - repeat:
-        for_each:
-          - "{{ label_entities('South Shade Auto Target') }}"
-        sequence:
-          - service: input_number.set_value
-            data:
-              value: "{{ states('sensor.south_shade_target') }}"
-            target:
-              entity_id: "{{ repeat.item }}"
-    - repeat:
-        for_each:
-          - "{{ label_entities('West Shade Auto Target') }}"
-        sequence:
-          - service: input_number.set_value
-            data:
-              value: "{{ states('sensor.west_shade_target') }}"
-            target:
-              entity_id: "{{ repeat.item }}"
+alias: Shades
+id: shades
+mode: single
+trace:
+  stored_traces: 100
+trigger:
+  - platform: sun
+    event: sunrise
+    id: sun_rise
+  - platform: sun
+    event: sunset
+    id: sun_set
+    offset: "5:00"
+  - platform: state
+    entity_id:
+      - sensor.north_shade_target
+      - sensor.east_shade_target
+      - sensor.south_shade_target
+      - sensor.west_shade_target
+    id: timer
+action:
+  - repeat:
+      for_each:
+        - "{{ label_entities('North Shade Auto Target') }}"
+      sequence:
+        - service: input_number.set_value
+          data:
+            value: "{{ states('sensor.north_shade_target') }}"
+          target:
+            entity_id: "{{ repeat.item }}"
+  - repeat:
+      for_each:
+        - "{{ label_entities('East Shade Auto Target') }}"
+      sequence:
+        - service: input_number.set_value
+          data:
+            value: "{{ states('sensor.east_shade_target') }}"
+          target:
+            entity_id: "{{ repeat.item }}"
+  - repeat:
+      for_each:
+        - "{{ label_entities('South Shade Auto Target') }}"
+      sequence:
+        - service: input_number.set_value
+          data:
+            value: "{{ states('sensor.south_shade_target') }}"
+          target:
+            entity_id: "{{ repeat.item }}"
+  - repeat:
+      for_each:
+        - "{{ label_entities('West Shade Auto Target') }}"
+      sequence:
+        - service: input_number.set_value
+          data:
+            value: "{{ states('sensor.west_shade_target') }}"
+          target:
+            entity_id: "{{ repeat.item }}"
