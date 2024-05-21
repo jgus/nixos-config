@@ -1,0 +1,7 @@
+unique_id: theater_preamp_zone_1_volume
+source: media_player.theater_preamp_zone_1
+attribute: volume_level
+unit_of_measurement: dB
+data_points:
+  - [0.0, 0]
+  - [1.0, 99]

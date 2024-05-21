@@ -60,7 +60,7 @@ attributes:
   source: select.theater_activity
   source_list: select.theater_activity|options
   is_volume_muted: media_player.theater_preamp_zone_1|is_volume_muted
-  volume_level: media_player.theater_preamp_zone_1|volume_level
+  volume_level: sensor.theater_preamp_zone_1_volume
   sound_mode: media_player.theater_preamp_zone_1|sound_mode
   sound_mode_raw: media_player.theater_preamp_zone_1|sound_mode_raw
   sound_mode_list: media_player.theater_preamp_zone_1|sound_mode_list
