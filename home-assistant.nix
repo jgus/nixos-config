@@ -297,17 +297,20 @@ in
       ]
     ) gree_climate_devices)) //
     {
+      "home-assistant/amcrest/secrets.yaml".text = ''
+        doorbell_password: ${pw.doorbell}
+      '';
       "home-assistant/amcrest/front_doorbell.yaml".text = ''
         name: "Front Doorbell"
         host: doorbell-front.home.gustafson.me
         username: admin
-        password: ${pw.doorbell}
+        password: !secret doorbell_password
       '';
       "home-assistant/amcrest/basement_doorbell.yaml".text = ''
         name: "Basement Doorbell"
         host: doorbell-basement.home.gustafson.me
         username: admin
-        password: ${pw.doorbell}
+        password: !secret doorbell_password
       '';
     };
 
