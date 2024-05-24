@@ -41,7 +41,7 @@ media_player: !include_dir_list etc/media_player
 
 climate: !include_dir_list etc/climate
 
-amcrest: !include_dir_list etc/amcrest
+amcrest: !include_dir_list amcrest
 
 shell_command: !include_dir_named etc/shell_command
 # lock:
