@@ -153,14 +153,6 @@ in
     builtins.listToAttrs(lib.lists.flatten(map(
       i: [
         {
-          name = lib.strings.removePrefix "/etc/nixos/" (toString i);
-          value = { source = i; };
-        }
-      ]
-    ) (lib.filesystem.listFilesRecursive(./home-assistant)))) //
-    builtins.listToAttrs(lib.lists.flatten(map(
-      i: [
-        {
           name = "home-assistant/input_number/cover_${i}_auto_target.yaml";
           value = {
             text = ''
@@ -322,7 +314,6 @@ in
             -e VERSION=latest \
             -v /var/lib/home-assistant:/config \
             -v /etc/home-assistant:/config/etc:ro \
-            -v /etc/home-assistant/configuration.yaml:/config/configuration.yaml:ro \
             -v /etc/home-assistant/secrets.yaml:/config/secrets.yaml:ro \
             -v "$(readlink -f /etc/static)":/etc/static:ro \
             -v /nix/store:/nix/store:ro \
