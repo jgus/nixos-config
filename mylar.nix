@@ -30,6 +30,7 @@
             -e PGID=$(id -g plex) \
             -e TZ=$(timedatectl show -p Timezone --value) \
             -v /var/lib/mylar:/config \
+            --tmpfs /config/mylar/cache \
             -v /d/media/Comics:/comics \
             -v /d/media/Comics.import:/import \
             -v /d/scratch/peer:/peer \
