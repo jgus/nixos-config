@@ -153,7 +153,7 @@ in
     builtins.listToAttrs(lib.lists.flatten(map(
       i: [
         {
-          name = "home-assistant/input_number/cover_${i}_auto_target.yaml";
+          name = "home-assistant/input_number/${i}_auto_target.yaml";
           value = {
             text = ''
               min: 0
@@ -162,65 +162,66 @@ in
           };
         }
         {
-          name = "home-assistant/input_boolean/cover_${i}_window_open.yaml";
+          name = "home-assistant/input_boolean/${i}_window_open.yaml";
           value = { text = ""; };
         }
         {
-          name = "home-assistant/input_boolean/cover_${i}_auto_set_enable.yaml";
-          value = { text = "initial: true"; };
+          name = "home-assistant/input_boolean/${i}_user_override.yaml";
+          value = { text = "initial: false"; };
         }
         {
-          name = "home-assistant/input_boolean/cover_${i}_user_set_enable.yaml";
-          value = { text = "initial: true"; };
+          name = "home-assistant/input_boolean/${i}_auto_working.yaml";
+          value = { text = "initial: false"; };
         }
         {
-          name = "home-assistant/automation/cover_${i}_auto_set.yaml";
+          name = "home-assistant/automation/${i}_auto_set.yaml";
           value = {
             text = ''
-              alias: cover ${i} auto set
-              id: cover_${i}_auto_set
+              alias: ${i} auto set
+              id: ${i}_auto_set
               mode: restart
               trigger:
                 - platform: state
                   entity_id:
-                    - input_number.cover_${i}_auto_target
+                    - input_number.${i}_auto_target
                 - platform: state
                   entity_id:
-                    - input_boolean.cover_${i}_auto_set_enable
-                  to: "on"
+                    - input_boolean.${i}_user_override
+                  to: "off"
                 - platform: state
                   entity_id:
-                    - input_boolean.cover_${i}_window_open
+                    - input_boolean.${i}_window_open
               condition:
                 - condition: state
-                  entity_id: input_boolean.cover_${i}_auto_set_enable
-                  state: "on"
+                  entity_id: input_boolean.${i}_user_override
+                  state: "off"
               action:
                 - variables:
-                    p: "{{ [states('input_number.cover_${i}_auto_target') | int, 50 if is_state('input_boolean.cover_${i}_window_open', 'on') else 0] | max }}"
-                - service: input_boolean.turn_off
+                    p: "{{ [states('input_number.${i}_auto_target') | int, 50 if is_state('input_boolean.${i}_window_open', 'on') else 0] | max }}"
+                - service: input_boolean.turn_on
                   target:
-                    entity_id: input_boolean.cover_${i}_user_set_enable
-                - wait_template: "{{ is_state('input_boolean.cover_${i}_user_set_enable', 'off') }}"
+                    entity_id: input_boolean.${i}_auto_working
+                - wait_template: "{{ is_state('input_boolean.${i}_auto_working', 'on') }}"
                 - service: cover.set_cover_position
                   target:
                     entity_id: cover.${i}
                   data:
                     position: "{{ p }}"
+                  continue_on_error: true
                 - wait_template: "{{ (state_attr('cover.${i}', 'current_position') | int) == (p | int) }}"
                   timeout: "00:01:00"
-                - service: input_boolean.turn_on
+                - service: input_boolean.turn_off
                   target:
-                    entity_id: input_boolean.cover_${i}_user_set_enable
+                    entity_id: input_boolean.${i}_auto_working
             '';
           };
         }
         {
-          name = "home-assistant/automation/cover_${i}_user_set.yaml";
+          name = "home-assistant/automation/${i}_user_set.yaml";
           value = {
             text = ''
-              alias: cover ${i} user set
-              id: cover_${i}_user_set
+              alias: ${i} user set
+              id: ${i}_user_set
               mode: restart
               trigger:
                 - platform: state
@@ -229,17 +230,17 @@ in
                   attribute: current_position
               condition:
                 - condition: state
-                  entity_id: input_boolean.cover_${i}_user_set_enable
-                  state: "on"
+                  entity_id: input_boolean.${i}_auto_working
+                  state: "off"
               action:
-                - service: input_boolean.turn_off
-                  target:
-                    entity_id: input_boolean.cover_${i}_auto_set_enable
-                - delay:
-                    hours: 2
                 - service: input_boolean.turn_on
                   target:
-                    entity_id: input_boolean.cover_${i}_auto_set_enable
+                    entity_id: input_boolean.${i}_user_override
+                - delay:
+                    hours: 2
+                - service: input_boolean.turn_off
+                  target:
+                    entity_id: input_boolean.${i}_user_override
             '';
           };
         }
