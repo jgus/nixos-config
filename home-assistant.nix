@@ -295,42 +295,37 @@ in
       '';
     };
 
+  virtualisation.oci-containers.containers.home-assistant = {
+    image = "${image}";
+    autoStart = true;
+    extraOptions = [
+      "--privileged"
+      "--net=host"
+    ];
+    environment = {
+      PUID = "${toString config.users.users.plex.uid}";
+      PGID = "${toString config.users.groups.plex.gid}";
+      TZ = "${config.time.timeZone}";
+      VERSION = "latest";
+    };
+    volumes = [
+      "/var/lib/home-assistant:/config"
+      "/etc/home-assistant:/config/etc:ro"
+      "/etc/home-assistant/secrets.yaml:/config/secrets.yaml:ro"
+      "/etc/static:/etc/static:ro"
+      "/nix/store:/nix/store:ro"
+      "/run/dbus:/run/dbus:ro"
+    ];
+  };
+
   systemd = {
     services = {
-      home-assistant = {
-        enable = true;
-        description = "Home Assistant";
-        wantedBy = [ "multi-user.target" ];
-        requires = [ "network-online.target" ];
-        path = [ pkgs.docker ];
-        script = ''
-          docker container stop home-assistant >/dev/null 2>&1 || true ; \
-          docker container rm -f home-assistant >/dev/null 2>&1 || true ; \
-          docker run --rm --name home-assistant \
-            --privileged \
-            --net host \
-            -e PUID="$(id -u home-assistant)" \
-            -e PGID="$(id -g home-assistant)" \
-            -e TZ="$(timedatectl show -p Timezone --value)" \
-            -e VERSION=latest \
-            -v /var/lib/home-assistant:/config \
-            -v /etc/home-assistant:/config/etc:ro \
-            -v /etc/home-assistant/secrets.yaml:/config/secrets.yaml:ro \
-            -v "$(readlink -f /etc/static)":/etc/static:ro \
-            -v /nix/store:/nix/store:ro \
-            -v /run/dbus:/run/dbus:ro \
-            ${image}
-        '';
-        serviceConfig = {
-          Restart = "no";
-        };
-      };
       home-assistant-update = {
         path = [ pkgs.docker ];
         script = ''
           if docker pull ${image} | grep "Status: Downloaded"
           then
-            systemctl restart home-assistant
+            systemctl restart docker-home-assistant
           fi
         '';
         serviceConfig = {

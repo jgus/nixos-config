@@ -1,5 +1,8 @@
 { config, pkgs, ... }:
 
+let
+  image = "ghcr.io/esphome/esphome";
+in
 {
   imports = [ ./docker.nix ];
 
@@ -11,36 +14,34 @@
 
   networking.firewall.allowedTCPPorts = [ 6052 ];
 
+  virtualisation.oci-containers.containers.esphome = {
+    image = "${image}";
+    autoStart = true;
+    user = "${toString config.users.users.josh.uid}:${toString config.users.groups.users.gid}";
+    extraOptions = [
+      "--net=host"
+      "--tmpfs=/cache:exec,uid=${toString config.users.users.josh.uid},gid=${toString config.users.groups.users.gid}"
+      "--tmpfs=/.cache/pip:exec,uid=${toString config.users.users.josh.uid},gid=${toString config.users.groups.users.gid}"
+      "--tmpfs=/config/.esphome/build:exec,uid=${toString config.users.users.josh.uid},gid=${toString config.users.groups.users.gid}"
+      "--tmpfs=/config/.esphome/external_components:exec,uid=${toString config.users.users.josh.uid},gid=${toString config.users.groups.users.gid}"
+    ];
+    environment = {
+      PLATFORMIO_CORE_DIR = "/cache/.plattformio";
+      PLATFORMIO_GLOBALLIB_DIR = "/cache/.plattformioLibs";
+    };
+    volumes = [
+      "/var/lib/esphome:/config"
+    ];
+  };
+
   systemd = {
     services = {
-      esphome = {
-        enable = true;
-        description = "ESPHome";
-        wantedBy = [ "multi-user.target" ];
-        requires = [ "docker.service" ];
-        path = [ pkgs.docker ];
-        script = ''
-          docker container stop esphome >/dev/null 2>&1 || true ; \
-          docker container rm -f esphome >/dev/null 2>&1 || true ; \
-          docker run --rm --name esphome \
-            --user "$(id -u josh)":"$(id -g josh)" \
-            --net=host \
-            -e PLATFORMIO_CORE_DIR=/cache/.plattformio \
-            -e PLATFORMIO_GLOBALLIB_DIR=/cache/.plattformioLibs \
-            -v /var/lib/esphome:/config \
-            --tmpfs /cache:exec,uid=$(id -u josh),gid=$(id -g josh) \
-            --tmpfs /.cache/pip:exec,uid=$(id -u josh),gid=$(id -g josh) \
-            --tmpfs /config/.esphome/build:exec,uid=$(id -u josh),gid=$(id -g josh) \
-            --tmpfs /config/.esphome/external_components:exec,uid=$(id -u josh),gid=$(id -g josh) \
-            ghcr.io/esphome/esphome
-        '';
-      };
       esphome-update = {
         path = [ pkgs.docker ];
         script = ''
-          if docker pull ghcr.io/esphome/esphome | grep "Status: Downloaded"
+          if docker pull ${image} | grep "Status: Downloaded"
           then
-            systemctl restart esphome
+            systemctl restart docker-esphome
           fi
         '';
         serviceConfig = {

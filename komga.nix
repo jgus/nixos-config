@@ -1,5 +1,8 @@
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 
+let
+  image = "gotson/komga";
+in
 {
   imports = [ ./docker.nix ];
 
@@ -13,36 +16,31 @@
     allowedTCPPorts = [ 25600 ];
   };
 
+  virtualisation.oci-containers.containers.komga = {
+    image = "${image}";
+    autoStart = true;
+    user = "${toString config.users.users.josh.uid}:${toString config.users.groups.plex.gid}";
+    environment = {
+      TZ = "${config.time.timeZone}";
+      SERVER_PORT = "25600";
+    };
+    ports = [
+      "25600:25600"
+    ];
+    volumes = [
+      "/var/lib/komga:/config"
+      "/d/media/Comics:/data"
+    ];
+  };
+
   systemd = {
     services = {
-      komga = {
-        enable = true;
-        description = "Komga";
-        wantedBy = [ "multi-user.target" ];
-        requires = [ "network-online.target" ];
-        path = [ pkgs.docker ];
-        script = ''
-          docker container stop komga >/dev/null 2>&1 || true ; \
-          docker container rm -f komga >/dev/null 2>&1 || true ; \
-          docker run --rm --name komga \
-            -p 25600:25600 \
-            --user $(id -u josh):$(id -g plex) \
-            -e TZ=$(timedatectl show -p Timezone --value) \
-            -e SERVER_PORT=25600 \
-            -v /var/lib/komga:/config \
-            -v /d/media/Comics:/data \
-            gotson/komga
-        '';
-        serviceConfig = {
-          Restart = "no";
-        };
-      };
       komga-update = {
         path = [ pkgs.docker ];
         script = ''
-          if docker pull gotson/komga | grep "Status: Downloaded"
+          if docker pull ${image} | grep "Status: Downloaded"
           then
-            systemctl restart komga
+            systemctl restart docker-komga
           fi
         '';
         serviceConfig = {

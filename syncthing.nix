@@ -49,7 +49,7 @@ in
         script = ''
           if docker pull ${image} | grep "Status: Downloaded"
           then
-            systemctl restart syncthing
+            systemctl restart docker-syncthing
           fi
         '';
         serviceConfig = {

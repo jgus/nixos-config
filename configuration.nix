@@ -26,7 +26,6 @@
       ./www.nix
       ./ntp.nix
       ./mosquitto.nix
-      #./home-assistant-record.nix
       ./zigbee2mqtt.nix
       ./home-assistant.nix
       ./esphome.nix

@@ -1,6 +1,8 @@
 { config, pkgs, ... }:
 
-let pw = import ./.secrets/passwords.nix;
+let
+  pw = import ./.secrets/passwords.nix;
+  image = "ghcr.io/blakeblackshear/frigate:stable";
 in
 {
   imports = [ ./docker.nix ];
@@ -17,7 +19,8 @@ in
     '';
   };
 
-  networking.firewall.allowedTCPPorts = [ 5000 1935 ];
+  networking.firewall.allowedTCPPorts = [ 5000 1935 1984 8554 8555 ];
+  networking.firewall.allowedUDPPorts = [ 8555 ];
 
   environment.etc = {
     "frigate/config.yml".text = ''
@@ -342,48 +345,42 @@ in
     '';
   };
 
+  virtualisation.oci-containers.containers.frigate = {
+    image = "${image}";
+    autoStart = true;
+    extraOptions = [
+      "--shm-size=2048m"
+      "--gpus=all"
+      "--privileged"
+    ];
+    environment = {
+      FRIGATE_RTSP_PASSWORD = "password";
+    };
+    ports = [
+      "5000:5000"
+      "1935:1935"
+      "1984:1984" # go2rtc API
+      "8554:8554" # go2rtc RTSP
+      "8555:8555" # go2rtc WebRTC
+      "8555:8555/udp"
+    ];
+    volumes = [
+      "/dev/bus/usb/004:/dev/bus/usb/004"
+      "/var/lib/frigate-media:/media/frigate"
+      "/var/lib/frigate-config:/config"
+      "/etc/frigate/config.yml:/config/config.yml:ro"
+      "/etc/localtime:/etc/localtime:ro"
+    ];
+  };
+
   systemd = {
     services = {
-      frigate = {
-        enable = true;
-        description = "Frigate NVR";
-        wantedBy = [ "multi-user.target" ];
-        requires = [ "network-online.target" ];
-        path = with pkgs; [ docker wget ];
-        # 1984 - go2rtc API
-        # 8554 - go2rtc RTSP
-        # 8555 - go2rtc WebRTC
-        script = ''
-          docker container stop frigate >/dev/null 2>&1 || true ; \
-          docker container rm -f frigate >/dev/null 2>&1 || true ; \
-          docker run --rm --name frigate \
-            --shm-size=2048m \
-            --gpus all \
-            --privileged \
-            -v /dev/bus/usb/004:/dev/bus/usb/004 \
-            -v /var/lib/frigate-media:/media/frigate \
-            -v /var/lib/frigate-config:/config \
-            -v /etc/frigate/config.yml:/config/config.yml:ro \
-            -v /etc/localtime:/etc/localtime:ro \
-            -e FRIGATE_RTSP_PASSWORD='password' \
-            -p 5000:5000 \
-            -p 1935:1935 \
-            -p 1984:1984 \
-            -p 8554:8554 \
-            -p 8555:8555 \
-            -p 8555:8555/udp \
-            ghcr.io/blakeblackshear/frigate:stable
-        '';
-        serviceConfig = {
-          Restart = "no";
-        };
-      };
       frigate-update = {
         path = [ pkgs.docker ];
         script = ''
-          if docker pull ghcr.io/blakeblackshear/frigate:stable | grep "Status: Downloaded"
+          if docker pull ${image} | grep "Status: Downloaded"
           then
-            systemctl restart frigate
+            systemctl restart docker-frigate
           fi
         '';
         serviceConfig = {

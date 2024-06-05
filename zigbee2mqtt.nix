@@ -15,33 +15,28 @@ in
 
   networking.firewall.allowedTCPPorts = [ 8081 ];
 
+  virtualisation.oci-containers.containers.zigbee2mqtt = {
+    image = "${image}";
+    autoStart = true;
+    environment = {
+      TZ = "${config.time.timeZone}";
+    };
+    ports = [
+      "8081:8081"
+    ];
+    volumes = [
+      "/var/lib/zigbee2mqtt:/app/data"
+    ];
+  };
+
   systemd = {
     services = {
-      zigbee2mqtt = {
-        enable = true;
-        description = "Zigbee2mqtt";
-        wantedBy = [ "multi-user.target" ];
-        requires = [ "network-online.target" ];
-        path = [ pkgs.docker ];
-        script = ''
-          docker container stop zigbee2mqtt >/dev/null 2>&1 || true ; \
-          docker container rm -f zigbee2mqtt >/dev/null 2>&1 || true ; \
-          docker run --rm --name zigbee2mqtt \
-            -e TZ="$(timedatectl show -p Timezone --value)" \
-            -p 8081:8081 \
-            -v /var/lib/zigbee2mqtt:/app/data \
-            ${image}
-        '';
-        serviceConfig = {
-          Restart = "no";
-        };
-      };
       zigbee2mqtt-update = {
         path = [ pkgs.docker ];
         script = ''
           if docker pull ${image} | grep "Status: Downloaded"
           then
-            systemctl restart zigbee2mqtt
+            systemctl restart docker-zigbee2mqtt
           fi
         '';
         serviceConfig = {
