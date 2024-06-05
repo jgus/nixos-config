@@ -37,6 +37,9 @@
     openssh = {
       enable = true;
       openFirewall = true;
+      extraConfig = ''
+        AllowAgentForwarding yes
+      '';
     };
   };
 
@@ -47,6 +50,7 @@
     git.lfs.enable = true;
     htop.enable = true;
     mosh.enable = true;
+    ssh.startAgent = true;
     tmux.enable = true;
   };
 
