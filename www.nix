@@ -1,5 +1,10 @@
 { config, pkgs, ... }:
 
+let
+  db_image = "mysql:5.7";
+  db_admin_image = "phpmyadmin/phpmyadmin";
+  swag_image = "lscr.io/linuxserver/swag";
+in
 {
   imports = [ ./docker.nix ];
 
@@ -28,57 +33,86 @@
     '';
   };
 
+  virtualisation.oci-containers.containers.web-db = {
+    image = "${db_image}";
+    autoStart = true;
+    volumes = [
+      "/var/lib/web_db_data:/var/lib/mysql"
+    ];
+  };
+
+  virtualisation.oci-containers.containers.web-db-admin = {
+    image = "${db_admin_image}";
+    autoStart = true;
+    dependsOn = [ "web-db" ];
+    extraOptions = [
+      "--link=web-db:db"
+    ];
+    ports = [
+      "8101:80"
+    ];
+    volumes = [
+      "/var/lib/web_db_admin_sessions:/sessions"
+    ];
+  };
+
+  virtualisation.oci-containers.containers.web-swag = {
+    image = "${swag_image}";
+    autoStart = true;
+    dependsOn = [ "web-db" ];
+    extraOptions = [
+      "--tmpfs=/config"
+      "--tmpfs=/config/www/Photos/cache"
+      "--link=web-db:db"
+    ];
+    environment = {
+      URL = "gustafson.me";
+      SUBDOMAINS = "www,homeassistant,komga,";
+      EXTRA_DOMAINS = "gushome.org,www.gushome.org";
+      VALIDATION = "http";
+      EMAIL = "joshgstfsn@gmail.com";
+      PUID = "${toString config.users.users.www.uid}";
+      PGID = "${toString config.users.groups.www.gid}";
+      TZ = "${config.time.timeZone}";
+    };
+    ports = [
+      "80:80"
+      "443:443"
+    ];
+    volumes = [
+      "/var/lib/swag_config/keys:/config/keys"
+      "/var/lib/swag_config/etc/letsencrypt:/config/etc/letsencrypt"
+      "/etc/nixos/www/site-confs/default.conf:/config/nginx/site-confs/default.conf"
+      "/etc/nixos/www/location-confs:/config/nginx/location-confs"
+      "/etc/nixos/www/proxy-confs/homeassistant.subdomain.conf:/config/nginx/proxy-confs/homeassistant.subdomain.conf"
+      "/etc/nixos/www/proxy-confs/komga.subdomain.conf:/config/nginx/proxy-confs/komga.subdomain.conf"
+      "/var/lib/www:/config/www"
+      "/d/photos/Published:/config/www/published:ro"
+      "/var/lib/dav:/config/www/dav"
+    ];
+  };
+
   systemd = {
     services = {
-      web-db = {
-        enable = true;
-        description = "Web DB";
-        wantedBy = [ "multi-user.target" ];
-        requires = [ "docker.service" ];
-        path = [ pkgs.docker ];
-        script = ''
-          docker container stop web-db >/dev/null 2>&1 || true ; \
-          docker container rm -f web-db >/dev/null 2>&1 || true ; \
-          docker run --rm --name web-db \
-            -v /var/lib/web_db_data:/var/lib/mysql \
-            mysql:5.7
-        '';
-      };
       web-db-update = {
         path = [ pkgs.docker ];
         script = ''
-          if docker pull mysql:5.7 | grep "Status: Downloaded"
+          if docker pull ${db_image} | grep "Status: Downloaded"
           then
-            systemctl restart web-db
+            systemctl restart docker-web-db
           fi
         '';
         serviceConfig = {
           Type = "oneshot";
         };
         startAt = "hourly";
-      };
-      web-db-admin = {
-        enable = false;
-        description = "Web DB Admin";
-        wantedBy = [ "multi-user.target" ];
-        requires = [ "web-db.service" ];
-        path = [ pkgs.docker ];
-        script = ''
-          docker container stop web-db-admin >/dev/null 2>&1 || true ; \
-          docker container rm -f web-db-admin >/dev/null 2>&1 || true ; \
-          docker run --rm --name web-db-admin \
-            -v /var/lib/web_db_admin_sessions:/sessions \
-            --link web-db:db \
-            -p 8101:80 \
-            phpmyadmin/phpmyadmin
-        '';
       };
       web-db-admin-update = {
         path = [ pkgs.docker ];
         script = ''
-          if docker pull phpmyadmin/phpmyadmin | grep "Status: Downloaded"
+          if docker pull ${db_admin_image} | grep "Status: Downloaded"
           then
-            systemctl restart web-db-admin
+            systemctl restart docker-web-db-admin
           fi
         '';
         serviceConfig = {
@@ -86,50 +120,12 @@
         };
         startAt = "hourly";
       };
-      web-swag = {
-        enable = true;
-        description = "Web Service & Proxy";
-        wantedBy = [ "multi-user.target" ];
-        requires = [ "network-online.target" "web-db.service" ];
-        path = [ pkgs.docker ];
-        script = ''
-          docker container stop web-swag >/dev/null 2>&1 || true ; \
-          docker container rm -f web-swag >/dev/null 2>&1 || true ; \
-          docker run --rm --name web-swag \
-            -e URL=gustafson.me \
-            -e SUBDOMAINS=www,homeassistant,komga, \
-            -e EXTRA_DOMAINS=gushome.org,www.gushome.org \
-            -e VALIDATION=http \
-            -e EMAIL=joshgstfsn@gmail.com \
-            -e PUID=$(id -u www) \
-            -e PGID=$(id -g www) \
-            -e TZ=$(timedatectl show -p Timezone --value) \
-            --tmpfs /config \
-            -v /var/lib/swag_config/keys:/config/keys \
-            -v /var/lib/swag_config/etc/letsencrypt:/config/etc/letsencrypt \
-            -v /etc/nixos/www/site-confs/default.conf:/config/nginx/site-confs/default.conf \
-            -v /etc/nixos/www/location-confs:/config/nginx/location-confs \
-            -v /etc/nixos/www/proxy-confs/homeassistant.subdomain.conf:/config/nginx/proxy-confs/homeassistant.subdomain.conf \
-            -v /etc/nixos/www/proxy-confs/komga.subdomain.conf:/config/nginx/proxy-confs/komga.subdomain.conf \
-            -v /var/lib/www:/config/www \
-            -v /d/photos/Published:/config/www/published:ro \
-            -v /var/lib/dav:/config/www/dav \
-            --tmpfs /config/www/Photos/cache \
-            --link web-db:db \
-            -p 80:80 \
-            -p 443:443 \
-            lscr.io/linuxserver/swag
-        '';
-        serviceConfig = {
-          Restart = "no";
-        };
-      };
       web-swag-update = {
         path = [ pkgs.docker ];
         script = ''
-          if docker pull lscr.io/linuxserver/swag | grep "Status: Downloaded"
+          if docker pull ${swag_image} | grep "Status: Downloaded"
           then
-            systemctl restart web-swag
+            systemctl restart docker-web-swag
           fi
         '';
         serviceConfig = {
