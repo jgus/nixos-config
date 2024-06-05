@@ -1,5 +1,8 @@
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 
+let
+  image = "lscr.io/linuxserver/syncthing";
+in
 {
   imports = [ ./docker.nix ];
 
@@ -15,41 +18,36 @@
     '';
   };
 
+  virtualisation.oci-containers.containers.syncthing = {
+    image = "${image}";
+    autoStart = true;
+    ports = [
+      "8384:8384"
+      "22000:22000"
+      "21027:21027/udp"
+    ];
+    environment = {
+      PUID = "${toString config.users.users.josh.uid}";
+      PGID = "${toString config.users.groups.users.gid}";
+      TZ = "${config.time.timeZone}";
+      UMASK_SET = "002";
+    };
+    volumes = [
+      "/var/lib/syncthing:/config"
+      "/home/josh/sync:/shares/Sync"
+      "/d/photos:/shares/Photos"
+      "/d/software/Tools:/shares/Tools"
+      "/d/media/Comics:/shares/Comics"
+      "/d/media/Music:/shares/Music"
+    ];
+  };
+
   systemd = {
     services = {
-      syncthing = {
-        enable = true;
-        description = "Syncthing";
-        wantedBy = [ "multi-user.target" ];
-        requires = [ "network-online.target" ];
-        path = [ pkgs.docker ];
-        script = ''
-          docker container stop syncthing >/dev/null 2>&1 || true ; \
-          docker container rm -f syncthing >/dev/null 2>&1 || true ; \
-          docker run --rm --name syncthing \
-            -p 8384:8384 \
-            -p 22000:22000 \
-            -p 21027:21027/udp \
-            -e PUID=$(id -u josh) \
-            -e PGID=$(id -g josh) \
-            -e TZ=$(timedatectl show -p Timezone --value) \
-            -e UMASK_SET=002 \
-            -v /var/lib/syncthing:/config \
-            -v /home/josh/sync:/shares/Sync \
-            -v /d/photos:/shares/Photos \
-            -v /d/software/Tools:/shares/Tools \
-            -v /d/media/Comics:/shares/Comics \
-            -v /d/media/Music:/shares/Music \
-            lscr.io/linuxserver/syncthing
-        '';
-        serviceConfig = {
-          Restart = "no";
-        };
-      };
       syncthing-update = {
         path = [ pkgs.docker ];
         script = ''
-          if docker pull lscr.io/linuxserver/syncthing | grep "Status: Downloaded"
+          if docker pull ${image} | grep "Status: Downloaded"
           then
             systemctl restart syncthing
           fi
