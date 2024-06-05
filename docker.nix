@@ -18,5 +18,9 @@
         dns = ["172.22.0.1"];
       };
     };
+    oci-containers = {
+      backend = "docker";
+      containers = {};
+    };
   };
 }
