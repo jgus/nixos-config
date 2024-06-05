@@ -15,6 +15,6 @@
       ./vscode.nix
       #./clamav.nix # needs .secrets/gmail-password.nix
 
-      ./zwave-js-ui.nix
+      ./cec.nix
     ];
 }
