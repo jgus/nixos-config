@@ -1,5 +1,8 @@
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 
+let
+  image = "lscr.io/linuxserver/mylar3";
+in
 {
   imports = [ ./docker.nix ];
 
@@ -13,40 +16,37 @@
     allowedTCPPorts = [ 8090 ];
   };
 
+  virtualisation.oci-containers.containers.mylar = {
+    image = "${image}";
+    autoStart = true;
+    extraOptions = [
+      "--tmpfs=/config/mylar/cache"
+    ];
+    environment = {
+      PUID = "${toString config.users.users.josh.uid}";
+      PGID = "${toString config.users.groups.plex.gid}";
+      TZ = "${config.time.timeZone}";
+    };
+    ports = [
+      "8090:8090"
+    ];
+    volumes = [
+      "/var/lib/mylar:/config"
+      "/d/media/Comics:/comics"
+      "/d/media/Comics.import:/import"
+      "/d/scratch/peer:/peer"
+      "/d/scratch/usenet:/usenet"
+    ];
+  };
+
   systemd = {
     services = {
-      mylar = {
-        enable = true;
-        description = "Mylar";
-        wantedBy = [ "multi-user.target" ];
-        requires = [ "prowlarr.service" ];
-        path = [ pkgs.docker ];
-        script = ''
-          docker container stop mylar >/dev/null 2>&1 || true ; \
-          docker container rm -f mylar >/dev/null 2>&1 || true ; \
-          docker run --rm --name mylar \
-            -p 8090:8090 \
-            -e PUID=$(id -u josh) \
-            -e PGID=$(id -g plex) \
-            -e TZ=$(timedatectl show -p Timezone --value) \
-            -v /var/lib/mylar:/config \
-            --tmpfs /config/mylar/cache \
-            -v /d/media/Comics:/comics \
-            -v /d/media/Comics.import:/import \
-            -v /d/scratch/peer:/peer \
-            -v /d/scratch/usenet:/usenet \
-            lscr.io/linuxserver/mylar3
-        '';
-        serviceConfig = {
-          Restart = "no";
-        };
-      };
       mylar-update = {
         path = [ pkgs.docker ];
         script = ''
-          if docker pull lscr.io/linuxserver/mylar3 | grep "Status: Downloaded"
+          if docker pull ${image} | grep "Status: Downloaded"
           then
-            systemctl restart mylar
+            systemctl restart docker-mylar
           fi
         '';
         serviceConfig = {

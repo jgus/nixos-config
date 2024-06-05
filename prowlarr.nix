@@ -1,5 +1,8 @@
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 
+let
+  image = "lscr.io/linuxserver/prowlarr";
+in
 {
   imports = [ ./docker.nix ];
 
@@ -13,35 +16,30 @@
     allowedTCPPorts = [ 9696 ];
   };
 
+  virtualisation.oci-containers.containers.prowlarr = {
+    image = "${image}";
+    autoStart = true;
+    environment = {
+      PUID = "${toString config.users.users.josh.uid}";
+      PGID = "${toString config.users.groups.plex.gid}";
+      TZ = "${config.time.timeZone}";
+    };
+    ports = [
+      "9696:9696"
+    ];
+    volumes = [
+      "/var/lib/prowlarr:/config"
+    ];
+  };
+
   systemd = {
     services = {
-      prowlarr = {
-        enable = true;
-        description = "Prowlarr";
-        wantedBy = [ "multi-user.target" ];
-        requires = [ "sabnzbd.service" "transmission.service" ];
-        path = [ pkgs.docker ];
-        script = ''
-          docker container stop prowlarr >/dev/null 2>&1 || true ; \
-          docker container rm -f prowlarr >/dev/null 2>&1 || true ; \
-          docker run --rm --name prowlarr \
-            -p 9696:9696 \
-            -e PUID=$(id -u josh) \
-            -e PGID=$(id -g plex) \
-            -e TZ=$(timedatectl show -p Timezone --value) \
-            -v /var/lib/prowlarr:/config \
-            lscr.io/linuxserver/prowlarr
-        '';
-        serviceConfig = {
-          Restart = "no";
-        };
-      };
       prowlarr-update = {
         path = [ pkgs.docker ];
         script = ''
-          if docker pull lscr.io/linuxserver/prowlarr | grep "Status: Downloaded"
+          if docker pull ${image} | grep "Status: Downloaded"
           then
-            systemctl restart prowlarr
+            systemctl restart docker-prowlarr
           fi
         '';
         serviceConfig = {

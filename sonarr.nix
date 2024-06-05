@@ -1,5 +1,8 @@
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 
+let
+  image = "lscr.io/linuxserver/sonarr";
+in
 {
   imports = [ ./docker.nix ];
 
@@ -13,38 +16,33 @@
     allowedTCPPorts = [ 8989 ];
   };
 
+  virtualisation.oci-containers.containers.sonarr = {
+    image = "${image}";
+    autoStart = true;
+    environment = {
+      PUID = "${toString config.users.users.josh.uid}";
+      PGID = "${toString config.users.groups.plex.gid}";
+      TZ = "${config.time.timeZone}";
+    };
+    ports = [
+      "8989:8989"
+    ];
+    volumes = [
+      "/var/lib/sonarr:/config"
+      "/d/scratch/peer:/peer"
+      "/d/scratch/usenet:/usenet"
+      "/d/media:/media"
+    ];
+  };
+
   systemd = {
     services = {
-      sonarr = {
-        enable = true;
-        description = "Sonarr";
-        wantedBy = [ "multi-user.target" ];
-        requires = [ "prowlarr.service" ];
-        path = [ pkgs.docker ];
-        script = ''
-          docker container stop sonarr >/dev/null 2>&1 || true ; \
-          docker container rm -f sonarr >/dev/null 2>&1 || true ; \
-          docker run --rm --name sonarr \
-            -p 8989:8989 \
-            -e PUID=$(id -u josh) \
-            -e PGID=$(id -g plex) \
-            -e TZ=$(timedatectl show -p Timezone --value) \
-            -v /var/lib/sonarr:/config \
-            -v /d/scratch/peer:/peer \
-            -v /d/scratch/usenet:/usenet \
-            -v /d/media:/media \
-            lscr.io/linuxserver/sonarr
-        '';
-        serviceConfig = {
-          Restart = "no";
-        };
-      };
       sonarr-update = {
         path = [ pkgs.docker ];
         script = ''
-          if docker pull lscr.io/linuxserver/sonarr | grep "Status: Downloaded"
+          if docker pull ${image} | grep "Status: Downloaded"
           then
-            systemctl restart sonarr
+            systemctl restart docker-sonarr
           fi
         '';
         serviceConfig = {

@@ -1,5 +1,8 @@
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 
+let
+  image = "lscr.io/linuxserver/lidarr";
+in
 {
   imports = [ ./docker.nix ];
 
@@ -13,38 +16,33 @@
     allowedTCPPorts = [ 8686 ];
   };
 
+  virtualisation.oci-containers.containers.lidarr = {
+    image = "${image}";
+    autoStart = true;
+    environment = {
+      PUID = "${toString config.users.users.josh.uid}";
+      PGID = "${toString config.users.groups.plex.gid}";
+      TZ = "${config.time.timeZone}";
+    };
+    ports = [
+      "8686:8686"
+    ];
+    volumes = [
+      "/var/lib/lidarr:/config"
+      "/d/scratch/peer:/peer"
+      "/d/scratch/usenet:/usenet"
+      "/d/media:/media"
+    ];
+  };
+
   systemd = {
     services = {
-      lidarr = {
-        enable = true;
-        description = "Lidarr";
-        wantedBy = [ "multi-user.target" ];
-        requires = [ "prowlarr.service" ];
-        path = [ pkgs.docker ];
-        script = ''
-          docker container stop lidarr >/dev/null 2>&1 || true ; \
-          docker container rm -f lidarr >/dev/null 2>&1 || true ; \
-          docker run --rm --name lidarr \
-            -p 8686:8686 \
-            -e PUID=$(id -u josh) \
-            -e PGID=$(id -g plex) \
-            -e TZ=$(timedatectl show -p Timezone --value) \
-            -v /var/lib/lidarr:/config \
-            -v /d/scratch/peer:/peer \
-            -v /d/scratch/usenet:/usenet \
-            -v /d/media:/media \
-            lscr.io/linuxserver/lidarr
-        '';
-        serviceConfig = {
-          Restart = "no";
-        };
-      };
       lidarr-update = {
         path = [ pkgs.docker ];
         script = ''
-          if docker pull lscr.io/linuxserver/lidarr | grep "Status: Downloaded"
+          if docker pull ${image} | grep "Status: Downloaded"
           then
-            systemctl restart lidarr
+            systemctl restart docker-lidarr
           fi
         '';
         serviceConfig = {

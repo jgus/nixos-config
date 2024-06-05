@@ -1,5 +1,8 @@
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 
+let
+  image = "lscr.io/linuxserver/radarr";
+in
 {
   imports = [ ./docker.nix ];
 
@@ -13,38 +16,33 @@
     allowedTCPPorts = [ 7878 ];
   };
 
+  virtualisation.oci-containers.containers.radarr = {
+    image = "${image}";
+    autoStart = true;
+    environment = {
+      PUID = "${toString config.users.users.josh.uid}";
+      PGID = "${toString config.users.groups.plex.gid}";
+      TZ = "${config.time.timeZone}";
+    };
+    ports = [
+      "7878:7878"
+    ];
+    volumes = [
+      "/var/lib/radarr:/config"
+      "/d/scratch/peer:/peer"
+      "/d/scratch/usenet:/usenet"
+      "/d/media:/media"
+    ];
+  };
+
   systemd = {
     services = {
-      radarr = {
-        enable = true;
-        description = "Radarr";
-        wantedBy = [ "multi-user.target" ];
-        requires = [ "prowlarr.service" ];
-        path = [ pkgs.docker ];
-        script = ''
-          docker container stop radarr >/dev/null 2>&1 || true ; \
-          docker container rm -f radarr >/dev/null 2>&1 || true ; \
-          docker run --rm --name radarr \
-            -p 7878:7878 \
-            -e PUID=$(id -u josh) \
-            -e PGID=$(id -g plex) \
-            -e TZ=$(timedatectl show -p Timezone --value) \
-            -v /var/lib/radarr:/config \
-            -v /d/scratch/peer:/peer \
-            -v /d/scratch/usenet:/usenet \
-            -v /d/media:/media \
-            lscr.io/linuxserver/radarr
-        '';
-        serviceConfig = {
-          Restart = "no";
-        };
-      };
       radarr-update = {
         path = [ pkgs.docker ];
         script = ''
-          if docker pull lscr.io/linuxserver/radarr | grep "Status: Downloaded"
+          if docker pull ${image} | grep "Status: Downloaded"
           then
-            systemctl restart radarr
+            systemctl restart docker-radarr
           fi
         '';
         serviceConfig = {

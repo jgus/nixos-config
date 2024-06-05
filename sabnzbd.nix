@@ -1,5 +1,8 @@
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 
+let
+  image = "lscr.io/linuxserver/sabnzbd";
+in
 {
   imports = [ ./docker.nix ];
 
@@ -13,36 +16,31 @@
     allowedTCPPorts = [ 8080 ];
   };
 
+  virtualisation.oci-containers.containers.sabnzbd = {
+    image = "${image}";
+    autoStart = true;
+    environment = {
+      PUID = "${toString config.users.users.josh.uid}";
+      PGID = "${toString config.users.groups.plex.gid}";
+      TZ = "${config.time.timeZone}";
+    };
+    ports = [
+      "8080:8080"
+    ];
+    volumes = [
+      "/var/lib/sabnzbd:/config"
+      "/d/scratch/usenet:/config/Downloads"
+    ];
+  };
+
   systemd = {
     services = {
-      sabnzbd = {
-        enable = true;
-        description = "Sabnzbd";
-        wantedBy = [ "multi-user.target" ];
-        requires = [ "network-online.target" ];
-        path = [ pkgs.docker ];
-        script = ''
-          docker container stop sabnzbd >/dev/null 2>&1 || true ; \
-          docker container rm -f sabnzbd >/dev/null 2>&1 || true ; \
-          docker run --rm --name sabnzbd \
-            -p 8080:8080 \
-            -e PUID=$(id -u josh) \
-            -e PGID=$(id -g plex) \
-            -e TZ=$(timedatectl show -p Timezone --value) \
-            -v /var/lib/sabnzbd:/config \
-            -v /d/scratch/usenet:/config/Downloads \
-            lscr.io/linuxserver/sabnzbd
-        '';
-        serviceConfig = {
-          Restart = "no";
-        };
-      };
       sabnzbd-update = {
         path = [ pkgs.docker ];
         script = ''
-          if docker pull lscr.io/linuxserver/sabnzbd | grep "Status: Downloaded"
+          if docker pull ${image} | grep "Status: Downloaded"
           then
-            systemctl restart sabnzbd
+            systemctl restart docker-sabnzbd
           fi
         '';
         serviceConfig = {

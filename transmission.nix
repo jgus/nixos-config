@@ -1,5 +1,8 @@
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 
+let
+  image = "haugene/transmission-openvpn";
+in
 {
   imports = [ ./docker.nix ];
 
@@ -14,50 +17,49 @@
     '';
   };
 
+  virtualisation.oci-containers.containers.transmission = {
+    image = "${image}";
+    autoStart = true;
+    extraOptions = [
+      "--cap-add=NET_ADMIN"
+    ];
+    environmentFiles = [
+      .secrets/privadovpn.env
+    ];
+    environment = {
+      PUID = "${toString config.users.users.josh.uid}";
+      PGID = "${toString config.users.groups.plex.gid}";
+      TZ = "${config.time.timeZone}";
+      OPENVPN_PROVIDER = "PRIVADO";
+      LOCAL_NETWORK = "172.22.0.0/16,192.168.2.0/24";
+      TRANSMISSION_DOWNLOAD_DIR = "/peer/Complete";
+      TRANSMISSION_INCOMPLETE_DIR = "/peer/Incomplete";
+      TRANSMISSION_INCOMPLETE_DIR_ENABLED = "true";
+      TRANSMISSION_WATCH_DIR = "/peer/Watch";
+      TRANSMISSION_WATCH_DIR_ENABLED = "true";
+      TRANSMISSION_DOWNLOAD_QUEUE_ENABLED = "false";
+      TRANSMISSION_BLOCKLIST_ENABLED = "true";
+      TRANSMISSION_BLOCKLIST_URL = "https://github.com/Naunter/BT_BlockLists/raw/master/bt_blocklists.gz";
+    };
+    ports = [
+      "9091:9091"
+      "51413:51413"
+    ];
+    volumes = [
+      "/etc/localtime:/etc/localtime:ro"
+      "/var/lib/transmission:/config"
+      "/d/scratch/peer:/peer"
+    ];
+  };
+
   systemd = {
     services = {
-      transmission = {
-        enable = true;
-        description = "Transmission";
-        wantedBy = [ "multi-user.target" ];
-        requires = [ "network-online.target" ];
-        path = [ pkgs.docker ];
-        script = ''
-          docker container stop transmission >/dev/null 2>&1 || true ; \
-          docker container rm -f transmission >/dev/null 2>&1 || true ; \
-          docker run --rm --name transmission \
-            -p 9091:9091 \
-            -p 51413:51413 \
-            -e PUID=$(id -u josh) \
-            -e PGID=$(id -g plex) \
-            -e TZ=$(timedatectl show -p Timezone --value) \
-            -e OPENVPN_PROVIDER=PRIVADO \
-            -e LOCAL_NETWORK=172.22.0.0/16,192.168.2.0/24 \
-            -e TRANSMISSION_DOWNLOAD_DIR=/peer/Complete \
-            -e TRANSMISSION_INCOMPLETE_DIR=/peer/Incomplete \
-            -e TRANSMISSION_INCOMPLETE_DIR_ENABLED=true \
-            -e TRANSMISSION_WATCH_DIR=/peer/Watch \
-            -e TRANSMISSION_WATCH_DIR_ENABLED=true \
-            -e TRANSMISSION_DOWNLOAD_QUEUE_ENABLED=false \
-            -e TRANSMISSION_BLOCKLIST_ENABLED=true \
-            -e TRANSMISSION_BLOCKLIST_URL="https://github.com/Naunter/BT_BlockLists/raw/master/bt_blocklists.gz" \
-            --env-file /etc/nixos/.secrets/privadovpn.env \
-            --cap-add NET_ADMIN \
-            -v /etc/localtime:/etc/localtime:ro \
-            -v /var/lib/transmission:/data \
-            -v /d/scratch/peer:/peer \
-            haugene/transmission-openvpn
-        '';
-        serviceConfig = {
-          Restart = "no";
-        };
-      };
       transmission-update = {
         path = [ pkgs.docker ];
         script = ''
-          if docker pull haugene/transmission-openvpn | grep "Status: Downloaded"
+          if docker pull ${image} | grep "Status: Downloaded"
           then
-            systemctl restart transmission
+            systemctl restart docker-transmission
           fi
         '';
         serviceConfig = {
