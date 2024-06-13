@@ -202,14 +202,17 @@ in
                   target:
                     entity_id: input_boolean.${i}_auto_working
                 - wait_template: "{{ is_state('input_boolean.${i}_auto_working', 'on') }}"
-                - service: cover.set_cover_position
-                  target:
-                    entity_id: cover.${i}
-                  data:
-                    position: "{{ p }}"
-                  continue_on_error: true
-                - wait_template: "{{ (state_attr('cover.${i}', 'current_position') | int) == (p | int) }}"
-                  timeout: "00:01:00"
+                - repeat:
+                    while: "{{ repeat.index <= 20 and (state_attr('cover.${i}', 'current_position') | int) != (p | int) }}"
+                    sequence:
+                      - service: cover.set_cover_position
+                        target:
+                          entity_id: cover.${i}
+                        data:
+                          position: "{{ p }}"
+                        continue_on_error: true
+                      - wait_template: "{{ (state_attr('cover.${i}', 'current_position') | int) == (p | int) }}"
+                        timeout: "00:00:20"
                 - service: input_boolean.turn_off
                   target:
                     entity_id: input_boolean.${i}_auto_working
