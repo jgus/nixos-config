@@ -1,4 +1,4 @@
-{ pkgs, lib, ... }:
+{ config, pkgs, lib, ... }:
 
 {
   imports = [ ./docker.nix ];
@@ -47,8 +47,8 @@
           docker container rm -f minecraft >/dev/null 2>&1 || true ; \
 
           docker build \
-            --build-arg uid=$(id -u minecraft) \
-            --build-arg gid=$(id -g minecraft) \
+            --build-arg uid=${toString config.users.users.minecraft.uid} \
+            --build-arg gid=${toString config.users.groups.minecraft.gid} \
             --build-arg java_ver=17 \
             -t minecraft \
             /etc/minecraft/docker
