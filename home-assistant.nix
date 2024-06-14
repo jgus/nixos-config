@@ -137,8 +137,8 @@ in
           mac = "94:24:b8:6c:0f:41";
         }
         {
-          id = "theater_climate";
-          name = "Theater Climate";
+          id = "theater_climate_unit";
+          name = "Theater Climate Unit";
           host = "theater-climate";
           mac = "94:24:b8:6c:10:13";
         }
