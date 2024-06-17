@@ -3,7 +3,7 @@ FROM ubuntu
 ARG uid=1000
 ARG gid=1000
 ARG pw="3bwb8G/RzidNRdagX7phcM54pto="
-ARG java_ver=17
+ARG java_ver=21
 
 ENV DEBIAN_FRONTEND noninteractive
 ENV LANG C.UTF-8

@@ -9,6 +9,7 @@
     19133
     25565
     25565
+    28123
   ];
 
   users = {
@@ -49,7 +50,7 @@
           docker build \
             --build-arg uid=${toString config.users.users.minecraft.uid} \
             --build-arg gid=${toString config.users.groups.minecraft.gid} \
-            --build-arg java_ver=17 \
+            --build-arg java_ver=21 \
             -t minecraft \
             /etc/minecraft/docker
 
@@ -59,6 +60,7 @@
             -p 19133:19133/udp \
             -p 25565:25565/udp \
             -p 25565:25565/tcp \
+            -p 28123:8123/tcp \
             -v /var/lib/minecraft:/home/minecraft/config \
             minecraft
         '';
