@@ -26,8 +26,11 @@ RUN groupadd --gid $gid minecraft && \
     useradd --uid $uid --gid $gid --password $pw --create-home --shell /bin/bash minecraft && \
     echo "minecraft:$pw" | chpasswd
 
+COPY ssh_host_* /etc/ssh
 COPY id-minecraft.pub /home/minecraft/.ssh/authorized_keys
-RUN chown -R minecraft:minecraft /home/minecraft/.ssh && \
+RUN chmod 600 /etc/ssh/ssh_host_* && \
+    chmod 644 /etc/ssh/ssh_host_*.pub && \
+    chown -R minecraft:minecraft /home/minecraft/.ssh && \
     chmod 700 /home/minecraft/.ssh && \
     chmod 600 /home/minecraft/.ssh/authorized_keys
 
