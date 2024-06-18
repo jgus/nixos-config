@@ -170,10 +170,6 @@ in
           value = { text = "initial: false"; };
         }
         {
-          name = "home-assistant/input_boolean/${i}_auto_working.yaml";
-          value = { text = "initial: false"; };
-        }
-        {
           name = "home-assistant/automation/${i}_auto_set.yaml";
           value = {
             text = ''
@@ -198,10 +194,6 @@ in
               action:
                 - variables:
                     p: "{{ [states('input_number.${i}_auto_target') | int, 50 if is_state('input_boolean.${i}_window_open', 'on') else 0] | max }}"
-                - service: input_boolean.turn_on
-                  target:
-                    entity_id: input_boolean.${i}_auto_working
-                - wait_template: "{{ is_state('input_boolean.${i}_auto_working', 'on') }}"
                 - repeat:
                     while: "{{ repeat.index <= 20 and (state_attr('cover.${i}', 'current_position') | int) != (p | int) }}"
                     sequence:
@@ -213,9 +205,6 @@ in
                         continue_on_error: true
                       - wait_template: "{{ (state_attr('cover.${i}', 'current_position') | int) == (p | int) }}"
                         timeout: "00:00:20"
-                - service: input_boolean.turn_off
-                  target:
-                    entity_id: input_boolean.${i}_auto_working
             '';
           };
         }
@@ -231,10 +220,7 @@ in
                   entity_id:
                     - cover.${i}
                   attribute: current_position
-              condition:
-                - condition: state
-                  entity_id: input_boolean.${i}_auto_working
-                  state: "off"
+              condition: "{{ ([trigger.from_state.attributes.current_position | int, trigger.to_state.attributes.current_position | int, states('input_number.${i}_auto_target') | int] | sort)[1] != (trigger.to_state.attributes.current_position | int) }}"
               action:
                 - service: input_boolean.turn_on
                   target:
