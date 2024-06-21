@@ -56,6 +56,8 @@ in
       birdseye:
         enabled: True
         mode: objects
+        width: 3840
+        height: 2160
         restream: True
       cameras:
         doorbell-front:
@@ -235,11 +237,11 @@ in
           snapshots:
             enabled: True
           detect:
-            width: 3840
-            height: 2160
+            width: 4096
+            height: 1800
           motion:
             mask:
-              - 2596,188,3696,188,3696,80,2596,80
+              - 3020,154,3950,154,3950,76,3020,76
         camera-pool:
           ffmpeg:
             inputs:
