@@ -194,17 +194,11 @@ in
               action:
                 - variables:
                     p: "{{ [states('input_number.${i}_auto_target') | int, 50 if is_state('input_boolean.${i}_window_open', 'on') else 0] | max }}"
-                - repeat:
-                    while: "{{ repeat.index <= 20 and (state_attr('cover.${i}', 'current_position') | int) != (p | int) }}"
-                    sequence:
-                      - service: cover.set_cover_position
-                        target:
-                          entity_id: cover.${i}
-                        data:
-                          position: "{{ p }}"
-                        continue_on_error: true
-                      - wait_template: "{{ (state_attr('cover.${i}', 'current_position') | int) == (p | int) }}"
-                        timeout: "00:00:20"
+                - service: cover.set_cover_position
+                  target:
+                    entity_id: cover.${i}
+                  data:
+                    position: "{{ p }}"
             '';
           };
         }
@@ -220,13 +214,31 @@ in
                   entity_id:
                     - cover.${i}
                   attribute: current_position
+                  for:
+                    seconds: 10
               condition: "{{ ([trigger.from_state.attributes.current_position | int, trigger.to_state.attributes.current_position | int, states('input_number.${i}_auto_target') | int] | sort)[1] != (trigger.to_state.attributes.current_position | int) }}"
               action:
                 - service: input_boolean.turn_on
                   target:
                     entity_id: input_boolean.${i}_user_override
-                - delay:
+            '';
+          };
+        }
+        {
+          name = "home-assistant/automation/${i}_user_reset.yaml";
+          value = {
+            text = ''
+              alias: ${i} user reset
+              id: ${i}_user_reset
+              mode: restart
+              trigger:
+                - platform: state
+                  entity_id:
+                    - input_boolean.${i}_user_override
+                  to: "on"
+                  for:
                     hours: 2
+              action:
                 - service: input_boolean.turn_off
                   target:
                     entity_id: input_boolean.${i}_user_override
