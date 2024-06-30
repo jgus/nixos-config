@@ -42,7 +42,7 @@
         requires = [ "network-online.target" ];
         path = [ pkgs.docker pkgs.zfs ];
         script = ''
-          zfs list d/varlib/minecraft >/dev/null 2>&1 || ( zfs create d/varlib/minecraft && chown minecraft:minecraft /var/lib/minecraft )
+          zfs list r/varlib/minecraft >/dev/null 2>&1 || ( zfs create r/varlib/minecraft && chown minecraft:minecraft /var/lib/minecraft )
 
           docker container stop minecraft >/dev/null 2>&1 || true ; \
           docker container rm -f minecraft >/dev/null 2>&1 || true ; \
