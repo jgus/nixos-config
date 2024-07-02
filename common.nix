@@ -43,6 +43,8 @@
         AllowAgentForwarding yes
       '';
     };
+
+    fwupd.enable = true;
   };
 
   programs = {
