@@ -8,9 +8,10 @@
       <domain type="kvm">
         <name>vm1</name>
         <uuid>99fefcc4-d5aa-4717-8dde-4fe5f0552d87</uuid>
-        <memory unit="GiB">96</memory>
-        <currentMemory unit="GiB">96</currentMemory>
+        <memory unit="GiB">32</memory>
+        <currentMemory unit="GiB">32</currentMemory>
         <vcpu placement="static">24</vcpu>
+        <!--
         <iothreads>4</iothreads>
         <cputune>
           <vcpupin vcpu="0" cpuset="12"/>
@@ -40,6 +41,7 @@
           <emulatorpin cpuset="0,24"/>
           <iothreadpin iothread="1" cpuset="2,4,26,28"/>
         </cputune>
+        -->
         <os>
           <type arch="x86_64" machine="q35">hvm</type>
           <loader readonly="yes" secure="yes" type="pflash">/run/libvirt/nix-ovmf/OVMF_CODE.fd</loader>
@@ -75,10 +77,10 @@
             <boot order="1"/>
             <address type="drive" controller="0" bus="0" target="0" unit="0"/>
           </disk>
-          <!--
+          <!-- --> 
           <disk type="file" device="cdrom">
             <driver name="qemu" type="raw"/>
-            <source file="/d/software/MSDN/Windows/Windows 11/Win11_22H2_English_x64v1.iso"/>
+            <source file="/d/software/MSDN/Windows/Windows 11/Win11_23H2_English_x64v2.iso"/>
             <target dev="sdb" bus="sata"/>
             <readonly/>
             <boot order="2"/>
@@ -86,18 +88,18 @@
           </disk>
           <disk type="file" device="cdrom">
             <driver name="qemu" type="raw"/>
-            <source file="/d/software/Drivers/virtio-win-0.1.229.iso"/>
+            <source file="/d/software/Drivers/virtio-win-0.1.240.iso"/>
             <target dev="sdc" bus="sata"/>
             <readonly/>
             <address type="drive" controller="0" bus="0" target="0" unit="2"/>
           </disk>
-          -->
+          <!-- -->
           <controller type="scsi" index="0" model="virtio-scsi"/>
           <controller type="sata" index="0"/>
           <controller type="virtio-serial" index="0"/>
           <interface type="direct">
             <mac address="52:54:00:6e:b4:bc"/>
-            <source dev="enp5s0f1" mode="bridge"/>
+            <source dev="enp5s0f0" mode="bridge"/>
             <model type="virtio"/>
           </interface>
           <interface type="network">
@@ -146,22 +148,22 @@
       text = ''
         #! /usr/bin/env bash
         ${pkgs.zfs}/bin/zfs list r/varlib/vm/vm1 >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create r/varlib/vm/vm1
-        ${pkgs.zfs}/bin/zfs list r/varlib/vm/vm1/system >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create -b 8k -s -V 128G r/varlib/vm/vm1/system
+        ${pkgs.zfs}/bin/zfs list r/varlib/vm/vm1/system >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create -b 16k -s -V 64G r/varlib/vm/vm1/system
         ${pkgs.libvirt}/bin/virsh create /etc/vm/vm1.xml
-        for x in system.slice user.slice init.scope
-        do
-          systemctl set-property --runtime -- $x AllowedCPUs=0-11,24-35
-        done
+        # for x in system.slice user.slice init.scope
+        # do
+        #   systemctl set-property --runtime -- $x AllowedCPUs=0-11,24-35
+        # done
       '';
       mode = "0555";
     };
     "vm/vm1/stop.sh" = {
       text = ''
         #! /usr/bin/env bash
-        for x in system.slice user.slice init.scope
-        do
-          systemctl set-property --runtime -- $x AllowedCPUs=0-47
-        done
+        # for x in system.slice user.slice init.scope
+        # do
+        #   systemctl set-property --runtime -- $x AllowedCPUs=0-47
+        # done
         export LANG=C
         COUNT=0
         while [ $COUNT -le 60 ]

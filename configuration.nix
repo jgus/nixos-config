@@ -42,7 +42,7 @@
       ./minecraft.nix
 
       #      ./libvirt.nix
-      #      ./vm-vm1.nix
+      ./vm-vm1.nix
 
       #      ./offsite-josh-ws.nix
       #      ./offsite-homeassistant.nix
