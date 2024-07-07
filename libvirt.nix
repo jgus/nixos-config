@@ -1,6 +1,13 @@
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 
 {
+  boot.kernelModules = [
+    "vfio_pci" "vfio" "vfio_iommu_type1"
+  ];
+  boot.kernelParams = [ 
+    "intel_iommu=on"
+  ];
+
   environment.etc = {
     "vm/local-net.xml".text = ''
       <network>
