@@ -108,6 +108,18 @@ in
             <address type="drive" controller="0" bus="0" target="0" unit="2"/>
           </disk>
           <!-- -->
+          <hostdev mode="subsystem" type="pci" managed="yes">
+            <source>
+              <address domain="0x0000" bus="0x04" slot="0x00" function="0x0"/>
+            </source>
+            <address type="pci" domain="0x0000" bus="0x04" slot="0x00" function="0x0"/>
+          </hostdev>
+          <hostdev mode="subsystem" type="pci" managed="yes">
+            <source>
+              <address domain="0x0000" bus="0x04" slot="0x00" function="0x1"/>
+            </source>
+            <address type="pci" domain="0x0000" bus="0x04" slot="0x00" function="0x1"/>
+          </hostdev>
           <controller type="scsi" index="0" model="virtio-scsi"/>
           <controller type="sata" index="0"/>
           <controller type="virtio-serial" index="0"/>
