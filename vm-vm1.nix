@@ -1,5 +1,19 @@
 { pkgs, ... }:
 
+let
+  pci_devices = [
+    { # GPU
+      path = "0000:04:00.0";
+      vendor = "0x10de";
+      device = "0x1bb1";
+    }
+    { # Audio
+      path = "0000:04:00.1";
+      vendor = "0x10de";
+      device = "0x10f0";
+    }
+  ];
+in
 {
   imports = [ ./libvirt.nix ];
 
@@ -130,89 +144,48 @@
         </devices>
       </domain>
     '';
-    "vm/vm1/startpre.sh" = {
-      text = ''
-        #! /usr/bin/env bash
-        COUNT=0
-        while [ $COUNT -le 10 ]
-        do
-          ((COUNT++))
-          ${pkgs.libvirt}/bin/virsh connect 2>/dev/null
-          [ $? -eq 0 ] && exit 0 || sleep 1
-        done
-        exit 1
-      '';
-      mode = "0555";
-    };
-    "vm/vm1/start.sh" = {
-      text = ''
-        #! /usr/bin/env bash
-        ${pkgs.zfs}/bin/zfs list r/varlib/vm/vm1 >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create r/varlib/vm/vm1
-        ${pkgs.zfs}/bin/zfs list r/varlib/vm/vm1/system >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create -b 16k -s -V 64G r/varlib/vm/vm1/system
-        ${pkgs.libvirt}/bin/virsh create /etc/vm/vm1.xml
-        # for x in system.slice user.slice init.scope
-        # do
-        #   systemctl set-property --runtime -- $x AllowedCPUs=0-11,24-35
-        # done
-      '';
-      mode = "0555";
-    };
-    "vm/vm1/stop.sh" = {
-      text = ''
-        #! /usr/bin/env bash
-        # for x in system.slice user.slice init.scope
-        # do
-        #   systemctl set-property --runtime -- $x AllowedCPUs=0-47
-        # done
-        export LANG=C
-        COUNT=0
-        while [ $COUNT -le 60 ]
-        do
-          STATE=$(${pkgs.libvirt}/bin/virsh domstate vm1 2>&1)
-          if [[ "$STATE" == "shut off" ]] || [[ "''${STATE::27}" == "error: failed to get domain" ]]
-          then
-            exit 0
-          fi
-          if [[ "$STATE" == "running" ]]
-          then
-            [ $(($COUNT % 15)) -eq 0 ] && ${pkgs.libvirt}/bin/virsh shutdown vm1
-            ((COUNT++))
-          fi
-          sleep 1
-        done
-        exit 1
-      '';
-      mode = "0555";
-    };
   };
 
-  systemd = {
-    services = {
-      vm-vm1 = {
-        enable = true;
-        description = "Virtual Machine vm1";
-        # wantedBy = [ "multi-user.target" ];
-        requires = [ "network-online.target" ];
-        path = with pkgs; [ bash libvirt zfs ];
-        environment = {
-          DOMAIN_DIR = "/etc/libvirt/qemu";
-          DOMAIN = "vm1";
-        };
-        serviceConfig = {
-          Type = "forking";
-          PIDFile = "/run/libvirt/qemu/vm1.pid";
+  system.activationScripts = {
+    vm-vm1.text = ''
+      ${pkgs.zfs}/bin/zfs list r/varlib/vm/vm1 >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create r/varlib/vm/vm1
+      ${pkgs.zfs}/bin/zfs list r/varlib/vm/vm1/system >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create -b 16k -s -V 64G r/varlib/vm/vm1/system
+      ${pkgs.libvirt}/bin/virsh define /etc/vm/vm1.xml
+    '';
+  };
 
-          # Check if libvirtd is responsive by connecting to it. This is not allowed to fail.
-          ExecStartPre = "${pkgs.bash}/bin/bash -c /etc/vm/vm1/startpre.sh";
-          # Create the domain.
-          ExecStart = "${pkgs.bash}/bin/bash -c /etc/vm/vm1/start.sh";
-          # Shutdown the domain gracefully by sending ACPI shutdown event.
-          ExecStop = "${pkgs.bash}/bin/bash -c /etc/vm/vm1/stop.sh";
-          # Set higher timeouts to allow for Exec commands to take longer.
-          TimeoutStartSec = 90;
-          TimeoutStopSec = 180;
-        };
-      };
+  virtualisation.libvirtd.hooks = {
+    qemu = {
+      "vm1.sh" = let
+        prepare_pci = builtins.concatStringsSep "\n" (
+          (map (d: ''echo "${d.path}" > "/sys/bus/pci/devices/${d.path}/driver/unbind"'') pci_devices) ++ 
+          (map (d: ''echo "${d.vendor} ${d.device}" > /sys/bus/pci/drivers/vfio-pci/new_id'') pci_devices)
+        );
+        release_pci = builtins.concatStringsSep "\n" (
+          (map (d: ''echo "${d.vendor} ${d.device}" > /sys/bus/pci/drivers/vfio-pci/remove_id'') pci_devices) ++ 
+          (map (d: ''echo 1 > "/sys/bus/pci/devices/${d.path}/remove"'') pci_devices)
+        );
+      in
+      pkgs.writeShellScript "vm1.sh" ''
+        [ "$1" == "vm1" ] || exit 0
+        case "$2" in
+          "prepare")
+            # for x in system.slice user.slice init.scope
+            # do
+            #   systemctl set-property --runtime -- $x AllowedCPUs=0-11,24-35
+            # done
+            ${prepare_pci}
+            ;;
+          "release")
+            ${release_pci}
+            echo 1 > /sys/bus/pci/rescan
+            # for x in system.slice user.slice init.scope
+            # do
+            #   systemctl set-property --runtime -- $x AllowedCPUs=0-47
+            # done
+            ;;
+        esac
+      '';
     };
   };
 }
