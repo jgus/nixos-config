@@ -1,5 +1,24 @@
 { config, pkgs, ... }:
 
+let
+  ip_net = "192.168.100";
+  local_vm_addresses = import ./local-vm-addresses.nix;
+  hosts = builtins.concatStringsSep "\n" (map (name: let value = local_vm_addresses."${name}"; in ''
+    <host mac="${value.mac}" name="${name}" ip="${ip_net}.${toString value.ip}"/>
+  '') (builtins.attrNames local_vm_addresses));
+  net_file = pkgs.writeText "net-local.xml" ''
+    <network>
+      <name>local</name>
+      <domain name="vm-local"/>
+      <ip address="${ip_net}.1" netmask="255.255.255.0">
+        <dhcp>
+          <range start="${ip_net}.128" end="${ip_net}.254"/>
+          ${hosts}
+        </dhcp>
+      </ip>
+    </network>
+  '';
+in
 {
   boot.kernelModules = [
     "vfio_pci" "vfio" "vfio_iommu_type1"
@@ -8,26 +27,15 @@
     "intel_iommu=on"
   ];
 
-  environment.etc = {
-    "vm/local-net.xml".text = ''
-      <network>
-        <name>local</name>
-        <domain name="local"/>
-        <ip address="192.168.100.1" netmask="255.255.255.0">
-          <dhcp>
-            <range start="192.168.100.128" end="192.168.100.254"/>
-            <host mac="d4:7b:31:69:c4:1d" name="vm1" ip="192.168.100.2"/>
-          </dhcp>
-        </ip>
-      </network>
-    '';
-  };
-
   system.activationScripts = {
     libvirt.text = ''
       ${pkgs.zfs}/bin/zfs list r/varlib/vm >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create r/varlib/vm
       ${pkgs.zfs}/bin/zfs list d/varlib/images >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create d/varlib/images
-      ${pkgs.libvirt}/bin/virsh net-info local >/dev/null 2>&1 || ${pkgs.libvirt}/bin/virsh net-create /etc/vm/local-net.xml
+      ${pkgs.libvirt}/bin/virsh net-destroy local
+      ${pkgs.libvirt}/bin/virsh net-undefine local
+      ${pkgs.libvirt}/bin/virsh net-define ${net_file}
+      ${pkgs.libvirt}/bin/virsh net-start local
+      ${pkgs.libvirt}/bin/virsh net-autostart local
     '';
   };
 
