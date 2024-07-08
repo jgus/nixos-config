@@ -1,11 +1,12 @@
 { config, pkgs, ... }:
 
+with builtins;
 let
   ip_net = "192.168.100";
   local_vm_addresses = import ./local-vm-addresses.nix;
-  hosts = builtins.concatStringsSep "\n" (map (name: let value = local_vm_addresses."${name}"; in ''
+  hosts = concatStringsSep "\n" (map (name: let value = local_vm_addresses."${name}"; in ''
     <host mac="${value.mac}" name="${name}" ip="${ip_net}.${toString value.ip}"/>
-  '') (builtins.attrNames local_vm_addresses));
+  '') (attrNames local_vm_addresses));
   net_file = pkgs.writeText "net-local.xml" ''
     <network>
       <name>local</name>

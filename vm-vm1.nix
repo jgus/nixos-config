@@ -1,11 +1,17 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 
+with builtins;
 let
+  ### Settings
   name = "vm1";
   uuid = "99fefcc4-d5aa-4717-8dde-4fe5f0552d87";
   mem_gb = 16;
   mac = {
     external = "52:54:00:6e:b4:bc";
+  };
+  cpu = {
+    cores = 8;
+    threads = 2;
   };
   pci_devices = [
     { # GPU
@@ -25,8 +31,12 @@ let
       device = "0x10f0";
     }
   ];
+  ### Derivations
   local_vm_addresses = import ./local-vm-addresses.nix;
-  hostdevs = builtins.concatStringsSep "\n" (map (d: ''
+  vcpupins = concatStringsSep "\n" (lib.lists.flatten (genList (core: genList (thread: ''
+    <vcpupin vcpu="${toString (core*cpu.threads + thread)}" cpuset="${toString (1 + 2*core + 16*thread)}"/>
+  '') cpu.threads) cpu.cores));
+  hostdevs = concatStringsSep "\n" (map (d: ''
     <hostdev mode="subsystem" type="pci" managed="yes">
       <source>
         <address domain="0x${d.domain}" bus="0x${d.bus}" slot="0x${d.slot}" function="0x${d.function}"/>
@@ -39,38 +49,19 @@ let
       <name>${name}</name>
       <uuid>${uuid}</uuid>
       <memory unit="GiB">${toString mem_gb}</memory>
-      <vcpu placement="static">24</vcpu>
-      <!--
+      <vcpu placement="static">${toString (cpu.cores * cpu.threads)}</vcpu>
+      <cpu mode="host-passthrough">
+        <topology sockets="1" cores="${toString cpu.cores}" threads="${toString cpu.threads}"/>
+      </cpu>
       <iothreads>4</iothreads>
       <cputune>
-        <vcpupin vcpu="0" cpuset="12"/>
-        <vcpupin vcpu="1" cpuset="36"/>
-        <vcpupin vcpu="2" cpuset="13"/>
-        <vcpupin vcpu="3" cpuset="37"/>
-        <vcpupin vcpu="4" cpuset="14"/>
-        <vcpupin vcpu="5" cpuset="38"/>
-        <vcpupin vcpu="6" cpuset="15"/>
-        <vcpupin vcpu="7" cpuset="39"/>
-        <vcpupin vcpu="8" cpuset="16"/>
-        <vcpupin vcpu="9" cpuset="40"/>
-        <vcpupin vcpu="10" cpuset="17"/>
-        <vcpupin vcpu="11" cpuset="41"/>
-        <vcpupin vcpu="12" cpuset="18"/>
-        <vcpupin vcpu="13" cpuset="42"/>
-        <vcpupin vcpu="14" cpuset="19"/>
-        <vcpupin vcpu="15" cpuset="43"/>
-        <vcpupin vcpu="16" cpuset="20"/>
-        <vcpupin vcpu="17" cpuset="44"/>
-        <vcpupin vcpu="18" cpuset="21"/>
-        <vcpupin vcpu="19" cpuset="45"/>
-        <vcpupin vcpu="20" cpuset="22"/>
-        <vcpupin vcpu="21" cpuset="46"/>
-        <vcpupin vcpu="22" cpuset="23"/>
-        <vcpupin vcpu="23" cpuset="47"/>
-        <emulatorpin cpuset="0,24"/>
-        <iothreadpin iothread="1" cpuset="2,4,26,28"/>
+        ${vcpupins}
+        <emulatorpin cpuset="24,26,28,30"/>
+        <iothreadpin iothread="1" cpuset="16"/>
+        <iothreadpin iothread="2" cpuset="18"/>
+        <iothreadpin iothread="3" cpuset="20"/>
+        <iothreadpin iothread="4" cpuset="22"/>
       </cputune>
-      -->
       <os>
         <type arch="x86_64" machine="q35">hvm</type>
         <loader readonly="yes" secure="yes" type="pflash">/run/libvirt/nix-ovmf/OVMF_CODE.fd</loader>
@@ -82,9 +73,6 @@ let
         <vmport state="off"/>
         <smm state="on"/>
       </features>
-      <cpu mode="host-passthrough">
-        <topology sockets="1" cores="12" threads="2"/>
-      </cpu>
       <clock offset="localtime">
         <timer name="rtc" tickpolicy="catchup"/>
         <timer name="pit" tickpolicy="delay"/>
@@ -170,11 +158,11 @@ in
   virtualisation.libvirtd.hooks = {
     qemu = {
       "${name}.sh" = let
-        prepare_pci = builtins.concatStringsSep "\n" (
+        prepare_pci = concatStringsSep "\n" (
           (map (d: ''echo "${d.domain}:${d.bus}:${d.slot}.${d.function}" > "/sys/bus/pci/devices/${d.domain}:${d.bus}:${d.slot}.${d.function}/driver/unbind"'') pci_devices) ++ 
           (map (d: ''echo "${d.vendor} ${d.device}" > /sys/bus/pci/drivers/vfio-pci/new_id'') pci_devices)
         );
-        release_pci = builtins.concatStringsSep "\n" (
+        release_pci = concatStringsSep "\n" (
           (map (d: ''echo "${d.vendor} ${d.device}" > /sys/bus/pci/drivers/vfio-pci/remove_id'') pci_devices) ++ 
           (map (d: ''echo 1 > "/sys/bus/pci/devices/${d.domain}:${d.bus}:${d.slot}.${d.function}/remove"'') pci_devices)
         );
@@ -183,19 +171,19 @@ in
         [ "$1" == "${name}" ] || exit 0
         case "$2" in
           "prepare")
-            # for x in system.slice user.slice init.scope
-            # do
-            #   systemctl set-property --runtime -- $x AllowedCPUs=0-11,24-35
-            # done
+            for x in system.slice user.slice init.scope
+            do
+              systemctl set-property --runtime -- $x AllowedCPUs=0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30
+            done
             ${prepare_pci}
             ;;
           "release")
             ${release_pci}
             echo 1 > /sys/bus/pci/rescan
-            # for x in system.slice user.slice init.scope
-            # do
-            #   systemctl set-property --runtime -- $x AllowedCPUs=0-47
-            # done
+            for x in system.slice user.slice init.scope
+            do
+              systemctl set-property --runtime -- $x AllowedCPUs=0-31
+            done
             ;;
         esac
       '';
