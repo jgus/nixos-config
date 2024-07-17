@@ -7,6 +7,7 @@ let
     arch = "x86";
     nvidia = false;
     zfs = true;
+    zfs-pools = [];
     clamav = pw ? gmail;
     imports = [];
   };
@@ -20,6 +21,7 @@ let
       stateVersion = "23.05";
       hostId = "2bec4b05";
       nvidia = true;
+      zfs-pools = [ "d" ];
       imports = [
         #./ddclient.nix
         ./samba.nix
