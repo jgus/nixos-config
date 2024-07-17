@@ -143,8 +143,8 @@ in
           mac = "94:24:b8:6c:10:13";
         }
         {
-          id = "workshop_climate";
-          name = "Workshop Climate";
+          id = "workshop_climate_unit";
+          name = "Workshop Climate Unit";
           host = "workshop-climate";
           mac = "94:24:b8:6d:47:92";
         }
@@ -261,13 +261,13 @@ in
     ) theater_devices)) //
     builtins.listToAttrs(lib.lists.flatten(map(
       i: [
-        { name = "home-assistant/input_boolean/${i.id}_lights.yaml"; value = { text = "initial: true"; }; }
-        { name = "home-assistant/input_boolean/${i.id}_xfan.yaml"; value = { text = "initial: true"; }; }
-        { name = "home-assistant/input_boolean/${i.id}_health.yaml"; value = { text = "initial: true"; }; }
-        { name = "home-assistant/input_boolean/${i.id}_sleep.yaml"; value = { text = "initial: true"; }; }
-        { name = "home-assistant/input_boolean/${i.id}_powersave.yaml"; value = { text = "initial: true"; }; }
-        { name = "home-assistant/input_boolean/${i.id}_eightdegheat.yaml"; value = { text = "initial: true"; }; }
-        { name = "home-assistant/input_boolean/${i.id}_air.yaml"; value = { text = "initial: true"; }; }
+        # { name = "home-assistant/input_boolean/${i.id}_lights.yaml"; value = { text = ""; }; }
+        # { name = "home-assistant/input_boolean/${i.id}_xfan.yaml"; value = { text = ""; }; }
+        # { name = "home-assistant/input_boolean/${i.id}_health.yaml"; value = { text = ""; }; }
+        # { name = "home-assistant/input_boolean/${i.id}_sleep.yaml"; value = { text = ""; }; }
+        # { name = "home-assistant/input_boolean/${i.id}_powersave.yaml"; value = { text = ""; }; }
+        # { name = "home-assistant/input_boolean/${i.id}_eightdegheat.yaml"; value = { text = ""; }; }
+        # { name = "home-assistant/input_boolean/${i.id}_air.yaml"; value = { text = ""; }; }
         {
           name = "home-assistant/climate/${i.id}.yaml";
           value = {
@@ -278,13 +278,13 @@ in
               port: 7000
               mac: ${i.mac}
               target_temp_step: 1
-              lights: input_boolean.${i.id}_lights
-              xfan: input_boolean.${i.id}_xfan
-              health: input_boolean.${i.id}_health
-              sleep: input_boolean.${i.id}_sleep
-              powersave: input_boolean.${i.id}_powersave
-              eightdegheat: input_boolean.${i.id}_eightdegheat
-              air: input_boolean.${i.id}_air
+              # lights: input_boolean.${i.id}_lights
+              # xfan: input_boolean.${i.id}_xfan
+              # health: input_boolean.${i.id}_health
+              # sleep: input_boolean.${i.id}_sleep
+              # powersave: input_boolean.${i.id}_powersave
+              # eightdegheat: input_boolean.${i.id}_eightdegheat
+              # air: input_boolean.${i.id}_air
             '';
           };
         }
