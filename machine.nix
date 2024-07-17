@@ -13,6 +13,12 @@ let
       imports = [ ./zwave-js-ui.nix ];
   };
   machine = default // {
+    pi-67cba1 = {
+      hostId = "62c05afa";
+      arch = "rpi";
+      zfs = false;
+      imports = [ ./cec.nix ];
+    };
     pi-67db40 = zwave-box // {
       hostId = "1f758e73";
     };
