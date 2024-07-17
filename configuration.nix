@@ -12,46 +12,11 @@ in
       ./${machine.arch}.nix
       ./host.nix
       ./users.nix
-
-      ./nvidia.nix
       ./vscode.nix
-      ./clamav.nix
-
-      #./pihole.nix
-      #./ddclient.nix
-      ./samba.nix
-      ./landing.nix
-      ./syncthing.nix
-      ./www.nix
-      ./ntp.nix
-      ./mosquitto.nix
-      ./zigbee2mqtt.nix
-      ./home-assistant.nix
-      ./esphome.nix
-      ./frigate.nix
-      ./plex.nix
-      ./transmission.nix
-      ./sabnzbd.nix
-      ./prowlarr.nix
-      ./lidarr.nix
-      ./radarr.nix
-      ./sonarr.nix
-      ./mylar.nix
-      ./komga.nix
-      ./minecraft.nix
-
-      #      ./libvirt.nix
-      ./vm-vm1.nix
-
-      #      ./offsite-josh-ws.nix
-      #      ./offsite-homeassistant.nix
-      ./offsite-gustafson-nas.nix
-      # ./sync-to-cloud.nix
-
-      ./userbox.nix
-
-      ./python.nix
     ]
+    ++ (if machine.nvidia then [ ./nvidia.nix ] else [])
     ++ (if machine.zfs then [ ./zfs.nix ] else [])
+    ++ (if machine.clamav then [ ./clamav.nix ] else [])
+    ++ (if machine.python then [ ./python.nix ] else [])
     ++ machine.imports;
 }
