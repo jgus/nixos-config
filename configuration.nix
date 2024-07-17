@@ -1,21 +1,20 @@
 { config, pkgs, ... }:
 
+let
+  machine = import ./machine.nix;
+in
 {
   imports =
-    [
-      # Include the results of the hardware scan.
-      ./hardware-configuration.nix
-
+    [ # Include the results of the hardware scan.
+      (if (machine.arch == "rpi") then ./hardware-configuration-pi.nix else ./hardware-configuration.nix)
       ./interfaces.nix
-
       ./common.nix
-      ./x86.nix
+      ./${machine.arch}.nix
       ./host.nix
       ./users.nix
 
       ./nvidia.nix
       ./vscode.nix
-      ./zfs.nix
       ./clamav.nix
 
       #./pihole.nix
@@ -52,5 +51,7 @@
       ./userbox.nix
 
       ./python.nix
-    ];
+    ]
+    ++ (if machine.zfs then [ ./zfs.nix ] else [])
+    ++ machine.imports;
 }

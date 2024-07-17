@@ -1,5 +1,8 @@
 { ... }:
 
+let
+  machine = import ./machine.nix;
+in
 {
   time.timeZone = "America/Denver";
 
@@ -23,7 +26,7 @@
   };
 
   networking = {
-    hostName = "d1";
-    hostId = "2bec4b05"; # head -c4 /dev/urandom | od -A none -t x4
+    hostName = machine.hostName;
+    hostId = machine.hostId;
   };
 }
