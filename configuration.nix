@@ -13,8 +13,10 @@ in
       ./host.nix
       ./users.nix
       ./vscode.nix
-      #./clamav.nix # needs .secrets/gmail-password.nix
     ]
+    ++ (if machine.nvidia then [ ./nvidia.nix ] else [])
     ++ (if machine.zfs then [ ./zfs.nix ] else [])
+    ++ (if machine.clamav then [ ./clamav.nix ] else [])
+    ++ (if machine.python then [ ./python.nix ] else [])
     ++ machine.imports;
 }

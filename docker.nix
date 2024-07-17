@@ -15,7 +15,7 @@
       autoPrune.enable = true;
       storageDriver = if (lib.elem pkgs.zfs config.environment.systemPackages) then "zfs" else null;
       daemon.settings = {
-        dns = ["172.22.0.1"];
+        dns = [ "172.22.0.1" ];
       };
     };
     oci-containers = {

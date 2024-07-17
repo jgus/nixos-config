@@ -1,5 +1,8 @@
 { pkgs, ... }:
 
+let
+  machine = import ./machine.nix;
+in
 {
   boot = {
     supportedFilesystems = [
@@ -7,7 +10,7 @@
     ];
     zfs = {
       devNodes = "/dev/disk/by-path";
-      extraPools = [ "r" ];
+      extraPools = [ "r" ] ++ machine.zfs-pools;
     };
   };
 
