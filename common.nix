@@ -26,6 +26,8 @@ in
     # replicates the default behaviour.
     useDHCP = false;
     tempAddresses = "disabled";
+
+    timeServers = [ "ntp.home.gustafson.me" "pool.ntp.org" ];
   };
 
   # List packages installed in system profile. To search, run:
