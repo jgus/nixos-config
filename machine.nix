@@ -55,6 +55,18 @@ let
         ./userbox.nix
       ];
     };
+    d2 = {
+      stateVersion = "24.05";
+      hostId = "b5d59608";
+      zfs-pools = [];
+      imports = [];
+    };
+    d3 = {
+      stateVersion = "24.05";
+      hostId = "d4f10aaf";
+      zfs-pools = [];
+      imports = [];
+    };
     pi-67cba1 = {
       stateVersion = "23.05";
       hostId = "62c05afa";
