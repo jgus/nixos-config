@@ -20,7 +20,12 @@ do
     DEVS+=(/dev/disk/by-partuuid/$(blkid -o value -s PARTUUID "${d}"))
 done
 
-zpool create -f "${ZPOOL_OPTS[@]}" r mirror "${DEVS[@]}"
+ZPOOL_TYPE=${ZPOOL_TYPE:-mirror}
+if (( ${#DEVS[@]} <= 1 ))
+then
+    ZPOOL_TYPE=""
+fi
+zpool create -f "${ZPOOL_OPTS[@]}" r ${ZPOOL_TYPE} "${DEVS[@]}"
 
 zfs create -o mountpoint=/etc/nixos r/nixos
 zfs create                          r/home

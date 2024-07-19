@@ -4,6 +4,8 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" ; pwd)"
 
 BRANCH="${BRANCH:-main}"
 
+[[ "x${MACHINE_ID}" != "x" ]] || ( echo "!!! MACHINE_ID not specified"; exit 1 )
+
 mountpoint -q /mnt || ( echo "!!! Root not mounted at /mnt"; exit 1 )
 mountpoint -q /mnt/boot || ( echo "!!! Boot not mounted at /mnt/boot"; exit 1 )
 
@@ -22,7 +24,13 @@ sed -i 's/fsType = "zfs"/fsType = "zfs"; options = [ "zfsutil" ]/' /mnt/etc/nixo
 
 /mnt/etc/nixos/gen-interfaces.sh >/mnt/etc/nixos/interfaces.nix
 
-sed -i "s/HOSTID/$(head -c4 /dev/urandom | od -A none -t x4 | xargs)/g" /mnt/etc/nixos/host.nix
+echo "\"${MACHINE_ID}\"" >/mnt/etc/nixos/.machine-id.nix
+
+mkdir /mnt/etc/nixos/.secrets
+echo "{}" >/mnt/etc/nixos/.secrets/passwords.nix
+mkdir /mnt/etc/ssh
+ssh-keygen -A -f /mnt
+mv /mnt/etc/ssh /mnt/etc/nixos/.secrets/
 
 echo "### Installing"
 nixos-install
