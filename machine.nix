@@ -67,6 +67,18 @@ let
       zfs-pools = [];
       imports = [];
     };
+    c1-1 = {
+      stateVersion = "24.05";
+      hostId = "dfc92a33";
+      zfs-pools = [];
+      imports = [];
+    };
+    c1-2 = {
+      stateVersion = "24.05";
+      hostId = "39810e52";
+      zfs-pools = [];
+      imports = [];
+    };
     pi-67cba1 = {
       stateVersion = "23.05";
       hostId = "62c05afa";
