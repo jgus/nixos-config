@@ -28,9 +28,8 @@ echo "\"${MACHINE_ID}\"" >/mnt/etc/nixos/.machine-id.nix
 
 mkdir /mnt/etc/nixos/.secrets
 echo "{}" >/mnt/etc/nixos/.secrets/passwords.nix
-mkdir /mnt/etc/ssh
-ssh-keygen -A -f /mnt
-mv /mnt/etc/ssh /mnt/etc/nixos/.secrets/
+mkdir -p /mnt/etc/nixos/.secrets/etc/ssh
+ssh-keygen -A -f /mnt/etc/nixos/.secrets
 
 echo "### Installing"
 nixos-install
