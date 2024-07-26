@@ -70,7 +70,7 @@ let
     c1-1 = {
       stateVersion = "24.05";
       hostId = "dfc92a33";
-      zfs-pools = [];
+      zfs-pools = [ "d" ];
       imports = [];
     };
     c1-2 = {
