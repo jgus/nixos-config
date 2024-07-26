@@ -71,7 +71,7 @@ let
       stateVersion = "24.05";
       hostId = "dfc92a33";
       zfs-pools = [ "d" ];
-      imports = [];
+      imports = [ ./machine/c1-1/samba.nix ];
     };
     c1-2 = {
       stateVersion = "24.05";
