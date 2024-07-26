@@ -2,3 +2,4 @@
 result
 .machine-id.nix
 interfaces.nix
+hardware-configuration.nix
