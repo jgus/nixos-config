@@ -27,7 +27,8 @@ sed -i 's/fsType = "zfs"/fsType = "zfs"; options = [ "zfsutil" ]/' /mnt/etc/nixo
 echo "\"${MACHINE_ID}\"" >/mnt/etc/nixos/.machine-id.nix
 
 mkdir -p /mnt/boot/.secrets
-ln -s /mnt/boot/.secrets ../../boot/.secrets
+mkdir -p /mnt/etc/nixos/.secrets
+mount --bind /mnt/boot/.secrets /mnt/etc/nixos/.secrets
 [ -f /mnt/etc/nixos/.secrets/passwords.nix ] || echo "{}" >/mnt/etc/nixos/.secrets/passwords.nix
 [ -f /mnt/etc/nixos/.secrets/vkey ] || dd if=/dev/random of=/mnt/etc/nixos/.secrets/vkey bs=32 count=1
 mkdir -p /mnt/etc/nixos/.secrets/etc/ssh

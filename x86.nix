@@ -9,6 +9,11 @@
     };
   };
 
+  fileSystems."/etc/nixos/.secrets" = {
+    device = "/boot/.secrets";
+    options = [ "bind" ];
+  };
+
   system = {
     autoUpgrade = {
       enable = true;
