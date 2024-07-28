@@ -19,6 +19,7 @@
       enable = true;
       allowReboot = true;
     };
+    includeBuildDependencies = true;
     activationScripts = {
       syncBoot.text = ''
         i=1
