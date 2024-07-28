@@ -2,13 +2,17 @@
 
 REMOTE=d1
 
+NOW=$(date +%Y%m%d%H%M)
+
+ssh -M root@${REMOTE} zfs snapshot -r d@migrate-${NOW}
+
 copy() {
     DATASET=$1
-    REMOTE_FIRST=$(ssh root@${REMOTE} zfs list -t snapshot ${DATASET} -o name -H | head -n 1)
+    REMOTE_FIRST=$(ssh root@${REMOTE} zfs list -t snapshot ${DATASET} -o name -H | grep -v @clam | head -n 1)
     echo "Base is ${REMOTE_FIRST}"
     zfs list ${DATASET} || ssh root@${REMOTE} zfs send ${REMOTE_FIRST} | pv | zfs recv -F ${DATASET}
-    LOCAL_LAST=$(zfs list -t snapshot ${DATASET} -o name -H | tail -n 1)
-    REMOTE_LAST=$(ssh root@${REMOTE} zfs list -t snapshot ${DATASET} -o name -H | tail -n 1)
+    LOCAL_LAST=$(zfs list -t snapshot ${DATASET} -o name -H | grep -v @clam | tail -n 1)
+    REMOTE_LAST=$(ssh root@${REMOTE} zfs list -t snapshot ${DATASET} -o name -H | grep -v @clam | tail -n 1)
     echo "${LOCAL_LAST} -> ${REMOTE_LAST}"
     [[ "${LOCAL_LAST}" == "${REMOTE_LAST}" ]] || ssh root@${REMOTE} zfs send -I ${LOCAL_LAST} ${REMOTE_LAST} | pv | zfs recv -F ${DATASET}
 }
