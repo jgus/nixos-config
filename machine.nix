@@ -70,7 +70,11 @@ let
     c1-1 = {
       stateVersion = "24.05";
       hostId = "dfc92a33";
-      zfs-pools = [ "d" ];
+      zfs-pools = []; # [ "d" ];
+      bridge = {
+        interfaces = [ "eno1" ];
+        mac = "00:24:0b:01:c1:10";
+      };
       imports = [ ./machine/c1-1/samba.nix ];
     };
     c1-2 = {
