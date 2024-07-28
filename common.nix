@@ -28,6 +28,10 @@ in
     tempAddresses = "disabled";
 
     timeServers = [ "ntp.home.gustafson.me" "pool.ntp.org" ];
+
+    bridges.br0.interfaces = machine.bridge.interfaces;
+    interfaces.br0.macAddress = machine.bridge.mac;
+    interfaces.br0.useDHCP = true;
   };
 
   # List packages installed in system profile. To search, run:

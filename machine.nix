@@ -77,7 +77,11 @@ let
       stateVersion = "24.05";
       hostId = "39810e52";
       zfs-pools = [];
-      imports = [];
+      bridge = {
+        interfaces = [ "eno1" ];
+        mac = "00:24:0b:01:c1:20";
+      };
+      imports = [ ./userbox.nix ];
     };
     pi-67cba1 = {
       stateVersion = "23.05";
