@@ -2,6 +2,11 @@
 let
   machine-id = import ./.machine-id.nix; # file contains just a quoted string
   pw = import ./.secrets/passwords.nix;
+  mac-addresses = {
+    c1-1 = "00:24:0b:01:c1:10";
+    c1-2 = "00:24:0b:01:c1:20";
+    d1 = "00:24:0b:01:d1:10";
+  };
   default = {
     hostName = "${machine-id}";
     arch = "x86";
@@ -20,6 +25,7 @@ let
     d1 = {
       stateVersion = "23.05";
       hostId = "2bec4b05";
+      bridge-interfaces = [ "enp5s0f0" ];
       nvidia = true;
       zfs-pools = [ "d" ];
       imports = [
@@ -70,21 +76,15 @@ let
     c1-1 = {
       stateVersion = "24.05";
       hostId = "dfc92a33";
+      bridge-interfaces = [ "eno1" ];
       zfs-pools = []; # [ "d" ];
-      bridge = {
-        interfaces = [ "eno1" ];
-        mac = "00:24:0b:01:c1:10";
-      };
       imports = [ ./machine/c1-1/samba.nix ];
     };
     c1-2 = {
       stateVersion = "24.05";
       hostId = "39810e52";
+      bridge-interfaces = [ "eno1" ];
       zfs-pools = [];
-      bridge = {
-        interfaces = [ "eno1" ];
-        mac = "00:24:0b:01:c1:20";
-      };
       imports = [ ./userbox.nix ];
     };
     pi-67cba1 = {
@@ -111,4 +111,11 @@ in
 {
   fwupd = (machine.arch == "x86");
   python = (machine.arch == "x86");
-} // machine
+} //
+(if (machine ? bridge-interfaces) then {
+  bridge = {
+    interfaces = machine.bridge-interfaces;
+    mac = mac-addresses."${machine-id}";
+  };
+} else {}) //
+machine
