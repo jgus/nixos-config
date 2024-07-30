@@ -5,9 +5,7 @@ set -e
 
 REMOTE=d1
 
-NOW=$(date +%Y%m%d%H%M)
-
-ssh -M root@${REMOTE} zfs snapshot -r d@migrate-${NOW}
+ssh -M root@${REMOTE} true
 
 repl() {
     DATASET=$1
@@ -22,15 +20,24 @@ repl() {
 
 copy() {
     DATASET=$1
-    ssh root@${REMOTE} zfs destroy ${DATASET}@rsync || true
-    ssh root@${REMOTE} zfs snapshot ${DATASET}@rsync
+    # ssh root@${REMOTE} zfs destroy ${DATASET}@rsync || true
+    # ssh root@${REMOTE} zfs snapshot ${DATASET}@rsync
+    # zfs list ${DATASET} || zfs create ${DATASET}
+    # SMOUNT=$(ssh root@${REMOTE} zfs get mountpoint ${DATASET} -o value -H)
+    # TMOUNT=$(zfs get mountpoint ${DATASET} -o value -H)
+    # rsync -arP root@${REMOTE}:${SMOUNT}/.zfs/snapshot/rsync/ ${TMOUNT}/
+    # ssh root@${REMOTE} zfs destroy ${DATASET}@rsync
     zfs list ${DATASET} || zfs create ${DATASET}
     SMOUNT=$(ssh root@${REMOTE} zfs get mountpoint ${DATASET} -o value -H)
     TMOUNT=$(zfs get mountpoint ${DATASET} -o value -H)
-    rsync -arP root@${REMOTE}:${SMOUNT}/.zfs/snapshot/rsync/ ${TMOUNT}/
-    ssh root@${REMOTE} zfs destroy ${DATASET}@rsync
+    rsync -arP root@${REMOTE}:${SMOUNT}/ ${TMOUNT}/
 }
 
+copy d/photos
+copy d/photos/Incoming
+copy d/photos/Published
+copy d/projects
+copy d/software
 copy d/backup
 copy d/backup/timemachine
 copy d/external
@@ -46,13 +53,8 @@ copy d/offsite/gustafson-nas/d/Tv
 copy d/offsite/gustafson-nas/d/plex
 copy d/offsite/gustafson-nas/r
 copy d/offsite/gustafson-nas/r/nixos
-copy d/photos
-copy d/photos/Incoming
-copy d/photos/Published
-copy d/projects
 copy d/scratch/peer
 copy d/scratch/usenet
-copy d/software
 copy d/varlib/images
 copy d/media
 

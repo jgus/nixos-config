@@ -21,9 +21,13 @@ ZPOOL_OPTS=(
 )
 
 AVAILABLE_DISKS=($(for i in {0..22} {24..28}; do echo /dev/disk/by-path/pci-0000\:0d\:00.0-scsi-0\:0\:${i}\:0; done))
-DISKS=($(for i in {0..$((COUNT-1))}; do echo ${AVAILABLE_DISKS[${i}]}; done))
+DISKS=($(for i in $(seq 0 $((COUNT-1))); do echo ${AVAILABLE_DISKS[${i}]}; done))
 
 zpool create -f "${ZPOOL_OPTS[@]}" d ${ZPOOL_TYPE} "${DISKS[@]}"
 
-zfs create -o autobackup:snap-$(hostname)=false d/scratch
+zfs create -o autobackup:snap-$(hostname)=false -o recordsize=1M d/scratch
+zfs create -o recordsize=1M d/external
+zfs create -o recordsize=1M d/offsite
+zfs create -o recordsize=2M d/photos
+zfs create -o recordsize=2M d/projects
 zfs create -o mountpoint=/var/lib -o canmount=off d/varlib
