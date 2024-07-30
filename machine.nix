@@ -76,14 +76,14 @@ let
     c1-1 = {
       stateVersion = "24.05";
       hostId = "dfc92a33";
-      bridge-interfaces = [ "eno1" ];
+      bridge-interfaces = [ "eno1" "eno2" ];
       zfs-pools = []; # [ "d" ];
       imports = [ ./machine/c1-1/samba.nix ];
     };
     c1-2 = {
       stateVersion = "24.05";
       hostId = "39810e52";
-      bridge-interfaces = [ "eno1" ];
+      bridge-interfaces = [ "eno1" "eno2" ];
       zfs-pools = [];
       imports = [ ./userbox.nix ];
     };
