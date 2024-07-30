@@ -3,6 +3,7 @@ let
   machine-id = import ./.machine-id.nix; # file contains just a quoted string
   pw = import ./.secrets/passwords.nix;
   mac-addresses = {
+    b1 = "00:24:0b:01:b1:10";
     c1-1 = "00:24:0b:01:c1:10";
     c1-2 = "00:24:0b:01:c1:20";
     d1 = "00:24:0b:01:d1:10";
@@ -25,7 +26,7 @@ let
     d1 = {
       stateVersion = "23.05";
       hostId = "2bec4b05";
-      bridge-interfaces = [ "enp5s0f0" ];
+      bridge-interfaces = [ "eno1" "eno2" "eno3" "eno4" "enp5s0f0" "enp5s0f1" ];
       nvidia = true;
       zfs-pools = [ "d" ];
       imports = [
@@ -86,6 +87,13 @@ let
       bridge-interfaces = [ "eno1" "eno2" ];
       zfs-pools = [];
       imports = [ ./userbox.nix ];
+    };
+    b1 = {
+      stateVersion = "24.05";
+      hostId = "8f150749";
+      bridge-interfaces = [ "8f150749" ];
+      zfs-pools = [];
+      imports = [];
     };
     pi-67cba1 = {
       stateVersion = "23.05";
