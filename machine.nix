@@ -77,7 +77,7 @@ let
       stateVersion = "24.05";
       hostId = "dfc92a33";
       bridge-interfaces = [ "eno1" "eno2" ];
-      zfs-pools = []; # [ "d" ];
+      zfs-pools = [ "d" ];
       imports = [ ./machine/c1-1/samba.nix ];
     };
     c1-2 = {
