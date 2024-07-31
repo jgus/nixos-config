@@ -11,6 +11,7 @@ ZPOOL_OPTS=(
     -O relatime=on
     -O xattr=sa
     -O mountpoint=/
+    -O recordsize=16k
     -R /mnt
 )
 
