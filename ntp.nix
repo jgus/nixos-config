@@ -2,6 +2,7 @@
 
 let
   image = "cturra/ntp";
+  mac-addresses = import ./mac-addresses.nix;
 in
 {
   imports = [ ./docker.nix ];
@@ -12,6 +13,8 @@ in
     image = "${image}";
     autoStart = true;
     extraOptions = [
+      "--network=dhcp-net"
+      "--mac-address=${mac-addresses.services.ntp}"
       "--read-only"
       "--tmpfs=/etc/chrony:rw,mode=1750"
       "--tmpfs=/run/chrony:rw,mode=1750"

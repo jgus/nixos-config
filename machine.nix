@@ -2,12 +2,7 @@
 let
   machine-id = import ./.machine-id.nix; # file contains just a quoted string
   pw = import ./.secrets/passwords.nix;
-  mac-addresses = {
-    b1 = "00:24:0b:01:b1:10";
-    c1-1 = "00:24:0b:01:c1:10";
-    c1-2 = "00:24:0b:01:c1:20";
-    d1 = "00:24:0b:01:d1:10";
-  };
+  mac-addresses = import ./mac-addresses.nix;
   default = {
     hostName = "${machine-id}";
     arch = "x86";
@@ -123,7 +118,7 @@ in
 (if (machine ? bridge-interfaces) then {
   bridge = {
     interfaces = machine.bridge-interfaces;
-    mac = mac-addresses."${machine-id}";
+    mac = mac-addresses.machines."${machine-id}";
   };
 } else {}) //
 machine

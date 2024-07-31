@@ -1,5 +1,8 @@
 { pkgs, ... }:
 
+let
+  mac-addresses = import ./mac-addresses.nix;
+in
 {
   imports = [ ./docker.nix ];
 
@@ -59,6 +62,8 @@
           chmod a+x /tmp/landing/docker/entrypoint.sh
           docker build -t ssh /tmp/landing/docker
           /bin/sh -c "docker run --rm --name landing \
+            --network=dhcp-net \
+            --mac-address=${mac-addresses.services.landing} \
             -p 22022:22/tcp \
             -e AUTHORIZED_KEYS='$(cat /root/.ssh/id_rsa-backup.pub)' \
             -v /tmp/landing/etc/ssh:/etc/ssh \
