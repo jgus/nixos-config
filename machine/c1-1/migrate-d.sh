@@ -39,7 +39,6 @@ copy d/photos/Published
 copy d/projects
 copy d/software
 copy d/backup
-copy d/backup/timemachine
 copy d/external
 copy d/external/brown
 copy d/offsite
@@ -57,6 +56,7 @@ copy d/scratch/peer
 copy d/scratch/usenet
 copy d/varlib/images
 copy d/media
+copy d/backup/timemachine
 
 repl d/varlib/frigate-config
 
