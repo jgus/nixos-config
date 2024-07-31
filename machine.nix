@@ -86,7 +86,7 @@ let
     b1 = {
       stateVersion = "24.05";
       hostId = "8f150749";
-      bridge-interfaces = [ "8f150749" ];
+      bridge-interfaces = [ "enp1s0" ];
       zfs-pools = [];
       imports = [];
     };
