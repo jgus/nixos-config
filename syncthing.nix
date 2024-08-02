@@ -2,6 +2,7 @@
 
 let
   image = "lscr.io/linuxserver/syncthing";
+  mac-addresses = import ./mac-addresses.nix;
 in
 {
   imports = [ ./docker.nix ];
@@ -39,6 +40,10 @@ in
       "/d/software/Tools:/shares/Tools"
       "/d/media/Comics:/shares/Comics"
       "/d/media/Music:/shares/Music"
+    ];
+    extraOptions = [
+      "--network=dhcp-net"
+      "--mac-address=${mac-addresses.services.syncthing}"
     ];
   };
 

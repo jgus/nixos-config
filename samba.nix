@@ -1,11 +1,23 @@
 { pkgs, ... }:
 
+let
+  mac-addresses = import ./mac-addresses.nix;
+in
 {
   fileSystems."/tmp/share" = { device = "tmpfs"; fsType = "tmpfs"; };
 
-  networking.firewall = {
-    allowedTCPPorts = [ 5357 ]; # wsdd
-    allowedUDPPorts = [ 3702 ]; # wsdd
+  networking = {
+    macvlans.br-nas = {
+      interface = "br0";
+    };
+    interfaces.br-nas = {
+      macAddress = mac-addresses.services.nas;
+      useDHCP = true;
+    };
+    firewall = {
+      allowedTCPPorts = [ 5357 ]; # wsdd
+      allowedUDPPorts = [ 3702 ]; # wsdd
+    };
   };
 
   services.samba-wsdd.enable = true; # make shares visible for windows 10 clients
@@ -15,6 +27,8 @@
     openFirewall = true;
     securityType = "user";
     extraConfig = ''
+      interfaces = lo br-nas
+      bind interfaces only = yes
       workgroup = WORKGROUP
       server string = nas
       netbios name = nas
