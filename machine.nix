@@ -88,7 +88,7 @@ let
       hostId = "8f150749";
       bridge-interfaces = [ "enp1s0" ];
       zfs-pools = [];
-      imports = [];
+      imports = [ ./machine/b1/ups.nix ];
     };
     pi-67cba1 = {
       stateVersion = "23.05";
