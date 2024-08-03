@@ -24,7 +24,7 @@ sed -i 's/fsType = "zfs"/fsType = "zfs"; options = [ "zfsutil" ]/' /mnt/etc/nixo
 
 /mnt/etc/nixos/gen-interfaces.sh >/mnt/etc/nixos/interfaces.nix
 
-echo "\"${MACHINE_ID}\"" >/mnt/etc/nixos/.machine-id.nix
+echo -n "${MACHINE_ID}" >/mnt/etc/nixos/machine-id.nix
 
 mkdir -p /mnt/boot/.secrets
 mkdir -p /mnt/etc/nixos/.secrets
