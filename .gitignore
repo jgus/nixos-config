@@ -1,5 +1,5 @@
 .secrets
 result
-.machine-id.nix
+machine-id.nix
 interfaces.nix
 hardware-configuration.nix

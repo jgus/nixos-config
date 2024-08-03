@@ -1,6 +1,6 @@
 # hostId: head -c4 /dev/urandom | od -A none -t x4
 let
-  machine-id = import ./.machine-id.nix; # file contains just a quoted string
+  machine-id = builtins.readFile ./machine-id.nix;
   pw = import ./.secrets/passwords.nix;
   mac-addresses = import ./mac-addresses.nix;
   default = {
