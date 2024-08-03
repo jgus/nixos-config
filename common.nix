@@ -28,11 +28,11 @@ in
     tempAddresses = "disabled";
 
     timeServers = [ "ntp.home.gustafson.me" "pool.ntp.org" ];
-
+  } // (if (machine ? bridge) then {
     bridges.br0.interfaces = machine.bridge.interfaces;
     interfaces.br0.macAddress = machine.bridge.mac;
     interfaces.br0.useDHCP = true;
-  };
+  } else {});
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
