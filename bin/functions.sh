@@ -180,3 +180,18 @@ zfs_prune_empty_snapshots() {
 
     echo "Done pruning snapshots from ${HOST}:${DATASET}"
 }
+
+on_all_servers() {
+    local PIDS=()
+    local RET=0
+    for host in b1 c1-1 c1-2 d1 pi-67cba1 pi-67db40 pi-67dbcd pi-67dc75
+    do
+        ssh -A root@${host} "$@" &
+        PIDS+=($!)
+    done
+    for pid in "${PIDS[@]}"
+    do
+        wait ${pid} || ((RET+=1))
+    done
+    return ${RET}
+}
