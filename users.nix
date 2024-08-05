@@ -25,7 +25,9 @@ in
     };
 
     users = {
-      root.openssh.authorizedKeys.keys = [ pubkeys.josh-ed25519 pubkeys.josh-rsa ];
+      root = {
+        openssh.authorizedKeys.keys = [ pubkeys.josh-ed25519 pubkeys.josh-rsa ];
+      };
 
       plex = {
         uid = 193;
@@ -54,6 +56,7 @@ in
         uid = 1001;
         isNormalUser = true;
         extraGroups = [ "wheel" "www" "docker" "libvirtd" ];
+        hashedPassword = "$y$j9T$ejqS3R1wFPz6VoSCPm6l31$e60wSoEFUtCCklzlwnCxdzre4vuNnmbJE8E/b6/tJ72";
         openssh.authorizedKeys.keys = [ pubkeys.josh-ed25519 pubkeys.josh-rsa ];
       };
 

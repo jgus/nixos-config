@@ -2,7 +2,7 @@
 let
   machine-id = builtins.readFile ./machine-id.nix;
   pw = import ./.secrets/passwords.nix;
-  mac-addresses = import ./mac-addresses.nix;
+  addresses = import ./addresses.nix;
   default = {
     hostName = "${machine-id}";
     arch = "x86";
@@ -52,7 +52,7 @@ let
 
         # ./offsite-josh-ws.nix
         # ./offsite-homeassistant.nix
-        ./offsite-gustafson-nas.nix
+        #./offsite-gustafson-nas.nix
         # ./sync-to-cloud.nix
 
         ./userbox.nix
@@ -119,7 +119,7 @@ in
 (if (machine ? bridge-interfaces) then {
   bridge = {
     interfaces = machine.bridge-interfaces;
-    mac = mac-addresses.machines."${machine-id}";
+    mac = addresses.machines."${machine-id}".mac;
   };
 } else {}) //
 machine

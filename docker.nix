@@ -5,9 +5,8 @@ let
 in
 {
   system.activationScripts = {
-    docker-setup-dhcp.text = ''
-      ${pkgs.docker}/bin/docker plugin ls --format "{{.Name}}" | grep "^net-dhcp:latest$" || ${pkgs.docker}/bin/docker plugin install --grant-all-permissions --alias net-dhcp ghcr.io/devplayer0/docker-net-dhcp:release-linux-amd64
-      ${pkgs.docker}/bin/docker network ls --format "{{.Name}}" | grep "^dhcp-net$" || ${pkgs.docker}/bin/docker network create -d net-dhcp:latest --ipam-driver null -o bridge=br0 dhcp-net
+    docker-setup-macvlan.text = ''
+      ${pkgs.docker}/bin/docker network ls --format "{{.Name}}" | grep "^macvlan$" || ${pkgs.docker}/bin/docker network create -d macvlan --subnet=172.22.0.0/16 --gateway=172.22.0.1 -o parent=br0 macvlan
     '';
     docker-setup-zfs.text = if machine.zfs then ''
       ${pkgs.zfs}/bin/zfs list r/varlib/docker >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create r/varlib/docker

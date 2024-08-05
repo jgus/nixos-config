@@ -1,7 +1,7 @@
 { pkgs, ... }:
 
 let
-  mac-addresses = import ./mac-addresses.nix;
+  addresses = import ./addresses.nix;
 in
 {
   fileSystems."/tmp/share" = { device = "tmpfs"; fsType = "tmpfs"; };
@@ -11,8 +11,9 @@ in
       interface = "br0";
     };
     interfaces.br-nas = {
-      macAddress = mac-addresses.services.nas;
+      macAddress = addresses.services.nas.mac;
       useDHCP = true;
+      #ipv4.addresses = [ { address = addresses.services.nas.ip; prefixLength = 16; } ];
     };
     firewall = {
       allowedTCPPorts = [ 5357 ]; # wsdd
