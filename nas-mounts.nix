@@ -1,4 +1,4 @@
-{ ... }:
+{ pkgs, ... }:
 
 let
   commonMountOptions = {
@@ -16,6 +16,10 @@ let
 in
 {
   services.rpcbind.enable = true;
+  
+  environment.systemPackages = with pkgs; [
+    nfs-utils
+  ];
 
   systemd.mounts = [
     (commonMountOptions // {
