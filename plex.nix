@@ -6,15 +6,6 @@ in
 {
   imports = [ ./docker.nix ];
 
-  users = {
-    groups.plex = { gid = 193; };
-    users.plex = {
-      uid = 193;
-      isSystemUser = true;
-      group = "plex";
-    };
-  };
-
   system.activationScripts = {
     plexSetup.text = ''
       ${pkgs.zfs}/bin/zfs list r/varlib/plex >/dev/null 2>&1 || ( ${pkgs.zfs}/bin/zfs create r/varlib/plex && chown plex:plex /var/lib/plex )

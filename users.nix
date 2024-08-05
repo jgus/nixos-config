@@ -13,19 +13,55 @@ in
   #   extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
   # };
 
-  users.groups.users.gid = 100;
+  users = {
+    mutableUsers = false;
 
-  users.users.root.openssh.authorizedKeys.keys = [ pubkeys.josh-ed25519 pubkeys.josh-rsa ];
+    groups = {
+      users.gid = 100;
+      plex.gid = 193;
+      home-assistant.gid = 200;
+      www.gid = 911;
+      minecraft.gid = 2000;
+    };
 
-  users.users.josh = {
-    uid = 1001;
-    isNormalUser = true;
-    extraGroups = [ "wheel" "www" "docker" "libvirtd" ];
-    openssh.authorizedKeys.keys = [ pubkeys.josh-ed25519 pubkeys.josh-rsa ];
-  };
+    users = {
+      root.openssh.authorizedKeys.keys = [ pubkeys.josh-ed25519 pubkeys.josh-rsa ];
 
-  users.users.gustafson = {
-    uid = 1000;
-    isNormalUser = true;
+      plex = {
+        uid = 193;
+        isSystemUser = true;
+        group = "plex";
+      };
+
+      home-assistant = {
+        uid = 200;
+        isSystemUser = true;
+        group = "home-assistant";
+      };
+
+      www = {
+        uid = 911;
+        isSystemUser = true;
+        group = "www";
+      };
+
+      gustafson = {
+        uid = 1000;
+        isNormalUser = true;
+      };
+
+      josh = {
+        uid = 1001;
+        isNormalUser = true;
+        extraGroups = [ "wheel" "www" "docker" "libvirtd" ];
+        openssh.authorizedKeys.keys = [ pubkeys.josh-ed25519 pubkeys.josh-rsa ];
+      };
+
+      minecraft = {
+        uid = 2000;
+        isSystemUser = true;
+        group = "minecraft";
+      };
+    };
   };
 }

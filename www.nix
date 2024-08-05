@@ -8,15 +8,6 @@ in
 {
   imports = [ ./docker.nix ];
 
-  users = {
-    groups.www = { gid = 911; };
-    users.www = {
-      uid = 911;
-      isSystemUser = true;
-      group = "www";
-    };
-  };
-
   system.activationScripts = {
     web-swag-setup.text = ''
       ${pkgs.zfs}/bin/zfs list r/varlib/web_db_data >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create r/varlib/web_db_data

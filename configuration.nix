@@ -13,6 +13,7 @@ in
       ./host.nix
       ./users.nix
       ./vscode.nix
+      ./nas-mounts.nix
     ]
     ++ (if machine.nvidia then [ ./nvidia.nix ] else [])
     ++ (if machine.zfs then [ ./zfs.nix ] else [])

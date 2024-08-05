@@ -7,15 +7,6 @@ in
 {
   imports = [ ./docker.nix ];
 
-  users = {
-    groups.home-assistant = { gid = 200; };
-    users.home-assistant = {
-      uid = 200;
-      isSystemUser = true;
-      group = "home-assistant";
-    };
-  };
-
   system.activationScripts = {
     home-assistantSetup.text = ''
       ${pkgs.zfs}/bin/zfs list r/varlib/home-assistant >/dev/null 2>&1 || ( ${pkgs.zfs}/bin/zfs create r/varlib/home-assistant && chown home-assistant:home-assistant /var/lib/home-assistant )

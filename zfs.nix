@@ -18,7 +18,7 @@ in
     zfs
     zfs-autobackup
   ];
-
+  
   services.zfs.autoScrub.enable = true;
 
   systemd = {

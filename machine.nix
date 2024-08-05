@@ -27,6 +27,7 @@ let
       imports = [
         #./ddclient.nix
         ./samba.nix
+        ./nfs.nix
         ./landing.nix
         ./syncthing.nix
         ./www.nix

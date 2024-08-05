@@ -12,15 +12,6 @@
     28123
   ];
 
-  users = {
-    groups.minecraft = { gid = 2000; };
-    users.minecraft = {
-      uid = 2000;
-      isSystemUser = true;
-      group = "minecraft";
-    };
-  };
-
   environment.etc =
     lib.attrsets.mapAttrs'
       (name: value:
