@@ -4,15 +4,6 @@ let
   machine = import ./machine.nix;
 in
 {
-  system.activationScripts = {
-    docker-setup-macvlan.text = ''
-      ${pkgs.docker}/bin/docker network ls --format "{{.Name}}" | grep "^macvlan$" || ${pkgs.docker}/bin/docker network create -d macvlan --subnet=172.22.0.0/16 --gateway=172.22.0.1 -o parent=${machine.primary_interface} macvlan
-    '';
-    docker-setup-zfs.text = if machine.zfs then ''
-      ${pkgs.zfs}/bin/zfs list r/varlib/docker >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create r/varlib/docker
-    '' else "";
-  };
-
   virtualisation = {
     docker = {
       enable = true;
@@ -26,6 +17,34 @@ in
     oci-containers = {
       backend = "docker";
       containers = {};
+    };
+  };
+
+  systemd = {
+    services = (if machine.zfs then {
+      docker-setup = {
+        path = [ pkgs.zfs ];
+        script = ''
+          zfs list r/varlib/docker >/dev/null 2>&1 || zfs create r/varlib/docker
+        '';
+        serviceConfig = {
+          Type = "oneshot";
+        };
+        requiredBy = [ "docker.service" ];
+        before = [ "docker.service" ];
+      };
+    } else {}) // {
+      docker-configure = {
+        path = [ pkgs.docker ];
+        script = ''
+          docker network ls --format "{{.Name}}" | grep "^macvlan$" || docker network create -d macvlan --subnet=172.22.0.0/16 --gateway=172.22.0.1 -o parent=${machine.primary_interface} macvlan
+        '';
+        serviceConfig = {
+          Type = "oneshot";
+        };
+        wantedBy = [ "docker.service" ];
+        after = [ "docker.service" ];
+      };
     };
   };
 }

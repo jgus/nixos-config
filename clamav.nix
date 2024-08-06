@@ -28,6 +28,7 @@
           zfs
         ];
         script = ''
+          [ -d /var/lib/clamav ] || freshclam
           clamscan -r --cross-fs=no -i --move=/boot/INFECTED /boot/
           /etc/clamav/clamav-scan-zfs.sh
         '';
@@ -37,11 +38,5 @@
         startAt = "daily";
       };
     };
-  };
-
-  system.activationScripts = {
-    freshclam.text = ''
-      [ -d /var/lib/clamav ] || ${pkgs.clamav}/bin/freshclam
-    '';
   };
 }
