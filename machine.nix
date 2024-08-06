@@ -48,14 +48,14 @@ let
         ./komga.nix
         ./minecraft.nix
 
-        ./vm-vm1.nix
+        #./vm-vm1.nix
 
         # ./offsite-josh-ws.nix
         # ./offsite-homeassistant.nix
         #./offsite-gustafson-nas.nix
         # ./sync-to-cloud.nix
 
-        ./userbox.nix
+        #./userbox.nix
       ];
     };
     d2 = {
