@@ -7,12 +7,6 @@ in
 {
   imports = [ ./docker.nix ];
 
-  system.activationScripts = {
-    home-assistantSetup.text = ''
-      ${pkgs.zfs}/bin/zfs list r/varlib/home-assistant >/dev/null 2>&1 || ( ${pkgs.zfs}/bin/zfs create r/varlib/home-assistant && chown home-assistant:home-assistant /var/lib/home-assistant )
-    '';
-  };
-
   networking.firewall.allowedTCPPorts = [ 8123 ];
 
   environment.etc =
@@ -312,6 +306,17 @@ in
 
   systemd = {
     services = {
+      home-assistant-setup = {
+        path = [ pkgs.zfs ];
+        script = ''
+          zfs list r/varlib/home-assistant >/dev/null 2>&1 || ( zfs create r/varlib/home-assistant && chown home-assistant:home-assistant /var/lib/home-assistant )
+        '';
+        serviceConfig = {
+          Type = "oneshot";
+        };
+        requiredBy = [ "docker-home-assistant.service" ];
+        before = [ "docker-home-assistant.service" ];
+      };
       home-assistant-update = {
         path = [ pkgs.docker ];
         script = ''

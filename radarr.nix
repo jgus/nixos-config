@@ -6,12 +6,6 @@ in
 {
   imports = [ ./docker.nix ];
 
-  system.activationScripts = {
-    docker-setup.text = ''
-      ${pkgs.zfs}/bin/zfs list r/varlib/radarr >/dev/null 2>&1 || ( ${pkgs.zfs}/bin/zfs create r/varlib/radarr && chown josh:plex /var/lib/radarr )
-    '';
-  };
-
   networking.firewall = {
     allowedTCPPorts = [ 7878 ];
   };
@@ -37,6 +31,17 @@ in
 
   systemd = {
     services = {
+      radarr-setup = {
+        path = [ pkgs.zfs ];
+        script = ''
+          zfs list r/varlib/radarr >/dev/null 2>&1 || ( zfs create r/varlib/radarr && chown josh:plex /var/lib/radarr )
+        '';
+        serviceConfig = {
+          Type = "oneshot";
+        };
+        requiredBy = [ "docker-radarr.service" ];
+        before = [ "docker-radarr.service" ];
+      };
       radarr-update = {
         path = [ pkgs.docker ];
         script = ''

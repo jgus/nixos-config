@@ -11,12 +11,6 @@ in
     allowedUDPPorts = [ 9091 51413 ];
   };
 
-  system.activationScripts = {
-    transmissionSetup.text = ''
-      ${pkgs.zfs}/bin/zfs list r/varlib/transmission >/dev/null 2>&1 || ( ${pkgs.zfs}/bin/zfs create r/varlib/transmission && chown josh:plex /var/lib/transmission )
-    '';
-  };
-
   virtualisation.oci-containers.containers.transmission = {
     image = "${image}";
     autoStart = true;
@@ -54,6 +48,17 @@ in
 
   systemd = {
     services = {
+      transmission-setup = {
+        path = [ pkgs.zfs ];
+        script = ''
+          zfs list r/varlib/transmission >/dev/null 2>&1 || ( zfs create r/varlib/transmission && chown josh:plex /var/lib/transmission )
+        '';
+        serviceConfig = {
+          Type = "oneshot";
+        };
+        requiredBy = [ "docker-transmission.service" ];
+        before = [ "docker-transmission.service" ];
+      };
       transmission-update = {
         path = [ pkgs.docker ];
         script = ''

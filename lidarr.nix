@@ -6,12 +6,6 @@ in
 {
   imports = [ ./docker.nix ];
 
-  system.activationScripts = {
-    docker-setup.text = ''
-      ${pkgs.zfs}/bin/zfs list r/varlib/lidarr >/dev/null 2>&1 || ( ${pkgs.zfs}/bin/zfs create r/varlib/lidarr && chown josh:plex /var/lib/lidarr )
-    '';
-  };
-
   networking.firewall = {
     allowedTCPPorts = [ 8686 ];
   };
@@ -37,6 +31,17 @@ in
 
   systemd = {
     services = {
+      lidarr-setup = {
+        path = [ pkgs.zfs ];
+        script = ''
+          zfs list r/varlib/lidarr >/dev/null 2>&1 || ( zfs create r/varlib/lidarr && chown josh:plex /var/lib/lidarr )
+        '';
+        serviceConfig = {
+          Type = "oneshot";
+        };
+        requiredBy = [ "docker-lidarr.service" ];
+        before = [ "docker-lidarr.service" ];
+      };
       lidarr-update = {
         path = [ pkgs.docker ];
         script = ''

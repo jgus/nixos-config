@@ -12,13 +12,6 @@ in
     SUBSYSTEM=="usb",ATTRS{idVendor}=="18d1",ATTRS{idProduct}=="9302",GROUP="plugdev"
   '';
 
-  system.activationScripts = {
-    frigateSetup.text = ''
-      ${pkgs.zfs}/bin/zfs list d/varlib/frigate-media >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create d/varlib/frigate-media;
-      ${pkgs.zfs}/bin/zfs list d/varlib/frigate-config >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create d/varlib/frigate-config;
-    '';
-  };
-
   networking.firewall.allowedTCPPorts = [ 5000 1935 1984 8554 8555 ];
   networking.firewall.allowedUDPPorts = [ 8555 ];
 
@@ -510,6 +503,18 @@ in
 
   systemd = {
     services = {
+      frigate-setup = {
+        path = [ pkgs.zfs ];
+        script = ''
+          zfs list d/varlib/frigate-media >/dev/null 2>&1 || zfs create d/varlib/frigate-media;
+          zfs list d/varlib/frigate-config >/dev/null 2>&1 || zfs create d/varlib/frigate-config;
+        '';
+        serviceConfig = {
+          Type = "oneshot";
+        };
+        requiredBy = [ "docker-frigate.service" ];
+        before = [ "docker-frigate.service" ];
+      };
       frigate-update = {
         path = [ pkgs.docker ];
         script = ''

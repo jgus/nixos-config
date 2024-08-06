@@ -6,12 +6,6 @@ in
 {
   imports = [ ./docker.nix ];
 
-  system.activationScripts = {
-    docker-setup.text = ''
-      ${pkgs.zfs}/bin/zfs list r/varlib/komga >/dev/null 2>&1 || ( ${pkgs.zfs}/bin/zfs create r/varlib/komga && chown josh:plex /var/lib/komga )
-    '';
-  };
-
   networking.firewall = {
     allowedTCPPorts = [ 25600 ];
   };
@@ -35,6 +29,17 @@ in
 
   systemd = {
     services = {
+      komga-setup = {
+        path = [ pkgs.zfs ];
+        script = ''
+          zfs list r/varlib/komga >/dev/null 2>&1 || ( zfs create r/varlib/komga && chown josh:plex /var/lib/komga )
+        '';
+        serviceConfig = {
+          Type = "oneshot";
+        };
+        requiredBy = [ "docker-komga.service" ];
+        before = [ "docker-komga.service" ];
+      };
       komga-update = {
         path = [ pkgs.docker ];
         script = ''

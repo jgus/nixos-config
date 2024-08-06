@@ -6,12 +6,6 @@ in
 {
   imports = [ ./docker.nix ];
 
-  system.activationScripts = {
-    web-swag-setup.text = ''
-      ${pkgs.zfs}/bin/zfs list r/varlib/esphome >/dev/null 2>&1 || ( ${pkgs.zfs}/bin/zfs create r/varlib/esphome && chown josh:users /var/lib/esphome )
-    '';
-  };
-
   networking.firewall.allowedTCPPorts = [ 6052 ];
 
   virtualisation.oci-containers.containers.esphome = {
@@ -36,6 +30,17 @@ in
 
   systemd = {
     services = {
+      esphome-setup = {
+        path = [ pkgs.zfs ];
+        script = ''
+          zfs list r/varlib/esphome >/dev/null 2>&1 || ( zfs create r/varlib/esphome && chown josh:users /var/lib/esphome )
+        '';
+        serviceConfig = {
+          Type = "oneshot";
+        };
+        requiredBy = [ "docker-esphome.service" ];
+        before = [ "docker-esphome.service" ];
+      };
       esphome-update = {
         path = [ pkgs.docker ];
         script = ''

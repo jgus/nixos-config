@@ -7,12 +7,6 @@ in
 {
   imports = [ ./docker.nix ];
 
-  system.activationScripts = {
-    zigbee2mqttSetup.text = ''
-      ${pkgs.zfs}/bin/zfs list r/varlib/zigbee2mqtt >/dev/null 2>&1 || ( ${pkgs.zfs}/bin/zfs create r/varlib/zigbee2mqtt )
-    '';
-  };
-
   networking.firewall.allowedTCPPorts = [ 8081 ];
 
   virtualisation.oci-containers.containers.zigbee2mqtt = {
@@ -31,6 +25,17 @@ in
 
   systemd = {
     services = {
+      zigbee2mqtt-setup = {
+        path = [ pkgs.zfs ];
+        script = ''
+          zfs list r/varlib/zigbee2mqtt >/dev/null 2>&1 || ( zfs create r/varlib/zigbee2mqtt )
+        '';
+        serviceConfig = {
+          Type = "oneshot";
+        };
+        requiredBy = [ "docker-zigbee2mqtt.service" ];
+        before = [ "docker-zigbee2mqtt.service" ];
+      };
       zigbee2mqtt-update = {
         path = [ pkgs.docker ];
         script = ''

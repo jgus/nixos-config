@@ -6,12 +6,6 @@ in
 {
   imports = [ ./docker.nix ];
 
-  system.activationScripts = {
-    docker-setup.text = ''
-      ${pkgs.zfs}/bin/zfs list r/varlib/sonarr >/dev/null 2>&1 || ( ${pkgs.zfs}/bin/zfs create r/varlib/sonarr && chown josh:plex /var/lib/sonarr )
-    '';
-  };
-
   networking.firewall = {
     allowedTCPPorts = [ 8989 ];
   };
@@ -37,6 +31,17 @@ in
 
   systemd = {
     services = {
+      sonarr-setup = {
+        path = [ pkgs.zfs ];
+        script = ''
+          zfs list r/varlib/sonarr >/dev/null 2>&1 || ( zfs create r/varlib/sonarr && chown josh:plex /var/lib/sonarr )
+        '';
+        serviceConfig = {
+          Type = "oneshot";
+        };
+        requiredBy = [ "docker-sonarr.service" ];
+        before = [ "docker-sonarr.service" ];
+      };
       sonarr-update = {
         path = [ pkgs.docker ];
         script = ''

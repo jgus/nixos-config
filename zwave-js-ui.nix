@@ -12,12 +12,6 @@ in
 {
   imports = [ ./docker.nix ];
 
-  system.activationScripts = {
-    zwave-js-ui-setup.text = ''
-      [ -d /var/lib/zwave-js-ui ] || ( mkdir /var/lib/zwave-js-ui )
-    '';
-  };
-
   networking.firewall = {
     allowedTCPPorts = [ 8091 3000 ];
   };
@@ -42,6 +36,17 @@ in
 
   systemd = {
     services = {
+      zwave-js-ui-setup = {
+        path = [ pkgs.zfs ];
+        script = ''
+          [ -d /var/lib/zwave-js-ui ] || ( mkdir /var/lib/zwave-js-ui )
+        '';
+        serviceConfig = {
+          Type = "oneshot";
+        };
+        requiredBy = [ "docker-zwave-js-ui.service" ];
+        before = [ "docker-zwave-js-ui.service" ];
+      };
       zwave-js-ui-update = {
         path = [ pkgs.docker ];
         script = ''

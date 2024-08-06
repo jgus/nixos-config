@@ -12,13 +12,6 @@ in
     allowedUDPPorts = [ 21027 ];
   };
 
-  system.activationScripts = {
-    syncthingSetup.text = ''
-      ${pkgs.zfs}/bin/zfs list r/varlib/syncthing >/dev/null 2>&1 || ( ${pkgs.zfs}/bin/zfs create r/varlib/syncthing && chown josh:users /var/lib/syncthing )
-      ${pkgs.zfs}/bin/zfs list r/varlib/syncthing/index-v0.14.0.db >/dev/null 2>&1 || ( ${pkgs.zfs}/bin/zfs create r/varlib/syncthing/index-v0.14.0.db && chown josh:users /var/lib/syncthing/index-v0.14.0.db )
-    '';
-  };
-
   virtualisation.oci-containers.containers.syncthing = {
     image = "${image}";
     autoStart = true;
@@ -50,6 +43,18 @@ in
 
   systemd = {
     services = {
+      syncthing-setup = {
+        path = [ pkgs.zfs ];
+        script = ''
+          zfs list r/varlib/syncthing >/dev/null 2>&1 || ( zfs create r/varlib/syncthing && chown josh:users /var/lib/syncthing )
+          zfs list r/varlib/syncthing/index-v0.14.0.db >/dev/null 2>&1 || ( zfs create r/varlib/syncthing/index-v0.14.0.db && chown josh:users /var/lib/syncthing/index-v0.14.0.db )
+        '';
+        serviceConfig = {
+          Type = "oneshot";
+        };
+        requiredBy = [ "docker-syncthing.service" ];
+        before = [ "docker-syncthing.service" ];
+      };
       syncthing-update = {
         path = [ pkgs.docker ];
         script = ''

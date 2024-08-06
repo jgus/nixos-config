@@ -6,12 +6,6 @@ in
 {
   imports = [ ./docker.nix ];
 
-  system.activationScripts = {
-    docker-setup.text = ''
-      ${pkgs.zfs}/bin/zfs list r/varlib/prowlarr >/dev/null 2>&1 || ( ${pkgs.zfs}/bin/zfs create r/varlib/prowlarr && chown josh:plex /var/lib/prowlarr )
-    '';
-  };
-
   networking.firewall = {
     allowedTCPPorts = [ 9696 ];
   };
@@ -34,6 +28,17 @@ in
 
   systemd = {
     services = {
+      prowlarr-setup = {
+        path = [ pkgs.zfs ];
+        script = ''
+          zfs list r/varlib/prowlarr >/dev/null 2>&1 || ( zfs create r/varlib/prowlarr && chown josh:plex /var/lib/prowlarr )
+        '';
+        serviceConfig = {
+          Type = "oneshot";
+        };
+        requiredBy = [ "docker-prowlarr.service" ];
+        before = [ "docker-prowlarr.service" ];
+      };
       prowlarr-update = {
         path = [ pkgs.docker ];
         script = ''

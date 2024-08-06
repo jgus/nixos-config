@@ -8,22 +8,6 @@ in
 {
   imports = [ ./docker.nix ];
 
-  system.activationScripts = {
-    web-swag-setup.text = ''
-      ${pkgs.zfs}/bin/zfs list r/varlib/web_db_data >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create r/varlib/web_db_data
-      ${pkgs.zfs}/bin/zfs list r/varlib/web_db_admin_sessions >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create r/varlib/web_db_admin_sessions
-      ${pkgs.zfs}/bin/zfs list r/varlib/web_proxy_config >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create r/varlib/web_proxy_config
-      ${pkgs.zfs}/bin/zfs list r/varlib/swag_config >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create r/varlib/swag_config
-      mkdir -p /var/lib/swag_config/keys
-      mkdir -p /var/lib/swag_config/etc/letsencrypt
-      ${pkgs.zfs}/bin/zfs list r/varlib/www >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create r/varlib/www
-      ${pkgs.zfs}/bin/zfs list r/varlib/dav >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create r/varlib/dav
-      mkdir -p /var/lib/dav/tmp
-      mkdir -p /var/lib/dav/files
-      chown -R www:www /var/lib/dav
-    '';
-  };
-
   virtualisation.oci-containers.containers.web-db = {
     image = "${db_image}";
     autoStart = true;
@@ -85,6 +69,27 @@ in
 
   systemd = {
     services = {
+      web-setup = {
+        path = [ pkgs.zfs ];
+        script = ''
+          zfs list r/varlib/web_db_data >/dev/null 2>&1 || zfs create r/varlib/web_db_data
+          zfs list r/varlib/web_db_admin_sessions >/dev/null 2>&1 || zfs create r/varlib/web_db_admin_sessions
+          zfs list r/varlib/web_proxy_config >/dev/null 2>&1 || zfs create r/varlib/web_proxy_config
+          zfs list r/varlib/swag_config >/dev/null 2>&1 || zfs create r/varlib/swag_config
+          mkdir -p /var/lib/swag_config/keys
+          mkdir -p /var/lib/swag_config/etc/letsencrypt
+          zfs list r/varlib/www >/dev/null 2>&1 || zfs create r/varlib/www
+          zfs list r/varlib/dav >/dev/null 2>&1 || zfs create r/varlib/dav
+          mkdir -p /var/lib/dav/tmp
+          mkdir -p /var/lib/dav/files
+          chown -R www:www /var/lib/dav
+        '';
+        serviceConfig = {
+          Type = "oneshot";
+        };
+        requiredBy = [ "docker-web-db.service" "docker-web-db-admin.service" "docker-web-swag.service" ];
+        before = [ "docker-web-db.service" "docker-web-db-admin.service" "docker-web-swag.service" ];
+      };
       web-db-update = {
         path = [ pkgs.docker ];
         script = ''

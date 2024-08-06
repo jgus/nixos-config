@@ -3,12 +3,6 @@
 let pw = import ./.secrets/passwords.nix;
 in
 {
-  system.activationScripts = {
-    mqttSetup.text = ''
-      ${pkgs.zfs}/bin/zfs list r/varlib/mosquitto >/dev/null 2>&1 || ( ${pkgs.zfs}/bin/zfs create r/varlib/mosquitto && chown mosquitto:mosquitto /var/lib/mosquitto )
-    '';
-  };
-
   networking.firewall.allowedTCPPorts = [ 1883 ];
 
   services.mosquitto = {
@@ -51,5 +45,21 @@ in
         };
       }
     ];
+  };
+
+  systemd = {
+    services = {
+      mosquitto-setup = {
+        path = [ pkgs.zfs ];
+        script = ''
+          zfs list r/varlib/mosquitto >/dev/null 2>&1 || ( zfs create r/varlib/mosquitto && chown mosquitto:mosquitto /var/lib/mosquitto )
+        '';
+        serviceConfig = {
+          Type = "oneshot";
+        };
+        requiredBy = [ "mosquitto.service" ];
+        before = [ "mosquitto.service" ];
+      };
+    };
   };
 }

@@ -6,12 +6,6 @@ in
 {
   imports = [ ./docker.nix ];
 
-  system.activationScripts = {
-    plexSetup.text = ''
-      ${pkgs.zfs}/bin/zfs list r/varlib/plex >/dev/null 2>&1 || ( ${pkgs.zfs}/bin/zfs create r/varlib/plex && chown plex:plex /var/lib/plex )
-    '';
-  };
-
   networking.firewall.allowedTCPPorts = [ 32400 ];
   networking.firewall.allowedUDPPorts = [ 32410 32412 32413 32414 ];
 
@@ -44,6 +38,17 @@ in
 
   systemd = {
     services = {
+      plex-setup = {
+        path = [ pkgs.zfs ];
+        script = ''
+          zfs list r/varlib/plex >/dev/null 2>&1 || ( zfs create r/varlib/plex && chown plex:plex /var/lib/plex )
+        '';
+        serviceConfig = {
+          Type = "oneshot";
+        };
+        requiredBy = [ "docker-plex.service" ];
+        before = [ "docker-plex.service" ];
+      };
       plex-update = {
         path = [ pkgs.docker ];
         script = ''

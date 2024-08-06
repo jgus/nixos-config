@@ -6,12 +6,6 @@ in
 {
   imports = [ ./docker.nix ];
 
-  system.activationScripts = {
-    docker-setup.text = ''
-      ${pkgs.zfs}/bin/zfs list r/varlib/sabnzbd >/dev/null 2>&1 || ( ${pkgs.zfs}/bin/zfs create r/varlib/sabnzbd && chown josh:plex /var/lib/sabnzbd )
-    '';
-  };
-
   networking.firewall = {
     allowedTCPPorts = [ 8080 ];
   };
@@ -35,6 +29,17 @@ in
 
   systemd = {
     services = {
+      sabnzbd-setup = {
+        path = [ pkgs.zfs ];
+        script = ''
+          zfs list r/varlib/sabnzbd >/dev/null 2>&1 || ( zfs create r/varlib/sabnzbd && chown josh:plex /var/lib/sabnzbd )
+        '';
+        serviceConfig = {
+          Type = "oneshot";
+        };
+        requiredBy = [ "docker-sabnzbd.service" ];
+        before = [ "docker-sabnzbd.service" ];
+      };
       sabnzbd-update = {
         path = [ pkgs.docker ];
         script = ''

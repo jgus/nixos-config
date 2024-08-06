@@ -6,12 +6,6 @@ in
 {
   imports = [ ./docker.nix ];
 
-  system.activationScripts = {
-    docker-setup.text = ''
-      ${pkgs.zfs}/bin/zfs list r/varlib/mylar >/dev/null 2>&1 || ( ${pkgs.zfs}/bin/zfs create r/varlib/mylar && chown josh:plex /var/lib/mylar )
-    '';
-  };
-
   networking.firewall = {
     allowedTCPPorts = [ 8090 ];
   };
@@ -41,6 +35,17 @@ in
 
   systemd = {
     services = {
+      mylar-setup = {
+        path = [ pkgs.zfs ];
+        script = ''
+          zfs list r/varlib/mylar >/dev/null 2>&1 || ( zfs create r/varlib/mylar && chown josh:plex /var/lib/mylar )
+        '';
+        serviceConfig = {
+          Type = "oneshot";
+        };
+        requiredBy = [ "docker-mylar.service" ];
+        before = [ "docker-mylar.service" ];
+      };
       mylar-update = {
         path = [ pkgs.docker ];
         script = ''
