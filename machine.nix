@@ -3,31 +3,32 @@ let
   machine-id = builtins.readFile ./machine-id.nix;
   pw = import ./.secrets/passwords.nix;
   addresses = import ./addresses.nix;
-  default = {
-    hostName = "${machine-id}";
-    arch = "x86";
-    nvidia = false;
-    zfs = true;
-    zfs-pools = [];
-    clamav = pw ? gmail;
-    imports = [];
-  };
   zwave-box = {
       arch = "rpi";
       zfs = false;
       imports = [ ./zwave-js-ui.nix ];
   };
-  machine = default // {
+  machine = {
+    # Defaults
+    hostName = "${machine-id}";
+    arch = "x86";
+    nas-host = false;
+    nvidia = false;
+    zfs = true;
+    zfs-pools = [];
+    clamav = pw ? gmail;
+    imports = [];
+  } // {
     d1 = {
       stateVersion = "23.05";
       hostId = "2bec4b05";
       bridge-interfaces = [ "eno1" "eno2" "eno3" "eno4" "enp5s0f0" "enp5s0f1" ];
       nvidia = true;
+      nas-host = true;
       zfs-pools = [ "d" ];
       imports = [
         #./ddclient.nix
         ./samba.nix
-        ./nfs.nix
         ./landing.nix
         ./syncthing.nix
         ./www.nix
