@@ -55,7 +55,7 @@ let
         #./offsite-gustafson-nas.nix
         # ./sync-to-cloud.nix
 
-        #./userbox.nix
+        ./userbox.nix
       ];
     };
     d2 = {
