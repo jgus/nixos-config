@@ -115,6 +115,7 @@ in
 {
   fwupd = (machine.arch == "x86");
   python = (machine.arch == "x86");
+  primary_interface = if (machine.arch == "rpi") then "end0" else "br0";
 } //
 (if (machine ? bridge-interfaces) then {
   bridge = {

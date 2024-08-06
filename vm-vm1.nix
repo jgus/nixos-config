@@ -2,13 +2,12 @@
 
 with builtins;
 let
+  machine = import ./machine.nix;
+  addresses = import ./addresses.nix;
   ### Settings
   name = "vm1";
   uuid = "99fefcc4-d5aa-4717-8dde-4fe5f0552d87";
   mem_gb = 16;
-  mac = {
-    external = "52:54:00:6e:b4:bc";
-  };
   cpu = {
     cores = 8;
     threads = 2;
@@ -109,8 +108,8 @@ let
         <controller type="sata" index="0"/>
         <controller type="virtio-serial" index="0"/>
         <interface type="direct">
-          <mac address="${mac.external}"/>
-          <source dev="enp5s0f0" mode="bridge"/>
+          <mac address="${addresses.vms.${name}.mac}"/>
+          <source dev="${machine.primary_interface}" mode="bridge"/>
           <model type="virtio"/>
         </interface>
         <interface type="network">
