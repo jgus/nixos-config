@@ -14,7 +14,7 @@ if machine.nas-host then
   };
 
   services.nfs.server.exports = ''
-    /nas 172.22.1.0/24(rw,crossmnt,no_root_squash)
+    /nas 172.22.1.0/22(rw,crossmnt,no_root_squash)
   '';
 }
 else
