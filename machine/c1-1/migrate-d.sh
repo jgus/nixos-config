@@ -30,7 +30,7 @@ copy() {
     zfs list ${DATASET} || zfs create ${DATASET}
     SMOUNT=$(ssh root@${REMOTE} zfs get mountpoint ${DATASET} -o value -H)
     TMOUNT=$(zfs get mountpoint ${DATASET} -o value -H)
-    rsync -arPx root@${REMOTE}:${SMOUNT}/ ${TMOUNT}/
+    rsync -arPx --delete root@${REMOTE}:${SMOUNT}/ ${TMOUNT}/
 }
 
 copy d/photos

@@ -1,5 +1,6 @@
 { config, pkgs, ... }:
 
+with (import ./functions.nix) { inherit pkgs; };
 let
   image = "cturra/ntp";
   addresses = import ./addresses.nix;
@@ -27,20 +28,9 @@ in
   };
 
   systemd = {
-    services = {
-      ntp-update = {
-        path = [ pkgs.docker ];
-        script = ''
-          if docker pull ${image} | grep "Status: Downloaded"
-          then
-            systemctl restart docker-ntp
-          fi
-        '';
-        serviceConfig = {
-          Type = "oneshot";
-        };
-        startAt = "hourly";
-      };
+    services = docker-services {
+      name = "ntp";
+      image = image;
     };
   };
 }

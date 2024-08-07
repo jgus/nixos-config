@@ -1,5 +1,6 @@
 { config, pkgs, ... }:
 
+with (import ./functions.nix) { inherit pkgs; };
 let
   image = "lscr.io/linuxserver/plex";
 in
@@ -37,31 +38,21 @@ in
   };
 
   systemd = {
-    services = {
-      plex-setup = {
-        path = [ pkgs.zfs ];
-        script = ''
-          zfs list r/varlib/plex >/dev/null 2>&1 || ( zfs create r/varlib/plex && chown plex:plex /var/lib/plex )
-        '';
-        serviceConfig = {
-          Type = "oneshot";
-        };
-        requiredBy = [ "docker-plex.service" ];
-        before = [ "docker-plex.service" ];
-      };
-      plex-update = {
-        path = [ pkgs.docker ];
-        script = ''
-          if docker pull ${image} | grep "Status: Downloaded"
-          then
-            systemctl restart docker-plex
-          fi
-        '';
-        serviceConfig = {
-          Type = "oneshot";
-        };
-        startAt = "hourly";
-      };
+    services = docker-services {
+      name = "plex";
+      image = image;
+      setup-script = ''
+        if ! zfs list r/varlib/plex >/dev/null 2>&1
+        then
+          zfs create r/varlib/plex
+          chown plex:plex /var/lib/plex
+          rsync -arPx --delete /nas/backup/varlib/plex/ /var/lib/plex/ || true
+        fi
+      '';
+      backup-script = ''
+        mkdir -p /nas/backup/varlib/plex
+        rsync -arPx --delete /var/lib/plex/ /nas/backup/varlib/plex/
+      '';
     };
   };
 }
