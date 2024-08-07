@@ -23,9 +23,9 @@ in
     ];
     volumes = [
       "/var/lib/lidarr:/config"
-      "/d/scratch/peer:/peer"
-      "/d/scratch/usenet:/usenet"
-      "/d/media:/media"
+      "/nas/scratch/peer:/peer"
+      "/nas/scratch/usenet:/usenet"
+      "/nas/media:/media"
     ];
   };
 

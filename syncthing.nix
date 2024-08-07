@@ -29,10 +29,10 @@ in
     volumes = [
       "/var/lib/syncthing:/config"
       "/home/josh/sync:/shares/Sync"
-      "/d/photos:/shares/Photos"
-      "/d/software/Tools:/shares/Tools"
-      "/d/media/Comics:/shares/Comics"
-      "/d/media/Music:/shares/Music"
+      "/nas/photos:/shares/Photos"
+      "/nas/software/Tools:/shares/Tools"
+      "/nas/media/Comics:/shares/Comics"
+      "/nas/media/Music:/shares/Music"
     ];
     extraOptions = [
       "--network=macvlan"

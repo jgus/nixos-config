@@ -23,7 +23,7 @@ in
     ];
     volumes = [
       "/var/lib/komga:/config"
-      "/d/media/Comics:/data"
+      "/nas/media/Comics:/data"
     ];
   };
 

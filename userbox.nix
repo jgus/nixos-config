@@ -63,7 +63,7 @@ in
           /bin/sh -c "docker run --rm --name userbox-${user} \
             -p ${toString port}:22/tcp \
             -v /home/${user}:/home/${user} \
-            -v /d/external/${user}:/home/${user}/data \
+            -v /nas/external/${user}:/home/${user}/data \
             -v /var/lib/userbox-${user}:/etc/ssh \
             -v /etc/userbox-${user}/etc/ssh/sshd_config:/etc/ssh/sshd_config \
             userbox-${user}"

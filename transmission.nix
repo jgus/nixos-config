@@ -42,7 +42,7 @@ in
     volumes = [
       "/etc/localtime:/etc/localtime:ro"
       "/var/lib/transmission:/config"
-      "/d/scratch/peer:/peer"
+      "/nas/scratch/peer:/peer"
     ];
   };
 

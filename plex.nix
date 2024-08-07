@@ -31,8 +31,8 @@ in
     };
     volumes = [
       "/var/lib/plex:/config"
-      "/d/media:/media"
-      "/d/photos:/shares/photos"
+      "/nas/media:/media"
+      "/nas/photos:/shares/photos"
     ];
   };
 

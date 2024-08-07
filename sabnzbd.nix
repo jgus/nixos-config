@@ -23,7 +23,7 @@ in
     ];
     volumes = [
       "/var/lib/sabnzbd:/config"
-      "/d/scratch/usenet:/config/Downloads"
+      "/nas/scratch/usenet:/config/Downloads"
     ];
   };
 

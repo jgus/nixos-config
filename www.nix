@@ -62,7 +62,7 @@ in
       "/etc/nixos/www/proxy-confs/homeassistant.subdomain.conf:/config/nginx/proxy-confs/homeassistant.subdomain.conf"
       "/etc/nixos/www/proxy-confs/komga.subdomain.conf:/config/nginx/proxy-confs/komga.subdomain.conf"
       "/var/lib/www:/config/www"
-      "/d/photos/Published:/config/www/published:ro"
+      "/nas/photos/Published:/config/www/published:ro"
       "/var/lib/dav:/config/www/dav"
     ];
   };

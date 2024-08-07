@@ -26,10 +26,10 @@ in
     ];
     volumes = [
       "/var/lib/mylar:/config"
-      "/d/media/Comics:/comics"
-      "/d/media/Comics.import:/import"
-      "/d/scratch/peer:/peer"
-      "/d/scratch/usenet:/usenet"
+      "/nas/media/Comics:/comics"
+      "/nas/media/Comics.import:/import"
+      "/nas/scratch/peer:/peer"
+      "/nas/scratch/usenet:/usenet"
     ];
   };
 
