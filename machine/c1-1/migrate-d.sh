@@ -33,6 +33,9 @@ copy() {
     rsync -arPx root@${REMOTE}:${SMOUNT}/ ${TMOUNT}/
 }
 
+copy r/home
+copy r/home/josh
+copy r/home/josh/sync
 copy d/photos
 copy d/photos/Incoming
 copy d/photos/Published
@@ -56,8 +59,9 @@ copy d/scratch/peer
 copy d/scratch/usenet
 copy d/varlib/images
 copy d/media
-copy d/backup/timemachine
 
 repl d/varlib/frigate-config
 
 copy d/varlib/frigate-media
+
+copy d/backup/timemachine
