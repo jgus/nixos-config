@@ -1,5 +1,6 @@
 { config, pkgs, ... }:
 
+with (import ./functions.nix) { inherit pkgs; };
 let
   image = "lscr.io/linuxserver/syncthing";
   addresses = import ./addresses.nix;
@@ -29,10 +30,10 @@ in
     volumes = [
       "/var/lib/syncthing:/config"
       "/home/josh/sync:/shares/Sync"
-      "/d/photos:/shares/Photos"
-      "/d/software/Tools:/shares/Tools"
-      "/d/media/Comics:/shares/Comics"
-      "/d/media/Music:/shares/Music"
+      "/nas/photos:/shares/Photos"
+      "/nas/software/Tools:/shares/Tools"
+      "/nas/media/Comics:/shares/Comics"
+      "/nas/media/Music:/shares/Music"
     ];
     extraOptions = [
       "--network=macvlan"
@@ -42,32 +43,22 @@ in
   };
 
   systemd = {
-    services = {
-      syncthing-setup = {
-        path = [ pkgs.zfs ];
-        script = ''
-          zfs list r/varlib/syncthing >/dev/null 2>&1 || ( zfs create r/varlib/syncthing && chown josh:users /var/lib/syncthing )
-          zfs list r/varlib/syncthing/index-v0.14.0.db >/dev/null 2>&1 || ( zfs create r/varlib/syncthing/index-v0.14.0.db && chown josh:users /var/lib/syncthing/index-v0.14.0.db )
-        '';
-        serviceConfig = {
-          Type = "oneshot";
-        };
-        requiredBy = [ "docker-syncthing.service" ];
-        before = [ "docker-syncthing.service" ];
-      };
-      syncthing-update = {
-        path = [ pkgs.docker ];
-        script = ''
-          if docker pull ${image} | grep "Status: Downloaded"
-          then
-            systemctl restart docker-syncthing
-          fi
-        '';
-        serviceConfig = {
-          Type = "oneshot";
-        };
-        startAt = "hourly";
-      };
+    services = docker-services {
+      name = "syncthing";
+      image = image;
+      setup-script = ''
+        if ! zfs list r/varlib/syncthing >/dev/null 2>&1
+        then
+          zfs create r/varlib/syncthing
+          chown josh:users /var/lib/syncthing
+          rsync -arPx --delete /nas/backup/varlib/syncthing/ /var/lib/syncthing/ || true
+        fi
+        zfs list r/varlib/syncthing/index-v0.14.0.db >/dev/null 2>&1 || ( zfs create r/varlib/syncthing/index-v0.14.0.db && chown josh:users /var/lib/syncthing/index-v0.14.0.db )
+      '';
+      backup-script = ''
+        mkdir -p /nas/backup/varlib/syncthing
+        rsync -arPx --delete /var/lib/syncthing/ /nas/backup/varlib/syncthing/
+      '';
     };
   };
 }

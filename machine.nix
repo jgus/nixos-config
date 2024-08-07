@@ -51,11 +51,6 @@ let
 
         #./vm-vm1.nix
 
-        # ./offsite-josh-ws.nix
-        # ./offsite-homeassistant.nix
-        #./offsite-gustafson-nas.nix
-        # ./sync-to-cloud.nix
-
         ./userbox.nix
       ];
     };
@@ -76,7 +71,7 @@ let
       hostId = "dfc92a33";
       bridge-interfaces = [ "eno1" "eno2" ];
       zfs-pools = [ "d" ];
-      imports = [ ./machine/c1-1/samba.nix ];
+      imports = [];
     };
     c1-2 = {
       stateVersion = "24.05";

@@ -92,14 +92,14 @@ let
         <!-- --> 
         <disk type="file" device="cdrom">
           <driver name="qemu" type="raw"/>
-          <source file="/d/software/MSDN/Windows/Windows 11/Win11_23H2_English_x64v2.iso"/>
+          <source file="/nas/software/MSDN/Windows/Windows 11/Win11_23H2_English_x64v2.iso"/>
           <target dev="sdb" bus="sata"/>
           <readonly/>
           <boot order="2"/>
         </disk>
         <disk type="file" device="cdrom">
           <driver name="qemu" type="raw"/>
-          <source file="/d/software/Drivers/virtio-win-0.1.240.iso"/>
+          <source file="/nas/software/Drivers/virtio-win-0.1.240.iso"/>
           <target dev="sdc" bus="sata"/>
           <readonly/>
         </disk>

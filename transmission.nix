@@ -1,5 +1,6 @@
 { config, pkgs, ... }:
 
+with (import ./functions.nix) { inherit pkgs; };
 let
   image = "haugene/transmission-openvpn";
 in
@@ -42,36 +43,26 @@ in
     volumes = [
       "/etc/localtime:/etc/localtime:ro"
       "/var/lib/transmission:/config"
-      "/d/scratch/peer:/peer"
+      "/nas/scratch/peer:/peer"
     ];
   };
 
   systemd = {
-    services = {
-      transmission-setup = {
-        path = [ pkgs.zfs ];
-        script = ''
-          zfs list r/varlib/transmission >/dev/null 2>&1 || ( zfs create r/varlib/transmission && chown josh:plex /var/lib/transmission )
-        '';
-        serviceConfig = {
-          Type = "oneshot";
-        };
-        requiredBy = [ "docker-transmission.service" ];
-        before = [ "docker-transmission.service" ];
-      };
-      transmission-update = {
-        path = [ pkgs.docker ];
-        script = ''
-          if docker pull ${image} | grep "Status: Downloaded"
-          then
-            systemctl restart docker-transmission
-          fi
-        '';
-        serviceConfig = {
-          Type = "oneshot";
-        };
-        startAt = "hourly";
-      };
+    services = docker-services {
+      name = "transmission";
+      image = image;
+      setup-script = ''
+        if ! zfs list r/varlib/transmission >/dev/null 2>&1
+        then
+          zfs create r/varlib/transmission
+          chown josh:plex /var/lib/transmission
+          rsync -arPx --delete /nas/backup/varlib/transmission/ /var/lib/transmission/ || true
+        fi
+      '';
+      backup-script = ''
+        mkdir -p /nas/backup/varlib/transmission
+        rsync -arPx --delete /var/lib/transmission/ /nas/backup/varlib/transmission/
+      '';
     };
   };
 }

@@ -1,5 +1,6 @@
 { config, pkgs, ... }:
 
+with (import ./functions.nix) { inherit pkgs; };
 let
   image = "lscr.io/linuxserver/sonarr";
 in
@@ -23,38 +24,28 @@ in
     ];
     volumes = [
       "/var/lib/sonarr:/config"
-      "/d/scratch/peer:/peer"
-      "/d/scratch/usenet:/usenet"
-      "/d/media:/media"
+      "/nas/scratch/peer:/peer"
+      "/nas/scratch/usenet:/usenet"
+      "/nas/media:/media"
     ];
   };
 
   systemd = {
-    services = {
-      sonarr-setup = {
-        path = [ pkgs.zfs ];
-        script = ''
-          zfs list r/varlib/sonarr >/dev/null 2>&1 || ( zfs create r/varlib/sonarr && chown josh:plex /var/lib/sonarr )
-        '';
-        serviceConfig = {
-          Type = "oneshot";
-        };
-        requiredBy = [ "docker-sonarr.service" ];
-        before = [ "docker-sonarr.service" ];
-      };
-      sonarr-update = {
-        path = [ pkgs.docker ];
-        script = ''
-          if docker pull ${image} | grep "Status: Downloaded"
-          then
-            systemctl restart docker-sonarr
-          fi
-        '';
-        serviceConfig = {
-          Type = "oneshot";
-        };
-        startAt = "hourly";
-      };
+    services = docker-services {
+      name = "sonarr";
+      image = image;
+      setup-script = ''
+        if ! zfs list r/varlib/sonarr >/dev/null 2>&1
+        then
+          zfs create r/varlib/sonarr
+          chown josh:plex /var/lib/sonarr
+          rsync -arPx --delete /nas/backup/varlib/sonarr/ /var/lib/sonarr/ || true
+        fi
+      '';
+      backup-script = ''
+        mkdir -p /nas/backup/varlib/sonarr
+        rsync -arPx --delete /var/lib/sonarr/ /nas/backup/varlib/sonarr/
+      '';
     };
   };
 }

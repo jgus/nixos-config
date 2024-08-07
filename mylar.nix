@@ -1,5 +1,6 @@
 { config, pkgs, ... }:
 
+with (import ./functions.nix) { inherit pkgs; };
 let
   image = "lscr.io/linuxserver/mylar3";
 in
@@ -26,39 +27,29 @@ in
     ];
     volumes = [
       "/var/lib/mylar:/config"
-      "/d/media/Comics:/comics"
-      "/d/media/Comics.import:/import"
-      "/d/scratch/peer:/peer"
-      "/d/scratch/usenet:/usenet"
+      "/nas/media/Comics:/comics"
+      "/nas/media/Comics.import:/import"
+      "/nas/scratch/peer:/peer"
+      "/nas/scratch/usenet:/usenet"
     ];
   };
 
   systemd = {
-    services = {
-      mylar-setup = {
-        path = [ pkgs.zfs ];
-        script = ''
-          zfs list r/varlib/mylar >/dev/null 2>&1 || ( zfs create r/varlib/mylar && chown josh:plex /var/lib/mylar )
-        '';
-        serviceConfig = {
-          Type = "oneshot";
-        };
-        requiredBy = [ "docker-mylar.service" ];
-        before = [ "docker-mylar.service" ];
-      };
-      mylar-update = {
-        path = [ pkgs.docker ];
-        script = ''
-          if docker pull ${image} | grep "Status: Downloaded"
-          then
-            systemctl restart docker-mylar
-          fi
-        '';
-        serviceConfig = {
-          Type = "oneshot";
-        };
-        startAt = "hourly";
-      };
+    services = docker-services {
+      name = "mylar";
+      image = image;
+      setup-script = ''
+        if ! zfs list r/varlib/mylar >/dev/null 2>&1
+        then
+          zfs create r/varlib/mylar
+          chown josh:plex /var/lib/mylar
+          rsync -arPx --delete /nas/backup/varlib/mylar/ /var/lib/mylar/ || true
+        fi
+      '';
+      backup-script = ''
+        mkdir -p /nas/backup/varlib/mylar
+        rsync -arPx --delete /var/lib/mylar/ /nas/backup/varlib/mylar/
+      '';
     };
   };
 }

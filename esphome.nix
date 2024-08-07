@@ -1,5 +1,6 @@
 { config, pkgs, ... }:
 
+with (import ./functions.nix) { inherit pkgs; };
 let
   image = "ghcr.io/esphome/esphome";
 in
@@ -29,31 +30,21 @@ in
   };
 
   systemd = {
-    services = {
-      esphome-setup = {
-        path = [ pkgs.zfs ];
-        script = ''
-          zfs list r/varlib/esphome >/dev/null 2>&1 || ( zfs create r/varlib/esphome && chown josh:users /var/lib/esphome )
-        '';
-        serviceConfig = {
-          Type = "oneshot";
-        };
-        requiredBy = [ "docker-esphome.service" ];
-        before = [ "docker-esphome.service" ];
-      };
-      esphome-update = {
-        path = [ pkgs.docker ];
-        script = ''
-          if docker pull ${image} | grep "Status: Downloaded"
-          then
-            systemctl restart docker-esphome
-          fi
-        '';
-        serviceConfig = {
-          Type = "oneshot";
-        };
-        startAt = "hourly";
-      };
+    services = docker-services {
+      name = "esphome";
+      image = image;
+      setup-script = ''
+        if ! zfs list r/varlib/esphome >/dev/null 2>&1
+        then
+          zfs create r/varlib/esphome
+          chown josh:users /var/lib/esphome
+          rsync -arPx --delete /nas/backup/varlib/esphome/ /var/lib/esphome/ || true
+        fi
+      '';
+      backup-script = ''
+        mkdir -p /nas/backup/varlib/esphome
+        rsync -arPx --delete /var/lib/esphome/ /nas/backup/varlib/esphome/
+      '';
     };
   };
 }

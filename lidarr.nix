@@ -1,5 +1,6 @@
 { config, pkgs, ... }:
 
+with (import ./functions.nix) { inherit pkgs; };
 let
   image = "lscr.io/linuxserver/lidarr";
 in
@@ -23,38 +24,28 @@ in
     ];
     volumes = [
       "/var/lib/lidarr:/config"
-      "/d/scratch/peer:/peer"
-      "/d/scratch/usenet:/usenet"
-      "/d/media:/media"
+      "/nas/scratch/peer:/peer"
+      "/nas/scratch/usenet:/usenet"
+      "/nas/media:/media"
     ];
   };
 
   systemd = {
-    services = {
-      lidarr-setup = {
-        path = [ pkgs.zfs ];
-        script = ''
-          zfs list r/varlib/lidarr >/dev/null 2>&1 || ( zfs create r/varlib/lidarr && chown josh:plex /var/lib/lidarr )
-        '';
-        serviceConfig = {
-          Type = "oneshot";
-        };
-        requiredBy = [ "docker-lidarr.service" ];
-        before = [ "docker-lidarr.service" ];
-      };
-      lidarr-update = {
-        path = [ pkgs.docker ];
-        script = ''
-          if docker pull ${image} | grep "Status: Downloaded"
-          then
-            systemctl restart docker-lidarr
-          fi
-        '';
-        serviceConfig = {
-          Type = "oneshot";
-        };
-        startAt = "hourly";
-      };
+    services = docker-services {
+      name = "lidarr";
+      image = image;
+      setup-script = ''
+        if ! zfs list r/varlib/lidarr >/dev/null 2>&1
+        then
+          zfs create r/varlib/lidarr
+          chown josh:plex /var/lib/lidarr
+          rsync -arPx --delete /nas/backup/varlib/lidarr/ /var/lib/lidarr/ || true
+        fi
+      '';
+      backup-script = ''
+        mkdir -p /nas/backup/varlib/lidarr
+        rsync -arPx --delete /var/lib/lidarr/ /nas/backup/varlib/lidarr/
+      '';
     };
   };
 }

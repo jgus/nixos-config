@@ -1,5 +1,6 @@
 { config, pkgs, ... }:
 
+with (import ./functions.nix) { inherit pkgs; };
 let
   image = "lscr.io/linuxserver/radarr";
 in
@@ -23,38 +24,28 @@ in
     ];
     volumes = [
       "/var/lib/radarr:/config"
-      "/d/scratch/peer:/peer"
-      "/d/scratch/usenet:/usenet"
-      "/d/media:/media"
+      "/nas/scratch/peer:/peer"
+      "/nas/scratch/usenet:/usenet"
+      "/nas/media:/media"
     ];
   };
 
   systemd = {
-    services = {
-      radarr-setup = {
-        path = [ pkgs.zfs ];
-        script = ''
-          zfs list r/varlib/radarr >/dev/null 2>&1 || ( zfs create r/varlib/radarr && chown josh:plex /var/lib/radarr )
-        '';
-        serviceConfig = {
-          Type = "oneshot";
-        };
-        requiredBy = [ "docker-radarr.service" ];
-        before = [ "docker-radarr.service" ];
-      };
-      radarr-update = {
-        path = [ pkgs.docker ];
-        script = ''
-          if docker pull ${image} | grep "Status: Downloaded"
-          then
-            systemctl restart docker-radarr
-          fi
-        '';
-        serviceConfig = {
-          Type = "oneshot";
-        };
-        startAt = "hourly";
-      };
+    services = docker-services {
+      name = "radarr";
+      image = image;
+      setup-script = ''
+        if ! zfs list r/varlib/radarr >/dev/null 2>&1
+        then
+          zfs create r/varlib/radarr
+          chown josh:plex /var/lib/radarr
+          rsync -arPx --delete /nas/backup/varlib/radarr/ /var/lib/radarr/ || true
+        fi
+      '';
+      backup-script = ''
+        mkdir -p /nas/backup/varlib/radarr
+        rsync -arPx --delete /var/lib/radarr/ /nas/backup/varlib/radarr/
+      '';
     };
   };
 }

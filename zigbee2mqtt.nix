@@ -1,5 +1,6 @@
 { config, pkgs, lib, ... }:
 
+with (import ./functions.nix) { inherit pkgs; };
 let
   pw = import ./.secrets/passwords.nix;
   image = "koenkk/zigbee2mqtt";
@@ -24,31 +25,20 @@ in
   };
 
   systemd = {
-    services = {
-      zigbee2mqtt-setup = {
-        path = [ pkgs.zfs ];
-        script = ''
-          zfs list r/varlib/zigbee2mqtt >/dev/null 2>&1 || ( zfs create r/varlib/zigbee2mqtt )
-        '';
-        serviceConfig = {
-          Type = "oneshot";
-        };
-        requiredBy = [ "docker-zigbee2mqtt.service" ];
-        before = [ "docker-zigbee2mqtt.service" ];
-      };
-      zigbee2mqtt-update = {
-        path = [ pkgs.docker ];
-        script = ''
-          if docker pull ${image} | grep "Status: Downloaded"
-          then
-            systemctl restart docker-zigbee2mqtt
-          fi
-        '';
-        serviceConfig = {
-          Type = "oneshot";
-        };
-        startAt = "hourly";
-      };
+    services = docker-services {
+      name = "zigbee2mqtt";
+      image = image;
+      setup-script = ''
+        if ! zfs list r/varlib/zigbee2mqtt >/dev/null 2>&1
+        then
+          zfs create r/varlib/zigbee2mqtt
+          rsync -arPx --delete /nas/backup/varlib/zigbee2mqtt/ /var/lib/zigbee2mqtt/ || true
+        fi
+      '';
+      backup-script = ''
+        mkdir -p /nas/backup/varlib/zigbee2mqtt
+        rsync -arPx --delete /var/lib/zigbee2mqtt/ /nas/backup/varlib/zigbee2mqtt/
+      '';
     };
   };
 }

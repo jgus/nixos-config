@@ -1,5 +1,6 @@
 { config, pkgs, ... }:
 
+with (import ./functions.nix) { inherit pkgs; };
 let
   image = "lscr.io/linuxserver/prowlarr";
 in
@@ -27,31 +28,21 @@ in
   };
 
   systemd = {
-    services = {
-      prowlarr-setup = {
-        path = [ pkgs.zfs ];
-        script = ''
-          zfs list r/varlib/prowlarr >/dev/null 2>&1 || ( zfs create r/varlib/prowlarr && chown josh:plex /var/lib/prowlarr )
-        '';
-        serviceConfig = {
-          Type = "oneshot";
-        };
-        requiredBy = [ "docker-prowlarr.service" ];
-        before = [ "docker-prowlarr.service" ];
-      };
-      prowlarr-update = {
-        path = [ pkgs.docker ];
-        script = ''
-          if docker pull ${image} | grep "Status: Downloaded"
-          then
-            systemctl restart docker-prowlarr
-          fi
-        '';
-        serviceConfig = {
-          Type = "oneshot";
-        };
-        startAt = "hourly";
-      };
+    services = docker-services {
+      name = "prowlarr";
+      image = image;
+      setup-script = ''
+        if ! zfs list r/varlib/prowlarr >/dev/null 2>&1
+        then
+          zfs create r/varlib/prowlarr
+          chown josh:plex /var/lib/prowlarr
+          rsync -arPx --delete /nas/backup/varlib/prowlarr/ /var/lib/prowlarr/ || true
+        fi
+      '';
+      backup-script = ''
+        mkdir -p /nas/backup/varlib/prowlarr
+        rsync -arPx --delete /var/lib/prowlarr/ /nas/backup/varlib/prowlarr/
+      '';
     };
   };
 }

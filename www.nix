@@ -1,5 +1,6 @@
 { config, pkgs, ... }:
 
+with (import ./functions.nix) { inherit pkgs; };
 let
   db_image = "mysql:5.7";
   db_admin_image = "phpmyadmin/phpmyadmin";
@@ -62,73 +63,82 @@ in
       "/etc/nixos/www/proxy-confs/homeassistant.subdomain.conf:/config/nginx/proxy-confs/homeassistant.subdomain.conf"
       "/etc/nixos/www/proxy-confs/komga.subdomain.conf:/config/nginx/proxy-confs/komga.subdomain.conf"
       "/var/lib/www:/config/www"
-      "/d/photos/Published:/config/www/published:ro"
+      "/nas/photos/Published:/config/www/published:ro"
       "/var/lib/dav:/config/www/dav"
     ];
   };
 
   systemd = {
-    services = {
-      web-setup = {
-        path = [ pkgs.zfs ];
-        script = ''
-          zfs list r/varlib/web_db_data >/dev/null 2>&1 || zfs create r/varlib/web_db_data
-          zfs list r/varlib/web_db_admin_sessions >/dev/null 2>&1 || zfs create r/varlib/web_db_admin_sessions
-          zfs list r/varlib/web_proxy_config >/dev/null 2>&1 || zfs create r/varlib/web_proxy_config
-          zfs list r/varlib/swag_config >/dev/null 2>&1 || zfs create r/varlib/swag_config
+    services = docker-services {
+      name = "web-db";
+      image = db_image;
+      setup-script = ''
+        if ! zfs list r/varlib/web_db_data >/dev/null 2>&1
+        then
+          zfs create r/varlib/web_db_data
+          rsync -arPx --delete /nas/backup/varlib/web_db_data/ /var/lib/web_db_data/ || true
+        fi
+      '';
+      backup-script = ''
+        mkdir -p /nas/backup/varlib/web_db_data
+        rsync -arPx --delete /var/lib/web_db_data/ /nas/backup/varlib/web_db_data/
+      '';
+    } // docker-services {
+      name = "web-db-admin";
+      image = db_admin_image;
+      setup-script = ''
+        if ! zfs list r/varlib/web_db_admin_sessions >/dev/null 2>&1
+        then
+          zfs create r/varlib/web_db_admin_sessions
+          rsync -arPx --delete /nas/backup/varlib/web_db_admin_sessions/ /var/lib/web_db_admin_sessions/ || true
+        fi
+      '';
+      backup-script = ''
+        mkdir -p /nas/backup/varlib/web_db_admin_sessions
+        rsync -arPx --delete /var/lib/web_db_admin_sessions/ /nas/backup/varlib/web_db_admin_sessions/
+      '';
+    } // docker-services {
+      name = "web-swag";
+      image = swag_image;
+      setup-script = ''
+        if ! zfs list r/varlib/web_proxy_config >/dev/null 2>&1
+        then
+          zfs create r/varlib/web_proxy_config
+          rsync -arPx --delete /nas/backup/varlib/web_proxy_config/ /var/lib/web_proxy_config/ || true
+        fi
+        if ! zfs list r/varlib/swag_config >/dev/null 2>&1
+        then
+          zfs create r/varlib/swag_config
+          rsync -arPx --delete /nas/backup/varlib/swag_config/ /var/lib/swag_config/ || true
           mkdir -p /var/lib/swag_config/keys
           mkdir -p /var/lib/swag_config/etc/letsencrypt
-          zfs list r/varlib/www >/dev/null 2>&1 || zfs create r/varlib/www
-          zfs list r/varlib/dav >/dev/null 2>&1 || zfs create r/varlib/dav
+        fi
+        if ! zfs list r/varlib/www >/dev/null 2>&1
+        then
+          zfs create r/varlib/www
+          rsync -arPx --delete /nas/backup/varlib/www/ /var/lib/www/ || true
+        fi
+        if ! zfs list r/varlib/dav >/dev/null 2>&1
+        then
+          zfs create r/varlib/dav
           mkdir -p /var/lib/dav/tmp
           mkdir -p /var/lib/dav/files
-          chown -R www:www /var/lib/dav
-        '';
-        serviceConfig = {
-          Type = "oneshot";
-        };
-        requiredBy = [ "docker-web-db.service" "docker-web-db-admin.service" "docker-web-swag.service" ];
-        before = [ "docker-web-db.service" "docker-web-db-admin.service" "docker-web-swag.service" ];
-      };
-      web-db-update = {
-        path = [ pkgs.docker ];
-        script = ''
-          if docker pull ${db_image} | grep "Status: Downloaded"
-          then
-            systemctl restart docker-web-db
-          fi
-        '';
-        serviceConfig = {
-          Type = "oneshot";
-        };
-        startAt = "hourly";
-      };
-      web-db-admin-update = {
-        path = [ pkgs.docker ];
-        script = ''
-          if docker pull ${db_admin_image} | grep "Status: Downloaded"
-          then
-            systemctl restart docker-web-db-admin
-          fi
-        '';
-        serviceConfig = {
-          Type = "oneshot";
-        };
-        startAt = "hourly";
-      };
-      web-swag-update = {
-        path = [ pkgs.docker ];
-        script = ''
-          if docker pull ${swag_image} | grep "Status: Downloaded"
-          then
-            systemctl restart docker-web-swag
-          fi
-        '';
-        serviceConfig = {
-          Type = "oneshot";
-        };
-        startAt = "hourly";
-      };
+          chown www:www /var/lib/dav
+          chown www:www /var/lib/dav/tmp
+          chown www:www /var/lib/dav/files
+          rsync -arPx --delete /nas/backup/varlib/dav/ /var/lib/dav/ || true
+        fi
+      '';
+      backup-script = ''
+        mkdir -p /nas/backup/varlib/web_proxy_config
+        rsync -arPx --delete /var/lib/web_proxy_config/ /nas/backup/varlib/web_proxy_config/
+        mkdir -p /nas/backup/varlib/swag_config
+        rsync -arPx --delete /var/lib/swag_config/ /nas/backup/varlib/swag_config/
+        mkdir -p /nas/backup/varlib/www
+        rsync -arPx --delete /var/lib/www/ /nas/backup/varlib/www/
+        mkdir -p /nas/backup/varlib/dav
+        rsync -arPx --delete /var/lib/dav/ /nas/backup/varlib/dav/
+      '';
     };
   };
 }

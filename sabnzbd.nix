@@ -1,5 +1,6 @@
 { config, pkgs, ... }:
 
+with (import ./functions.nix) { inherit pkgs; };
 let
   image = "lscr.io/linuxserver/sabnzbd";
 in
@@ -23,36 +24,26 @@ in
     ];
     volumes = [
       "/var/lib/sabnzbd:/config"
-      "/d/scratch/usenet:/config/Downloads"
+      "/nas/scratch/usenet:/config/Downloads"
     ];
   };
 
   systemd = {
-    services = {
-      sabnzbd-setup = {
-        path = [ pkgs.zfs ];
-        script = ''
-          zfs list r/varlib/sabnzbd >/dev/null 2>&1 || ( zfs create r/varlib/sabnzbd && chown josh:plex /var/lib/sabnzbd )
-        '';
-        serviceConfig = {
-          Type = "oneshot";
-        };
-        requiredBy = [ "docker-sabnzbd.service" ];
-        before = [ "docker-sabnzbd.service" ];
-      };
-      sabnzbd-update = {
-        path = [ pkgs.docker ];
-        script = ''
-          if docker pull ${image} | grep "Status: Downloaded"
-          then
-            systemctl restart docker-sabnzbd
-          fi
-        '';
-        serviceConfig = {
-          Type = "oneshot";
-        };
-        startAt = "hourly";
-      };
+    services = docker-services {
+      name = "sabnzbd";
+      image = image;
+      setup-script = ''
+        if ! zfs list r/varlib/sabnzbd >/dev/null 2>&1
+        then
+          zfs create r/varlib/sabnzbd
+          chown josh:plex /var/lib/sabnzbd
+          rsync -arPx --delete /nas/backup/varlib/sabnzbd/ /var/lib/sabnzbd/ || true
+        fi
+      '';
+      backup-script = ''
+        mkdir -p /nas/backup/varlib/sabnzbd
+        rsync -arPx --delete /var/lib/sabnzbd/ /nas/backup/varlib/sabnzbd/
+      '';
     };
   };
 }

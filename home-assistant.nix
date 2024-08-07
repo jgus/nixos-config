@@ -1,5 +1,6 @@
 { config, pkgs, lib, ... }:
 
+with (import ./functions.nix) { inherit pkgs; };
 let
   pw = import ./.secrets/passwords.nix;
   image = "ghcr.io/home-assistant/home-assistant:stable";
@@ -305,31 +306,21 @@ in
   };
 
   systemd = {
-    services = {
-      home-assistant-setup = {
-        path = [ pkgs.zfs ];
-        script = ''
-          zfs list r/varlib/home-assistant >/dev/null 2>&1 || ( zfs create r/varlib/home-assistant && chown home-assistant:home-assistant /var/lib/home-assistant )
-        '';
-        serviceConfig = {
-          Type = "oneshot";
-        };
-        requiredBy = [ "docker-home-assistant.service" ];
-        before = [ "docker-home-assistant.service" ];
-      };
-      home-assistant-update = {
-        path = [ pkgs.docker ];
-        script = ''
-          if docker pull ${image} | grep "Status: Downloaded"
-          then
-            systemctl restart docker-home-assistant
-          fi
-        '';
-        serviceConfig = {
-          Type = "oneshot";
-        };
-        startAt = "hourly";
-      };
+    services = docker-services {
+      name = "home-assistant";
+      image = image;
+      setup-script = ''
+        if ! zfs list r/varlib/home-assistant >/dev/null 2>&1
+        then
+          zfs create r/varlib/home-assistant
+          chown home-assistant:home-assistant /var/lib/home-assistant
+          rsync -arPx --delete /nas/backup/varlib/home-assistant/ /var/lib/home-assistant/ || true
+        fi
+      '';
+      backup-script = ''
+        mkdir -p /nas/backup/varlib/home-assistant
+        rsync -arPx --delete /var/lib/home-assistant/ /nas/backup/varlib/home-assistant/
+      '';
     };
   };
 }

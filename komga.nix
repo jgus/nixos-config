@@ -1,5 +1,6 @@
 { config, pkgs, ... }:
 
+with (import ./functions.nix) { inherit pkgs; };
 let
   image = "gotson/komga";
 in
@@ -23,36 +24,26 @@ in
     ];
     volumes = [
       "/var/lib/komga:/config"
-      "/d/media/Comics:/data"
+      "/nas/media/Comics:/data"
     ];
   };
 
   systemd = {
-    services = {
-      komga-setup = {
-        path = [ pkgs.zfs ];
-        script = ''
-          zfs list r/varlib/komga >/dev/null 2>&1 || ( zfs create r/varlib/komga && chown josh:plex /var/lib/komga )
-        '';
-        serviceConfig = {
-          Type = "oneshot";
-        };
-        requiredBy = [ "docker-komga.service" ];
-        before = [ "docker-komga.service" ];
-      };
-      komga-update = {
-        path = [ pkgs.docker ];
-        script = ''
-          if docker pull ${image} | grep "Status: Downloaded"
-          then
-            systemctl restart docker-komga
-          fi
-        '';
-        serviceConfig = {
-          Type = "oneshot";
-        };
-        startAt = "hourly";
-      };
+    services = docker-services {
+      name = "komga";
+      image = image;
+      setup-script = ''
+        if ! zfs list r/varlib/komga >/dev/null 2>&1
+        then
+          zfs create r/varlib/komga
+          chown josh:plex /var/lib/komga
+          rsync -arPx --delete /nas/backup/varlib/komga/ /var/lib/komga/ || true
+        fi
+      '';
+      backup-script = ''
+        mkdir -p /nas/backup/varlib/komga
+        rsync -arPx --delete /var/lib/komga/ /nas/backup/varlib/komga/
+      '';
     };
   };
 }

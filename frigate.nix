@@ -1,5 +1,6 @@
 { config, pkgs, ... }:
 
+with (import ./functions.nix) { inherit pkgs; };
 let
   pw = import ./.secrets/passwords.nix;
   image = "ghcr.io/blakeblackshear/frigate:stable";
@@ -502,32 +503,21 @@ in
   };
 
   systemd = {
-    services = {
-      frigate-setup = {
-        path = [ pkgs.zfs ];
-        script = ''
-          zfs list d/varlib/frigate-media >/dev/null 2>&1 || zfs create d/varlib/frigate-media;
-          zfs list d/varlib/frigate-config >/dev/null 2>&1 || zfs create d/varlib/frigate-config;
-        '';
-        serviceConfig = {
-          Type = "oneshot";
-        };
-        requiredBy = [ "docker-frigate.service" ];
-        before = [ "docker-frigate.service" ];
-      };
-      frigate-update = {
-        path = [ pkgs.docker ];
-        script = ''
-          if docker pull ${image} | grep "Status: Downloaded"
-          then
-            systemctl restart docker-frigate
-          fi
-        '';
-        serviceConfig = {
-          Type = "oneshot";
-        };
-        startAt = "hourly";
-      };
+    services = docker-services {
+      name = "frigate";
+      image = image;
+      setup-script = ''
+        zfs list d/varlib/frigate-media >/dev/null 2>&1 || zfs create d/varlib/frigate-media # TODO
+        if ! zfs list r/varlib/frigate-config >/dev/null 2>&1
+        then
+          zfs create r/varlib/frigate-config
+          rsync -arPx --delete /nas/backup/varlib/frigate-config/ /var/lib/frigate-config/ || true
+        fi
+      '';
+      backup-script = ''
+        mkdir -p /nas/backup/varlib/frigate-config
+        rsync -arPx --delete /var/lib/frigate-config/ /nas/backup/varlib/frigate-config/
+      '';
     };
   };
 }
