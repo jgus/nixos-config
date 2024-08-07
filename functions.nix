@@ -13,7 +13,7 @@
     "${name}-backup" = {
       path = [ pkgs.rsync pkgs.zfs ];
       script = backup-script;
-      serviceConfig = { Type = "oneshot"; };
+      serviceConfig = { Type = "exec"; };
       startAt = "hourly";
     };
     "${name}-shutdown-backup" = {
@@ -23,7 +23,7 @@
         docker container wait ${name}
         systemctl restart ${name}-backup
       '';
-      serviceConfig = { Type = "oneshot"; };
+      serviceConfig = { Type = "exec"; };
       wantedBy = [ "docker-${name}.service" ];
       after = [ "docker-${name}.service" ];
     };
@@ -36,7 +36,7 @@
           systemctl restart docker-${name}
         fi
       '';
-      serviceConfig = { Type = "oneshot"; };
+      serviceConfig = { Type = "exec"; };
       startAt = "hourly";
     };
   };
