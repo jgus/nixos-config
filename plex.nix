@@ -3,26 +3,21 @@
 with (import ./functions.nix) { inherit pkgs; };
 let
   image = "lscr.io/linuxserver/plex";
+  addresses = import ./addresses.nix;
 in
 {
   imports = [ ./docker.nix ];
-
-  networking.firewall.allowedTCPPorts = [ 32400 ];
-  networking.firewall.allowedUDPPorts = [ 32410 32412 32413 32414 ];
 
   virtualisation.oci-containers.containers.plex = {
     image = "${image}";
     autoStart = true;
     extraOptions = [
-      "--net=host"
+      "--network=macvlan"
+      "--mac-address=${addresses.services.plex.mac}"
+      "--ip=${addresses.services.plex.ip}"
       "--gpus=all"
       "--device=/dev/dri:/dev/dri"
       "--tmpfs=/tmp"
-    ];
-    ports = [
-      "8384:8384"
-      "22000:22000"
-      "21027:21027/udp"
     ];
     environment = {
       PUID = "${toString config.users.users.plex.uid}";
