@@ -2,31 +2,36 @@
 
 with (import ./functions.nix) { inherit pkgs; };
 let
+  service = "plex";
+  user = "plex";
+  group = "plex";
   image = "lscr.io/linuxserver/plex";
   addresses = import ./addresses.nix;
+  machine = import ./machine.nix;
 in
+if (machine.hostName != addresses.services."${service}".host) then {} else
 {
   imports = [ ./docker.nix ];
 
-  virtualisation.oci-containers.containers.plex = {
+  virtualisation.oci-containers.containers."${service}" = {
     image = "${image}";
     autoStart = true;
     extraOptions = [
       "--network=macvlan"
-      "--mac-address=${addresses.services.plex.mac}"
-      "--ip=${addresses.services.plex.ip}"
+      "--mac-address=${addresses.services."${service}".mac}"
+      "--ip=${addresses.services."${service}".ip}"
       "--gpus=all"
       "--device=/dev/dri:/dev/dri"
       "--tmpfs=/tmp"
     ];
     environment = {
-      PUID = "${toString config.users.users.plex.uid}";
-      PGID = "${toString config.users.groups.plex.gid}";
+      PUID = "${toString config.users.users."${user}".uid}";
+      PGID = "${toString config.users.groups."${group}".gid}";
       TZ = "${config.time.timeZone}";
       VERSION = "latest";
     };
     volumes = [
-      "/var/lib/plex:/config"
+      "/var/lib/${service}:/config"
       "/nas/media:/media"
       "/nas/photos:/shares/photos"
     ];
@@ -34,19 +39,19 @@ in
 
   systemd = {
     services = docker-services {
-      name = "plex";
+      name = service;
       image = image;
       setup-script = ''
-        if ! zfs list r/varlib/plex >/dev/null 2>&1
+        if ! zfs list r/varlib/${service} >/dev/null 2>&1
         then
-          zfs create r/varlib/plex
-          chown plex:plex /var/lib/plex
-          rsync -arPx --delete /nas/backup/varlib/plex/ /var/lib/plex/ || true
+          zfs create r/varlib/${service}
+          chown ${user}:${group} /var/lib/${service}
+          rsync -arPx --delete /nas/backup/varlib/${service}/ /var/lib/${service}/ || true
         fi
       '';
       backup-script = ''
-        mkdir -p /nas/backup/varlib/plex
-        rsync -arPx --delete /var/lib/plex/ /nas/backup/varlib/plex/
+        mkdir -p /nas/backup/varlib/${service}
+        rsync -arPx --delete /var/lib/${service}/ /nas/backup/varlib/${service}/
       '';
     };
   };

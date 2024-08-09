@@ -12,7 +12,6 @@ let
     # Defaults
     hostName = "${machine-id}";
     arch = "x86";
-    nas-host = false;
     nvidia = false;
     zfs = true;
     zfs-pools = [];
@@ -24,21 +23,15 @@ let
       hostId = "2bec4b05";
       bridge-interfaces = [ "eno1" "eno2" "eno3" "eno4" "enp5s0f0" "enp5s0f1" ];
       nvidia = true;
-      nas-host = true;
       zfs-pools = [ "d" ];
       imports = [
         #./ddclient.nix
-        ./samba.nix
-        ./landing.nix
-        ./syncthing.nix
+        
         ./www.nix
-        ./ntp.nix
-        ./mosquitto.nix
         ./zigbee2mqtt.nix
         ./home-assistant.nix
         ./esphome.nix
         ./frigate.nix
-        ./plex.nix
         ./transmission.nix
         ./sabnzbd.nix
         ./prowlarr.nix

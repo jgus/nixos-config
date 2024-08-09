@@ -12,8 +12,14 @@ in
       ./${machine.arch}.nix
       ./host.nix
       ./users.nix
-      ./nas.nix
       ./vscode.nix
+
+      ./ntp.nix
+      ./landing.nix
+      ./nas.nix
+      ./syncthing.nix
+      ./mosquitto.nix
+      ./plex.nix
     ]
     ++ (if machine.nvidia then [ ./nvidia.nix ] else [])
     ++ (if machine.zfs then [ ./zfs.nix ] else [])

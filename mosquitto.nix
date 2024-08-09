@@ -1,32 +1,36 @@
 { config, pkgs, ... }:
 
 let
+  service = "mosquitto";
+  user = "mosquitto";
+  group = "mosquitto";
   pw = import ./.secrets/passwords.nix;
   addresses = import ./addresses.nix;
+  machine = import ./machine.nix;
 in
+if (machine.hostName != addresses.services."${service}".host) then {} else
 {
-
   networking = {
-    macvlans.br-mqtt = {
+    macvlans."eth-${service}" = {
       interface = "br0";
     };
-    interfaces.br-mqtt = {
-      macAddress = addresses.services.mqtt.mac;
+    interfaces."eth-${service}" = {
+      macAddress = addresses.services.${service}.mac;
       useDHCP = true;
-      #ipv4.addresses = [ { address = addresses.services.mqtt.ip; prefixLength = 16; } ];
+      #ipv4.addresses = [ { address = addresses.services.${service}.ip; prefixLength = 16; } ];
     };
     firewall = {
       allowedTCPPorts = [ 1883 ];
     };
   };
 
-  services.mosquitto = {
+  services."${service}" = {
     enable = true;
-    dataDir = "/var/lib/mosquitto";
+    dataDir = "/var/lib/${service}";
     # logType = [ "all" ];
     listeners = [
       {
-        address = addresses.services.mqtt.ip;
+        address = addresses.services.${service}.ip;
         users = {
           ha = {
             acl = [ "readwrite #" ];
@@ -67,28 +71,28 @@ in
 
   systemd = {
     services = {
-      mosquitto-setup = {
+      "${service}-setup" = {
         path = [ pkgs.zfs ];
         script = ''
-          zfs list r/varlib/mosquitto >/dev/null 2>&1 || ( zfs create r/varlib/mosquitto && chown mosquitto:mosquitto /var/lib/mosquitto )
+          zfs list r/varlib/${service} >/dev/null 2>&1 || ( zfs create r/varlib/${service} && chown ${user}:${group} /var/lib/${service} )
         '';
         serviceConfig = {
           Type = "oneshot";
         };
-        requiredBy = [ "mosquitto.service" ];
-        before = [ "mosquitto.service" ];
+        requiredBy = [ "${service}.service" ];
+        before = [ "${service}.service" ];
       };
-      mosquitto-kick = {
+      "${service}-kick" = {
         enable = true;
         description = "Restart Mosquitto after network address is available";
         wantedBy = [ "multi-user.target" ];
-        requires = [ "network-addresses-br-mqtt.service" ];
+        requires = [ "network-addresses-eth-${service}.service" ];
         script = ''
-          while ! systemctl restart mosquitto.service
+          while ! systemctl restart ${service}.service
           do
             sleep 1
-            systemctl stop mosquitto.service || true
-          done          
+            systemctl stop ${service}.service || true
+          done
         '';
         serviceConfig = {
           Type = "oneshot";

@@ -1,8 +1,11 @@
 { pkgs, ... }:
 
 let
+  service = "landing";
   addresses = import ./addresses.nix;
+  machine = import ./machine.nix;
 in
+if (machine.hostName != addresses.services."${service}".host) then {} else
 {
   imports = [ ./docker.nix ];
 
@@ -47,7 +50,7 @@ in
 
   systemd = {
     services = {
-      landing = {
+      "${service}" = {
         enable = true;
         description = "Landing";
         wantedBy = [ "multi-user.target" ];

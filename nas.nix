@@ -1,9 +1,11 @@
 { pkgs, ... }:
 
 let
+  service = "landing";
+  addresses = import ./addresses.nix;
   machine = import ./machine.nix;
 in
-if machine.nas-host then
+if (machine.hostName == addresses.services."${service}".host) then
 {
   services.nfs.server.enable = true;
   networking.firewall.allowedTCPPorts = [ 2049 ];
@@ -16,6 +18,8 @@ if machine.nas-host then
   services.nfs.server.exports = ''
     /nas 172.22.1.0/22(rw,crossmnt,no_root_squash)
   '';
+
+  imports = [ ./samba.nix ];
 }
 else
 {

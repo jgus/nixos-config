@@ -7,10 +7,10 @@ in
   fileSystems."/tmp/share" = { device = "tmpfs"; fsType = "tmpfs"; };
 
   networking = {
-    macvlans.br-nas = {
+    macvlans.eth-nas = {
       interface = "br0";
     };
-    interfaces.br-nas = {
+    interfaces.eth-nas = {
       macAddress = addresses.services.nas.mac;
       useDHCP = true;
       #ipv4.addresses = [ { address = addresses.services.nas.ip; prefixLength = 16; } ];
@@ -28,7 +28,7 @@ in
     openFirewall = true;
     securityType = "user";
     extraConfig = ''
-      interfaces = lo br-nas
+      interfaces = lo eth-nas
       bind interfaces only = yes
       workgroup = WORKGROUP
       server string = nas

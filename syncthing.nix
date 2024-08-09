@@ -2,9 +2,12 @@
 
 with (import ./functions.nix) { inherit pkgs; };
 let
+  service = "syncthing";
   image = "lscr.io/linuxserver/syncthing";
   addresses = import ./addresses.nix;
+  machine = import ./machine.nix;
 in
+if (machine.hostName != addresses.services."${service}".host) then {} else
 {
   imports = [ ./docker.nix ];
 
@@ -13,7 +16,7 @@ in
     allowedUDPPorts = [ 21027 ];
   };
 
-  virtualisation.oci-containers.containers.syncthing = {
+  virtualisation.oci-containers.containers."${service}" = {
     image = "${image}";
     autoStart = true;
     ports = [
@@ -47,17 +50,17 @@ in
       name = "syncthing";
       image = image;
       setup-script = ''
-        if ! zfs list r/varlib/syncthing >/dev/null 2>&1
+        if ! zfs list r/varlib/${service} >/dev/null 2>&1
         then
-          zfs create r/varlib/syncthing
-          chown josh:users /var/lib/syncthing
-          rsync -arPx --delete /nas/backup/varlib/syncthing/ /var/lib/syncthing/ || true
+          zfs create r/varlib/${service}
+          chown josh:users /var/lib/${service}
+          rsync -arPx --delete /nas/backup/varlib/${service}/ /var/lib/${service}/ || true
         fi
-        zfs list r/varlib/syncthing/index-v0.14.0.db >/dev/null 2>&1 || ( zfs create r/varlib/syncthing/index-v0.14.0.db && chown josh:users /var/lib/syncthing/index-v0.14.0.db )
+        zfs list r/varlib/${service}/index-v0.14.0.db >/dev/null 2>&1 || ( zfs create r/varlib/${service}/index-v0.14.0.db && chown josh:users /var/lib/${service}/index-v0.14.0.db )
       '';
       backup-script = ''
-        mkdir -p /nas/backup/varlib/syncthing
-        rsync -arPx --delete /var/lib/syncthing/ /nas/backup/varlib/syncthing/
+        mkdir -p /nas/backup/varlib/${service}
+        rsync -arPx --delete /var/lib/${service}/ /nas/backup/varlib/${service}/
       '';
     };
   };
