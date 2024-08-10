@@ -1,4 +1,7 @@
-{
+with builtins;
+let
+  lib = import <nixpkgs/lib>;
+  domain = "home.gustafson.me";
   machines = {
     b1 =        { mac = "00:24:0b:01:b1:10";  ip = "172.22.1.36"; };
     c1-1 =      { mac = "00:24:0b:01:c1:10";  ip = "172.22.1.30"; };
@@ -49,4 +52,31 @@
   vms = {
     vm1 =               { mac = "00:24:0b:51:40:10"; ip = "172.22.4.1";   host = "d1"; dns = "host"; };
   };
-}
+  servicesAndVms = services // vms;
+  pairs = lib.lists.flatten [
+    (map
+      (k: 
+        let
+          m = (getAttr k machines);
+          ip = m.ip;
+        in
+        [ { name = k; ip = ip; } ] ++ (map (alias: { name = alias; ip = ip; }) (if (m ? aliases) then m.aliases else []))
+      )
+      (attrNames machines)
+    )
+    (map
+      (k: 
+        let
+          s = (getAttr k servicesAndVms);
+          ip = if (s.dns == "own") then s.ip else if (s.dns == "host") then (getAttr s.host machines).ip else (getAttr s.dns machines).ip;
+        in
+        [ { name = k; ip = ip; } ] ++ (map (alias: { name = alias; ip = ip; }) (if (s ? aliases) then s.aliases else []))
+      )
+      (attrNames servicesAndVms)
+    )
+  ];
+  names = map (p: p.name) pairs;
+  nameToIp = listToAttrs (map (p: { name = p.name; value = p.ip; }) pairs);
+  ipToNames = lib.lists.groupBy (n: getAttr n nameToIp) names;
+  hosts = mapAttrs (key: value: lib.lists.flatten (map (e: [e (e + "." + domain)]) value)) ipToNames;
+in { inherit domain machines services vms hosts; }

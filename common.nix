@@ -1,6 +1,7 @@
 { config, pkgs, ... }:
 
 let
+  addresses = import ./addresses.nix;
   machine = import ./machine.nix;
 in
 {
@@ -27,7 +28,8 @@ in
     useDHCP = false;
     tempAddresses = "disabled";
 
-    timeServers = [ "ntp.home.gustafson.me" "pool.ntp.org" ];
+    timeServers = [ "ntp.home.gustafson.me" ];
+    hosts = addresses.hosts;
   } // (if (machine ? bridge) then {
     bridges.br0.interfaces = machine.bridge.interfaces;
     interfaces.br0.macAddress = machine.bridge.mac;
