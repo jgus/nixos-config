@@ -34,35 +34,35 @@ if (machine.hostName != addresses.services."${service}".host) then {} else
         users = {
           ha = {
             acl = [ "readwrite #" ];
-            password = "${pw.mqtt.ha}";
+            password = pw.mqtt.ha;
           };
           frigate = {
             acl = [ "readwrite #" ];
-            password = "${pw.mqtt.frigate}";
+            password = pw.mqtt.frigate;
           };
           zigbee2mqtt = {
             acl = [ "readwrite #" ];
-            password = "${pw.mqtt.zigbee2mqtt}";
+            password = pw.mqtt.zigbee2mqtt;
           };
           theater_remote = {
             acl = [ "readwrite #" ];
-            password = "${pw.mqtt.theater_remote}";
+            password = pw.mqtt.theater_remote;
           };
           frodo = {
             acl = [ "readwrite valetudo/Frodo/#" ];
-            password = "${pw.mqtt.frodo}";
+            password = pw.mqtt.frodo;
           };
           sam = {
             acl = [ "readwrite valetudo/Sam/#" ];
-            password = "${pw.mqtt.sam}";
+            password = pw.mqtt.sam;
           };
           merry = {
             acl = [ "readwrite valetudo/Merry/#" ];
-            password = "${pw.mqtt.merry}";
+            password = pw.mqtt.merry;
           };
           pippin = {
             acl = [ "readwrite valetudo/Pippin/#" ];
-            password = "${pw.mqtt.pippin}";
+            password = pw.mqtt.pippin;
           };
         };
       }

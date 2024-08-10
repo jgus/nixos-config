@@ -11,10 +11,10 @@ in
   networking.firewall.allowedTCPPorts = [ 8081 ];
 
   virtualisation.oci-containers.containers.zigbee2mqtt = {
-    image = "${image}";
+    image = image;
     autoStart = true;
     environment = {
-      TZ = "${config.time.timeZone}";
+      TZ = config.time.timeZone;
     };
     ports = [
       "8081:8081"

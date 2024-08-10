@@ -14,7 +14,7 @@ if (machine.hostName != addresses.services."${service}".host) then {} else
   imports = [ ./docker.nix ];
 
   virtualisation.oci-containers.containers."${service}" = {
-    image = "${image}";
+    image = image;
     autoStart = true;
     extraOptions = [
       "--network=macvlan"
@@ -25,9 +25,9 @@ if (machine.hostName != addresses.services."${service}".host) then {} else
       "--tmpfs=/tmp"
     ];
     environment = {
-      PUID = "${toString config.users.users."${user}".uid}";
-      PGID = "${toString config.users.groups."${group}".gid}";
-      TZ = "${config.time.timeZone}";
+      PUID = toString config.users.users."${user}".uid;
+      PGID = toString config.users.groups."${group}".gid;
+      TZ = config.time.timeZone;
       VERSION = "latest";
     };
     volumes = [

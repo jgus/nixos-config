@@ -12,12 +12,12 @@ in
   };
 
   virtualisation.oci-containers.containers.prowlarr = {
-    image = "${image}";
+    image = image;
     autoStart = true;
     environment = {
-      PUID = "${toString config.users.users.josh.uid}";
-      PGID = "${toString config.users.groups.plex.gid}";
-      TZ = "${config.time.timeZone}";
+      PUID = toString config.users.users.josh.uid;
+      PGID = toString config.users.groups.plex.gid;
+      TZ = config.time.timeZone;
     };
     ports = [
       "9696:9696"

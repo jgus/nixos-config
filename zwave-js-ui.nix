@@ -19,7 +19,7 @@ in
   };
 
   virtualisation.oci-containers.containers.zwave-js-ui = {
-    image = "${image}";
+    image = image;
     autoStart = true;
     extraOptions = [
       "--device=${device}:/dev/zwave"
@@ -29,7 +29,7 @@ in
       "3000:3000"
     ];
     environment = {
-      TZ = "${config.time.timeZone}";
+      TZ = config.time.timeZone;
     };
     volumes = [
       "/var/lib/zwave-js-ui:/usr/src/app/store"

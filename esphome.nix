@@ -10,7 +10,7 @@ in
   networking.firewall.allowedTCPPorts = [ 6052 ];
 
   virtualisation.oci-containers.containers.esphome = {
-    image = "${image}";
+    image = image;
     autoStart = true;
     user = "${toString config.users.users.josh.uid}:${toString config.users.groups.users.gid}";
     extraOptions = [

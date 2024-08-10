@@ -17,7 +17,7 @@ if (machine.hostName != addresses.services."${service}".host) then {} else
   };
 
   virtualisation.oci-containers.containers."${service}" = {
-    image = "${image}";
+    image = image;
     autoStart = true;
     ports = [
       "8384:8384"
@@ -25,9 +25,9 @@ if (machine.hostName != addresses.services."${service}".host) then {} else
       "21027:21027/udp"
     ];
     environment = {
-      PUID = "${toString config.users.users.josh.uid}";
-      PGID = "${toString config.users.groups.users.gid}";
-      TZ = "${config.time.timeZone}";
+      PUID = toString config.users.users.josh.uid;
+      PGID = toString config.users.groups.users.gid;
+      TZ = config.time.timeZone;
       UMASK_SET = "002";
     };
     volumes = [

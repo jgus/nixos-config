@@ -10,7 +10,7 @@ let
   };
   machine = {
     # Defaults
-    hostName = "${machine-id}";
+    hostName = machine-id;
     arch = "x86";
     nvidia = false;
     zfs = true;

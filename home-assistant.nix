@@ -283,16 +283,16 @@ in
     };
 
   virtualisation.oci-containers.containers.home-assistant = {
-    image = "${image}";
+    image = image;
     autoStart = true;
     extraOptions = [
       "--privileged"
       "--net=host"
     ];
     environment = {
-      PUID = "${toString config.users.users.plex.uid}";
-      PGID = "${toString config.users.groups.plex.gid}";
-      TZ = "${config.time.timeZone}";
+      PUID = toString config.users.users.plex.uid;
+      PGID = toString config.users.groups.plex.gid;
+      TZ = config.time.timeZone;
       VERSION = "latest";
     };
     volumes = [

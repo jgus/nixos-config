@@ -12,11 +12,11 @@ in
   };
 
   virtualisation.oci-containers.containers.komga = {
-    image = "${image}";
+    image = image;
     autoStart = true;
     user = "${toString config.users.users.josh.uid}:${toString config.users.groups.plex.gid}";
     environment = {
-      TZ = "${config.time.timeZone}";
+      TZ = config.time.timeZone;
       SERVER_PORT = "25600";
     };
     ports = [

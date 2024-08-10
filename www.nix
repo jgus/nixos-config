@@ -10,7 +10,7 @@ in
   imports = [ ./docker.nix ];
 
   virtualisation.oci-containers.containers.web-db = {
-    image = "${db_image}";
+    image = db_image;
     autoStart = true;
     volumes = [
       "/var/lib/web_db_data:/var/lib/mysql"
@@ -18,7 +18,7 @@ in
   };
 
   virtualisation.oci-containers.containers.web-db-admin = {
-    image = "${db_admin_image}";
+    image = db_admin_image;
     autoStart = true;
     dependsOn = [ "web-db" ];
     extraOptions = [
@@ -33,7 +33,7 @@ in
   };
 
   virtualisation.oci-containers.containers.web-swag = {
-    image = "${swag_image}";
+    image = swag_image;
     autoStart = true;
     dependsOn = [ "web-db" ];
     extraOptions = [
@@ -47,9 +47,9 @@ in
       EXTRA_DOMAINS = "gushome.org,www.gushome.org";
       VALIDATION = "http";
       EMAIL = "joshgstfsn@gmail.com";
-      PUID = "${toString config.users.users.www.uid}";
-      PGID = "${toString config.users.groups.www.gid}";
-      TZ = "${config.time.timeZone}";
+      PUID = toString config.users.users.www.uid;
+      PGID = toString config.users.groups.www.gid;
+      TZ = config.time.timeZone;
     };
     ports = [
       "80:80"

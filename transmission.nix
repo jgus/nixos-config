@@ -13,7 +13,7 @@ in
   };
 
   virtualisation.oci-containers.containers.transmission = {
-    image = "${image}";
+    image = image;
     autoStart = true;
     extraOptions = [
       "--cap-add=NET_ADMIN"
@@ -22,9 +22,9 @@ in
       .secrets/privadovpn.env
     ];
     environment = {
-      PUID = "${toString config.users.users.josh.uid}";
-      PGID = "${toString config.users.groups.plex.gid}";
-      TZ = "${config.time.timeZone}";
+      PUID = toString config.users.users.josh.uid;
+      PGID = toString config.users.groups.plex.gid;
+      TZ = config.time.timeZone;
       OPENVPN_PROVIDER = "PRIVADO";
       LOCAL_NETWORK = "172.22.0.0/16,192.168.2.0/24";
       TRANSMISSION_DOWNLOAD_DIR = "/peer/Complete";

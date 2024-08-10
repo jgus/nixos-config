@@ -475,7 +475,7 @@ in
   };
 
   virtualisation.oci-containers.containers.frigate = {
-    image = "${image}";
+    image = image;
     autoStart = true;
     extraOptions = [
       "--shm-size=2048m"

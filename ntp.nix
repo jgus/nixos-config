@@ -14,7 +14,7 @@ if (machine.hostName != addresses.services."${service}".host) then {} else
   networking.firewall.allowedUDPPorts = [ 123 ];
 
   virtualisation.oci-containers.containers."${service}" = {
-    image = "${image}";
+    image = image;
     autoStart = true;
     extraOptions = [
       "--network=macvlan"

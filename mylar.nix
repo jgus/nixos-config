@@ -12,15 +12,15 @@ in
   };
 
   virtualisation.oci-containers.containers.mylar = {
-    image = "${image}";
+    image = image;
     autoStart = true;
     extraOptions = [
       "--tmpfs=/config/mylar/cache"
     ];
     environment = {
-      PUID = "${toString config.users.users.josh.uid}";
-      PGID = "${toString config.users.groups.plex.gid}";
-      TZ = "${config.time.timeZone}";
+      PUID = toString config.users.users.josh.uid;
+      PGID = toString config.users.groups.plex.gid;
+      TZ = config.time.timeZone;
     };
     ports = [
       "8090:8090"

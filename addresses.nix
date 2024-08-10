@@ -13,9 +13,11 @@ let
     pi-67cba1 = { mac = "d8:3a:dd:67:cb:a1";  ip = "172.22.2.8"; aliases = [ "theater-pi" "theater-cec" ]; };
   };
   services = {
-    ntp =               { mac = "00:24:0b:51:00:10"; ip = "172.22.3.1";   host = "d1"; dns = "own"; };
+    pihole =            { mac = "00:24:0b:51:00:00"; ip = "172.22.3.1";   host = "c1-2"; dns = "own"; };
 
-    landing =           { mac = "00:24:0b:51:01:10"; ip = "172.22.3.2";   host = "d1"; dns = "own"; };
+    ntp =               { mac = "00:24:0b:51:00:10"; ip = "172.22.3.2";   host = "d1"; dns = "own"; };
+
+    landing =           { mac = "00:24:0b:51:01:10"; ip = "172.22.3.3";   host = "d1"; dns = "own"; };
 
     nas =               { mac = "00:24:0b:51:03:10"; ip = "172.22.3.10";  host = "d1"; dns = "own"; };
     syncthing =         { mac = "00:24:0b:51:03:20"; ip = "172.22.3.11";  host = "d1"; dns = "own"; };

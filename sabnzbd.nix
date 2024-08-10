@@ -12,12 +12,12 @@ in
   };
 
   virtualisation.oci-containers.containers.sabnzbd = {
-    image = "${image}";
+    image = image;
     autoStart = true;
     environment = {
-      PUID = "${toString config.users.users.josh.uid}";
-      PGID = "${toString config.users.groups.plex.gid}";
-      TZ = "${config.time.timeZone}";
+      PUID = toString config.users.users.josh.uid;
+      PGID = toString config.users.groups.plex.gid;
+      TZ = config.time.timeZone;
     };
     ports = [
       "8080:8080"
