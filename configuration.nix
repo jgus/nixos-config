@@ -14,6 +14,7 @@ in
       ./users.nix
       ./vscode.nix
 
+      ./pihole.nix
       ./ntp.nix
       ./landing.nix
       ./nas.nix
