@@ -25,7 +25,7 @@ in
     tempAddresses = "disabled";
     defaultGateway.address = addresses.network.defaultGateway;
     domain = addresses.network.domain;
-    nameservers = [ addresses.services.pihole.ip ];
+    nameservers = [ addresses.services.pihole.ip "1.1.1.1" "1.0.0.1" ];
     timeServers = [ "ntp.home.gustafson.me" ];
     hosts = addresses.hosts;
     interfaces.lan0 = let m = addresses.machines."${machine.hostName}"; in {
