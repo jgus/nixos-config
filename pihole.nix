@@ -26,7 +26,7 @@ if (machine.hostName != addresses.services."${service}".host) then {} else
       TZ = config.time.timeZone;
       WEBPASSWORD = pw.pihole;
       FTLCONF_LOCAL_IPV4 = addresses.services."${service}".ip;
-      VIRTUAL_HOST = "${service}.${addresses.domain}";
+      VIRTUAL_HOST = "${service}.${addresses.network.domain}";
     };
     volumes = [
       "/var/lib/${service}/pihole:/etc/pihole"

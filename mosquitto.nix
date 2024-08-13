@@ -12,7 +12,7 @@ if (machine.hostName != addresses.services."${service}".host) then {} else
 {
   networking = {
     macvlans."eth-${service}" = {
-      interface = "br0";
+      interface = "${machine.lan-interface}";
     };
     interfaces."eth-${service}" = {
       macAddress = addresses.services.${service}.mac;

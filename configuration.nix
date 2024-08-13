@@ -7,7 +7,6 @@ in
   imports =
     [ # Include the results of the hardware scan.
       (if (machine.arch == "rpi") then ./hardware-configuration-pi.nix else ./hardware-configuration.nix)
-      ./interfaces.nix
       ./common.nix
       ./${machine.arch}.nix
       ./host.nix

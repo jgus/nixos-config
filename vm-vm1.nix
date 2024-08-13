@@ -109,7 +109,7 @@ let
         <controller type="virtio-serial" index="0"/>
         <interface type="direct">
           <mac address="${addresses.vms.${name}.mac}"/>
-          <source dev="${machine.primary_interface}" mode="bridge"/>
+          <source dev="${machine.lan-interface}" mode="bridge"/>
           <model type="virtio"/>
         </interface>
         <interface type="network">

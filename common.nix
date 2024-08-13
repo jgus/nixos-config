@@ -21,19 +21,23 @@ in
 
   networking = {
     firewall.allowPing = true;
-
-    # The global useDHCP flag is deprecated, therefore explicitly set to false here.
-    # Per-interface useDHCP will be mandatory in the future, so this generated config
-    # replicates the default behaviour.
     useDHCP = false;
     tempAddresses = "disabled";
-
+    defaultGateway.address = addresses.network.defaultGateway;
+    domain = addresses.network.domain;
+    nameservers = [ addresses.services.pihole.ip ];
     timeServers = [ "ntp.home.gustafson.me" ];
     hosts = addresses.hosts;
-  } // (if (machine ? bridge) then {
-    bridges.br0.interfaces = machine.bridge.interfaces;
-    interfaces.br0.macAddress = machine.bridge.mac;
-    interfaces.br0.useDHCP = true;
+    interfaces.lan0 = let m = addresses.machines."${machine.hostName}"; in {
+      macAddress = m.mac;
+      ipv4.addresses = [ { address = m.ip; prefixLength = addresses.network.prefixLength; } ];
+    };
+    macvlans.lan0 = {
+      interface = machine.lan-interface;
+      mode = "bridge";
+    };
+  } // (if (machine ? lan-interfaces) then {
+    bridges."${machine.lan-interface}".interfaces = machine.lan-interfaces;
   } else {});
 
   # List packages installed in system profile. To search, run:

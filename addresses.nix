@@ -1,7 +1,11 @@
 with builtins;
 let
   lib = import <nixpkgs/lib>;
-  domain = "home.gustafson.me";
+  network = {
+    defaultGateway = "172.22.0.1";
+    prefixLength = 16;
+    domain = "home.gustafson.me";
+  };
   machines = {
     b1 =        { mac = "00:24:0b:01:b1:10";  ip = "172.22.1.36"; };
     c1-1 =      { mac = "00:24:0b:01:c1:10";  ip = "172.22.1.30"; };
@@ -80,5 +84,5 @@ let
   names = map (p: p.name) pairs;
   nameToIp = listToAttrs (map (p: { name = p.name; value = p.ip; }) pairs);
   ipToNames = lib.lists.groupBy (n: getAttr n nameToIp) names;
-  hosts = mapAttrs (key: value: lib.lists.flatten (map (e: [e (e + "." + domain)]) value)) ipToNames;
-in { inherit domain machines services vms hosts; }
+  hosts = mapAttrs (key: value: lib.lists.flatten (map (e: [e (e + "." + network.domain)]) value)) ipToNames;
+in { inherit network machines services vms hosts; }

@@ -15,8 +15,6 @@ git config --global user.name root
 git clone -b ${BRANCH} https://github.com/jgus/nixos-config.git /etc/nixos
 "
 
-/mnt/etc/nixos/gen-interfaces.sh >/mnt/etc/nixos/interfaces.nix
-
 echo -n "${MACHINE_ID}" >/mnt/etc/nixos/machine-id.nix
 
 mkdir -p /etc/nixos/.secrets

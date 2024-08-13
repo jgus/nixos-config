@@ -2,10 +2,12 @@
 let
   machine-id = builtins.readFile ./machine-id.nix;
   pw = import ./.secrets/passwords.nix;
-  addresses = import ./addresses.nix;
-  zwave-box = {
+  rpi = {
       arch = "rpi";
+      lan-interface = "end0";
       zfs = false;
+  };
+  zwave-box = rpi // {
       imports = [ ./zwave-js-ui.nix ];
   };
   machine = {
@@ -21,7 +23,7 @@ let
     d1 = {
       stateVersion = "23.05";
       hostId = "2bec4b05";
-      bridge-interfaces = [ "eno1" "eno2" "eno3" "eno4" "enp5s0f0" "enp5s0f1" ];
+      lan-interfaces = [ "eno1" "eno2" "eno3" "eno4" "enp5s0f0" "enp5s0f1" ];
       nvidia = true;
       zfs-pools = [ "d" ];
       imports = [
@@ -62,29 +64,27 @@ let
     c1-1 = {
       stateVersion = "24.05";
       hostId = "dfc92a33";
-      bridge-interfaces = [ "eno1" "eno2" ];
+      lan-interfaces = [ "eno1" "eno2" ];
       zfs-pools = [ "d" "m" ];
       imports = [];
     };
     c1-2 = {
       stateVersion = "24.05";
       hostId = "39810e52";
-      bridge-interfaces = [ "eno1" "eno2" ];
+      lan-interfaces = [ "eno1" "eno2" ];
       zfs-pools = [];
       imports = [ ./userbox.nix ];
     };
     b1 = {
       stateVersion = "24.05";
       hostId = "8f150749";
-      bridge-interfaces = [ "enp1s0" ];
+      lan-interfaces = [ "enp1s0" ];
       zfs-pools = [];
       imports = [ ./machine/b1/ups.nix ];
     };
-    pi-67cba1 = {
+    pi-67cba1 = rpi // {
       stateVersion = "23.05";
       hostId = "62c05afa";
-      arch = "rpi";
-      zfs = false;
       imports = [ ./cec.nix ];
     };
     pi-67db40 = zwave-box // {
@@ -104,12 +104,6 @@ in
 {
   fwupd = (machine.arch == "x86");
   python = (machine.arch == "x86");
-  primary_interface = if (machine.arch == "rpi") then "end0" else "br0";
 } //
-(if (machine ? bridge-interfaces) then {
-  bridge = {
-    interfaces = machine.bridge-interfaces;
-    mac = addresses.machines."${machine-id}".mac;
-  };
-} else {}) //
+(if (machine ? lan-interfaces) then { lan-interface = "br0"; } else {}) //
 machine

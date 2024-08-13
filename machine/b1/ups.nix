@@ -28,25 +28,4 @@ in
       passwordFile = toString (pkgs.writeText "password.txt" pw.ups);
     };
   };
-
-  systemd = {
-    services = {
-      upsd-kick = {
-        enable = true;
-        description = "Restart UPSD after network address is available";
-        wantedBy = [ "multi-user.target" ];
-        requires = [ "network-addresses-${machine.primary_interface}.service" ];
-        script = ''
-          while ! systemctl restart upsd.service
-          do
-            sleep 1
-            systemctl stop upsd.service || true
-          done          
-        '';
-        serviceConfig = {
-          Type = "oneshot";
-        };
-      };
-    };
-  };
 }

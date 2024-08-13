@@ -22,8 +22,6 @@ echo "### Generating hardware configuration"
 nixos-generate-config --root /mnt
 sed -i 's/fsType = "zfs"/fsType = "zfs"; options = [ "zfsutil" ]/' /mnt/etc/nixos/hardware-configuration.nix
 
-/mnt/etc/nixos/gen-interfaces.sh >/mnt/etc/nixos/interfaces.nix
-
 echo -n "${MACHINE_ID}" >/mnt/etc/nixos/machine-id.nix
 
 mkdir -p /mnt/boot/.secrets

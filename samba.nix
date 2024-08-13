@@ -8,7 +8,7 @@ in
 
   networking = {
     macvlans.eth-nas = {
-      interface = "br0";
+      interface = "${machine.lan-interface}";
     };
     interfaces.eth-nas = {
       macAddress = addresses.services.nas.mac;
