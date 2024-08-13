@@ -78,7 +78,7 @@ let
     b1 = {
       stateVersion = "24.05";
       hostId = "8f150749";
-      lan-interfaces = [ "enp1s0" ];
+      lan-interface = "enp1s0";
       zfs-pools = [];
       imports = [ ./machine/b1/ups.nix ];
     };
