@@ -2,6 +2,7 @@
 
 let
   addresses = import ./addresses.nix;
+  machine = import ./machine.nix;
 in
 {
   fileSystems."/tmp/share" = { device = "tmpfs"; fsType = "tmpfs"; };
