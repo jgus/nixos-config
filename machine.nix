@@ -63,7 +63,7 @@ let
       stateVersion = "24.05";
       hostId = "dfc92a33";
       bridge-interfaces = [ "eno1" "eno2" ];
-      zfs-pools = [ "d" ];
+      zfs-pools = [ "d" "m" ];
       imports = [];
     };
     c1-2 = {

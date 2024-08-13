@@ -19,17 +19,11 @@ repl() {
 }
 
 copy() {
-    DATASET=$1
-    # ssh root@${REMOTE} zfs destroy ${DATASET}@rsync || true
-    # ssh root@${REMOTE} zfs snapshot ${DATASET}@rsync
-    # zfs list ${DATASET} || zfs create ${DATASET}
-    # SMOUNT=$(ssh root@${REMOTE} zfs get mountpoint ${DATASET} -o value -H)
-    # TMOUNT=$(zfs get mountpoint ${DATASET} -o value -H)
-    # rsync -arP root@${REMOTE}:${SMOUNT}/.zfs/snapshot/rsync/ ${TMOUNT}/
-    # ssh root@${REMOTE} zfs destroy ${DATASET}@rsync
-    zfs list ${DATASET} || zfs create ${DATASET}
-    SMOUNT=$(ssh root@${REMOTE} zfs get mountpoint ${DATASET} -o value -H)
-    TMOUNT=$(zfs get mountpoint ${DATASET} -o value -H)
+    SDATASET=$1
+    TDATASET=${2:-${SDATASET}}
+    zfs list ${TDATASET} || zfs create ${TDATASET}
+    SMOUNT=$(ssh root@${REMOTE} zfs get mountpoint ${SDATASET} -o value -H)
+    TMOUNT=$(zfs get mountpoint ${TDATASET} -o value -H)
     rsync -arPx --delete root@${REMOTE}:${SMOUNT}/ ${TMOUNT}/
 }
 
@@ -58,9 +52,9 @@ copy d/offsite/gustafson-nas/r/nixos
 copy d/scratch/peer
 copy d/scratch/usenet
 copy d/varlib/images
-copy d/media
+copy d/media m/media
 
-repl d/varlib/frigate-config
+copy d/varlib/frigate-config
 
 copy d/varlib/frigate-media
 

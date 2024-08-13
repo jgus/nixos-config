@@ -1,8 +1,5 @@
 #!/usr/bin/env -S bash -e
 
-COUNT=28
-ZPOOL_TYPE=raidz3
-
 ZPOOL_OPTS=(
     -o ashift=12
     -O acltype=posixacl
@@ -12,22 +9,51 @@ ZPOOL_OPTS=(
     -O normalization=formD
     -O relatime=on
     -O xattr=sa
-    -O mountpoint=/d
     -O encryption=on
     -O keyformat=raw
     -O keylocation=file:///boot/.secrets/vkey
-    -O recordsize=4M
+    -O recordsize=1M
     -O autobackup:snap-$(hostname)=true
 )
 
-AVAILABLE_DISKS=($(for i in {0..22} {24..28}; do echo /dev/disk/by-path/pci-0000\:0d\:00.0-scsi-0\:0\:${i}\:0; done))
-DISKS=($(for i in $(seq 0 $((COUNT-1))); do echo ${AVAILABLE_DISKS[${i}]}; done))
+D_DISKS=(
+    /dev/disk/by-id/scsi-35000cca26a2e4448
+    /dev/disk/by-id/scsi-35000cca26a2f6f58
+    /dev/disk/by-id/scsi-35000cca26a35ff6c
+    /dev/disk/by-id/scsi-35000cca26a409bd4
+    /dev/disk/by-id/scsi-35000cca26a945b64
+    /dev/disk/by-id/scsi-35000cca26a97f720
+    /dev/disk/by-id/scsi-35000cca26a992310
+    /dev/disk/by-id/scsi-35000cca26a9975e8
+    /dev/disk/by-id/scsi-35000cca26a9e21f8
+    /dev/disk/by-id/scsi-35000cca26a9e7150
+    /dev/disk/by-id/scsi-35000cca26a9f8e74
+)
 
-zpool create -f "${ZPOOL_OPTS[@]}" d ${ZPOOL_TYPE} "${DISKS[@]}"
+M_DISKS=(
+    /dev/disk/by-id/scsi-35000cca26a9871e4
+    /dev/disk/by-id/scsi-35000cca26a35e998
+    /dev/disk/by-id/scsi-35000cca26a40a444
+    /dev/disk/by-id/scsi-35000cca26a34b108
+    /dev/disk/by-id/scsi-35000cca26a9e20f4
+    /dev/disk/by-id/scsi-35000cca26a361d9c
+    /dev/disk/by-id/scsi-35000cca26a3f8ad0
+    /dev/disk/by-id/scsi-35000cca26aa07e54
+    /dev/disk/by-id/scsi-35000cca26a988188
+    /dev/disk/by-id/scsi-35000cca26a993418
+    /dev/disk/by-id/scsi-35000cca26a9add94
+    /dev/disk/by-id/scsi-35000cca26a926508
+    /dev/disk/by-id/scsi-35000cca26aa0d918
+    /dev/disk/by-id/scsi-35000cca26a9f3cd0
+    /dev/disk/by-id/scsi-35000cca26a99fce8
+    /dev/disk/by-id/scsi-35000cca26a9fb548
+    /dev/disk/by-id/scsi-35000cca26aa02478
+    /dev/disk/by-id/scsi-35000cca26a347a70
+)
 
-zfs create -o autobackup:snap-$(hostname)=false -o recordsize=1M d/scratch
-zfs create -o recordsize=1M d/external
-zfs create -o recordsize=1M d/offsite
-zfs create -o recordsize=2M d/photos
-zfs create -o recordsize=2M d/projects
+zpool create -f "${ZPOOL_OPTS[@]}" -O mountpoint=/d d raidz3 "${D_DISKS[@]}"
+
+zfs create -o autobackup:snap-$(hostname)=false d/scratch
 zfs create -o mountpoint=/var/lib -o canmount=off d/varlib
+
+zpool create -f "${ZPOOL_OPTS[@]}" -O mountpoint=/m m raidz2 "${M_DISKS[@]}"
