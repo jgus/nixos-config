@@ -3,6 +3,7 @@
 let
   pw = import ./../../.secrets/passwords.nix;
   machine = import ./../../machine.nix;
+  addresses = import ./../../addresses.nix;
 in
 {
   power.ups = {
@@ -18,7 +19,7 @@ in
       enable = true;
       listen = [
         { address = "localhost"; }
-        { address = "${machine.hostName}.home.gustafson.me"; }
+        { address = addresses.machines."${machine.hostName}".ip; }
       ];
     };
     upsmon.enable = false;
