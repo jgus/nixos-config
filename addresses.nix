@@ -7,11 +7,15 @@ let
     defaultGateway = prefix + "0.1";
     domain = "home.gustafson.me";
   };
+  group = {
+    network = 0;
+    servers = 1;
+  };
   records = {
-    network = { gid = 0;
-    };
-    servers = { gid = 1;
-    };
+    b1 =        { group = 1; id = 1; };
+    c1-1 =      { group = 1; id = 2; };
+    c1-2 =      { group = 1; id = 3; };
+    d1 =        { group = 1; id = 4; };
   };
   servers = {
     b1 =        { mac = "00:24:0b:16:01:01";  ip = "172.22.1.1"; };
@@ -19,9 +23,9 @@ let
     c1-2 =      { mac = "00:24:0b:16:01:03";  ip = "172.22.1.3"; };
     d1 =        { mac = "00:24:0b:16:01:04";  ip = "172.22.1.4"; };
     pi-67cba1 = { mac = "00:24:0b:16:01:41";  ip = "172.22.1.65"; aliases = [ "theater-pi" "theater-cec" ]; };
-    pi-67db40 = { mac = "00:24:0b:16:01:42";  ip = "172.22.2.66"; };
-    pi-67dbcd = { mac = "00:24:0b:16:01:43";  ip = "172.22.2.67"; };
-    pi-67dc75 = { mac = "00:24:0b:16:01:44";  ip = "172.22.2.68"; };
+    pi-67db40 = { mac = "00:24:0b:16:01:42";  ip = "172.22.1.66"; };
+    pi-67dbcd = { mac = "00:24:0b:16:01:43";  ip = "172.22.1.67"; };
+    pi-67dc75 = { mac = "00:24:0b:16:01:44";  ip = "172.22.1.68"; };
   };
   statics = { 
     router =              { mac = "d2:21:f9:d9:78:8c"; ip = "172.22.0.1"; aliases = [ "gateway" ]; };
