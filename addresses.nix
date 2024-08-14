@@ -11,12 +11,28 @@ let
     network = 0;
     servers = 1;
   };
-  records = {
-    b1 =        { group = 1; id = 1; };
-    c1-1 =      { group = 1; id = 2; };
-    c1-2 =      { group = 1; id = 3; };
-    d1 =        { group = 1; id = 4; };
+  records-conf = {
+    b1 =        { g = 1; id = 1; };
+    c1-1 =      { g = 1; id = 2; };
+    c1-2 =      { g = 1; id = 3; };
+    d1 =        { g = 1; id = 4; };
+    pi-67cba1 = { g = 1; id = 65; aliases = [ "theater-pi" "theater-cec" ]; };
+    pi-67db40 = { g = 1; id = 66; };
+    pi-67dbcd = { g = 1; id = 67; };
+    pi-67dc75 = { g = 1; id = 68; };
   };
+  zeroPad = (s: n: if (stringLength s) >= n then s else (zeroPad ("0" + s) n));
+  toHex2 = (x: zeroPad (lib.strings.toLower (lib.trivial.toHexString x)) 2);
+  records = listToAttrs (map (k:
+    let r = (getAttr k records-conf); in
+    {
+      name = k;
+      value = {
+        ip = lib.concatStrings [ network.prefix (toString r.g) "." (toString r.id) ];
+        mac = lib.concatStrings [ "00:24:0b:16:" (toHex2 r.g) ":" (toHex2 r.id) ];
+      } // r;
+    }
+  ) (attrNames records-conf));
   servers = {
     b1 =        { mac = "00:24:0b:16:01:01";  ip = "172.22.1.1"; };
     c1-1 =      { mac = "00:24:0b:16:01:02";  ip = "172.22.1.2"; };
@@ -192,4 +208,4 @@ let
       (attrNames servicesAndVms)
     )
   ];
-in { inherit network servers services vms nameToIp hosts dhcpReservations; }
+in { inherit network records servers services vms nameToIp hosts dhcpReservations; }
