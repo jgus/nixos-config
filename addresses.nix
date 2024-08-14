@@ -21,7 +21,7 @@ let
     pi-67db40 = { mac = "d8:3a:dd:67:db:40";  ip = "172.22.2.10"; };
     pi-67dbcd = { mac = "d8:3a:dd:67:db:cd";  ip = "172.22.2.11"; };
     pi-67dc75 = { mac = "d8:3a:dd:67:dc:75";  ip = "172.22.2.12"; };
-    pi-67cba1 = { mac = "d8:3a:dd:67:cb:a1";  ip = "172.22.2.8"; aliases = [ "theater-pi" "theater-cec" ]; };
+    pi-67cba1 = { mac = "00:24:0b:16:01:41";  ip = "172.22.1.65"; aliases = [ "theater-pi" "theater-cec" ]; };
   };
   statics = { 
     router =              { mac = "d2:21:f9:d9:78:8c"; ip = "172.22.0.1"; aliases = [ "gateway" ]; };
