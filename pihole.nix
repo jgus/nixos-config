@@ -10,7 +10,6 @@ let
   dnsmasq-dns = with builtins; lib.concatStrings (map (ip: "host-record=" + (lib.concatStrings (map (s: "${s},") (getAttr ip addresses.hosts))) + ip + "\n") (attrNames addresses.hosts));
   dnsmasq-dhcp = with builtins; lib.concatStrings (map (r: "dhcp-host=" + r.mac + "," + r.ip + "," + r.name + ",infinite\n") addresses.dhcpReservations);
   dnsmasq-config = ''
-    domain=home.gustafson.me
     dhcp-option=option:ntp-server,${addresses.nameToIp.ntp}
   '';
 in
@@ -22,6 +21,7 @@ if (machine.hostName != addresses.services."${service}".host) then {} else
     image = image;
     autoStart = true;
     extraOptions = [
+      "--hostname=${service}"
       "--network=macvlan"
       "--mac-address=${addresses.services."${service}".mac}"
       "--ip=${addresses.services."${service}".ip}"
@@ -43,6 +43,7 @@ if (machine.hostName != addresses.services."${service}".host) then {} else
       DHCP_START = "172.22.200.1";
       DHCP_END = "172.22.254.254";
       DHCP_ROUTER = addresses.network.defaultGateway;
+      PIHOLE_DOMAIN = addresses.network.domain;
       VIRTUAL_HOST = "${service}.${addresses.network.domain}";
     };
     volumes = [
