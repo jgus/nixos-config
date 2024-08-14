@@ -14,6 +14,8 @@ let
     services = 3;
     vms = 4;
     admin = 5;
+    office = 31;
+    study = 33;
   };
   records-conf = 
   mapAttrs (k: v: { g = group.network; } // v) {
@@ -45,19 +47,100 @@ let
     pi-67db40 = { id = 66; };
     pi-67dbcd = { id = 67; };
     pi-67dc75 = { id = 68; };
+  } //
+  mapAttrs (k: v: { g = group.home-automation; } // v) {
+    zigbee =        { id = 6; mac = "b0:a7:32:05:7d:f3"; };
+    smartwings-n =  { id = 15; mac = "64:b7:08:17:38:53"; };
+    smartwings-s =  { id = 16; mac = "08:3a:8d:b2:be:e3"; };
+    somfy =         { id = 17; mac = "00:0e:c6:aa:0a:86"; };
+  } //
+  mapAttrs (k: v: { g = group.services; } // v) {
+    pihole =            { id = 1;   host = "b1"; aliases = [ "dhcp" "dns" ]; };
+    ntp =               { id = 2;   host = "d1"; };
+    landing =           { id = 3;   host = "d1"; };
+    nas =               { id = 10;  host = "d1"; dns = "host"; aliases = [ "samba" "smb" "nfs" ]; };
+    syncthing =         { id = 11;  host = "d1"; };
+    web-swag =          { id = 20;  host = "d1"; dns = "host"; };
+    web-db =            { id = 21;  host = "d1"; dns = "host"; };
+    web-db-admin =      { id = 22;  host = "d1"; dns = "host"; };
+    homeassistant =     { id = 30;  host = "d1"; dns = "host"; aliases = [ "ha" ]; };
+    esphome =           { id = 31;  host = "d1"; dns = "host"; };
+    mosquitto =         { id = 32;  host = "d1"; aliases = [ "mqtt" ]; };
+    zigbee2mqtt =       { id = 33;  host = "d1"; dns = "host"; };
+    zwave-main =        { id = 40;  host = "pi-67db40"; dns = "host"; };
+    zwave-upstairs =    { id = 41;  host = "pi-67dbcd"; dns = "host"; };
+    zwave-basement =    { id = 42;  host = "pi-67dc75"; dns = "host"; };
+    frigate =           { id = 50;  host = "d1"; dns = "host"; };
+    plex =              { id = 60;  host = "d1"; };
+    sabnzbd =           { id = 70;  host = "d1"; dns = "host"; };
+    transmission =      { id = 71;  host = "d1"; dns = "host"; };
+    prowlarr =          { id = 72;  host = "d1"; dns = "host"; };
+    sonarr =            { id = 73;  host = "d1"; dns = "host"; };
+    radarr =            { id = 74;  host = "d1"; dns = "host"; };
+    lidarr =            { id = 75;  host = "d1"; dns = "host"; };
+    mylar =             { id = 76;  host = "d1"; dns = "host"; };
+    komga =             { id = 77;  host = "d1"; dns = "host"; };
+    minecraft =         { id = 100; host = "d1"; dns = "host"; };
+    userbox-nathaniel = { id = 110; host = "d1"; dns = "host"; };
+  } //
+  mapAttrs (k: v: { g = group.vms; } // v) {
+    vm1 =               { id = 1; host = "d1"; dns = "host"; };
+  } //
+  mapAttrs (k: v: { g = group.admin; } // v) {
+    c1-imc =      { id = 2; mac = "70:0f:6a:3b:46:01"; };
+    d1-bmc =      { id = 4; mac = "18:66:da:b6:45:d8"; };
+    josh-pc-bmc = { id = 5; mac = "18:31:bf:cf:20:0b"; };
+  } //
+  mapAttrs (k: v: { g = group.office; } // v) {
+    josh-pc =             { id = 1; mac = "3c:fd:fe:e1:b9:d6"; };
+    snap-mac =            { id = 6; mac = "a4:fc:14:0d:f0:ea"; };
+    snap-laptop =         { id = 20; mac = "08:92:04:6e:38:61"; };
+  } //
+  mapAttrs (k: v: { g = group.study; } // v) {
+    printer =             { id = 2; mac = "f4:81:39:e4:0a:83"; };
+    kitchen-lappy =       { id = 10; mac = "74:e5:f9:e4:3f:59"; };
+    kayleigh-lappy-eth =  { id = 20; mac = "b4:45:06:82:81:47"; };
+    kayleigh-lappy =      { id = 21; mac = "f0:d4:15:30:c4:a6"; };
+    john-lappy-eth =      { id = 30; mac = "b4:45:06:82:81:46"; };
+    john-lappy =          { id = 31; mac = "f4:c8:8a:e8:8e:83"; };
+    william-lappy-eth =   { id = 40; mac = "b4:45:06:82:7e:db"; };
+    william-lappy =       { id = 41; mac = "f4:c8:8a:e8:e0:e0"; };
+    lyra-lappy-eth =      { id = 50; mac = "b4:45:06:82:7f:3d"; };
+    lyra-lappy =          { id = 51; mac = "f0:d4:15:30:c3:75"; };
+    eden-lappy-eth =      { id = 60; mac = "b4:45:06:82:82:e4"; };
+    eden-lappy =          { id = 61; mac = "f0:d4:15:30:c5:5a"; };
+    hope-lappy-eth =      { id = 70; mac = "f4:c8:8a:e8:e1:a8"; };
+    hope-lappy =          { id = 71; mac = "f0:d4:15:30:c5:00"; };
+    peter-lappy-eth =     { id = 80; mac = "b4:45:06:82:7e:ff"; };
+  } // {
+    gr-tv =               { g = 50;  id = 2;  mac = "64:e4:a5:61:30:0b"; };
+    lr-shield =           { g = 50;  id = 3;  mac = "00:04:4b:af:f0:0c"; };
+    game-room-tv =        { g = 56;  id = 1;  mac = "a0:6a:44:0f:bd:83"; };
+    theater-projector =   { g = 59;  id = 1;  mac = "e0:da:dc:17:ec:ef"; };
+    theater-preamp =      { g = 59;  id = 2;  mac = "00:1b:7c:0b:21:fb"; };
+    theater-shield =      { g = 59;  id = 3;  mac = "00:04:4b:a4:b0:84"; };
+    theater-bluray =      { g = 59;  id = 5;  mac = "34:31:7f:dd:db:9b"; };
+    camera-garage-s =     { g = 100; id = 16; mac = "9c:8e:cd:3d:72:89"; };
+    camera-garage-n =     { g = 100; id = 17; mac = "9c:8e:cd:3d:7c:0b"; };
+    camera-back-yard =    { g = 110; id = 16; mac = "9c:8e:cd:3d:72:a6"; };
+    camera-driveway =     { g = 113; id = 16; mac = "9c:8e:cd:3d:88:2c"; };
+    camera-n-side =       { g = 115; id = 16; mac = "9c:8e:cd:3d:7c:1a"; };
+    camera-patio =        { g = 116; id = 16; mac = "fc:5f:49:39:1d:18"; };
+    camera-pool =         { g = 117; id = 16; mac = "9c:8e:cd:3d:73:2f"; };
+    camera-porch-s =      { g = 118; id = 16; mac = "9c:8e:cd:3d:73:12"; };
+    camera-porch-n =      { g = 118; id = 17; mac = "9c:8e:cd:3d:72:f6"; };
+    camera-garage-rear =  { g = 119; id = 16; mac = "9c:8e:cd:3d:72:9c"; };
+    camera-s-side =       { g = 119; id = 17; mac = "9c:8e:cd:3d:72:c0"; };
+    camera-guest-patio =  { g = 120; id = 16; mac = "9c:8e:cd:3d:88:7d"; };
   };
   zeroPad = (s: n: if (stringLength s) >= n then s else (zeroPad ("0" + s) n));
   toHex2 = (x: zeroPad (lib.strings.toLower (lib.trivial.toHexString x)) 2);
-  records = listToAttrs (map (k:
-    let r = (getAttr k records-conf); in
+  records = mapAttrs (k: v:
     {
-      name = k;
-      value = {
-        ip = lib.concatStrings [ network.prefix (toString r.g) "." (toString r.id) ];
-        mac = lib.concatStrings [ "00:24:0b:16:" (toHex2 r.g) ":" (toHex2 r.id) ];
-      } // r;
-    }
-  ) (attrNames records-conf));
+      ip = lib.concatStrings [ network.prefix (toString v.g) "." (toString v.id) ];
+      mac = lib.concatStrings [ "00:24:0b:16:" (toHex2 v.g) ":" (toHex2 v.id) ];
+    } // v
+  ) records-conf;
   servers = {
     b1 =        { mac = "00:24:0b:16:01:01";  ip = "172.22.1.1"; };
     c1-1 =      { mac = "00:24:0b:16:01:02";  ip = "172.22.1.2"; };
@@ -89,12 +172,12 @@ let
     switch-c =            { mac = "f8:c2:88:23:8c:10"; ip = "172.22.0.30"; };
     c1-imc =              { mac = "70:0f:6a:3b:46:01"; ip = "172.22.5.2"; };
     d1-bmc =              { mac = "18:66:da:b6:45:d8"; ip = "172.22.5.4"; };
+    josh-pc-bmc =         { mac = "18:31:bf:cf:20:0b"; ip = "172.22.5.5"; };
     zigbee =              { mac = "b0:a7:32:05:7d:f3"; ip = "172.22.2.6"; };
     smartwings-n =        { mac = "64:b7:08:17:38:53"; ip = "172.22.2.15"; };
     smartwings-s =        { mac = "08:3a:8d:b2:be:e3"; ip = "172.22.2.16"; };
     somfy =               { mac = "00:0e:c6:aa:0a:86"; ip = "172.22.2.17"; };
     josh-pc =             { mac = "3c:fd:fe:e1:b9:d6"; ip = "172.22.31.1"; };
-    josh-pc-bmc =         { mac = "18:31:bf:cf:20:0b"; ip = "172.22.31.3"; };
     snap-mac =            { mac = "a4:fc:14:0d:f0:ea"; ip = "172.22.31.6"; };
     snap-laptop =         { mac = "08:92:04:6e:38:61"; ip = "172.22.31.20"; };
     printer =             { mac = "f4:81:39:e4:0a:83"; ip = "172.22.33.2"; };
@@ -158,18 +241,13 @@ let
   };
   services = {
     pihole =            { mac = "00:24:0b:51:00:00"; ip = "172.22.3.1";   host = "b1"; dns = "own"; aliases = [ "dhcp" "dns" ]; };
-
     ntp =               { mac = "00:24:0b:51:00:10"; ip = "172.22.3.2";   host = "d1"; dns = "own"; };
-
     landing =           { mac = "00:24:0b:51:01:10"; ip = "172.22.3.3";   host = "d1"; dns = "own"; };
-
     nas =               { mac = "00:24:0b:51:03:10"; ip = "172.22.3.10";  host = "d1"; dns = "host"; aliases = [ "samba" "smb" "nfs" ]; };
     syncthing =         { mac = "00:24:0b:51:03:20"; ip = "172.22.3.11";  host = "d1"; dns = "own"; };
-
     web-swag =          { mac = "00:24:0b:51:04:10"; ip = "172.22.3.20";  host = "d1"; dns = "host"; };
     web-db =            { mac = "00:24:0b:51:04:20"; ip = "172.22.3.21";  host = "d1"; dns = "host"; };
     web-db-admin =      { mac = "00:24:0b:51:04:20"; ip = "172.22.3.22";  host = "d1"; dns = "host"; };
-
     homeassistant =     { mac = "00:24:0b:51:0a:10"; ip = "172.22.3.30";  host = "d1"; dns = "host"; aliases = [ "ha" ]; };
     esphome =           { mac = "00:24:0b:51:0a:20"; ip = "172.22.3.31";  host = "d1"; dns = "host"; };
     mosquitto =         { mac = "00:24:0b:51:0a:30"; ip = "172.22.3.32";  host = "d1"; dns = "own"; aliases = [ "mqtt" ]; };
@@ -177,11 +255,8 @@ let
     zwave-main =        { mac = "00:24:0b:51:0a:51"; ip = "172.22.3.40";  host = "pi-67db40"; dns = "host"; };
     zwave-upstairs =    { mac = "00:24:0b:51:0a:52"; ip = "172.22.3.41";  host = "pi-67dbcd"; dns = "host"; };
     zwave-basement =    { mac = "00:24:0b:51:0a:53"; ip = "172.22.3.42";  host = "pi-67dc75"; dns = "host"; };
-
     frigate =           { mac = "00:24:0b:51:0f:10"; ip = "172.22.3.50";  host = "d1"; dns = "host"; };
-
     plex =              { mac = "00:24:0b:51:0e:10"; ip = "172.22.3.60";  host = "d1"; dns = "own"; };
-
     sabnzbd =           { mac = "00:24:0b:51:09:10"; ip = "172.22.3.70";  host = "d1"; dns = "host"; };
     transmission =      { mac = "00:24:0b:51:09:20"; ip = "172.22.3.71";  host = "d1"; dns = "host"; };
     prowlarr =          { mac = "00:24:0b:51:09:30"; ip = "172.22.3.72";  host = "d1"; dns = "host"; };
@@ -190,9 +265,7 @@ let
     lidarr =            { mac = "00:24:0b:51:09:60"; ip = "172.22.3.75";  host = "d1"; dns = "host"; };
     mylar =             { mac = "00:24:0b:51:09:70"; ip = "172.22.3.76";  host = "d1"; dns = "host"; };
     komga =             { mac = "00:24:0b:51:09:80"; ip = "172.22.3.77";  host = "d1"; dns = "host"; };
-
     minecraft =         { mac = "00:24:0b:51:10:10"; ip = "172.22.3.100"; host = "d1"; dns = "host"; };
-
     userbox-nathaniel = { mac = "00:24:0b:51:11:10"; ip = "172.22.3.110"; host = "d1"; dns = "host"; };
   };
   vms = {
