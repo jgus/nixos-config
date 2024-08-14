@@ -10,16 +10,41 @@ let
   group = {
     network = 0;
     servers = 1;
+    home-automation = 2;
+    services = 3;
+    vms = 4;
+    admin = 5;
   };
-  records-conf = {
-    b1 =        { g = 1; id = 1; };
-    c1-1 =      { g = 1; id = 2; };
-    c1-2 =      { g = 1; id = 3; };
-    d1 =        { g = 1; id = 4; };
-    pi-67cba1 = { g = 1; id = 65; aliases = [ "theater-pi" "theater-cec" ]; };
-    pi-67db40 = { g = 1; id = 66; };
-    pi-67dbcd = { g = 1; id = 67; };
-    pi-67dc75 = { g = 1; id = 68; };
+  records-conf = 
+  mapAttrs (k: v: { g = group.network; } // v) {
+    router =              { id = 1; mac = "d2:21:f9:d9:78:8c"; aliases = [ "gateway" ]; };
+    switch-1g-poe =       { id = 2; mac = "68:d7:9a:23:f1:70"; };
+    switch-2g-poe =       { id = 3; mac = "e4:38:83:e8:f3:b1"; };
+    switch-10g =          { id = 4; mac = "d8:b3:70:2b:3f:2f"; };
+    ap-balcony =          { id = 10; mac = "ac:8b:a9:69:2a:ea"; };
+    ap-basement-hall =    { id = 11; mac = "ac:8b:a9:69:36:b1"; };
+    ap-bedroom =          { id = 12; mac = "ac:8b:a9:69:3c:bf"; };
+    ap-master-closet =    { id = 13; mac = "ac:8b:a9:69:2d:01"; };
+    ap-media =            { id = 14; mac = "ac:8b:a9:69:33:f0"; };
+    ap-mudroom =          { id = 15; mac = "ac:8b:a9:69:3b:fc"; };
+    ap-office =           { id = 16; mac = "ac:8b:a9:69:31:52"; };
+    ap-server =           { id = 17; mac = "24:5a:4c:5e:bc:f6"; };
+    switch-admin =        { id = 20; mac = "80:2a:a8:9c:79:53"; };
+    switch-gr =           { id = 21; mac = "f4:e2:c6:59:a1:7d"; };
+    switch-heater =       { id = 22; mac = "f4:e2:c6:59:9e:37"; };
+    switch-office =       { id = 23; mac = "f4:e2:c6:59:9c:76"; };
+    switch-study =        { id = 24; mac = "f4:e2:c6:59:9c:4d"; };
+    switch-c =            { id = 30; mac = "f8:c2:88:23:8c:10"; };
+  } //
+  mapAttrs (k: v: { g = group.servers; } // v) {
+    b1 =        { id = 1; };
+    c1-1 =      { id = 2; };
+    c1-2 =      { id = 3; };
+    d1 =        { id = 4; };
+    pi-67cba1 = { id = 65; aliases = [ "theater-pi" "theater-cec" ]; };
+    pi-67db40 = { id = 66; };
+    pi-67dbcd = { id = 67; };
+    pi-67dc75 = { id = 68; };
   };
   zeroPad = (s: n: if (stringLength s) >= n then s else (zeroPad ("0" + s) n));
   toHex2 = (x: zeroPad (lib.strings.toLower (lib.trivial.toHexString x)) 2);
@@ -45,12 +70,25 @@ let
   };
   statics = { 
     router =              { mac = "d2:21:f9:d9:78:8c"; ip = "172.22.0.1"; aliases = [ "gateway" ]; };
-    d1-bmc =              { mac = "18:66:da:b6:45:d8"; ip = "172.22.1.10"; };
-    c1-imc-1 =            { mac = "70:0f:6a:3b:46:01"; ip = "172.22.1.22"; aliases = [ "c1-imc" ]; };
-    c1-imc-2 =            { mac = "70:79:b3:09:49:16"; ip = "172.22.1.23"; };
-    c1-bmc-1 =            { mac = "b4:de:31:bd:a8:be"; ip = "172.22.1.24"; };
-    c1-bmc-2 =            { mac = "00:be:75:e0:a2:3e"; ip = "172.22.1.25"; };
-    switch-c =            { mac = "f8:c2:88:23:8c:10"; ip = "172.22.1.28"; };
+    switch-1g-poe =       { mac = "68:d7:9a:23:f1:70"; ip = "172.22.0.2"; };
+    switch-2g-poe =       { mac = "e4:38:83:e8:f3:b1"; ip = "172.22.0.3"; };
+    switch-10g =          { mac = "d8:b3:70:2b:3f:2f"; ip = "172.22.0.4"; };
+    ap-balcony =          { mac = "ac:8b:a9:69:2a:ea"; ip = "172.22.0.10"; };
+    ap-basement-hall =    { mac = "ac:8b:a9:69:36:b1"; ip = "172.22.0.11"; };
+    ap-bedroom =          { mac = "ac:8b:a9:69:3c:bf"; ip = "172.22.0.12"; };
+    ap-master-closet =    { mac = "ac:8b:a9:69:2d:01"; ip = "172.22.0.13"; };
+    ap-media =            { mac = "ac:8b:a9:69:33:f0"; ip = "172.22.0.14"; };
+    ap-mudroom =          { mac = "ac:8b:a9:69:3b:fc"; ip = "172.22.0.15"; };
+    ap-office =           { mac = "ac:8b:a9:69:31:52"; ip = "172.22.0.16"; };
+    ap-server =           { mac = "24:5a:4c:5e:bc:f6"; ip = "172.22.0.17"; };
+    switch-admin =        { mac = "80:2a:a8:9c:79:53"; ip = "172.22.0.20"; };
+    switch-gr =           { mac = "f4:e2:c6:59:a1:7d"; ip = "172.22.0.21"; };
+    switch-heater =       { mac = "f4:e2:c6:59:9e:37"; ip = "172.22.0.22"; };
+    switch-office =       { mac = "f4:e2:c6:59:9c:76"; ip = "172.22.0.23"; };
+    switch-study =        { mac = "f4:e2:c6:59:9c:4d"; ip = "172.22.0.24"; };
+    switch-c =            { mac = "f8:c2:88:23:8c:10"; ip = "172.22.0.30"; };
+    c1-imc =              { mac = "70:0f:6a:3b:46:01"; ip = "172.22.5.2"; };
+    d1-bmc =              { mac = "18:66:da:b6:45:d8"; ip = "172.22.5.4"; };
     zigbee =              { mac = "b0:a7:32:05:7d:f3"; ip = "172.22.2.6"; };
     smartwings-n =        { mac = "64:b7:08:17:38:53"; ip = "172.22.2.15"; };
     smartwings-s =        { mac = "08:3a:8d:b2:be:e3"; ip = "172.22.2.16"; };
