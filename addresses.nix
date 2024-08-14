@@ -135,11 +135,16 @@ let
   };
   zeroPad = (s: n: if (stringLength s) >= n then s else (zeroPad ("0" + s) n));
   toHex2 = (x: zeroPad (lib.strings.toLower (lib.trivial.toHexString x)) 2);
+  getIp = (name:
+    let r = (getAttr name records-conf); in
+    if (r ? dns) then (getIp (if (r.dns == "host") then r.host else r.dns)) else lib.concatStrings [ network.prefix (toString r.g) "." (toString r.id) ]
+  );
   records = mapAttrs (k: v:
-    {
-      ip = lib.concatStrings [ network.prefix (toString v.g) "." (toString v.id) ];
-      mac = lib.concatStrings [ "00:24:0b:16:" (toHex2 v.g) ":" (toHex2 v.id) ];
-    } // v
+    { ip = getIp k; }
+    //
+    (if (v ? dns) then {} else { mac = lib.concatStrings [ "00:24:0b:16:" (toHex2 v.g) ":" (toHex2 v.id) ]; })
+    //
+    v
   ) records-conf;
   servers = {
     b1 =        { mac = "00:24:0b:16:01:01";  ip = "172.22.1.1"; };
