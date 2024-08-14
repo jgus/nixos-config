@@ -8,7 +8,7 @@ in
 {
   imports = [ ./docker.nix ];
 
-  users.users.${user} = {
+  users.users."${user}" = {
     uid = uid;
     isNormalUser = true;
   };

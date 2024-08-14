@@ -11,14 +11,14 @@ in
 if (machine.hostName != addresses.records."${service}".host) then {} else
 {
   networking = {
-    macvlans."lan-${service}" = {
-      interface = "${machine.lan-interface}";
-      mode = "bridge";
-    };
-    interfaces."lan-${service}" = {
-      macAddress = addresses.records.${service}.mac;
-      ipv4.addresses = [ { address = addresses.records.${service}.ip; prefixLength = addresses.network.prefixLength; } ];
-    };
+    # macvlans."lan-${service}" = {
+    #   interface = machine.lan-interface;
+    #   mode = "bridge";
+    # };
+    # interfaces."lan-${service}" = {
+    #   macAddress = addresses.records."${service}".mac;
+    #   ipv4.addresses = [ { address = addresses.records."${service}".ip; prefixLength = addresses.network.prefixLength; } ];
+    # };
     firewall = {
       allowedTCPPorts = [ 1883 ];
     };
@@ -30,7 +30,7 @@ if (machine.hostName != addresses.records."${service}".host) then {} else
     # logType = [ "all" ];
     listeners = [
       {
-        address = addresses.records.${service}.ip;
+        address = addresses.records."${service}".ip;
         users = {
           ha = {
             acl = [ "readwrite #" ];
