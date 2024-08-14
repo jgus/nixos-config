@@ -87,7 +87,7 @@ let
     camera-guest-patio =  { mac = "9c:8e:cd:3d:88:7d"; ip = "172.22.120.16"; };
   };
   services = {
-    pihole =            { mac = "00:24:0b:51:00:00"; ip = "172.22.3.1";   host = "b1"; dns = "own"; };
+    pihole =            { mac = "00:24:0b:51:00:00"; ip = "172.22.3.1";   host = "b1"; dns = "own"; aliases = [ "dhcp" "dns" ]; };
 
     ntp =               { mac = "00:24:0b:51:00:10"; ip = "172.22.3.2";   host = "d1"; dns = "own"; };
 
