@@ -34,8 +34,6 @@ if (machine.hostName == addresses.services."${service}".host) then
     openFirewall = true;
     securityType = "user";
     extraConfig = ''
-      interfaces = lo ${machine.lan-interface}
-      bind interfaces only = yes
       workgroup = WORKGROUP
       server string = nas
       netbios name = nas
