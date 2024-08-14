@@ -9,6 +9,10 @@ let
   pw = import ./.secrets/passwords.nix;
   dnsmasq-dns = with builtins; lib.concatStrings (map (ip: "host-record=" + (lib.concatStrings (map (s: "${s},") (getAttr ip addresses.hosts))) + ip + "\n") (attrNames addresses.hosts));
   dnsmasq-dhcp = with builtins; lib.concatStrings (map (r: "dhcp-host=" + r.mac + "," + r.ip + "," + r.name + ",infinite\n") addresses.dhcpReservations);
+  dnsmasq-config = ''
+    domain=home.gustafson.me
+    dhcp-option=option:ntp-server,${addresses.nameToIp.ntp}
+  '';
 in
 if (machine.hostName != addresses.services."${service}".host) then {} else
 {
@@ -46,6 +50,7 @@ if (machine.hostName != addresses.services."${service}".host) then {} else
       "/var/lib/${service}/dnsmasq.d:/etc/dnsmasq.d"
       "${pkgs.writeText "50-nixos-dns.conf" dnsmasq-dns}:/etc/dnsmasq.d/50-nixos-dns.conf"
       "${pkgs.writeText "50-nixos-dhcp.conf" dnsmasq-dhcp}:/etc/dnsmasq.d/50-nixos-dhcp.conf"
+      "${pkgs.writeText "50-nixos-config.conf" dnsmasq-config}:/etc/dnsmasq.d/50-nixos-config.conf"
     ];
   };
 

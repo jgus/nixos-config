@@ -176,4 +176,4 @@ let
       (attrNames servicesAndVms)
     )
   ];
-in { inherit network servers services vms hosts dhcpReservations; }
+in { inherit network servers services vms nameToIp hosts dhcpReservations; }
