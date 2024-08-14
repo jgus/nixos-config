@@ -18,6 +18,7 @@ in
       ./landing.nix
       ./nas.nix
       ./syncthing.nix
+      ./www.nix
       ./mosquitto.nix
       ./plex.nix
     ]

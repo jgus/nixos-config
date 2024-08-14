@@ -5,7 +5,10 @@ let
   db_image = "mysql:5.7";
   db_admin_image = "phpmyadmin/phpmyadmin";
   swag_image = "lscr.io/linuxserver/swag";
+  addresses = import ./addresses.nix;
+  machine = import ./machine.nix;
 in
+if (machine.hostName != addresses.records.web-swag.host) then {} else
 {
   imports = [ ./docker.nix ];
 
@@ -23,6 +26,9 @@ in
     dependsOn = [ "web-db" ];
     extraOptions = [
       "--link=web-db:db"
+      "--network=macvlan"
+      "--mac-address=${addresses.records.web-db-admin.mac}"
+      "--ip=${addresses.records.web-db-admin.ip}"
     ];
     ports = [
       "8101:80"
@@ -40,6 +46,9 @@ in
       "--tmpfs=/config"
       "--tmpfs=/config/www/Photos/cache"
       "--link=web-db:db"
+      "--network=macvlan"
+      "--mac-address=${addresses.records.web-swag.mac}"
+      "--ip=${addresses.records.web-swag.ip}"
     ];
     environment = {
       URL = "gustafson.me";
