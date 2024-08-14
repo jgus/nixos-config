@@ -139,13 +139,6 @@ let
     let r = (getAttr name records-conf); in
     if (r ? dns) then (getIp (if (r.dns == "host") then r.host else r.dns)) else lib.concatStrings [ network.prefix (toString r.g) "." (toString r.id) ]
   );
-  records = mapAttrs (k: v:
-    { ip = getIp k; }
-    //
-    (if (v ? dns) then {} else { mac = lib.concatStrings [ "00:24:0b:16:" (toHex2 v.g) ":" (toHex2 v.id) ]; })
-    //
-    v
-  ) records-conf;
   iot = { 
     server-climate =      { ip = "172.21.1.20"; };
     sprinklers =          { ip = "172.21.2.30"; };
@@ -170,7 +163,17 @@ let
     doorbell-front =      { ip = "172.21.118.2"; };
     doorbell-basement =   { ip = "172.21.120.2"; };
   };
-  nameToIp = mapAttrs (k: v: v.ip) (records // iot);
+  records = (mapAttrs (k: v:
+    { ip = getIp k; }
+    //
+    (if (v ? dns) then {} else { mac = lib.concatStrings [ "00:24:0b:16:" (toHex2 v.g) ":" (toHex2 v.id) ]; })
+    //
+    v
+  ) records-conf) // iot;
+  nameToIp = listToAttrs (lib.lists.flatten (map (k:
+    let r = (getAttr k records); in
+    [ { name = k; value = r.ip; } ] ++ (if (r ? aliases) then (map (a: { name = a; value = r.ip; } ) r.aliases) else [])
+  ) (attrNames records)));
   names = attrNames nameToIp;
   ipToNames = lib.lists.groupBy (n: getAttr n nameToIp) names;
   hosts = mapAttrs (key: value: lib.lists.flatten (map (e: [e (e + "." + network.domain)]) value)) ipToNames;
