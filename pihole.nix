@@ -23,10 +23,22 @@ if (machine.hostName != addresses.services."${service}".host) then {} else
       "--ip=${addresses.services."${service}".ip}"
       "--cap-add=NET_ADMIN"
     ];
+    ports = [
+      "53"
+      "67/udp"
+      "80/tcp"
+      "443/tcp"
+    ];
     environment = {
       TZ = config.time.timeZone;
       WEBPASSWORD = pw.pihole;
       FTLCONF_LOCAL_IPV4 = addresses.services."${service}".ip;
+      PIHOLE_DNS_ = "1.1.1.1;1.0.0.1;8.8.8.8;8.8.4.4";
+      DNSSEC = "true";
+      DHCP_ACTIVE = "true";
+      DHCP_START = "172.22.200.1";
+      DHCP_END = "172.22.254.254";
+      DHCP_ROUTER = addresses.network.defaultGateway;
       VIRTUAL_HOST = "${service}.${addresses.network.domain}";
     };
     volumes = [
