@@ -23,7 +23,7 @@ let
 
     landing =           { mac = "00:24:0b:51:01:10"; ip = "172.22.3.3";   host = "d1"; dns = "own"; };
 
-    nas =               { mac = "00:24:0b:51:03:10"; ip = "172.22.3.10";  host = "d1"; dns = "own"; };
+    nas =               { mac = "00:24:0b:51:03:10"; ip = "172.22.3.10";  host = "d1"; dns = "host"; aliases = [ "samba" "smb" "nfs" ]; };
     syncthing =         { mac = "00:24:0b:51:03:20"; ip = "172.22.3.11";  host = "d1"; dns = "own"; };
 
     web-swag =          { mac = "00:24:0b:51:04:10"; ip = "172.22.3.20";  host = "d1"; dns = "host"; };
