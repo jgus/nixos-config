@@ -24,7 +24,10 @@ let
     pi-67cba1 = { mac = "d8:3a:dd:67:cb:a1";  ip = "172.22.2.8"; aliases = [ "theater-pi" "theater-cec" ]; };
   };
   statics = { 
+    router =              { mac = "d2:21:f9:d9:78:8c"; ip = "172.22.0.1"; aliases = [ "gateway" ]; };
     d1-bmc =              { mac = "18:66:da:b6:45:d8"; ip = "172.22.1.10"; };
+    c1-imc-1 =            { mac = "70:0f:6a:3b:46:01"; ip = "172.22.1.22"; aliases = [ "c1-imc" ]; };
+    c1-imc-2 =            { mac = "70:79:b3:09:49:16"; ip = "172.22.1.23"; };
     c1-bmc-1 =            { mac = "b4:de:31:bd:a8:be"; ip = "172.22.1.24"; };
     c1-bmc-2 =            { mac = "00:be:75:e0:a2:3e"; ip = "172.22.1.25"; };
     switch-c =            { mac = "f8:c2:88:23:8c:10"; ip = "172.22.1.28"; };
