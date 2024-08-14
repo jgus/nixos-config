@@ -8,16 +8,16 @@ let
   addresses = import ./addresses.nix;
   machine = import ./machine.nix;
 in
-if (machine.hostName != addresses.services."${service}".host) then {} else
+if (machine.hostName != addresses.records."${service}".host) then {} else
 {
   networking = {
-    macvlans."eth-${service}" = {
+    macvlans."lan-${service}" = {
       interface = "${machine.lan-interface}";
+      mode = "bridge";
     };
-    interfaces."eth-${service}" = {
-      macAddress = addresses.services.${service}.mac;
-      useDHCP = true;
-      #ipv4.addresses = [ { address = addresses.services.${service}.ip; prefixLength = 16; } ];
+    interfaces."lan-${service}" = {
+      macAddress = addresses.records.${service}.mac;
+      ipv4.addresses = [ { address = addresses.records.${service}.ip; prefixLength = addresses.network.prefixLength; } ];
     };
     firewall = {
       allowedTCPPorts = [ 1883 ];
@@ -30,7 +30,7 @@ if (machine.hostName != addresses.services."${service}".host) then {} else
     # logType = [ "all" ];
     listeners = [
       {
-        address = addresses.services.${service}.ip;
+        address = addresses.records.${service}.ip;
         users = {
           ha = {
             acl = [ "readwrite #" ];
@@ -81,22 +81,6 @@ if (machine.hostName != addresses.services."${service}".host) then {} else
         };
         requiredBy = [ "${service}.service" ];
         before = [ "${service}.service" ];
-      };
-      "${service}-kick" = {
-        enable = true;
-        description = "Restart Mosquitto after network address is available";
-        wantedBy = [ "multi-user.target" ];
-        requires = [ "network-addresses-eth-${service}.service" ];
-        script = ''
-          while ! systemctl restart ${service}.service
-          do
-            sleep 1
-            systemctl stop ${service}.service || true
-          done
-        '';
-        serviceConfig = {
-          Type = "oneshot";
-        };
       };
     };
   };

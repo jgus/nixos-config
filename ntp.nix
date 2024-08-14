@@ -7,7 +7,7 @@ let
   addresses = import ./addresses.nix;
   machine = import ./machine.nix;
 in
-if (machine.hostName != addresses.services."${service}".host) then {} else
+if (machine.hostName != addresses.records."${service}".host) then {} else
 {
   imports = [ ./docker.nix ];
 
@@ -18,8 +18,8 @@ if (machine.hostName != addresses.services."${service}".host) then {} else
     autoStart = true;
     extraOptions = [
       "--network=macvlan"
-      "--mac-address=${addresses.services."${service}".mac}"
-      "--ip=${addresses.services."${service}".ip}"
+      "--mac-address=${addresses.records."${service}".mac}"
+      "--ip=${addresses.records."${service}".ip}"
       "--read-only"
       "--tmpfs=/etc/chrony:rw,mode=1750"
       "--tmpfs=/run/chrony:rw,mode=1750"

@@ -7,7 +7,7 @@ let
   addresses = import ./addresses.nix;
   machine = import ./machine.nix;
 in
-if (machine.hostName != addresses.services."${service}".host) then {} else
+if (machine.hostName != addresses.records."${service}".host) then {} else
 {
   imports = [ ./docker.nix ];
 
@@ -40,8 +40,8 @@ if (machine.hostName != addresses.services."${service}".host) then {} else
     ];
     extraOptions = [
       "--network=macvlan"
-      "--mac-address=${addresses.services.syncthing.mac}"
-      "--ip=${addresses.services.syncthing.ip}"
+      "--mac-address=${addresses.records.syncthing.mac}"
+      "--ip=${addresses.records.syncthing.ip}"
     ];
   };
 

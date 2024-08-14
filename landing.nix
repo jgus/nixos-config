@@ -5,7 +5,7 @@ let
   addresses = import ./addresses.nix;
   machine = import ./machine.nix;
 in
-if (machine.hostName != addresses.services."${service}".host) then {} else
+if (machine.hostName != addresses.records."${service}".host) then {} else
 {
   imports = [ ./docker.nix ];
 
@@ -66,8 +66,8 @@ if (machine.hostName != addresses.services."${service}".host) then {} else
           docker build -t ssh /tmp/landing/docker
           /bin/sh -c "docker run --rm --name landing \
             --network=macvlan \
-            --mac-address=${addresses.services.landing.mac} \
-            --ip=${addresses.services.landing.ip} \
+            --mac-address=${addresses.records.landing.mac} \
+            --ip=${addresses.records.landing.ip} \
             -e AUTHORIZED_KEYS='$(cat /root/.ssh/id_rsa-backup.pub)' \
             -v /tmp/landing/etc/ssh:/etc/ssh \
             ssh"

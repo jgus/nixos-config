@@ -5,7 +5,7 @@ let
   addresses = import ./addresses.nix;
   machine = import ./machine.nix;
 in
-if (machine.hostName == addresses.services."${service}".host) then
+if (machine.hostName == addresses.records."${service}".host) then
 {
   services.nfs.server.enable = true;
   networking.firewall = {

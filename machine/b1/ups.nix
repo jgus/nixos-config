@@ -19,7 +19,7 @@ in
       enable = true;
       listen = [
         { address = "localhost"; }
-        { address = addresses.servers."${machine.hostName}".ip; }
+        { address = addresses.records."${machine.hostName}".ip; }
       ];
     };
     upsmon.enable = false;

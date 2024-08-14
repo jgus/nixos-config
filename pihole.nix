@@ -13,7 +13,7 @@ let
     dhcp-option=option:ntp-server,${addresses.nameToIp.ntp}
   '';
 in
-if (machine.hostName != addresses.services."${service}".host) then {} else
+if (machine.hostName != addresses.records."${service}".host) then {} else
 {
   imports = [ ./docker.nix ];
 
@@ -23,8 +23,8 @@ if (machine.hostName != addresses.services."${service}".host) then {} else
     extraOptions = [
       "--hostname=${service}"
       "--network=macvlan"
-      "--mac-address=${addresses.services."${service}".mac}"
-      "--ip=${addresses.services."${service}".ip}"
+      "--mac-address=${addresses.records."${service}".mac}"
+      "--ip=${addresses.records."${service}".ip}"
       "--cap-add=NET_ADMIN"
     ];
     ports = [
@@ -36,7 +36,7 @@ if (machine.hostName != addresses.services."${service}".host) then {} else
     environment = {
       TZ = config.time.timeZone;
       WEBPASSWORD = pw.pihole;
-      FTLCONF_LOCAL_IPV4 = addresses.services."${service}".ip;
+      FTLCONF_LOCAL_IPV4 = addresses.records."${service}".ip;
       PIHOLE_DNS_ = "1.1.1.1;1.0.0.1;8.8.8.8;8.8.4.4";
       DNSSEC = "true";
       DHCP_ACTIVE = "true";
