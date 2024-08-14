@@ -15,6 +15,11 @@ if (machine.hostName != addresses.records.web-swag.host) then {} else
   virtualisation.oci-containers.containers.web-db = {
     image = db_image;
     autoStart = true;
+    extraOptions = [
+      "--network=macvlan"
+      "--mac-address=${addresses.records.web-db.mac}"
+      "--ip=${addresses.records.web-db.ip}"
+    ];
     volumes = [
       "/var/lib/web_db_data:/var/lib/mysql"
     ];
@@ -25,7 +30,6 @@ if (machine.hostName != addresses.records.web-swag.host) then {} else
     autoStart = true;
     dependsOn = [ "web-db" ];
     extraOptions = [
-      "--link=web-db:db"
       "--network=macvlan"
       "--mac-address=${addresses.records.web-db-admin.mac}"
       "--ip=${addresses.records.web-db-admin.ip}"

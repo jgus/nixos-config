@@ -3,7 +3,7 @@
   docker-services = { name, image, setup-script ? "", backup-script ? "" }:
   (if (setup-script == "") then {} else {
     "${name}-setup" = {
-      path = [ pkgs.rsync pkgs.zfs ];
+      path = [ pkgs.docker pkgs.rsync pkgs.zfs ];
       script = setup-script;
       serviceConfig = { Type = "oneshot"; };
       requiredBy = [ "docker-${name}.service" ];

@@ -61,6 +61,7 @@ let
     nas =               { id = 10;  host = "d1"; dns = "host"; aliases = [ "samba" "smb" "nfs" ]; };
     syncthing =         { id = 11;  host = "d1"; };
     web-swag =          { id = 20;  host = "d1"; };
+    web-db =            { id = 21;  host = "d1"; aliases = [ "db" ]; };
     web-db-admin =      { id = 22;  host = "d1"; };
     homeassistant =     { id = 30;  host = "d1"; dns = "host"; aliases = [ "ha" ]; };
     esphome =           { id = 31;  host = "d1"; dns = "host"; };
