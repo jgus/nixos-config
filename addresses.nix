@@ -130,7 +130,7 @@ let
   };
   serversAndStatics = servers // statics;
   servicesAndVms = services // vms;
-  pairs = lib.lists.flatten [
+  nameIpPairs = lib.lists.flatten [
     (map
       (k: 
         let
@@ -152,8 +152,28 @@ let
       (attrNames servicesAndVms)
     )
   ];
-  names = map (p: p.name) pairs;
-  nameToIp = listToAttrs (map (p: { name = p.name; value = p.ip; }) pairs);
+  names = map (p: p.name) nameIpPairs;
+  nameToIp = listToAttrs (map (p: { name = p.name; value = p.ip; }) nameIpPairs);
   ipToNames = lib.lists.groupBy (n: getAttr n nameToIp) names;
   hosts = mapAttrs (key: value: lib.lists.flatten (map (e: [e (e + "." + network.domain)]) value)) ipToNames;
-in { inherit network servers services vms hosts; }
+  dhcpReservations = lib.lists.flatten [
+    (map
+      (k:
+        let
+          s = (getAttr k serversAndStatics);
+        in
+        [ { name = k; ip = s.ip; mac = s.mac; } ]
+      )
+      (attrNames serversAndStatics)
+    )
+    (map
+      (k: 
+        let
+          s = (getAttr k servicesAndVms);
+        in
+        if (s.dns == "own") then [ { name = k; ip = s.ip; mac = s.mac; } ] else []
+      )
+      (attrNames servicesAndVms)
+    )
+  ];
+in { inherit network servers services vms hosts dhcpReservations; }

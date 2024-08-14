@@ -7,7 +7,8 @@ let
   addresses = import ./addresses.nix;
   machine = import ./machine.nix;
   pw = import ./.secrets/passwords.nix;
-  dnsmasq-entries = with builtins; lib.concatStrings (map (ip: "host-record=" + (lib.concatStrings (map (s: "${s},") (getAttr ip addresses.hosts))) + ip + "\n") (attrNames addresses.hosts));
+  dnsmasq-dns = with builtins; lib.concatStrings (map (ip: "host-record=" + (lib.concatStrings (map (s: "${s},") (getAttr ip addresses.hosts))) + ip + "\n") (attrNames addresses.hosts));
+  dnsmasq-dhcp = with builtins; lib.concatStrings (map (r: "dhcp-host=" + r.mac + "," + r.ip + "," + r.name + ",infinite\n") addresses.dhcpReservations);
 in
 if (machine.hostName != addresses.services."${service}".host) then {} else
 {
@@ -31,7 +32,8 @@ if (machine.hostName != addresses.services."${service}".host) then {} else
     volumes = [
       "/var/lib/${service}/pihole:/etc/pihole"
       "/var/lib/${service}/dnsmasq.d:/etc/dnsmasq.d"
-      "${pkgs.writeText "50-nixos.conf" dnsmasq-entries}:/etc/dnsmasq.d/50-nixos.conf"
+      "${pkgs.writeText "50-nixos-dns.conf" dnsmasq-dns}:/etc/dnsmasq.d/50-nixos-dns.conf"
+      "${pkgs.writeText "50-nixos-dhcp.conf" dnsmasq-dhcp}:/etc/dnsmasq.d/50-nixos-dhcp.conf"
     ];
   };
 
