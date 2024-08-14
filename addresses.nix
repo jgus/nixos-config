@@ -1,10 +1,17 @@
 with builtins;
 let
   lib = import <nixpkgs/lib>;
-  network = {
-    defaultGateway = "172.22.0.1";
+  network = rec {
+    prefix = "172.22.";
     prefixLength = 16;
+    defaultGateway = prefix + "0.1";
     domain = "home.gustafson.me";
+  };
+  records = {
+    network = { gid = 0;
+    };
+    servers = { gid = 1;
+    };
   };
   servers = {
     b1 =        { mac = "00:24:0b:01:b1:10";  ip = "172.22.1.36"; };
@@ -17,28 +24,6 @@ let
     pi-67cba1 = { mac = "d8:3a:dd:67:cb:a1";  ip = "172.22.2.8"; aliases = [ "theater-pi" "theater-cec" ]; };
   };
   statics = { 
-    server-climate =      { mac = "94:24:b8:6c:0f:41"; ip = "172.21.1.20"; };
-    sprinklers =          { mac = "48:e7:29:70:77:02"; ip = "172.21.2.30"; };
-    octoprint =           { mac = "b8:27:eb:e8:df:ae"; ip = "172.21.31.8"; };
-    workshop-climate =    { mac = "94:24:b8:6d:47:92"; ip = "172.21.32.20"; };
-    kitchen-cooktop =     { mac = "68:a4:0e:8b:bf:2b"; ip = "172.21.40.2"; };
-    ge-unknown-1 =        { mac = "bc:c7:da:16:46:d6"; ip = "172.21.40.3"; };
-    ge-unknown-2 =        { mac = "d8:28:c9:f2:cd:e6"; ip = "172.21.40.4"; };
-    ge-unknown-3 =        { mac = "38:7c:76:b3:93:dc"; ip = "172.21.40.5"; };
-    ice-maker =           { mac = "d8:28:c9:f3:89:f4"; ip = "172.21.40.6"; };
-    frodo =               { mac = "70:c9:32:29:fd:a9"; ip = "172.21.40.11"; };
-    sam =                 { mac = "70:c9:32:3e:8f:ce"; ip = "172.21.40.12"; };
-    merry =               { mac = "70:c9:32:3e:90:2f"; ip = "172.21.40.13"; };
-    pippin =              { mac = "70:c9:32:3e:90:9d"; ip = "172.21.40.14"; };
-    theater-remote =      { mac = "ac:ff:00:00:02:6b"; ip = "172.21.59.7"; };
-    theater-climate =     { mac = "94:24:b8:6c:10:13"; ip = "172.21.59.20"; };
-    ratgdo-1 =            { mac = "08:3a:8d:f6:14:fa"; ip = "172.21.100.11"; };
-    ratgdo-2 =            { mac = "08:3a:8d:f9:ed:1f"; ip = "172.21.100.12"; };
-    ratgdo-3 =            { mac = "48:3f:da:ca:04:e7"; ip = "172.21.100.13"; };
-    ratgdo-4 =            { mac = "08:f9:e0:4b:0a:2d"; ip = "172.21.100.14"; };
-    balcony-fan =         { mac = "1c:90:ff:8a:6e:22"; ip = "172.21.111.11"; };
-    doorbell-front =      { mac = "9c:8e:cd:3c:35:8f"; ip = "172.21.118.2"; };
-    doorbell-basement =   { mac = "9c:8e:cd:3c:e0:79"; ip = "172.21.120.2"; };
     d1-bmc =              { mac = "18:66:da:b6:45:d8"; ip = "172.22.1.10"; };
     c1-bmc-1 =            { mac = "b4:de:31:bd:a8:be"; ip = "172.22.1.24"; };
     c1-bmc-2 =            { mac = "00:be:75:e0:a2:3e"; ip = "172.22.1.25"; };
@@ -86,6 +71,30 @@ let
     camera-s-side =       { mac = "9c:8e:cd:3d:72:c0"; ip = "172.22.119.17"; };
     camera-guest-patio =  { mac = "9c:8e:cd:3d:88:7d"; ip = "172.22.120.16"; };
   };
+  staticsIot = { 
+    server-climate =      { mac = "94:24:b8:6c:0f:41"; ip = "172.21.1.20"; };
+    sprinklers =          { mac = "48:e7:29:70:77:02"; ip = "172.21.2.30"; };
+    octoprint =           { mac = "b8:27:eb:e8:df:ae"; ip = "172.21.31.8"; };
+    workshop-climate =    { mac = "94:24:b8:6d:47:92"; ip = "172.21.32.20"; };
+    kitchen-cooktop =     { mac = "68:a4:0e:8b:bf:2b"; ip = "172.21.40.2"; };
+    ge-unknown-1 =        { mac = "bc:c7:da:16:46:d6"; ip = "172.21.40.3"; };
+    ge-unknown-2 =        { mac = "d8:28:c9:f2:cd:e6"; ip = "172.21.40.4"; };
+    ge-unknown-3 =        { mac = "38:7c:76:b3:93:dc"; ip = "172.21.40.5"; };
+    ice-maker =           { mac = "d8:28:c9:f3:89:f4"; ip = "172.21.40.6"; };
+    frodo =               { mac = "70:c9:32:29:fd:a9"; ip = "172.21.40.11"; };
+    sam =                 { mac = "70:c9:32:3e:8f:ce"; ip = "172.21.40.12"; };
+    merry =               { mac = "70:c9:32:3e:90:2f"; ip = "172.21.40.13"; };
+    pippin =              { mac = "70:c9:32:3e:90:9d"; ip = "172.21.40.14"; };
+    theater-remote =      { mac = "ac:ff:00:00:02:6b"; ip = "172.21.59.7"; };
+    theater-climate =     { mac = "94:24:b8:6c:10:13"; ip = "172.21.59.20"; };
+    ratgdo-1 =            { mac = "08:3a:8d:f6:14:fa"; ip = "172.21.100.11"; };
+    ratgdo-2 =            { mac = "08:3a:8d:f9:ed:1f"; ip = "172.21.100.12"; };
+    ratgdo-3 =            { mac = "48:3f:da:ca:04:e7"; ip = "172.21.100.13"; };
+    ratgdo-4 =            { mac = "08:f9:e0:4b:0a:2d"; ip = "172.21.100.14"; };
+    balcony-fan =         { mac = "1c:90:ff:8a:6e:22"; ip = "172.21.111.11"; };
+    doorbell-front =      { mac = "9c:8e:cd:3c:35:8f"; ip = "172.21.118.2"; };
+    doorbell-basement =   { mac = "9c:8e:cd:3c:e0:79"; ip = "172.21.120.2"; };
+  };
   services = {
     pihole =            { mac = "00:24:0b:51:00:00"; ip = "172.22.3.1";   host = "b1"; dns = "own"; aliases = [ "dhcp" "dns" ]; };
 
@@ -128,7 +137,7 @@ let
   vms = {
     vm1 =               { mac = "00:24:0b:51:40:10"; ip = "172.22.4.1";   host = "d1"; dns = "host"; };
   };
-  serversAndStatics = servers // statics;
+  serversAndStatics = servers // statics // staticsIot;
   servicesAndVms = services // vms;
   nameIpPairs = lib.lists.flatten [
     (map
