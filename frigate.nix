@@ -3,8 +3,12 @@
 with (import ./functions.nix) { inherit pkgs; };
 let
   pw = import ./.secrets/passwords.nix;
+  service = "frigate";
   image = "ghcr.io/blakeblackshear/frigate:stable";
+  addresses = import ./addresses.nix;
+  machine = import ./machine.nix;
 in
+if (machine.hostName != addresses.records."${service}".host) then {} else
 {
   imports = [ ./docker.nix ];
 
@@ -12,9 +16,6 @@ in
     SUBSYSTEM=="usb",ATTRS{idVendor}=="1a6e",ATTRS{idProduct}=="089a",GROUP="plugdev"
     SUBSYSTEM=="usb",ATTRS{idVendor}=="18d1",ATTRS{idProduct}=="9302",GROUP="plugdev"
   '';
-
-  networking.firewall.allowedTCPPorts = [ 5000 1935 1984 8554 8555 ];
-  networking.firewall.allowedUDPPorts = [ 8555 ];
 
   environment.etc = {
     "frigate/config.yml".text = ''
@@ -478,6 +479,9 @@ in
     image = image;
     autoStart = true;
     extraOptions = [
+      "--network=macvlan"
+      "--mac-address=${addresses.records."${service}".mac}"
+      "--ip=${addresses.records."${service}".ip}"
       "--shm-size=2048m"
       "--gpus=all"
       "--privileged"
@@ -486,12 +490,12 @@ in
       FRIGATE_RTSP_PASSWORD = "password";
     };
     ports = [
-      "5000:5000"
-      "1935:1935"
-      "1984:1984" # go2rtc API
-      "8554:8554" # go2rtc RTSP
-      "8555:8555" # go2rtc WebRTC
-      "8555:8555/udp"
+      "5000"
+      "1935"
+      "1984" # go2rtc API
+      "8554" # go2rtc RTSP
+      "8555" # go2rtc WebRTC
+      "8555/udp"
     ];
     volumes = [
       "/dev/bus/usb/004:/dev/bus/usb/004"

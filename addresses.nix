@@ -70,7 +70,7 @@ let
     zwave-main =        { id = 40;  host = "pi-67db40"; dns = "host"; };
     zwave-upstairs =    { id = 41;  host = "pi-67dbcd"; dns = "host"; };
     zwave-basement =    { id = 42;  host = "pi-67dc75"; dns = "host"; };
-    frigate =           { id = 50;  host = "d1"; dns = "host"; };
+    frigate =           { id = 50;  host = "d1"; };
     plex =              { id = 60;  host = "d1"; };
     sabnzbd =           { id = 70;  host = "d1"; dns = "host"; };
     transmission =      { id = 71;  host = "d1"; dns = "host"; };

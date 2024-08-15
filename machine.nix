@@ -33,7 +33,6 @@ let
         ./zigbee2mqtt.nix
         ./home-assistant.nix
         ./esphome.nix
-        ./frigate.nix
         ./transmission.nix
         ./sabnzbd.nix
         ./prowlarr.nix

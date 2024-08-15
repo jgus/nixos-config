@@ -16,10 +16,16 @@ in
       ./pihole.nix
       ./ntp.nix
       ./landing.nix
+
       ./nas.nix
       ./syncthing.nix
+
       ./www.nix
+
       ./mosquitto.nix
+
+      ./frigate.nix
+
       ./plex.nix
     ]
     ++ (if machine.nvidia then [ ./nvidia.nix ] else [])
