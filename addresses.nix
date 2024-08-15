@@ -81,7 +81,7 @@ let
     mylar =             { id = 76;  host = "d1"; };
     komga =             { id = 77;  host = "d1"; };
     minecraft =         { id = 100; host = "d1"; };
-    userbox-nathaniel = { id = 110; host = "d1"; dns = "host"; };
+    userbox-nathaniel = { id = 110; host = "d1"; };
   } //
   mapAttrs (k: v: { g = group.vms; } // v) {
     vm1 =               { id = 1; host = "d1"; dns = "host"; };

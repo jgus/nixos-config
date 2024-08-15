@@ -42,6 +42,8 @@ in
       ./komga.nix
 
       ./minecraft.nix
+
+      ./userbox.nix
     ]
     ++ (if machine.nvidia then [ ./nvidia.nix ] else [])
     ++ (if machine.zfs then [ ./zfs.nix ] else [])
