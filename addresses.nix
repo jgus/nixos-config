@@ -194,5 +194,6 @@ let
     "--hostname=${service}"
     "--ip=${records."${service}".ip}"
     "--dns=${records.pihole.ip}"
+    "--dns-search=${network.domain}"
   ];
 in { inherit network records nameToIp hosts dhcpReservations dockerOptions; }
