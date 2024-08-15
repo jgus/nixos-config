@@ -7,9 +7,6 @@ let
       lan-interface = "end0";
       zfs = false;
   };
-  zwave-box = rpi // {
-      imports = [ ./zwave-js-ui.nix ];
-  };
   machine = {
     # Defaults
     hostName = machine-id;
@@ -84,15 +81,15 @@ let
       hostId = "62c05afa";
       imports = [ ./cec.nix ];
     };
-    pi-67db40 = zwave-box // {
+    pi-67db40 = rpi // {
       stateVersion = "23.05";
       hostId = "1f758e73";
     };
-    pi-67dbcd = zwave-box // {
+    pi-67dbcd = rpi // {
       stateVersion = "23.05";
       hostId = "da46f0cf";
     };
-    pi-67dc75 = zwave-box // {
+    pi-67dc75 = rpi // {
       stateVersion = "23.05";
       hostId = "39a18894";
     };

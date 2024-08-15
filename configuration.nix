@@ -24,6 +24,7 @@ in
 
       ./mosquitto.nix
       ./zigbee2mqtt.nix
+      ./zwave.nix
       ./esphome.nix
 
       ./frigate.nix

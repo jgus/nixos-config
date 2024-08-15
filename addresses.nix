@@ -67,9 +67,9 @@ let
     esphome =           { id = 31;  host = "d1"; };
     mosquitto =         { id = 32;  host = "d1"; aliases = [ "mqtt" ]; };
     zigbee2mqtt =       { id = 33;  host = "d1"; aliases = [ "z2m" ]; };
-    zwave-main =        { id = 40;  host = "pi-67db40"; dns = "host"; };
-    zwave-upstairs =    { id = 41;  host = "pi-67dbcd"; dns = "host"; };
-    zwave-basement =    { id = 42;  host = "pi-67dc75"; dns = "host"; };
+    zwave-main =        { id = 40;  host = "pi-67db40"; };
+    zwave-upstairs =    { id = 41;  host = "pi-67dbcd"; };
+    zwave-basement =    { id = 42;  host = "pi-67dc75"; };
     frigate =           { id = 50;  host = "d1"; };
     plex =              { id = 60;  host = "d1"; };
     sabnzbd =           { id = 70;  host = "d1"; dns = "host"; };
