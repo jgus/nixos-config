@@ -54,8 +54,8 @@ copy d/scratch/usenet
 copy d/varlib/images
 copy d/media m/media
 
-copy d/varlib/frigate-config
+copy d/backup/timemachine
 
 copy d/varlib/frigate-media
 
-copy d/backup/timemachine
+# copy d/varlib/frigate-config
