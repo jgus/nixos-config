@@ -9,8 +9,11 @@ in
 {
   environment.etc = {
     "glusterfs/glusterd.vol".text = ''
-      option base-port ${toString base-port}
-      option max-port ${toString max-port}
+      volume management
+        type mgmt/glusterd
+        option base-port ${toString base-port}
+        option max-port ${toString max-port}
+      end-volume
     '';
   };
   networking.firewall = {
