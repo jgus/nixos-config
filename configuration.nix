@@ -23,6 +23,7 @@ in
       ./www.nix
 
       ./mosquitto.nix
+      ./zigbee2mqtt.nix
 
       ./frigate.nix
 

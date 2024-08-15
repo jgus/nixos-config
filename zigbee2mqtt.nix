@@ -3,41 +3,48 @@
 with (import ./functions.nix) { inherit pkgs; };
 let
   pw = import ./.secrets/passwords.nix;
+  service = "zigbee2mqtt";
   image = "koenkk/zigbee2mqtt";
+  addresses = import ./addresses.nix;
+  machine = import ./machine.nix;
 in
+if (machine.hostName != addresses.records."${service}".host) then {} else
 {
   imports = [ ./docker.nix ];
 
-  networking.firewall.allowedTCPPorts = [ 8081 ];
-
-  virtualisation.oci-containers.containers.zigbee2mqtt = {
+  virtualisation.oci-containers.containers."${service}" = {
     image = image;
     autoStart = true;
+    extraOptions = [
+      "--network=macvlan"
+      "--mac-address=${addresses.records."${service}".mac}"
+      "--ip=${addresses.records."${service}".ip}"
+    ];
     environment = {
       TZ = config.time.timeZone;
     };
     ports = [
-      "8081:8081"
+      "8081"
     ];
     volumes = [
-      "/var/lib/zigbee2mqtt:/app/data"
+      "/var/lib/${service}:/app/data"
     ];
   };
 
   systemd = {
     services = docker-services {
-      name = "zigbee2mqtt";
+      name = "${service}";
       image = image;
       setup-script = ''
-        if ! zfs list r/varlib/zigbee2mqtt >/dev/null 2>&1
+        if ! zfs list r/varlib/${service} >/dev/null 2>&1
         then
-          zfs create r/varlib/zigbee2mqtt
-          rsync -arPx --delete /nas/backup/varlib/zigbee2mqtt/ /var/lib/zigbee2mqtt/ || true
+          zfs create r/varlib/${service}
+          rsync -arPx --delete /nas/backup/varlib/${service}/ /var/lib/${service}/ || true
         fi
       '';
       backup-script = ''
-        mkdir -p /nas/backup/varlib/zigbee2mqtt
-        rsync -arPx --delete /var/lib/zigbee2mqtt/ /nas/backup/varlib/zigbee2mqtt/
+        mkdir -p /nas/backup/varlib/${service}
+        rsync -arPx --delete /var/lib/${service}/ /nas/backup/varlib/${service}/
       '';
     };
   };

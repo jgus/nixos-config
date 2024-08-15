@@ -37,7 +37,7 @@ in
       docker-configure = {
         path = [ pkgs.docker ];
         script = ''
-          docker network ls --format "{{.Name}}" | grep "^macvlan$" || docker network create -d macvlan --subnet=172.22.0.0/16 --gateway=172.22.0.1 -o parent=${machine.lan-interface} macvlan
+          docker network ls --format "{{.Name}}" | grep "^macvlan$" || docker network create -d macvlan --subnet=172.22.0.0/16 --gateway=172.22.0.1 -o parent=${machine.lan-interface} -o macvlan_mode=bridge macvlan
         '';
         serviceConfig = {
           Type = "oneshot";

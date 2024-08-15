@@ -66,7 +66,7 @@ let
     homeassistant =     { id = 30;  host = "d1"; dns = "host"; aliases = [ "ha" ]; };
     esphome =           { id = 31;  host = "d1"; dns = "host"; };
     mosquitto =         { id = 32;  host = "d1"; aliases = [ "mqtt" ]; };
-    zigbee2mqtt =       { id = 33;  host = "d1"; dns = "host"; };
+    zigbee2mqtt =       { id = 33;  host = "d1"; aliases = [ "z2m" ]; };
     zwave-main =        { id = 40;  host = "pi-67db40"; dns = "host"; };
     zwave-upstairs =    { id = 41;  host = "pi-67dbcd"; dns = "host"; };
     zwave-basement =    { id = 42;  host = "pi-67dc75"; dns = "host"; };

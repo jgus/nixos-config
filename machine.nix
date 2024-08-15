@@ -30,7 +30,6 @@ let
       imports = [
         #./ddclient.nix
         
-        ./zigbee2mqtt.nix
         ./home-assistant.nix
         ./esphome.nix
         ./transmission.nix
