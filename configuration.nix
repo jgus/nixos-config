@@ -12,6 +12,7 @@ in
       ./host.nix
       ./users.nix
       ./vscode.nix
+      ./gluster.nix
 
       ./pihole.nix
       ./ntp.nix
