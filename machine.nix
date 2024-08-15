@@ -31,7 +31,6 @@ let
         #./ddclient.nix
         
         ./home-assistant.nix
-        ./esphome.nix
         ./transmission.nix
         ./sabnzbd.nix
         ./prowlarr.nix
