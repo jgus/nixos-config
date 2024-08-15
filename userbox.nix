@@ -3,8 +3,11 @@
 let
   user = "nathaniel";
   uid = 1023;
-  port = 22023;
+  service = "userbox-${user}";
+  addresses = import ./addresses.nix;
+  machine = import ./machine.nix;
 in
+if (machine.hostName != addresses.records."${service}".host) then {} else
 {
   imports = [ ./docker.nix ];
 
@@ -13,10 +16,8 @@ in
     isNormalUser = true;
   };
 
-  networking.firewall.allowedTCPPorts = [ port ];
-
   environment.etc = {
-    "userbox-${user}/docker/Dockerfile".text = ''
+    "${service}/docker/Dockerfile".text = ''
       FROM alpine
 
       RUN apk add --no-cache openssh tini rsync nano
@@ -28,7 +29,7 @@ in
       ENTRYPOINT ["tini", "--", "/entrypoint.sh"]
       CMD []
     '';
-    "userbox-${user}/docker/entrypoint.sh".text = ''
+    "${service}/docker/entrypoint.sh".text = ''
       #!/bin/sh
 
       adduser -D ${user} -u ${toString uid}
@@ -38,7 +39,7 @@ in
 
       /usr/sbin/sshd -D -e
     '';
-    "userbox-${user}/etc/ssh/sshd_config".text = ''
+    "${service}/etc/ssh/sshd_config".text = ''
       PermitRootLogin no
       AuthorizedKeysFile .ssh/authorized_keys
       PasswordAuthentication no
@@ -48,25 +49,26 @@ in
 
   systemd = {
     services = {
-      "userbox-${user}" = {
+      "${service}" = {
         enable = true;
-        description = "userbox-${user}";
+        description = service;
         wantedBy = [ "multi-user.target" ];
         requires = [ "network-online.target" ];
         path = [ pkgs.docker pkgs.rsync ];
         script = ''
-          docker container stop userbox-${user} >/dev/null 2>&1 || true ; \
-          docker container rm -f userbox-${user} >/dev/null 2>&1 || true ; \
-          rsync -arPL /etc/userbox-${user} /tmp/
-          chmod a+x /tmp/userbox-${user}/docker/entrypoint.sh
-          docker build -t userbox-${user} /tmp/userbox-${user}/docker
-          /bin/sh -c "docker run --rm --name userbox-${user} \
-            -p ${toString port}:22/tcp \
+          docker container stop ${service} >/dev/null 2>&1 || true ; \
+          docker container rm -f ${service} >/dev/null 2>&1 || true ; \
+          rsync -arPL /etc/${service} /tmp/
+          chmod a+x /tmp/${service}/docker/entrypoint.sh
+          docker build -t ${service} /tmp/${service}/docker
+          /bin/sh -c "docker run --rm --name ${service} \
+            ${builtins.concatStringsSep " " (addresses.dockerOptions service)} \
+            -p 22/tcp \
             -v /home/${user}:/home/${user} \
             -v /nas/external/${user}:/home/${user}/data \
-            -v /var/lib/userbox-${user}:/etc/ssh \
-            -v /etc/userbox-${user}/etc/ssh/sshd_config:/etc/ssh/sshd_config \
-            userbox-${user}"
+            -v /var/lib/${service}:/etc/ssh \
+            -v /etc/${service}/etc/ssh/sshd_config:/etc/ssh/sshd_config \
+            ${service}"
         '';
         unitConfig = {
           StartLimitIntervalSec = 0;

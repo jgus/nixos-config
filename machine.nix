@@ -26,10 +26,7 @@ let
       zfs-pools = [ "d" ];
       imports = [
         #./ddclient.nix
-
         #./vm-vm1.nix
-
-        ./userbox.nix
       ];
     };
     d2 = {
