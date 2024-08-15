@@ -63,7 +63,7 @@ let
     web-swag =          { id = 20;  host = "d1"; };
     web-db =            { id = 21;  host = "d1"; aliases = [ "db" ]; };
     web-db-admin =      { id = 22;  host = "d1"; };
-    homeassistant =     { id = 30;  host = "d1"; dns = "host"; aliases = [ "ha" ]; };
+    home-assistant =    { id = 30;  host = "d1"; aliases = [ "homeassistant" "ha" ]; };
     esphome =           { id = 31;  host = "d1"; };
     mosquitto =         { id = 32;  host = "d1"; aliases = [ "mqtt" ]; };
     zigbee2mqtt =       { id = 33;  host = "d1"; aliases = [ "z2m" ]; };
@@ -188,4 +188,11 @@ let
       (attrNames records)
     )
   ];
-in { inherit network records nameToIp hosts dhcpReservations; }
+  dockerOptions = service: [
+    "--network=macvlan"
+    "--mac-address=${records."${service}".mac}"
+    "--hostname=${service}"
+    "--ip=${records."${service}".ip}"
+    "--dns=${records.pihole.ip}"
+  ];
+in { inherit network records nameToIp hosts dhcpReservations dockerOptions; }

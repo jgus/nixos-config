@@ -26,6 +26,7 @@ in
       ./zigbee2mqtt.nix
       ./zwave.nix
       ./esphome.nix
+      ./home-assistant.nix
 
       ./frigate.nix
 

@@ -478,10 +478,7 @@ if (machine.hostName != addresses.records."${service}".host) then {} else
   virtualisation.oci-containers.containers."${service}" = {
     image = image;
     autoStart = true;
-    extraOptions = [
-      "--network=macvlan"
-      "--mac-address=${addresses.records."${service}".mac}"
-      "--ip=${addresses.records."${service}".ip}"
+    extraOptions = (addresses.dockerOptions service) ++ [
       "--shm-size=2048m"
       "--gpus=all"
       "--privileged"

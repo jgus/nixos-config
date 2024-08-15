@@ -20,11 +20,7 @@ if (machine.hostName != addresses.records."${service}".host) then {} else
   virtualisation.oci-containers.containers."${service}" = {
     image = image;
     autoStart = true;
-    extraOptions = [
-      "--hostname=${service}"
-      "--network=macvlan"
-      "--mac-address=${addresses.records."${service}".mac}"
-      "--ip=${addresses.records."${service}".ip}"
+    extraOptions = (addresses.dockerOptions service) ++ [
       "--cap-add=NET_ADMIN"
     ];
     ports = [

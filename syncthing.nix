@@ -38,11 +38,7 @@ if (machine.hostName != addresses.records."${service}".host) then {} else
       "/nas/media/Comics:/shares/Comics"
       "/nas/media/Music:/shares/Music"
     ];
-    extraOptions = [
-      "--network=macvlan"
-      "--mac-address=${addresses.records.syncthing.mac}"
-      "--ip=${addresses.records.syncthing.ip}"
-    ];
+    extraOptions = (addresses.dockerOptions service);
   };
 
   systemd = {

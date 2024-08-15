@@ -17,10 +17,7 @@ if (machine.hostName != addresses.records."${service}".host) then {} else
     image = image;
     autoStart = true;
     user = "${toString config.users.users.josh.uid}:${toString config.users.groups.users.gid}";
-    extraOptions = [
-      "--network=macvlan"
-      "--mac-address=${addresses.records."${service}".mac}"
-      "--ip=${addresses.records."${service}".ip}"
+    extraOptions = (addresses.dockerOptions service) ++ [
       "--tmpfs=/cache:exec,uid=${toString config.users.users.josh.uid},gid=${toString config.users.groups.users.gid}"
       "--tmpfs=/.cache/pip:exec,uid=${toString config.users.users.josh.uid},gid=${toString config.users.groups.users.gid}"
       "--tmpfs=/config/.esphome/build:exec,uid=${toString config.users.users.josh.uid},gid=${toString config.users.groups.users.gid}"

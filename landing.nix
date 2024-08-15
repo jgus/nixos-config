@@ -65,9 +65,7 @@ if (machine.hostName != addresses.records."${service}".host) then {} else
           chmod a+x /tmp/landing/docker/entrypoint.sh
           docker build -t ssh /tmp/landing/docker
           /bin/sh -c "docker run --rm --name landing \
-            --network=macvlan \
-            --mac-address=${addresses.records.landing.mac} \
-            --ip=${addresses.records.landing.ip} \
+            ${builtins.concatStringsSep " " (addresses.dockerOptions "landing")} \
             -e AUTHORIZED_KEYS='$(cat /root/.ssh/id_rsa-backup.pub)' \
             -v /tmp/landing/etc/ssh:/etc/ssh \
             ssh"

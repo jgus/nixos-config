@@ -27,7 +27,6 @@ let
       imports = [
         #./ddclient.nix
         
-        ./home-assistant.nix
         ./transmission.nix
         ./sabnzbd.nix
         ./prowlarr.nix

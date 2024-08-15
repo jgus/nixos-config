@@ -15,11 +15,7 @@ if (machine.hostName != addresses.records.web-swag.host) then {} else
   virtualisation.oci-containers.containers.web-db = {
     image = db_image;
     autoStart = true;
-    extraOptions = [
-      "--network=macvlan"
-      "--mac-address=${addresses.records.web-db.mac}"
-      "--ip=${addresses.records.web-db.ip}"
-    ];
+    extraOptions = (addresses.dockerOptions "web-db");
     volumes = [
       "/var/lib/web_db_data:/var/lib/mysql"
     ];
@@ -29,11 +25,7 @@ if (machine.hostName != addresses.records.web-swag.host) then {} else
     image = db_admin_image;
     autoStart = true;
     dependsOn = [ "web-db" ];
-    extraOptions = [
-      "--network=macvlan"
-      "--mac-address=${addresses.records.web-db-admin.mac}"
-      "--ip=${addresses.records.web-db-admin.ip}"
-    ];
+    extraOptions = (addresses.dockerOptions "web-db-admin");
     ports = [
       "8101:80"
     ];
@@ -46,13 +38,9 @@ if (machine.hostName != addresses.records.web-swag.host) then {} else
     image = swag_image;
     autoStart = true;
     dependsOn = [ "web-db" ];
-    extraOptions = [
+    extraOptions = (addresses.dockerOptions "web-swag") ++ [
       "--tmpfs=/config"
       "--tmpfs=/config/www/Photos/cache"
-      "--link=web-db:db"
-      "--network=macvlan"
-      "--mac-address=${addresses.records.web-swag.mac}"
-      "--ip=${addresses.records.web-swag.ip}"
     ];
     environment = {
       URL = "gustafson.me";

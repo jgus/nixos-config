@@ -3,12 +3,16 @@
 with (import ./functions.nix) { inherit pkgs; };
 let
   pw = import ./.secrets/passwords.nix;
+  service = "home-assistant";
+  user = "home-assistant";
+  group = "home-assistant";
   image = "ghcr.io/home-assistant/home-assistant:stable";
+  addresses = import ./addresses.nix;
+  machine = import ./machine.nix;
 in
+if (machine.hostName != addresses.records."${service}".host) then {} else
 {
   imports = [ ./docker.nix ];
-
-  networking.firewall.allowedTCPPorts = [ 8123 ];
 
   environment.etc =
     let
@@ -139,7 +143,7 @@ in
     builtins.listToAttrs(lib.lists.flatten(map(
       i: [
         {
-          name = "home-assistant/input_number/${i}_auto_target.yaml";
+          name = "${service}/input_number/${i}_auto_target.yaml";
           value = {
             text = ''
               min: 0
@@ -148,15 +152,15 @@ in
           };
         }
         {
-          name = "home-assistant/input_boolean/${i}_window_open.yaml";
+          name = "${service}/input_boolean/${i}_window_open.yaml";
           value = { text = ""; };
         }
         {
-          name = "home-assistant/input_boolean/${i}_user_override.yaml";
+          name = "${service}/input_boolean/${i}_user_override.yaml";
           value = { text = "initial: false"; };
         }
         {
-          name = "home-assistant/automation/${i}_auto_set.yaml";
+          name = "${service}/automation/${i}_auto_set.yaml";
           value = {
             text = ''
               alias: ${i} auto set
@@ -189,7 +193,7 @@ in
           };
         }
         {
-          name = "home-assistant/automation/${i}_user_set.yaml";
+          name = "${service}/automation/${i}_user_set.yaml";
           value = {
             text = ''
               alias: ${i} user set
@@ -211,7 +215,7 @@ in
           };
         }
         {
-          name = "home-assistant/automation/${i}_user_reset.yaml";
+          name = "${service}/automation/${i}_user_reset.yaml";
           value = {
             text = ''
               alias: ${i} user reset
@@ -237,7 +241,7 @@ in
       i: lib.lists.flatten(map(
         j: [
           {
-            name = "home-assistant/shell_command/cec_${i.device}_${j.command}.yaml";
+            name = "${service}/shell_command/cec_${i.device}_${j.command}.yaml";
             value = {
               text = "(echo 'tx 1${i.index}:44:${j.code}'; sleep 0.050s; echo 'tx 1${i.index}:45') | nc -uw1 theater-cec 9526";
             };
@@ -247,15 +251,15 @@ in
     ) theater_devices)) //
     builtins.listToAttrs(lib.lists.flatten(map(
       i: [
-        # { name = "home-assistant/input_boolean/${i.id}_lights.yaml"; value = { text = ""; }; }
-        # { name = "home-assistant/input_boolean/${i.id}_xfan.yaml"; value = { text = ""; }; }
-        # { name = "home-assistant/input_boolean/${i.id}_health.yaml"; value = { text = ""; }; }
-        # { name = "home-assistant/input_boolean/${i.id}_sleep.yaml"; value = { text = ""; }; }
-        # { name = "home-assistant/input_boolean/${i.id}_powersave.yaml"; value = { text = ""; }; }
-        # { name = "home-assistant/input_boolean/${i.id}_eightdegheat.yaml"; value = { text = ""; }; }
-        # { name = "home-assistant/input_boolean/${i.id}_air.yaml"; value = { text = ""; }; }
+        # { name = "${service}/input_boolean/${i.id}_lights.yaml"; value = { text = ""; }; }
+        # { name = "${service}/input_boolean/${i.id}_xfan.yaml"; value = { text = ""; }; }
+        # { name = "${service}/input_boolean/${i.id}_health.yaml"; value = { text = ""; }; }
+        # { name = "${service}/input_boolean/${i.id}_sleep.yaml"; value = { text = ""; }; }
+        # { name = "${service}/input_boolean/${i.id}_powersave.yaml"; value = { text = ""; }; }
+        # { name = "${service}/input_boolean/${i.id}_eightdegheat.yaml"; value = { text = ""; }; }
+        # { name = "${service}/input_boolean/${i.id}_air.yaml"; value = { text = ""; }; }
         {
-          name = "home-assistant/climate/${i.id}.yaml";
+          name = "${service}/climate/${i.id}.yaml";
           value = {
             text = ''
               platform: gree
@@ -277,28 +281,27 @@ in
       ]
     ) gree_climate_devices)) //
     {
-      "home-assistant/secrets.yaml".text = ''
+      "${service}/secrets.yaml".text = ''
         doorbell_password: ${pw.doorbell}
       '';
     };
 
-  virtualisation.oci-containers.containers.home-assistant = {
+  virtualisation.oci-containers.containers."${service}" = {
     image = image;
     autoStart = true;
-    extraOptions = [
+    extraOptions = (addresses.dockerOptions service) ++ [
       "--privileged"
-      "--net=host"
     ];
     environment = {
-      PUID = toString config.users.users.plex.uid;
-      PGID = toString config.users.groups.plex.gid;
+      PUID = toString config.users.users."${user}".uid;
+      PGID = toString config.users.groups."${group}".gid;
       TZ = config.time.timeZone;
       VERSION = "latest";
     };
     volumes = [
-      "/var/lib/home-assistant:/config"
-      "/etc/home-assistant:/config/etc:ro"
-      "/etc/home-assistant/secrets.yaml:/config/secrets.yaml:ro"
+      "/var/lib/${service}:/config"
+      "/etc/${service}:/config/etc:ro"
+      "/etc/${service}/secrets.yaml:/config/secrets.yaml:ro"
       "/etc/static:/etc/static:ro"
       "/nix/store:/nix/store:ro"
       "/run/dbus:/run/dbus:ro"
@@ -307,19 +310,19 @@ in
 
   systemd = {
     services = docker-services {
-      name = "home-assistant";
+      name = service;
       image = image;
       setup-script = ''
-        if ! zfs list r/varlib/home-assistant >/dev/null 2>&1
+        if ! zfs list r/varlib/${service} >/dev/null 2>&1
         then
-          zfs create r/varlib/home-assistant
-          chown home-assistant:home-assistant /var/lib/home-assistant
-          rsync -arPx --delete /nas/backup/varlib/home-assistant/ /var/lib/home-assistant/ || true
+          zfs create r/varlib/${service}
+          chown ${user}:${group} /var/lib/${service}
+          rsync -arPx --delete /nas/backup/varlib/${service}/ /var/lib/${service}/ || true
         fi
       '';
       backup-script = ''
-        mkdir -p /nas/backup/varlib/home-assistant
-        rsync -arPx --delete /var/lib/home-assistant/ /nas/backup/varlib/home-assistant/
+        mkdir -p /nas/backup/varlib/${service}
+        rsync -arPx --delete /var/lib/${service}/ /nas/backup/varlib/${service}/
       '';
     };
   };
