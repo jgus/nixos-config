@@ -1,59 +1,59 @@
 { config, pkgs, lib, ... }:
 
+let
+  service = "minecraft";
+  user = "minecraft";
+  group = "minecraft";
+  addresses = import ./addresses.nix;
+  machine = import ./machine.nix;
+in
+if (machine.hostName != addresses.records."${service}".host) then {} else
 {
   imports = [ ./docker.nix ];
-
-  networking.firewall.allowedTCPPorts = [
-    25522
-    19132
-    19133
-    25565
-    25565
-    28123
-  ];
 
   environment.etc =
     lib.attrsets.mapAttrs'
       (name: value:
         lib.attrsets.nameValuePair
-          ("minecraft/docker/${name}")
+          ("${service}/docker/${name}")
           {
-            source = ./minecraft/docker/${name};
+            source = ./${service}/docker/${name};
             mode = "0444";
           }
       )
-      (builtins.readDir ./minecraft/docker);
+      (builtins.readDir ./${service}/docker);
 
   systemd = {
     services = {
-      minecraft = {
+      "${service}" = {
         enable = true;
         description = "Minecraft";
         wantedBy = [ "multi-user.target" ];
         requires = [ "network-online.target" ];
         path = [ pkgs.docker pkgs.zfs ];
         script = ''
-          zfs list r/varlib/minecraft >/dev/null 2>&1 || ( zfs create r/varlib/minecraft && chown minecraft:minecraft /var/lib/minecraft )
+          zfs list r/varlib/${service} >/dev/null 2>&1 || ( zfs create r/varlib/${service} && chown ${user}:${group} /var/lib/${service} )
 
-          docker container stop minecraft >/dev/null 2>&1 || true ; \
-          docker container rm -f minecraft >/dev/null 2>&1 || true ; \
+          docker container stop ${service} >/dev/null 2>&1 || true ; \
+          docker container rm -f ${service} >/dev/null 2>&1 || true ; \
 
           docker build \
-            --build-arg uid=${toString config.users.users.minecraft.uid} \
-            --build-arg gid=${toString config.users.groups.minecraft.gid} \
+            --build-arg uid=${toString config.users.users."${user}".uid} \
+            --build-arg gid=${toString config.users.groups."${group}".gid} \
             --build-arg java_ver=21 \
-            -t minecraft \
-            /etc/minecraft/docker
+            -t ${service} \
+            /etc/${service}/docker
 
-          docker run --rm --name minecraft \
-            -p 25522:22/tcp \
-            -p 19132:19132/udp \
-            -p 19133:19133/udp \
-            -p 25565:25565/udp \
-            -p 25565:25565/tcp \
-            -p 28123:8123/tcp \
-            -v /var/lib/minecraft:/home/minecraft/config \
-            minecraft
+          docker run --rm --name ${service} \
+            ${builtins.concatStringsSep " " (addresses.dockerOptions service)} \
+            -p 22/tcp \
+            -p 19132/udp \
+            -p 19133/udp \
+            -p 25565/udp \
+            -p 25565/tcp \
+            -p 8123/tcp \
+            -v /var/lib/${service}:/home/${service}/config \
+            ${service}
         '';
         unitConfig = {
           StartLimitIntervalSec = 0;

@@ -26,8 +26,6 @@ let
       zfs-pools = [ "d" ];
       imports = [
         #./ddclient.nix
-        
-        ./minecraft.nix
 
         #./vm-vm1.nix
 

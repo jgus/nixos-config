@@ -40,6 +40,8 @@ in
       ./sonarr.nix
       ./mylar.nix
       ./komga.nix
+
+      ./minecraft.nix
     ]
     ++ (if machine.nvidia then [ ./nvidia.nix ] else [])
     ++ (if machine.zfs then [ ./zfs.nix ] else [])
