@@ -475,7 +475,7 @@ if (machine.hostName != addresses.records."${service}".host) then {} else
     '';
   };
 
-  virtualisation.oci-containers.containers.frigate = {
+  virtualisation.oci-containers.containers."${service}" = {
     image = image;
     autoStart = true;
     extraOptions = [
@@ -508,7 +508,7 @@ if (machine.hostName != addresses.records."${service}".host) then {} else
 
   systemd = {
     services = docker-services {
-      name = "frigate";
+      name = "${service}";
       image = image;
       setup-script = ''
         zfs list d/varlib/frigate-media >/dev/null 2>&1 || zfs create d/varlib/frigate-media # TODO
