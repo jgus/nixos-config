@@ -2,28 +2,31 @@
 
 with (import ./functions.nix) { inherit pkgs; };
 let
+  service = "radarr";
+  user = "josh";
+  group = "plex";
   image = "lscr.io/linuxserver/radarr";
+  addresses = import ./addresses.nix;
+  machine = import ./machine.nix;
 in
+if (machine.hostName != addresses.records."${service}".host) then {} else
 {
   imports = [ ./docker.nix ];
 
-  networking.firewall = {
-    allowedTCPPorts = [ 7878 ];
-  };
-
-  virtualisation.oci-containers.containers.radarr = {
+  virtualisation.oci-containers.containers."${service}" = {
     image = image;
     autoStart = true;
+    extraOptions = (addresses.dockerOptions service);
     environment = {
-      PUID = toString config.users.users.josh.uid;
-      PGID = toString config.users.groups.plex.gid;
+      PUID = toString config.users.users."${user}".uid;
+      PGID = toString config.users.groups."${group}".gid;
       TZ = config.time.timeZone;
     };
     ports = [
-      "7878:7878"
+      "7878"
     ];
     volumes = [
-      "/var/lib/radarr:/config"
+      "/var/lib/${service}:/config"
       "/nas/scratch/peer:/peer"
       "/nas/scratch/usenet:/usenet"
       "/nas/media:/media"
@@ -32,19 +35,19 @@ in
 
   systemd = {
     services = docker-services {
-      name = "radarr";
+      name = service;
       image = image;
       setup-script = ''
-        if ! zfs list r/varlib/radarr >/dev/null 2>&1
+        if ! zfs list r/varlib/${service} >/dev/null 2>&1
         then
-          zfs create r/varlib/radarr
-          chown josh:plex /var/lib/radarr
-          rsync -arPx --delete /nas/backup/varlib/radarr/ /var/lib/radarr/ || true
+          zfs create r/varlib/${service}
+          chown ${user}:${group} /var/lib/${service}
+          rsync -arPx --delete /nas/backup/varlib/${service}/ /var/lib/${service}/ || true
         fi
       '';
       backup-script = ''
-        mkdir -p /nas/backup/varlib/radarr
-        rsync -arPx --delete /var/lib/radarr/ /nas/backup/varlib/radarr/
+        mkdir -p /nas/backup/varlib/${service}
+        rsync -arPx --delete /var/lib/${service}/ /nas/backup/varlib/${service}/
       '';
     };
   };

@@ -2,31 +2,33 @@
 
 with (import ./functions.nix) { inherit pkgs; };
 let
+  service = "mylar";
+  user = "josh";
+  group = "plex";
   image = "lscr.io/linuxserver/mylar3";
+  addresses = import ./addresses.nix;
+  machine = import ./machine.nix;
 in
+if (machine.hostName != addresses.records."${service}".host) then {} else
 {
   imports = [ ./docker.nix ];
 
-  networking.firewall = {
-    allowedTCPPorts = [ 8090 ];
-  };
-
-  virtualisation.oci-containers.containers.mylar = {
+  virtualisation.oci-containers.containers."${service}" = {
     image = image;
     autoStart = true;
-    extraOptions = [
+    extraOptions = (addresses.dockerOptions service) ++ [
       "--tmpfs=/config/mylar/cache"
     ];
     environment = {
-      PUID = toString config.users.users.josh.uid;
-      PGID = toString config.users.groups.plex.gid;
+      PUID = toString config.users.users."${user}".uid;
+      PGID = toString config.users.groups."${group}".gid;
       TZ = config.time.timeZone;
     };
     ports = [
-      "8090:8090"
+      "8090"
     ];
     volumes = [
-      "/var/lib/mylar:/config"
+      "/var/lib/${service}:/config"
       "/nas/media/Comics:/comics"
       "/nas/media/Comics.import:/import"
       "/nas/scratch/peer:/peer"
@@ -36,19 +38,19 @@ in
 
   systemd = {
     services = docker-services {
-      name = "mylar";
+      name = service;
       image = image;
       setup-script = ''
-        if ! zfs list r/varlib/mylar >/dev/null 2>&1
+        if ! zfs list r/varlib/${service} >/dev/null 2>&1
         then
-          zfs create r/varlib/mylar
-          chown josh:plex /var/lib/mylar
-          rsync -arPx --delete /nas/backup/varlib/mylar/ /var/lib/mylar/ || true
+          zfs create r/varlib/${service}
+          chown ${user}:${group} /var/lib/${service}
+          rsync -arPx --delete /nas/backup/varlib/${service}/ /var/lib/${service}/ || true
         fi
       '';
       backup-script = ''
-        mkdir -p /nas/backup/varlib/mylar
-        rsync -arPx --delete /var/lib/mylar/ /nas/backup/varlib/mylar/
+        mkdir -p /nas/backup/varlib/${service}
+        rsync -arPx --delete /var/lib/${service}/ /nas/backup/varlib/${service}/
       '';
     };
   };

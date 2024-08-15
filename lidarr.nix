@@ -2,28 +2,31 @@
 
 with (import ./functions.nix) { inherit pkgs; };
 let
+  service = "lidarr";
+  user = "josh";
+  group = "plex";
   image = "lscr.io/linuxserver/lidarr";
+  addresses = import ./addresses.nix;
+  machine = import ./machine.nix;
 in
+if (machine.hostName != addresses.records."${service}".host) then {} else
 {
   imports = [ ./docker.nix ];
 
-  networking.firewall = {
-    allowedTCPPorts = [ 8686 ];
-  };
-
-  virtualisation.oci-containers.containers.lidarr = {
+  virtualisation.oci-containers.containers."${service}" = {
     image = image;
     autoStart = true;
+    extraOptions = (addresses.dockerOptions service);
     environment = {
-      PUID = toString config.users.users.josh.uid;
-      PGID = toString config.users.groups.plex.gid;
+      PUID = toString config.users.users."${user}".uid;
+      PGID = toString config.users.groups."${group}".gid;
       TZ = config.time.timeZone;
     };
     ports = [
-      "8686:8686"
+      "8686"
     ];
     volumes = [
-      "/var/lib/lidarr:/config"
+      "/var/lib/${service}:/config"
       "/nas/scratch/peer:/peer"
       "/nas/scratch/usenet:/usenet"
       "/nas/media:/media"
@@ -32,19 +35,19 @@ in
 
   systemd = {
     services = docker-services {
-      name = "lidarr";
+      name = service;
       image = image;
       setup-script = ''
-        if ! zfs list r/varlib/lidarr >/dev/null 2>&1
+        if ! zfs list r/varlib/${service} >/dev/null 2>&1
         then
-          zfs create r/varlib/lidarr
-          chown josh:plex /var/lib/lidarr
-          rsync -arPx --delete /nas/backup/varlib/lidarr/ /var/lib/lidarr/ || true
+          zfs create r/varlib/${service}
+          chown ${user}:${group} /var/lib/${service}
+          rsync -arPx --delete /nas/backup/varlib/${service}/ /var/lib/${service}/ || true
         fi
       '';
       backup-script = ''
-        mkdir -p /nas/backup/varlib/lidarr
-        rsync -arPx --delete /var/lib/lidarr/ /nas/backup/varlib/lidarr/
+        mkdir -p /nas/backup/varlib/${service}
+        rsync -arPx --delete /var/lib/${service}/ /nas/backup/varlib/${service}/
       '';
     };
   };

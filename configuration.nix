@@ -31,6 +31,15 @@ in
       ./frigate.nix
 
       ./plex.nix
+
+      ./sabnzbd.nix
+      ./transmission.nix
+      ./prowlarr.nix
+      ./lidarr.nix
+      ./radarr.nix
+      ./sonarr.nix
+      ./mylar.nix
+      ./komga.nix
     ]
     ++ (if machine.nvidia then [ ./nvidia.nix ] else [])
     ++ (if machine.zfs then [ ./zfs.nix ] else [])

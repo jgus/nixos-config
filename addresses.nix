@@ -72,14 +72,14 @@ let
     zwave-basement =    { id = 42;  host = "pi-67dc75"; };
     frigate =           { id = 50;  host = "d1"; };
     plex =              { id = 60;  host = "d1"; };
-    sabnzbd =           { id = 70;  host = "d1"; dns = "host"; };
-    transmission =      { id = 71;  host = "d1"; dns = "host"; };
-    prowlarr =          { id = 72;  host = "d1"; dns = "host"; };
-    sonarr =            { id = 73;  host = "d1"; dns = "host"; };
-    radarr =            { id = 74;  host = "d1"; dns = "host"; };
-    lidarr =            { id = 75;  host = "d1"; dns = "host"; };
-    mylar =             { id = 76;  host = "d1"; dns = "host"; };
-    komga =             { id = 77;  host = "d1"; dns = "host"; };
+    sabnzbd =           { id = 70;  host = "d1"; };
+    transmission =      { id = 71;  host = "d1"; };
+    prowlarr =          { id = 72;  host = "d1"; };
+    sonarr =            { id = 73;  host = "d1"; };
+    radarr =            { id = 74;  host = "d1"; };
+    lidarr =            { id = 75;  host = "d1"; };
+    mylar =             { id = 76;  host = "d1"; };
+    komga =             { id = 77;  host = "d1"; };
     minecraft =         { id = 100; host = "d1"; dns = "host"; };
     userbox-nathaniel = { id = 110; host = "d1"; dns = "host"; };
   } //

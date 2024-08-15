@@ -27,14 +27,6 @@ let
       imports = [
         #./ddclient.nix
         
-        ./transmission.nix
-        ./sabnzbd.nix
-        ./prowlarr.nix
-        ./lidarr.nix
-        ./radarr.nix
-        ./sonarr.nix
-        ./mylar.nix
-        ./komga.nix
         ./minecraft.nix
 
         #./vm-vm1.nix

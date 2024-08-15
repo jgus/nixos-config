@@ -2,47 +2,50 @@
 
 with (import ./functions.nix) { inherit pkgs; };
 let
+  service = "komga";
+  user = "josh";
+  group = "plex";
   image = "gotson/komga";
+  addresses = import ./addresses.nix;
+  machine = import ./machine.nix;
 in
+if (machine.hostName != addresses.records."${service}".host) then {} else
 {
   imports = [ ./docker.nix ];
 
-  networking.firewall = {
-    allowedTCPPorts = [ 25600 ];
-  };
-
-  virtualisation.oci-containers.containers.komga = {
+  virtualisation.oci-containers.containers."${service}" = {
     image = image;
     autoStart = true;
-    user = "${toString config.users.users.josh.uid}:${toString config.users.groups.plex.gid}";
+    extraOptions = (addresses.dockerOptions service);
+    user = "${toString config.users.users."${user}".uid}:${toString config.users.groups."${group}".gid}";
     environment = {
       TZ = config.time.timeZone;
       SERVER_PORT = "25600";
     };
     ports = [
-      "25600:25600"
+      "25600"
     ];
     volumes = [
-      "/var/lib/komga:/config"
+      "/var/lib/${service}:/config"
       "/nas/media/Comics:/data"
     ];
   };
 
   systemd = {
     services = docker-services {
-      name = "komga";
+      name = service;
       image = image;
       setup-script = ''
-        if ! zfs list r/varlib/komga >/dev/null 2>&1
+        if ! zfs list r/varlib/${service} >/dev/null 2>&1
         then
-          zfs create r/varlib/komga
-          chown josh:plex /var/lib/komga
-          rsync -arPx --delete /nas/backup/varlib/komga/ /var/lib/komga/ || true
+          zfs create r/varlib/${service}
+          chown ${user}:${group} /var/lib/${service}
+          rsync -arPx --delete /nas/backup/varlib/${service}/ /var/lib/${service}/ || true
         fi
       '';
       backup-script = ''
-        mkdir -p /nas/backup/varlib/komga
-        rsync -arPx --delete /var/lib/komga/ /nas/backup/varlib/komga/
+        mkdir -p /nas/backup/varlib/${service}
+        rsync -arPx --delete /var/lib/${service}/ /nas/backup/varlib/${service}/
       '';
     };
   };
