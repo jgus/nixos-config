@@ -175,6 +175,7 @@ let
     [ { name = k; value = r.ip; } ] ++ (if (r ? aliases) then (map (a: { name = a; value = r.ip; } ) r.aliases) else [])
   ) (attrNames records)));
   names = attrNames nameToIp;
+  serverNames = filter (n: (hasAttr n records) && (records."${n}" ? g) && (records."${n}".g == 1)) (attrNames records);
   ipToNames = lib.lists.groupBy (n: getAttr n nameToIp) names;
   hosts = mapAttrs (key: value: lib.lists.flatten (map (e: [e (e + "." + network.domain)]) value)) ipToNames;
   dhcpReservations = lib.lists.flatten [
@@ -196,4 +197,4 @@ let
     "--dns=${records.pihole.ip}"
     "--dns-search=${network.domain}"
   ];
-in { inherit network records nameToIp hosts dhcpReservations dockerOptions; }
+in { inherit network records nameToIp serverNames hosts dhcpReservations dockerOptions; }

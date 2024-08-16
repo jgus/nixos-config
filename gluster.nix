@@ -7,15 +7,6 @@ let
   max-port = 60999;
 in
 {
-  # environment.etc = {
-  #   "glusterfs/glusterd.vol".text = ''
-  #     volume management
-  #       type mgmt/glusterd
-  #       option base-port ${toString base-port}
-  #       option max-port ${toString max-port}
-  #     end-volume
-  #   '';
-  # };
   networking.firewall = {
     allowedTCPPorts = [ 24007 24008 ];
     allowedTCPPortRanges = [ { from = base-port; to = max-port; } ];
@@ -25,4 +16,24 @@ in
   services = {
     glusterfs.enable = true;
   };
+  system.activationScripts = {
+      gluster-peers.text = ''
+        for i in ''${SERVER_NAMES}
+        do
+          ${pkgs.glusterfs}/bin/gluster peer probe ''${i} >/dev/null
+        done
+      '';
+      gluster-bricks.text =
+      if machine.zfs then
+      ''
+        for p in r ${builtins.concatStringsSep " " machine.zfs-pools}
+        do
+          ${pkgs.zfs}/bin/zfs list ''${p}/gluster >/dev/null 2>&1 || ${pkgs.zfs}/bin/zfs create ''${p}/gluster
+        done
+      ''
+      else
+      ''
+        [ -d /gluster ] || mkdir /gluster
+      '';
+    };
 }

@@ -42,11 +42,16 @@ in
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
-  environment.systemPackages = with pkgs; [
-    parted
-    clang-tools # TODO
-    nixpkgs-fmt
-  ];
+  environment = {
+    systemPackages = with pkgs; [
+      parted
+      clang-tools # TODO
+      nixpkgs-fmt
+    ];
+    variables = {
+      SERVER_NAMES = builtins.concatStringsSep " " addresses.serverNames;
+    };
+  };
 
   services = {
     ntp.enable = true;
