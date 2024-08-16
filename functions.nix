@@ -1,4 +1,11 @@
 { pkgs }:
+let
+  addresses = import ./addresses.nix;
+  gluster-bricks = rec {
+    deep = [ "c1-1:/d/gluster" "c1-1:/m/gluster" "d1:/d/gluster" "b1:/d/gluster" "pi-67cba1:/d/gluster" ];
+    wide = deep ++ (map (n: "${n}:/gluster") addresses.serverNames);
+  };
+in
 {
   docker-services = { name, image, setup-script ? "", backup-script ? "" }:
   (if (setup-script == "") then {} else {
@@ -39,5 +46,8 @@
       serviceConfig = { Type = "exec"; };
       startAt = "hourly";
     };
+  };
+  scripts = {
+
   };
 }
