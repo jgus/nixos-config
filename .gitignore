@@ -1,4 +1,3 @@
 .secrets
 result
 machine-id.nix
-hardware-configuration.nix
