@@ -13,6 +13,12 @@
   boot.kernelModules = [ "kvm-intel" ];
   boot.extraModulePackages = [ ];
 
+  boot.initrd.secrets."/etc/nixos/.secrets/vkey" = ./../../.secrets/vkey;
+  boot.initrd.luks.devices."d" = {
+    device = "/dev/disk/by-uuid/33093883-e825-4216-bcb5-6062065fb912";
+    keyFile = "/etc/nixos/.secrets/vkey";
+  };
+
   fileSystems."/" =
     { device = "r";
       fsType = "zfs"; options = [ "zfsutil" ];
@@ -42,6 +48,11 @@
     { device = "/dev/disk/by-uuid/E141-62B8";
       fsType = "vfat";
       options = [ "fmask=0022" "dmask=0022" ];
+    };
+
+  fileSystems."/d" =
+    { device = "/dev/disk/by-uuid/ca436eff-76b5-491b-938d-cf72ca56d7f4";
+      fsType = "xfs";
     };
 
   swapDevices = [ ];
