@@ -36,4 +36,9 @@ in
   #       [ -d /gluster ] || mkdir /gluster
   #     '';
   #   };
+
+  fileSystems."/home.new" = {
+    device = "localhost:/home";
+    fsType = "glusterfs";
+  };
 }
