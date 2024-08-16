@@ -13,9 +13,20 @@
   boot.kernelModules = [ ];
   boot.extraModulePackages = [ ];
 
+  boot.initrd.secrets."/etc/nixos/.secrets/vkey" = ./../../.secrets/vkey;
+  boot.initrd.luks.devices."d" = {
+    device = "/dev/disk/by-uuid/a82e8c4f-14f0-4fbc-94de-0974dce7c131";
+    keyFile = "/etc/nixos/.secrets/vkey";
+  };
+
   fileSystems."/" =
     { device = "/dev/disk/by-uuid/44444444-4444-4444-8888-888888888888";
       fsType = "ext4";
+    };
+
+  fileSystems."/d" =
+    { device = "/dev/disk/by-uuid/de81a83e-0a8d-4474-a7c4-c39ec7136a5c";
+      fsType = "xfs";
     };
 
   swapDevices = [ ];
