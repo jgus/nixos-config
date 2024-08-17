@@ -50,11 +50,6 @@
       fsType = "xfs";
     };
 
-  fileSystems."/var/lib/test" =
-    { device = "localhost:/test";
-      fsType = "glusterfs";
-    };
-
   swapDevices = [ ];
 
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
