@@ -7,11 +7,10 @@ let
   };
 in
 {
-  # Define a user account. Don't forget to set a password with ‘passwd’.
-  # users.users.jane = {
-  #   isNormalUser = true;
-  #   extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
-  # };
+  fileSystems."/home" = {
+    device = "localhost:/home";
+    fsType = "glusterfs";
+  };
 
   users = {
     mutableUsers = false;

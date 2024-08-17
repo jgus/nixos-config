@@ -54,6 +54,8 @@ in
       mkdir -p ''${MOUNTPOINT}
       mount -t glusterfs localhost:/''${VOLNAME} ''${MOUNTPOINT}
       rsync -arPW --delete ''${MOUNTPOINT}.0/ ''${MOUNTPOINT}/
+      zfs set canmount=off r/varlib/''${NAME}
+      rm -r ''${MOUNTPOINT}.0
     '';
     gluster-varlib-migrate-deep = gluster-varlib-migrate "deep";
     gluster-varlib-migrate-wide = gluster-varlib-migrate "wide";
@@ -62,9 +64,4 @@ in
     gluster-varlib-migrate-deep
     gluster-varlib-migrate-wide
   ];
-
-  fileSystems."/home.new" = {
-    device = "localhost:/home";
-    fsType = "glusterfs";
-  };
 }

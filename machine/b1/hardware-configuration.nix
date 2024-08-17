@@ -29,11 +29,6 @@
       fsType = "zfs"; options = [ "zfsutil" ];
     };
 
-  fileSystems."/home" =
-    { device = "r/home";
-      fsType = "zfs"; options = [ "zfsutil" ];
-    };
-
   fileSystems."/root" =
     { device = "r/home/root";
       fsType = "zfs"; options = [ "zfsutil" ];
