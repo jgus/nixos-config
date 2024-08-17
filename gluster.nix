@@ -5,6 +5,10 @@ let
   machine = import ./machine.nix;
   base-port = 49152;
   max-port = 60999;
+  bricks = rec {
+    deep = [ "c1-1:/d/gluster" "c1-1:/m/gluster" "d1:/d/gluster" ];
+    wide = deep ++ (map (n: "${n}:/gluster") addresses.serverNames);
+  };
 in
 {
   networking.firewall = {
@@ -36,6 +40,28 @@ in
   #       [ -d /gluster ] || mkdir /gluster
   #     '';
   #   };
+  environment.systemPackages = 
+  let
+    gluster-varlib-migrate = brickset: pkgs.writeShellScriptBin "gluster-varlib-migrate-${brickset}" ''
+      set -e
+      NAME=$1
+      VOLNAME=varlib-''${NAME}
+      MOUNTPOINT=/var/lib/''${NAME}
+
+      gluster volume create ''${VOLNAME} replica ${toString (builtins.length bricks.${brickset})} ${builtins.concatStringsSep " " (map (s: "${s}/\${VOLNAME}") bricks.${brickset})} force
+      gluster volume start ''${VOLNAME}
+      zfs set mountpoint=''${MOUNTPOINT}.0 r/varlib/''${NAME}
+      mkdir -p ''${MOUNTPOINT}
+      mount -t glusterfs localhost:/''${VOLNAME} ''${MOUNTPOINT}
+      rsync -arPW --delete ''${MOUNTPOINT}.0/ ''${MOUNTPOINT}/
+    '';
+    gluster-varlib-migrate-deep = gluster-varlib-migrate "deep";
+    gluster-varlib-migrate-wide = gluster-varlib-migrate "wide";
+  in
+  [
+    gluster-varlib-migrate-deep
+    gluster-varlib-migrate-wide
+  ];
 
   fileSystems."/home.new" = {
     device = "localhost:/home";
