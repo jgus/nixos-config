@@ -26,6 +26,7 @@ in
 
     users = {
       root = {
+        hashedPassword = "$y$j9T$kPkXW3Xo/TsdmLvo5eQE9/$z1/r/jzXvqtH/0xXO.pwtFYqlkt4LN7mnBEU1gjKNR2";
         openssh.authorizedKeys.keys = [ pubkeys.josh-ed25519 pubkeys.josh-rsa ];
       };
 
