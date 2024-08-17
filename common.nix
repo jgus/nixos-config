@@ -6,6 +6,7 @@ let
 in
 {
   boot = {
+    initrd.secrets."/etc/nixos/.secrets/vkey" = ./.secrets/vkey;
     tmp.useTmpfs = true;
     supportedFilesystems = [ "ntfs" ];
   };
