@@ -24,7 +24,7 @@ copy() {
     zfs list ${TDATASET} || zfs create ${TDATASET}
     SMOUNT=$(ssh root@${REMOTE} zfs get mountpoint ${SDATASET} -o value -H)
     TMOUNT=$(zfs get mountpoint ${TDATASET} -o value -H)
-    rsync -arPx --delete root@${REMOTE}:${SMOUNT}/ ${TMOUNT}/
+    rsync -arPWx --delete root@${REMOTE}:${SMOUNT}/ ${TMOUNT}/
 }
 
 copy r/home
