@@ -29,8 +29,7 @@ fi
 zpool create -f "${ZPOOL_OPTS[@]}" r ${ZPOOL_TYPE} "${DEVS[@]}"
 
 zfs create -o mountpoint=/etc/nixos r/nixos
-zfs create                          r/home
-zfs create -o mountpoint=/root      r/home/root
+zfs create                          r/root
 zfs create -o mountpoint=/var/lib   r/varlib
 
 echo "### Formatting boot"

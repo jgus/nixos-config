@@ -24,7 +24,7 @@
     };
 
   fileSystems."/root" =
-    { device = "r/home/root";
+    { device = "r/root";
       fsType = "zfs"; options = [ "zfsutil" ];
     };
 
