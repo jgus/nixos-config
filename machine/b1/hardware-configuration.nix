@@ -29,11 +29,6 @@
       fsType = "zfs"; options = [ "zfsutil" ];
     };
 
-  fileSystems."/home" =
-    { device = "r/home";
-      fsType = "zfs"; options = [ "zfsutil" ];
-    };
-
   fileSystems."/root" =
     { device = "r/home/root";
       fsType = "zfs"; options = [ "zfsutil" ];
@@ -53,11 +48,6 @@
   fileSystems."/d" =
     { device = "/dev/disk/by-uuid/ca436eff-76b5-491b-938d-cf72ca56d7f4";
       fsType = "xfs";
-    };
-
-  fileSystems."/var/lib/test" =
-    { device = "localhost:/test";
-      fsType = "glusterfs";
     };
 
   swapDevices = [ ];

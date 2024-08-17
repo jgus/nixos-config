@@ -27,9 +27,6 @@ copy() {
     rsync -arPWx --delete root@${REMOTE}:${SMOUNT}/ ${TMOUNT}/
 }
 
-copy r/home
-copy r/home/josh
-copy r/home/josh/sync
 copy d/photos
 copy d/photos/Incoming
 copy d/photos/Published

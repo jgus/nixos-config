@@ -7,11 +7,10 @@ let
   };
 in
 {
-  # Define a user account. Don't forget to set a password with ‘passwd’.
-  # users.users.jane = {
-  #   isNormalUser = true;
-  #   extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
-  # };
+  fileSystems."/home" = {
+    device = "localhost:/home";
+    fsType = "glusterfs";
+  };
 
   users = {
     mutableUsers = false;
@@ -26,6 +25,7 @@ in
 
     users = {
       root = {
+        hashedPassword = "$y$j9T$kPkXW3Xo/TsdmLvo5eQE9/$z1/r/jzXvqtH/0xXO.pwtFYqlkt4LN7mnBEU1gjKNR2";
         openssh.authorizedKeys.keys = [ pubkeys.josh-ed25519 pubkeys.josh-rsa ];
       };
 
