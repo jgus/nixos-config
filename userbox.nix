@@ -53,7 +53,7 @@ if (machine.hostName != addresses.records."${service}".host) then {} else
         enable = true;
         description = service;
         wantedBy = [ "multi-user.target" ];
-        requires = [ "network-online.target" ];
+        requires = [ "network-online.target" "home.mount" ];
         path = [ pkgs.docker pkgs.rsync ];
         script = ''
           docker container stop ${service} >/dev/null 2>&1 || true ; \

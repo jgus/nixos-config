@@ -45,6 +45,7 @@ if (machine.hostName != addresses.records."${service}".host) then {} else
     services = docker-services {
       name = "syncthing";
       image = image;
+      requires = [ "home.mount" ];
       setup-script = ''
         if ! zfs list r/varlib/${service} >/dev/null 2>&1
         then

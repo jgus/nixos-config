@@ -3,12 +3,13 @@ let
   addresses = import ./addresses.nix;
 in
 {
-  docker-services = { name, image, setup-script ? "", backup-script ? "" }:
-  (if (setup-script == "") then {} else {
+  docker-services = { name, image, setup-script ? "", backup-script ? "", requires ? [] }:
+  (if ((setup-script == "") && ((length requires) == 0)) then {} else {
     "${name}-setup" = {
       path = [ pkgs.docker pkgs.rsync pkgs.zfs ];
       script = setup-script;
       serviceConfig = { Type = "oneshot"; };
+      requires = requires;
       requiredBy = [ "docker-${name}.service" ];
       before = [ "docker-${name}.service" ];
     };
