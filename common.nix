@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 let
   addresses = import ./addresses.nix;
@@ -21,7 +21,11 @@ in
   };
 
   networking = {
-    firewall.allowPing = true;
+    firewall = {
+      allowPing = true;
+      allowedTCPPorts = [ 5201 ]; # iperf
+      allowedUDPPorts = [ 5201 ]; # iperf
+    };
     useDHCP = false;
     tempAddresses = "disabled";
     defaultGateway.address = addresses.network.defaultGateway;
@@ -48,9 +52,11 @@ in
       parted
       clang-tools # TODO
       nixpkgs-fmt
+      iperf
     ];
     variables = {
       SERVER_NAMES = builtins.concatStringsSep " " addresses.serverNames;
+      OTHER_SERVER_NAMES = builtins.concatStringsSep " " (lib.lists.remove machine.hostName addresses.serverNames);
     };
   };
 
