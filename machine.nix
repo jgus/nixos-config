@@ -20,8 +20,8 @@ let
     d1 = {
       stateVersion = "23.05";
       hostId = "2bec4b05";
-      # lan-interfaces = [ "eno1" "eno2" "eno3" "eno4" "enp5s0f0" "enp5s0f1" ];
-      lan-interface = "enp5s0f0";
+      # lan-interfaces = [ "eno1" "eno2" "eno3" "eno4" "enp5s0" ];
+      lan-interface = "enp5s0";
       nvidia = true;
       zfs-pools = [ "d" ];
       imports = [
