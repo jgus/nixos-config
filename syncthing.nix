@@ -41,24 +41,16 @@ if (machine.hostName != addresses.records."${service}".host) then {} else
     extraOptions = (addresses.dockerOptions service);
   };
 
+  fileSystems."/var/lib/${service}" = {
+    device = "localhost:/varlib-${service}";
+    fsType = "glusterfs";
+  };
+
   systemd = {
     services = docker-services {
-      name = "syncthing";
+      name = service;
       image = image;
-      requires = [ "home.mount" ];
-      setup-script = ''
-        if ! zfs list r/varlib/${service} >/dev/null 2>&1
-        then
-          zfs create r/varlib/${service}
-          chown josh:users /var/lib/${service}
-          rsync -arPx --delete /nas/backup/varlib/${service}/ /var/lib/${service}/ || true
-        fi
-        zfs list r/varlib/${service}/index-v0.14.0.db >/dev/null 2>&1 || ( zfs create r/varlib/${service}/index-v0.14.0.db && chown josh:users /var/lib/${service}/index-v0.14.0.db )
-      '';
-      backup-script = ''
-        mkdir -p /nas/backup/varlib/${service}
-        rsync -arPx --delete /var/lib/${service}/ /nas/backup/varlib/${service}/
-      '';
+      requires = [ "var-lib-${service}.mount" "home.mount" "nas.mount" ];
     };
   };
 }

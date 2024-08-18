@@ -47,13 +47,18 @@ if (machine.hostName != addresses.records."${service}".host) then {} else
     '';
   };
 
+  fileSystems."/var/lib/${service}" = {
+    device = "localhost:/varlib-${service}";
+    fsType = "glusterfs";
+  };
+
   systemd = {
     services = {
       "${service}" = {
         enable = true;
         description = service;
         wantedBy = [ "multi-user.target" ];
-        requires = [ "network-online.target" "home.mount" ];
+        requires = [ "network-online.target" "home.mount" "nas.mount" "var-lib-${service}.mount" ];
         path = [ pkgs.docker pkgs.rsync ];
         script = ''
           docker container stop ${service} >/dev/null 2>&1 || true ; \

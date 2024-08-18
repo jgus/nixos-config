@@ -7,7 +7,7 @@ in
   (if ((setup-script == "") && ((builtins.length requires) == 0)) then {} else {
     "${name}-setup" = {
       path = [ pkgs.docker pkgs.rsync pkgs.zfs ];
-      script = setup-script;
+      script = setup-script + "\ntrue";
       serviceConfig = { Type = "oneshot"; };
       requires = requires;
       requiredBy = [ "docker-${name}.service" ];

@@ -39,8 +39,9 @@ if (machine.hostName != addresses.records."${service}".host) then {} else
 
   systemd = {
     services = docker-services {
-      name = "${service}";
+      name = service;
       image = image;
+      requires = [ "var-lib-${service}.mount" ];
     };
   };
 }
