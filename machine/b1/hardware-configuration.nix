@@ -9,14 +9,21 @@
     ];
 
   boot.initrd.availableKernelModules = [ "xhci_pci" "ahci" "usb_storage" "sd_mod" ];
-  boot.initrd.kernelModules = [ ];
+  boot.initrd.kernelModules = [ "uas" "usbcore" "usb_storage" ];
   boot.kernelModules = [ "kvm-intel" ];
   boot.extraModulePackages = [ ];
 
-  # boot.initrd.luks.devices."d" = {
-  #   device = "/dev/disk/by-uuid/33093883-e825-4216-bcb5-6062065fb912";
-  #   keyFile = "/etc/nixos/.secrets/vkey";
-  # };
+  # cryptsetup luksFormat /dev/sdb --key-file /etc/nixos/.secrets/vkey
+  # cryptsetup open /dev/sdb d --key-file /etc/nixos/.secrets/vkey
+  # mkfs.xfs /dev/mapper/d
+  # mount /dev/mapper/d /d
+  # nixos-generate-config
+  # copy/paste
+
+  boot.initrd.luks.devices."d" = {
+    device = "/dev/disk/by-uuid/b82f9947-51b4-4a41-af96-32baee7e5e35";
+    keyFile = "/etc/nixos/.secrets/vkey";
+  };
 
   fileSystems."/" =
     { device = "r";
@@ -44,10 +51,10 @@
       options = [ "fmask=0022" "dmask=0022" ];
     };
 
-  # fileSystems."/d" =
-  #   { device = "/dev/disk/by-uuid/ca436eff-76b5-491b-938d-cf72ca56d7f4";
-  #     fsType = "xfs";
-  #   };
+  fileSystems."/d" =
+    { device = "/dev/disk/by-uuid/eeda77c9-1a75-4c16-9a3c-a1fc6fbe067b";
+      fsType = "xfs";
+    };
 
   swapDevices = [ ];
 
