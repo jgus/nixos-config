@@ -6,7 +6,7 @@ let
   base-port = 49152;
   max-port = 60999;
   bricks = rec {
-    deep = [ "c1-1:/d/gluster" "c1-1:/m/gluster" "d1:/d/gluster" ];
+    deep = [ "c1-1:/d/gluster" "d1:/d/gluster" ];
     wide = deep ++ (map (n: "${n}:/gluster") addresses.serverNames);
   };
 in
