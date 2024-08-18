@@ -4,7 +4,7 @@ let
 in
 {
   docker-services = { name, image, setup-script ? "", backup-script ? "", requires ? [] }:
-  (if ((setup-script == "") && ((length requires) == 0)) then {} else {
+  (if ((setup-script == "") && ((builtins.length requires) == 0)) then {} else {
     "${name}-setup" = {
       path = [ pkgs.docker pkgs.rsync pkgs.zfs ];
       script = setup-script;
