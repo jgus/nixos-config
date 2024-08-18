@@ -53,7 +53,6 @@ let
       hostId = "39810e52";
       lan-interfaces = [ "eno1" "eno2" ];
       zfs-pools = [];
-      imports = [ ./userbox.nix ];
     };
     b1 = {
       stateVersion = "24.05";

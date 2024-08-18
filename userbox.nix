@@ -58,7 +58,7 @@ if (machine.hostName != addresses.records."${service}".host) then {} else
         enable = true;
         description = service;
         wantedBy = [ "multi-user.target" ];
-        requires = [ "network-online.target" "home.mount" "nas.mount" "var-lib-${service}.mount" ];
+        requires = [ "network-online.target" "home.mount" "nas.mount" "var-lib-${builtins.replaceStrings ["-"] ["\\x2d"] service}.mount" ];
         path = [ pkgs.docker pkgs.rsync ];
         script = ''
           docker container stop ${service} >/dev/null 2>&1 || true ; \
