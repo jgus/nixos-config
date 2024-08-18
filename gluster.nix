@@ -50,6 +50,7 @@ in
 
       gluster volume create ''${VOLNAME} replica ${toString (builtins.length bricks.${brickset})} ${builtins.concatStringsSep " " (map (s: "${s}/\${VOLNAME}") bricks.${brickset})} force
       gluster volume start ''${VOLNAME}
+      gluster volume set ''${VOLNAME} cluster.quorum-type none
       zfs set mountpoint=''${MOUNTPOINT}.0 r/varlib/''${NAME}
       mkdir -p ''${MOUNTPOINT}
       mount -t glusterfs localhost:/''${VOLNAME} ''${MOUNTPOINT}
