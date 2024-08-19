@@ -3,6 +3,7 @@
 with (import ./functions.nix) { inherit pkgs; };
 let
   service = "syncthing";
+  serviceMount = "var-lib-${builtins.replaceStrings ["-"] ["\\x2d"] service}.mount";
   image = "lscr.io/linuxserver/syncthing";
   addresses = import ./addresses.nix;
   machine = import ./machine.nix;
@@ -50,7 +51,7 @@ if (machine.hostName != addresses.records."${service}".host) then {} else
     services = docker-services {
       name = service;
       image = image;
-      requires = [ "var-lib-${service}.mount" "home.mount" "nas.mount" ];
+      requires = [ serviceMount "home.mount" "nas.mount" ];
     };
   };
 }
