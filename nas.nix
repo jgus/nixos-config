@@ -1,7 +1,7 @@
 { pkgs, ... }:
 
 let
-  service = "landing";
+  service = "nas";
   addresses = import ./addresses.nix;
   machine = import ./machine.nix;
 in
