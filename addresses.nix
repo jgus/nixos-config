@@ -197,5 +197,5 @@ let
     "--ip=${records."${service}".ip}"
     "--dns=${records.pihole.ip}"
     "--dns-search=${network.domain}"
-  ];
+  ] ++ (map (n: "--add-host=${n}:${getAttr n nameToIp}") names) ++ (map (n: "--add-host=${n}.${network.domain}:${getAttr n nameToIp}") names);
 in { inherit network records nameToIp serverNames hosts dhcpReservations dockerOptions; }
