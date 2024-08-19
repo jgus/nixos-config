@@ -2,6 +2,7 @@
 
 let
   service = "minecraft";
+  serviceMount = "var-lib-${builtins.replaceStrings ["-"] ["\\x2d"] service}.mount";
   user = "minecraft";
   group = "minecraft";
   addresses = import ./addresses.nix;
@@ -23,13 +24,18 @@ if (machine.hostName != addresses.records."${service}".host) then {} else
       )
       (builtins.readDir ./${service}/docker);
 
+  fileSystems."/var/lib/${service}" = {
+    device = "localhost:/varlib-${service}";
+    fsType = "glusterfs";
+  };
+
   systemd = {
     services = {
       "${service}" = {
         enable = true;
         description = "Minecraft";
         wantedBy = [ "multi-user.target" ];
-        requires = [ "network-online.target" ];
+        requires = [ "network-online.target" serviceMount ];
         path = [ pkgs.docker pkgs.zfs ];
         script = ''
           zfs list r/varlib/${service} >/dev/null 2>&1 || ( zfs create r/varlib/${service} && chown ${user}:${group} /var/lib/${service} )
