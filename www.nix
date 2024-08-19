@@ -14,7 +14,7 @@ if (machine.hostName != addresses.records.web-swag.host) then {} else
 
   fileSystems = builtins.listToAttrs (map (name:
     {
-      name = name;
+      name = "/var/lib/${name}";
       value = {
         device = "localhost:/varlib-${name}";
         fsType = "glusterfs";
