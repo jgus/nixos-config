@@ -20,6 +20,7 @@ in
       plex.gid = 193;
       home-assistant.gid = 200;
       www.gid = 911;
+      mosquitto.gid = 1883;
       minecraft.gid = 2000;
     };
 
@@ -45,6 +46,12 @@ in
         uid = 911;
         isSystemUser = true;
         group = "www";
+      };
+
+      mosquitto = {
+        uid = 1883;
+        isSystemUser = true;
+        group = "mosquitto";
       };
 
       gustafson = {
