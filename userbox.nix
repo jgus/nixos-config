@@ -4,6 +4,7 @@ let
   user = "nathaniel";
   uid = 1023;
   service = "userbox-${user}";
+  serviceMount = "var-lib-${builtins.replaceStrings ["-"] ["\\x2d"] service}.mount";
   addresses = import ./addresses.nix;
   machine = import ./machine.nix;
 in
@@ -58,7 +59,7 @@ if (machine.hostName != addresses.records."${service}".host) then {} else
         enable = true;
         description = service;
         wantedBy = [ "multi-user.target" ];
-        requires = [ "network-online.target" "home.mount" "nas.mount" "var-lib-${builtins.replaceStrings ["-"] ["\\x2d"] service}.mount" ];
+        requires = [ "network-online.target" "home.mount" "nas.mount" serviceMount ];
         path = [ pkgs.docker pkgs.rsync ];
         script = ''
           docker container stop ${service} >/dev/null 2>&1 || true ; \

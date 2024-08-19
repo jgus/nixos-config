@@ -4,6 +4,7 @@ with (import ./functions.nix) { inherit pkgs; };
 let
   pw = import ./.secrets/passwords.nix;
   service = "home-assistant";
+  serviceMount = "var-lib-${builtins.replaceStrings ["-"] ["\\x2d"] service}.mount";
   user = "home-assistant";
   group = "home-assistant";
   image = "ghcr.io/home-assistant/home-assistant:stable";
@@ -317,7 +318,7 @@ if (machine.hostName != addresses.records."${service}".host) then {} else
     services = docker-services {
       name = service;
       image = image;
-      requires = [ "var-lib-${builtins.replaceStrings ["-"] ["\\x2d"] service}.mount" ];
+      requires = [ serviceMount ];
     };
   };
 }

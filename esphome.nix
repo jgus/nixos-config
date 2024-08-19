@@ -3,6 +3,7 @@
 with (import ./functions.nix) { inherit pkgs; };
 let
   service = "esphome";
+  serviceMount = "var-lib-${builtins.replaceStrings ["-"] ["\\x2d"] service}.mount";
   image = "ghcr.io/esphome/esphome";
   addresses = import ./addresses.nix;
   machine = import ./machine.nix;
@@ -41,7 +42,7 @@ if (machine.hostName != addresses.records."${service}".host) then {} else
     services = docker-services {
       name = service;
       image = image;
-      requires = [ "var-lib-${service}.mount" ];
+      requires = [ serviceMount ];
     };
   };
 }

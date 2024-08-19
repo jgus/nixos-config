@@ -4,6 +4,7 @@ with (import ./functions.nix) { inherit pkgs; };
 let
   pw = import ./.secrets/passwords.nix;
   service = "frigate";
+  serviceMount = "var-lib-${builtins.replaceStrings ["-"] ["\\x2d"] service}.mount";
   image = "ghcr.io/blakeblackshear/frigate:stable";
   addresses = import ./addresses.nix;
   machine = import ./machine.nix;
@@ -509,7 +510,7 @@ if (machine.hostName != addresses.records."${service}".host) then {} else
     services = docker-services {
       name = service;
       image = image;
-      requires = [ "var-lib-${service}.mount" ];
+      requires = [ serviceMount ];
       setup-script = ''
         zfs list d/frigate-media >/dev/null 2>&1 || zfs create d/frigate-media
       '';
