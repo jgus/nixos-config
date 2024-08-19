@@ -57,8 +57,8 @@ let
   } //
   mapAttrs (k: v: { g = group.services; } // v) {
     pihole =            { id = 1;   host = "b1"; aliases = [ "dhcp" "dns" ]; };
-    ntp =               { id = 2;   host = "d1"; };
-    landing =           { id = 3;   host = "d1"; };
+    ntp =               { id = 2;   host = "b1"; };
+    landing =           { id = 3;   host = "b1"; };
     nas =               { id = 10;  host = "d1"; dns = "host"; aliases = [ "samba" "smb" "nfs" ]; };
     syncthing =         { id = 11;  host = "d1"; };
     web-swag =          { id = 20;  host = "d1"; };
