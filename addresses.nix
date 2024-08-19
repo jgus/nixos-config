@@ -64,10 +64,10 @@ let
     web-swag =          { id = 20;  host = "d1"; };
     web-db =            { id = 21;  host = "d1"; aliases = [ "db" ]; };
     web-db-admin =      { id = 22;  host = "d1"; };
-    home-assistant =    { id = 30;  host = "d1"; aliases = [ "homeassistant" "ha" ]; };
+    home-assistant =    { id = 30;  host = "b1"; aliases = [ "homeassistant" "ha" ]; };
     esphome =           { id = 31;  host = "d1"; };
-    mosquitto =         { id = 32;  host = "d1"; aliases = [ "mqtt" ]; };
-    zigbee2mqtt =       { id = 33;  host = "d1"; aliases = [ "z2m" ]; };
+    mosquitto =         { id = 32;  host = "b1"; aliases = [ "mqtt" ]; };
+    zigbee2mqtt =       { id = 33;  host = "b1"; aliases = [ "z2m" ]; };
     zwave-main =        { id = 40;  host = "pi-67db40"; };
     zwave-upstairs =    { id = 41;  host = "pi-67dbcd"; };
     zwave-basement =    { id = 42;  host = "pi-67dc75"; };
