@@ -5,6 +5,8 @@ let
   service = "esphome";
   serviceMount = "var-lib-${builtins.replaceStrings ["-"] ["\\x2d"] service}.mount";
   image = "ghcr.io/esphome/esphome";
+  user = "josh";
+  group = "users";
   addresses = import ./addresses.nix;
   machine = import ./machine.nix;
 in
@@ -15,12 +17,12 @@ if (machine.hostName != addresses.records."${service}".host) then {} else
   virtualisation.oci-containers.containers."${service}" = {
     image = image;
     autoStart = true;
-    user = "${toString config.users.users.josh.uid}:${toString config.users.groups.users.gid}";
+    user = "${toString config.users.users.${user}.uid}:${toString config.users.groups.${group}.gid}";
     extraOptions = (addresses.dockerOptions service) ++ [
-      "--tmpfs=/cache:exec,uid=${toString config.users.users.josh.uid},gid=${toString config.users.groups.users.gid}"
-      "--tmpfs=/.cache/pip:exec,uid=${toString config.users.users.josh.uid},gid=${toString config.users.groups.users.gid}"
-      "--tmpfs=/config/.esphome/build:exec,uid=${toString config.users.users.josh.uid},gid=${toString config.users.groups.users.gid}"
-      "--tmpfs=/config/.esphome/external_components:exec,uid=${toString config.users.users.josh.uid},gid=${toString config.users.groups.users.gid}"
+      "--tmpfs=/cache:exec,uid=${toString config.users.users.${user}.uid},gid=${toString config.users.groups.${group}.gid}"
+      "--tmpfs=/.cache/pip:exec,uid=${toString config.users.users.${user}.uid},gid=${toString config.users.groups.${group}.gid}"
+      "--tmpfs=/config/.esphome/build:exec,uid=${toString config.users.users.${user}.uid},gid=${toString config.users.groups.${group}.gid}"
+      "--tmpfs=/config/.esphome/external_components:exec,uid=${toString config.users.users.${user}.uid},gid=${toString config.users.groups.${group}.gid}"
     ];
     environment = {
       PLATFORMIO_CORE_DIR = "/cache/.plattformio";

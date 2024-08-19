@@ -5,6 +5,8 @@ let
   service = "syncthing";
   serviceMount = "var-lib-${builtins.replaceStrings ["-"] ["\\x2d"] service}.mount";
   image = "lscr.io/linuxserver/syncthing";
+  user = "josh";
+  group = "users";
   addresses = import ./addresses.nix;
   machine = import ./machine.nix;
 in
@@ -26,14 +28,14 @@ if (machine.hostName != addresses.records."${service}".host) then {} else
       "21027:21027/udp"
     ];
     environment = {
-      PUID = toString config.users.users.josh.uid;
-      PGID = toString config.users.groups.users.gid;
+      PUID = toString config.users.users.${user}.uid;
+      PGID = toString config.users.groups.${group}.gid;
       TZ = config.time.timeZone;
       UMASK_SET = "002";
     };
     volumes = [
       "/var/lib/syncthing:/config"
-      "/home/josh/sync:/shares/Sync"
+      "/home/${user}/sync:/shares/Sync"
       "/nas/photos:/shares/Photos"
       "/nas/software/Tools:/shares/Tools"
       "/nas/media/Comics:/shares/Comics"
