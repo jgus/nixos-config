@@ -37,6 +37,7 @@ let
     switch-office =       { id = 23; mac = "f4:e2:c6:59:9c:76"; };
     switch-study =        { id = 24; mac = "f4:e2:c6:59:9c:4d"; };
     switch-c =            { id = 30; mac = "f8:c2:88:23:8c:10"; };
+    switch-d =            { id = 31; mac = "ec:f4:bb:fe:71:f8"; };
   } //
   mapAttrs (k: v: { g = group.servers; } // v) {
     b1 =        { id = 1; };
