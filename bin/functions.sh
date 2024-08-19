@@ -186,7 +186,7 @@ on_all_servers() {
     local RET=0
     for host in b1 c1-1 c1-2 d1 pi-67cba1 pi-67db40 pi-67dbcd pi-67dc75
     do
-        (ssh -A root@${host} "$@" > >(sed -e "s/^/${host}: /;") 2> >(sed -e "s/^/${host} (err): /;" >&2)) &
+        (ssh -A root@${host} "$@" > >(sed -e "s/^/${host}: /;") 2> >(sed -e "s/^/${host}! /;" >&2)) &
         PIDS+=($!)
     done
     for pid in "${PIDS[@]}"
