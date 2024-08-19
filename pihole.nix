@@ -4,6 +4,7 @@ with (import ./functions.nix) { inherit pkgs; };
 let
   service = "pihole";
   image = "pihole/pihole";
+  serviceMount = "var-lib-${builtins.replaceStrings ["-"] ["\\x2d"] service}.mount";
   addresses = import ./addresses.nix;
   machine = import ./machine.nix;
   pw = import ./.secrets/passwords.nix;
@@ -51,23 +52,16 @@ if (machine.hostName != addresses.records."${service}".host) then {} else
     ];
   };
 
+  fileSystems."/var/lib/${service}" = {
+    device = "localhost:/varlib-${service}";
+    fsType = "glusterfs";
+  };
+
   systemd = {
     services = docker-services {
       name = service;
       image = image;
-      setup-script = ''
-        if ! zfs list r/varlib/${service} >/dev/null 2>&1
-        then
-          zfs create r/varlib/${service}
-          mkdir -p /var/lib/${service}/pihole
-          mkdir -p /var/lib/${service}/dnsmasq.d
-          rsync -arPx --delete /nas/backup/varlib/${service}/ /var/lib/${service}/ || true
-        fi
-      '';
-      backup-script = ''
-        mkdir -p /nas/backup/varlib/${service}
-        rsync -arPx --delete /var/lib/${service}/ /nas/backup/varlib/${service}/
-      '';
+      requires = [ serviceMount "nas.mount" ];
     };
   };
 }
