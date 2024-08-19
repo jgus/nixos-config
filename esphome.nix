@@ -12,8 +12,6 @@ if (machine.hostName != addresses.records."${service}".host) then {} else
 {
   imports = [ ./docker.nix ];
 
-  networking.firewall.allowedTCPPorts = [ 6052 ];
-
   virtualisation.oci-containers.containers."${service}" = {
     image = image;
     autoStart = true;
@@ -28,6 +26,9 @@ if (machine.hostName != addresses.records."${service}".host) then {} else
       PLATFORMIO_CORE_DIR = "/cache/.plattformio";
       PLATFORMIO_GLOBALLIB_DIR = "/cache/.plattformioLibs";
     };
+    ports = [
+      "6052"
+    ];
     volumes = [
       "/var/lib/${service}:/config"
     ];
