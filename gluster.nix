@@ -54,7 +54,7 @@ in
       zfs set mountpoint=''${MOUNTPOINT}.0 r/varlib/''${NAME}
       mkdir -p ''${MOUNTPOINT}
       mount -t glusterfs localhost:/''${VOLNAME} ''${MOUNTPOINT}
-      rsync -arPW --delete ''${MOUNTPOINT}.0/ ''${MOUNTPOINT}/
+      rsync -arPW ''${MOUNTPOINT}.0/ ''${MOUNTPOINT}/
       zfs set canmount=off r/varlib/''${NAME}
       rm -r ''${MOUNTPOINT}.0
     '';

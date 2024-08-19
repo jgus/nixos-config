@@ -29,7 +29,7 @@ if (machine.hostName != addresses.records."${service}".host) then {} else
 
   systemd = {
     services = docker-services {
-      name = "${service}";
+      name = service;
       image = image;
       setup-script = ''
         if ! zfs list r/varlib/${service} >/dev/null 2>&1
