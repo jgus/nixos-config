@@ -38,8 +38,6 @@ if (machine.hostName != addresses.records."${service}".host) then {} else
         requires = [ "network-online.target" serviceMount ];
         path = [ pkgs.docker pkgs.zfs ];
         script = ''
-          zfs list r/varlib/${service} >/dev/null 2>&1 || ( zfs create r/varlib/${service} && chown ${user}:${group} /var/lib/${service} )
-
           docker container stop ${service} >/dev/null 2>&1 || true ; \
           docker container rm -f ${service} >/dev/null 2>&1 || true ; \
 

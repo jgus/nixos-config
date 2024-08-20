@@ -61,11 +61,11 @@ let
     landing =           { id = 3;   host = "b1"; };
     nas =               { id = 10;  host = "c1-1"; dns = "host"; aliases = [ "samba" "smb" "nfs" ]; };
     syncthing =         { id = 11;  host = "c1-1"; };
-    web-swag =          { id = 20;  host = "d1"; };
-    web-db =            { id = 21;  host = "d1"; aliases = [ "db" ]; };
-    web-db-admin =      { id = 22;  host = "d1"; };
+    web-swag =          { id = 20;  host = "c1-2"; };
+    web-db =            { id = 21;  host = "c1-2"; aliases = [ "db" ]; };
+    web-db-admin =      { id = 22;  host = "c1-2"; };
     home-assistant =    { id = 30;  host = "b1"; aliases = [ "homeassistant" "ha" ]; };
-    esphome =           { id = 31;  host = "d1"; };
+    esphome =           { id = 31;  host = "c1-2"; };
     mosquitto =         { id = 32;  host = "b1"; aliases = [ "mqtt" ]; };
     zigbee2mqtt =       { id = 33;  host = "b1"; aliases = [ "z2m" ]; };
     zwave-main =        { id = 40;  host = "pi-67db40"; };
@@ -81,8 +81,8 @@ let
     lidarr =            { id = 75;  host = "c1-1"; };
     mylar =             { id = 76;  host = "c1-1"; };
     komga =             { id = 77;  host = "c1-1"; };
-    minecraft =         { id = 100; host = "d1"; };
-    userbox-nathaniel = { id = 110; host = "d1"; };
+    minecraft =         { id = 100; host = "c1-2"; };
+    userbox-nathaniel = { id = 110; host = "c1-2"; };
   } //
   mapAttrs (k: v: { g = group.vms; } // v) {
     vm1 =               { id = 1; host = "d1"; dns = "host"; };
