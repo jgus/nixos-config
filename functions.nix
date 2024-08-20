@@ -10,6 +10,7 @@ in
       script = setup-script + "\ntrue";
       serviceConfig = { Type = "oneshot"; };
       requires = requires;
+      after = requires;
       requiredBy = [ "docker-${name}.service" ];
       before = [ "docker-${name}.service" ];
     };
