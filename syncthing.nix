@@ -12,7 +12,14 @@ let
 in
 if (machine.hostName != addresses.records."${service}".host) then {} else
 {
-  imports = [ ./docker.nix ];
+  imports = [
+    ./docker.nix
+    (docker-services {
+      name = service;
+      image = image;
+      requires = [ serviceMount "home.mount" "nas.mount" ];
+    })
+  ];
 
   networking.firewall = {
     allowedTCPPorts = [ 8384 22000 ];
@@ -47,13 +54,5 @@ if (machine.hostName != addresses.records."${service}".host) then {} else
   fileSystems."/var/lib/${service}" = {
     device = "localhost:/varlib-${service}";
     fsType = "glusterfs";
-  };
-
-  systemd = {
-    services = docker-services {
-      name = service;
-      image = image;
-      requires = [ serviceMount "home.mount" "nas.mount" ];
-    };
   };
 }

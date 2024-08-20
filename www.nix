@@ -10,7 +10,24 @@ let
 in
 if (machine.hostName != addresses.records.web-swag.host) then {} else
 {
-  imports = [ ./docker.nix ];
+  imports = [
+    ./docker.nix
+    (docker-services {
+      name = "web-db";
+      image = db_image;
+      requires = [ "var-lib-web_db_data.mount" ];
+    })
+    (docker-services {
+      name = "web-db-admin";
+      image = db_admin_image;
+      requires = [ "var-lib-web_db_admin_sessions.mount" ];
+    })
+    (docker-services {
+      name = "web-swag";
+      image = swag_image;
+      requires = [ "var-lib-swag_config.mount" "var-lib-www.mount" "var-lib-dav.mount" "nas.mount" ];
+    })
+  ];
 
   fileSystems = builtins.listToAttrs (map (name:
     {
@@ -77,21 +94,5 @@ if (machine.hostName != addresses.records.web-swag.host) then {} else
       "/nas/photos/Published:/config/www/published:ro"
       "/var/lib/dav:/config/www/dav"
     ];
-  };
-
-  systemd = {
-    services = docker-services {
-      name = "web-db";
-      image = db_image;
-      requires = [ "var-lib-web_db_data.mount" ];
-    } // docker-services {
-      name = "web-db-admin";
-      image = db_admin_image;
-      requires = [ "var-lib-web_db_admin_sessions.mount" ];
-    } // docker-services {
-      name = "web-swag";
-      image = swag_image;
-      requires = [ "var-lib-swag_config.mount" "var-lib-www.mount" "var-lib-dav.mount" "nas.mount" ];
-    };
   };
 }

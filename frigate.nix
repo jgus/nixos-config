@@ -466,7 +466,17 @@ let
 in
 if (machine.hostName != addresses.records."${service}".host) then {} else
 {
-  imports = [ ./docker.nix ];
+  imports = [
+    ./docker.nix
+    (docker-services {
+      name = service;
+      image = image;
+      requires = [ serviceMount ];
+      setup-script = ''
+        zfs list d/frigate-media >/dev/null 2>&1 || zfs create d/frigate-media
+      '';
+    })
+  ];
 
   services.udev.extraRules = ''
     SUBSYSTEM=="usb",ATTRS{idVendor}=="1a6e",ATTRS{idProduct}=="089a",GROUP="plugdev"
@@ -504,16 +514,5 @@ if (machine.hostName != addresses.records."${service}".host) then {} else
   fileSystems."/var/lib/${service}" = {
     device = "localhost:/varlib-${service}";
     fsType = "glusterfs";
-  };
-
-  systemd = {
-    services = docker-services {
-      name = service;
-      image = image;
-      requires = [ serviceMount ];
-      setup-script = ''
-        zfs list d/frigate-media >/dev/null 2>&1 || zfs create d/frigate-media
-      '';
-    };
   };
 }

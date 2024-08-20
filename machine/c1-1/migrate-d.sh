@@ -27,30 +27,30 @@ copy() {
     rsync -arPWx --delete root@${REMOTE}:${SMOUNT}/ ${TMOUNT}/
 }
 
-copy d/photos
-copy d/photos/Incoming
-copy d/photos/Published
-copy d/projects
-copy d/software
-copy d/backup
-copy d/external
-copy d/external/brown
-copy d/offsite
-copy d/offsite/gustafson-nas
-copy d/offsite/gustafson-nas/boot
-copy d/offsite/gustafson-nas/d
-copy d/offsite/gustafson-nas/d/Files
-copy d/offsite/gustafson-nas/d/Movies
-copy d/offsite/gustafson-nas/d/Music
-copy d/offsite/gustafson-nas/d/Tv
-copy d/offsite/gustafson-nas/d/plex
-copy d/offsite/gustafson-nas/r
-copy d/offsite/gustafson-nas/r/nixos
-copy d/scratch/peer
-copy d/scratch/usenet
-copy d/varlib/images
-copy d/media m/media
+# copy d/photos
+# copy d/photos/Incoming
+# copy d/photos/Published
+# copy d/projects
+# copy d/software
+# copy d/backup
+# copy d/external
+# copy d/external/brown
+# copy d/offsite
+# copy d/offsite/gustafson-nas
+# copy d/offsite/gustafson-nas/boot
+# copy d/offsite/gustafson-nas/d
+# copy d/offsite/gustafson-nas/d/Files
+# copy d/offsite/gustafson-nas/d/Movies
+# copy d/offsite/gustafson-nas/d/Music
+# copy d/offsite/gustafson-nas/d/Tv
+# copy d/offsite/gustafson-nas/d/plex
+# copy d/offsite/gustafson-nas/r
+# copy d/offsite/gustafson-nas/r/nixos
+# copy d/scratch/peer
+# copy d/scratch/usenet
+# copy d/varlib/images
+# copy d/media m/media
 
-copy d/backup/timemachine
+# copy d/backup/timemachine
 
 copy d/frigate-media

@@ -45,6 +45,16 @@
       options = [ "fmask=0022" "dmask=0022" ];
     };
 
+  fileSystems."/d" =
+    { device = "d";
+      fsType = "zfs"; options = [ "zfsutil" ];
+    };
+
+  fileSystems."/m" =
+    { device = "m";
+      fsType = "zfs"; options = [ "zfsutil" ];
+    };
+
   swapDevices = [ ];
 
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking

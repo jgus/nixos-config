@@ -20,6 +20,10 @@ if (machine.hostName == addresses.records."${service}".host) then
     device = "/d";
     options = [ "rbind" ];
   };
+  fileSystems."/nas/media" = {
+    device = "/m/media";
+    options = [ "rbind" ];
+  };
   fileSystems."/nas/tmp" = { device = "tmpfs"; fsType = "tmpfs"; };
 
   services.nfs.server.exports = ''

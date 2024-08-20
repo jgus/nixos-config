@@ -59,8 +59,8 @@ let
     pihole =            { id = 1;   host = "b1"; aliases = [ "dhcp" "dns" ]; };
     ntp =               { id = 2;   host = "b1"; };
     landing =           { id = 3;   host = "b1"; };
-    nas =               { id = 10;  host = "d1"; dns = "host"; aliases = [ "samba" "smb" "nfs" ]; };
-    syncthing =         { id = 11;  host = "d1"; };
+    nas =               { id = 10;  host = "c1-1"; dns = "host"; aliases = [ "samba" "smb" "nfs" ]; };
+    syncthing =         { id = 11;  host = "c1-1"; };
     web-swag =          { id = 20;  host = "d1"; };
     web-db =            { id = 21;  host = "d1"; aliases = [ "db" ]; };
     web-db-admin =      { id = 22;  host = "d1"; };
@@ -73,14 +73,14 @@ let
     zwave-basement =    { id = 42;  host = "pi-67dc75"; };
     frigate =           { id = 50;  host = "d1"; };
     plex =              { id = 60;  host = "d1"; };
-    sabnzbd =           { id = 70;  host = "d1"; };
-    transmission =      { id = 71;  host = "d1"; };
-    prowlarr =          { id = 72;  host = "d1"; };
-    sonarr =            { id = 73;  host = "d1"; };
-    radarr =            { id = 74;  host = "d1"; };
-    lidarr =            { id = 75;  host = "d1"; };
-    mylar =             { id = 76;  host = "d1"; };
-    komga =             { id = 77;  host = "d1"; };
+    sabnzbd =           { id = 70;  host = "c1-1"; };
+    transmission =      { id = 71;  host = "c1-1"; };
+    prowlarr =          { id = 72;  host = "c1-1"; };
+    sonarr =            { id = 73;  host = "c1-1"; };
+    radarr =            { id = 74;  host = "c1-1"; };
+    lidarr =            { id = 75;  host = "c1-1"; };
+    mylar =             { id = 76;  host = "c1-1"; };
+    komga =             { id = 77;  host = "c1-1"; };
     minecraft =         { id = 100; host = "d1"; };
     userbox-nathaniel = { id = 110; host = "d1"; };
   } //

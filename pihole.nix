@@ -16,7 +16,14 @@ let
 in
 if (machine.hostName != addresses.records."${service}".host) then {} else
 {
-  imports = [ ./docker.nix ];
+  imports = [
+    ./docker.nix
+    (docker-services {
+      name = service;
+      image = image;
+      requires = [ serviceMount ];
+    })
+  ];
 
   virtualisation.oci-containers.containers."${service}" = {
     image = image;
@@ -55,13 +62,5 @@ if (machine.hostName != addresses.records."${service}".host) then {} else
   fileSystems."/var/lib/${service}" = {
     device = "localhost:/varlib-${service}";
     fsType = "glusterfs";
-  };
-
-  systemd = {
-    services = docker-services {
-      name = service;
-      image = image;
-      requires = [ serviceMount "nas.mount" ];
-    };
   };
 }

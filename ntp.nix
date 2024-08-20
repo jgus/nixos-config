@@ -9,7 +9,13 @@ let
 in
 if (machine.hostName != addresses.records."${service}".host) then {} else
 {
-  imports = [ ./docker.nix ];
+  imports = [
+    ./docker.nix
+    (docker-services {
+      name = service;
+      image = image;
+    })
+  ];
 
   networking.firewall.allowedUDPPorts = [ 123 ];
 
@@ -25,12 +31,5 @@ if (machine.hostName != addresses.records."${service}".host) then {} else
     ports = [
       "123/udp"
     ];
-  };
-
-  systemd = {
-    services = docker-services {
-      name = service;
-      image = image;
-    };
   };
 }
