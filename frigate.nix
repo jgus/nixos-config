@@ -37,12 +37,15 @@ let
     audio:
       enabled: True
     detectors:
-      coral1:
+      # coral1:
+      #   type: edgetpu
+      #   device: pci:0
+      # coral2:
+      #   type: edgetpu
+      #   device: pci:1
+      coral3:
         type: edgetpu
-        device: pci:0
-      coral2:
-        type: edgetpu
-        device: pci:1
+        device: usb:0
     record:
       retain:
         days: 30
