@@ -26,10 +26,16 @@ let
     audio:
       enabled: True
     detectors:
-      coral1:
+      # coral1:
+      #   type: edgetpu
+      #   device: pci:0
+      # coral2:
+      #   type: edgetpu
+      #   device: pci:0
+      coral3:
         type: edgetpu
         device: usb:0
-      # coral2:
+      # coral4:
       #   type: edgetpu
       #   device: usb:1
     record:
@@ -483,6 +489,8 @@ if (machine.hostName != addresses.records."${service}".host) then {} else
     SUBSYSTEM=="usb",ATTRS{idVendor}=="18d1",ATTRS{idProduct}=="9302",GROUP="plugdev"
   '';
 
+  boot.kernelModules = [ "gasket" ];
+
   virtualisation.oci-containers.containers."${service}" = {
     image = image;
     autoStart = true;
@@ -503,7 +511,7 @@ if (machine.hostName != addresses.records."${service}".host) then {} else
       "8555/udp"
     ];
     volumes = [
-      "/dev/bus/usb/004:/dev/bus/usb/004"
+      "/dev:/dev"
       "/d/frigate-media:/media/frigate"
       "/var/lib/${service}:/config"
       "${configFile}:/config/config.yml:ro"
