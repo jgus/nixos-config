@@ -4,10 +4,21 @@ with (import ./functions.nix) { inherit pkgs; };
 let
   pw = import ./.secrets/passwords.nix;
   service = "frigate";
-  serviceMount = "var-lib-${builtins.replaceStrings ["-"] ["\\x2d"] service}.mount";
   image = "ghcr.io/blakeblackshear/frigate:stable";
   addresses = import ./addresses.nix;
   machine = import ./machine.nix;
+  gasketRev = "09385d485812088e04a98a6e1227bf92663e0b59";
+  gasketPkg = (pkgs.gasket.overrideAttrs (final: prev: {
+    version = builtins.substring 0 6 gasketRev;
+    src = pkgs.fetchFromGitHub {
+      owner = "google";
+      repo = "gasket-driver";
+      rev = gasketRev;
+      hash = "sha256-fcnqCBh04e+w8g079JyuyY2RPu34M+/X+Q8ObE+42i4=";
+    };
+  })).override {
+    kernel = config.boot.kernelPackages.kernel;
+  };
   configFile = pkgs.writeText "config.yml" ''
     # logger:
     #   default: debug
@@ -26,18 +37,12 @@ let
     audio:
       enabled: True
     detectors:
-      # coral1:
-      #   type: edgetpu
-      #   device: pci:0
-      # coral2:
-      #   type: edgetpu
-      #   device: pci:0
-      coral3:
+      coral1:
         type: edgetpu
-        device: usb:0
-      # coral4:
-      #   type: edgetpu
-      #   device: usb:1
+        device: pci:0
+      coral2:
+        type: edgetpu
+        device: pci:1
     record:
       retain:
         days: 30
@@ -477,7 +482,6 @@ if (machine.hostName != addresses.records."${service}".host) then {} else
     (docker-services {
       name = service;
       image = image;
-      requires = [ serviceMount ];
       setup-script = ''
         zfs list d/frigate-media >/dev/null 2>&1 || zfs create d/frigate-media
       '';
@@ -489,7 +493,7 @@ if (machine.hostName != addresses.records."${service}".host) then {} else
     SUBSYSTEM=="usb",ATTRS{idVendor}=="18d1",ATTRS{idProduct}=="9302",GROUP="plugdev"
   '';
 
-  boot.kernelModules = [ "gasket" ];
+  boot.extraModulePackages = [ gasketPkg ];
 
   virtualisation.oci-containers.containers."${service}" = {
     image = image;
@@ -497,6 +501,8 @@ if (machine.hostName != addresses.records."${service}".host) then {} else
     extraOptions = (addresses.dockerOptions service) ++ [
       "--shm-size=2048m"
       "--gpus=all"
+      "--device=/dev/apex_0:/dev/apex_0"
+      "--device=/dev/apex_1:/dev/apex_1"
       "--privileged"
     ];
     environment = {
@@ -511,16 +517,10 @@ if (machine.hostName != addresses.records."${service}".host) then {} else
       "8555/udp"
     ];
     volumes = [
-      "/dev:/dev"
-      "/d/frigate-media:/media/frigate"
-      "/var/lib/${service}:/config"
+      "/d/frigate/config:/config"
+      "/d/frigate/media:/media/frigate"
       "${configFile}:/config/config.yml:ro"
       "/etc/localtime:/etc/localtime:ro"
     ];
-  };
-
-  fileSystems."/var/lib/${service}" = {
-    device = "localhost:/varlib-${service}";
-    fsType = "glusterfs";
   };
 }
