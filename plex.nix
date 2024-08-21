@@ -3,7 +3,6 @@
 with (import ./functions.nix) { inherit pkgs; };
 let
   service = "plex";
-  serviceMount = "var-lib-${builtins.replaceStrings ["-"] ["\\x2d"] service}.mount";
   user = "plex";
   group = "plex";
   image = "lscr.io/linuxserver/plex";
@@ -17,7 +16,7 @@ if (machine.hostName != addresses.records."${service}".host) then {} else
     (docker-services {
       name = service;
       image = image;
-      requires = [ serviceMount "nas.mount" ];
+      requires = [ "nas.mount" ];
     })
   ];
 
@@ -36,14 +35,9 @@ if (machine.hostName != addresses.records."${service}".host) then {} else
       VERSION = "latest";
     };
     volumes = [
-      "/var/lib/${service}:/config"
+      "/nas/varlib/${service}:/config"
       "/nas/media:/media"
       "/nas/photos:/shares/photos"
     ];
-  };
-
-  fileSystems."/var/lib/${service}" = {
-    device = "localhost:/varlib-${service}";
-    fsType = "glusterfs";
   };
 }
