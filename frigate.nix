@@ -7,18 +7,6 @@ let
   image = "ghcr.io/blakeblackshear/frigate:stable";
   addresses = import ./addresses.nix;
   machine = import ./machine.nix;
-  gasketRev = "09385d485812088e04a98a6e1227bf92663e0b59";
-  gasketPkg = (pkgs.gasket.overrideAttrs (final: prev: {
-    version = builtins.substring 0 6 gasketRev;
-    src = pkgs.fetchFromGitHub {
-      owner = "google";
-      repo = "gasket-driver";
-      rev = gasketRev;
-      hash = "sha256-fcnqCBh04e+w8g079JyuyY2RPu34M+/X+Q8ObE+42i4=";
-    };
-  })).override {
-    kernel = config.boot.kernelPackages.kernel;
-  };
   configFile = pkgs.writeText "config.yml" ''
     # logger:
     #   default: debug
@@ -496,7 +484,7 @@ if (machine.hostName != addresses.records."${service}".host) then {} else
     SUBSYSTEM=="usb",ATTRS{idVendor}=="18d1",ATTRS{idProduct}=="9302",GROUP="plugdev"
   '';
 
-  boot.extraModulePackages = [ gasketPkg ];
+  boot.extraModulePackages = [ pkgs.gasket ];
 
   virtualisation.oci-containers.containers."${service}" = {
     image = image;
