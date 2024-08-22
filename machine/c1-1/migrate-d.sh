@@ -53,4 +53,6 @@ copy() {
 
 # copy d/backup/timemachine
 
-copy d/frigate-media
+copy d/frigate
+copy d/frigate/config
+copy d/frigate/media
