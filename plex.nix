@@ -25,8 +25,7 @@ if (machine.hostName != addresses.records."${service}".host) then {} else
     autoStart = true;
     extraOptions = (addresses.dockerOptions service) ++ [
       "--gpus=all"
-      "--device=/dev/dri/card1:/dev/dri/card1"
-      "--device=/dev/dri/renderD128:/dev/dri/renderD128"
+      "--device=/dev/dri:/dev/dri"
       "--tmpfs=/tmp"
     ];
     environment = {
