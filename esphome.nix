@@ -2,49 +2,31 @@
 
 with (import ./functions.nix) { inherit pkgs; };
 let
-  service = "esphome";
-  serviceMount = "var-lib-${builtins.replaceStrings ["-"] ["\\x2d"] service}.mount";
-  image = "ghcr.io/esphome/esphome";
   user = "josh";
   group = "users";
-  addresses = import ./addresses.nix;
-  machine = import ./machine.nix;
+  uid = toString config.users.users.${user}.uid;
+  gid = toString config.users.groups.${group}.gid;
 in
-if (machine.hostName != addresses.records."${service}".host) then {} else
 {
-  imports = [
-    ./docker.nix
-    (docker-services {
-      name = service;
-      image = image;
-      requires = [ serviceMount ];
-    })
-  ];
-
-  virtualisation.oci-containers.containers."${service}" = {
-    image = image;
-    autoStart = true;
-    user = "${toString config.users.users.${user}.uid}:${toString config.users.groups.${group}.gid}";
-    extraOptions = (addresses.dockerOptions service) ++ [
-      "--tmpfs=/cache:exec,uid=${toString config.users.users.${user}.uid},gid=${toString config.users.groups.${group}.gid}"
-      "--tmpfs=/.cache/pip:exec,uid=${toString config.users.users.${user}.uid},gid=${toString config.users.groups.${group}.gid}"
-      "--tmpfs=/config/.esphome/build:exec,uid=${toString config.users.users.${user}.uid},gid=${toString config.users.groups.${group}.gid}"
-      "--tmpfs=/config/.esphome/external_components:exec,uid=${toString config.users.users.${user}.uid},gid=${toString config.users.groups.${group}.gid}"
-    ];
-    environment = {
-      PLATFORMIO_CORE_DIR = "/cache/.plattformio";
-      PLATFORMIO_GLOBALLIB_DIR = "/cache/.plattformioLibs";
+  imports = [(homelabService {
+    name = "esphome";
+    inherit user group;
+    docker = {
+      image = "ghcr.io/esphome/esphome";
+      environment = {
+        PLATFORMIO_CORE_DIR = "/cache/.plattformio";
+        PLATFORMIO_GLOBALLIB_DIR = "/cache/.plattformioLibs";
+      };
+      ports = [
+        "6052"
+      ];
+      configVolume = "/config";
+      extraOptions = [
+        "--tmpfs=/cache:exec,uid=${uid},gid=${gid}"
+        "--tmpfs=/.cache/pip:exec,uid=${uid},gid=${gid}"
+        "--tmpfs=/config/.esphome/build:exec,uid=${uid},gid=${gid}"
+        "--tmpfs=/config/.esphome/external_components:exec,uid=${uid},gid=${gid}"
+      ];
     };
-    ports = [
-      "6052"
-    ];
-    volumes = [
-      "/var/lib/${service}:/config"
-    ];
-  };
-
-  fileSystems."/var/lib/${service}" = {
-    device = "localhost:/varlib-${service}";
-    fsType = "glusterfs";
-  };
+  })];
 }
