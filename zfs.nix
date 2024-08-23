@@ -1,10 +1,11 @@
-{ pkgs, ... }:
+{ pkgs, config, ... }:
 
 let
   machine = import ./machine.nix;
 in
 {
   boot = {
+    kernelPackages = config.boot.zfs.package.latestCompatibleLinuxPackages;
     supportedFilesystems = [
       "zfs"
     ];

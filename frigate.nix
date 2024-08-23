@@ -25,15 +25,18 @@ let
     audio:
       enabled: True
     detectors:
-      # coral1:
-      #   type: edgetpu
-      #   device: pci:0
-      # coral2:
-      #   type: edgetpu
-      #   device: pci:1
-      coral3:
+      coral1:
         type: edgetpu
-        device: usb:0
+        device: pci:0
+      coral2:
+        type: edgetpu
+        device: pci:1
+      # coral3:
+      #   type: edgetpu
+      #   device: usb:0
+      # coral4:
+      #   type: edgetpu
+      #   device: usb:1
     record:
       retain:
         days: 30
@@ -473,9 +476,6 @@ if (machine.hostName != addresses.records."${service}".host) then {} else
     (docker-services {
       name = service;
       image = image;
-      setup-script = ''
-        zfs list d/frigate-media >/dev/null 2>&1 || zfs create d/frigate-media
-      '';
     })
   ];
 
@@ -484,13 +484,13 @@ if (machine.hostName != addresses.records."${service}".host) then {} else
     SUBSYSTEM=="usb",ATTRS{idVendor}=="18d1",ATTRS{idProduct}=="9302",GROUP="plugdev"
   '';
 
-  boot.extraModulePackages = [ pkgs.gasket ];
+  boot.extraModulePackages = with config.boot.kernelPackages; [ gasket ];
 
   virtualisation.oci-containers.containers."${service}" = {
     image = image;
     autoStart = true;
     extraOptions = (addresses.dockerOptions service) ++ [
-      "--shm-size=2048m"
+      "--shm-size=16g"
       "--gpus=all"
       "--device=/dev/apex_0:/dev/apex_0"
       "--device=/dev/apex_1:/dev/apex_1"
