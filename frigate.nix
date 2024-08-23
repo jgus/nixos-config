@@ -476,9 +476,6 @@ if (machine.hostName != addresses.records."${service}".host) then {} else
     (docker-services {
       name = service;
       image = image;
-      setup-script = ''
-        zfs list d/frigate-media >/dev/null 2>&1 || zfs create d/frigate-media
-      '';
     })
   ];
 
@@ -487,7 +484,7 @@ if (machine.hostName != addresses.records."${service}".host) then {} else
     SUBSYSTEM=="usb",ATTRS{idVendor}=="18d1",ATTRS{idProduct}=="9302",GROUP="plugdev"
   '';
 
-  boot.extraModulePackages = [ pkgs.gasket ];
+  boot.extraModulePackages = with config.boot.kernelPackages; [ gasket ];
 
   virtualisation.oci-containers.containers."${service}" = {
     image = image;
