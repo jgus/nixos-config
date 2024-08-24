@@ -8,7 +8,7 @@ let
 in
 {
   imports = [(homelabService {
-    inherit name user group;
+    inherit name;
     requires = [ "home.mount" "nas.mount" ];
     systemd = {
       path = [ pkgs.docker pkgs.rsync ];

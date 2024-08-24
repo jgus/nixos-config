@@ -9,7 +9,7 @@ let
 in
 {
   imports = [(homelabService {
-    inherit name user group;
+    inherit name;
     systemd = {
       path = [ pkgs.docker pkgs.zfs ];
       script = { uid, gid, storagePath, dockerOptions, ... }: ''
