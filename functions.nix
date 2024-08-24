@@ -143,7 +143,10 @@ in
           };
         }) // {
           "${name}-backup" = {
-            script = (concatStringsSep "\n" (map (s: "systemctl restart service-storage-${s}-backup") storageNames));
+            script = ''
+              ${concatStringsSep "\n" (map (s: "systemctl restart service-storage-${s}-backup") storageNames)}
+              true
+            '';
             serviceConfig = { Type = "exec"; };
             startAt = "hourly";
           };
