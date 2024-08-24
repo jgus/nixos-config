@@ -3,10 +3,6 @@
 with (import ./functions.nix) { inherit pkgs; };
 let
   pw = import ./.secrets/passwords.nix;
-  service = "frigate";
-  image = "ghcr.io/blakeblackshear/frigate:stable";
-  addresses = import ./addresses.nix;
-  machine = import ./machine.nix;
   configFile = pkgs.writeText "config.yml" ''
     # logger:
     #   default: debug
@@ -469,49 +465,44 @@ let
           - rtsp://admin:${pw.camera}@camera-back-yard.home.gustafson.me:554/cam/realmonitor?channel=1&subtype=0
   '';
 in
-if (machine.hostName != addresses.records."${service}".host) then {} else
 {
-  imports = [
-    ./docker.nix
-    (docker-services {
-      name = service;
-      image = image;
-    })
-  ];
-
-  services.udev.extraRules = ''
-    SUBSYSTEM=="usb",ATTRS{idVendor}=="1a6e",ATTRS{idProduct}=="089a",GROUP="plugdev"
-    SUBSYSTEM=="usb",ATTRS{idVendor}=="18d1",ATTRS{idProduct}=="9302",GROUP="plugdev"
-  '';
-
-  boot.extraModulePackages = with config.boot.kernelPackages; [ gasket ];
-
-  virtualisation.oci-containers.containers."${service}" = {
-    image = image;
-    autoStart = true;
-    extraOptions = (addresses.dockerOptions service) ++ [
-      "--shm-size=16g"
-      "--gpus=all"
-      "--device=/dev/apex_0:/dev/apex_0"
-      "--device=/dev/apex_1:/dev/apex_1"
-      "--privileged"
-    ];
-    environment = {
-      FRIGATE_RTSP_PASSWORD = "password";
+  imports = [(homelabService {
+    name = "frigate";
+    requires = [ "nas.mount" ];
+    docker = {
+      image = "ghcr.io/blakeblackshear/frigate:stable";
+      environment = {
+        FRIGATE_RTSP_PASSWORD = "password";
+      };
+      ports = [
+        "5000"
+        "1935"
+        "1984" # go2rtc API
+        "8554" # go2rtc RTSP
+        "8555" # go2rtc WebRTC
+        "8555/udp"
+      ];
+      configVolume = "/config";
+      volumes = [
+        "${configFile}:/config/config.yml:ro"
+        "/d/frigate/media:/media/frigate"
+        "/etc/localtime:/etc/localtime:ro"
+      ];
+      extraOptions = [
+        "--shm-size=16g"
+        "--gpus=all"
+        "--device=/dev/apex_0:/dev/apex_0"
+        "--device=/dev/apex_1:/dev/apex_1"
+        "--privileged"
+      ];
     };
-    ports = [
-      "5000"
-      "1935"
-      "1984" # go2rtc API
-      "8554" # go2rtc RTSP
-      "8555" # go2rtc WebRTC
-      "8555/udp"
-    ];
-    volumes = [
-      "/d/frigate/config:/config"
-      "/d/frigate/media:/media/frigate"
-      "${configFile}:/config/config.yml:ro"
-      "/etc/localtime:/etc/localtime:ro"
-    ];
-  };
+    extraConfig = {
+      boot.extraModulePackages = with config.boot.kernelPackages; [ gasket ];
+
+      services.udev.extraRules = ''
+        SUBSYSTEM=="usb",ATTRS{idVendor}=="1a6e",ATTRS{idProduct}=="089a",GROUP="plugdev"
+        SUBSYSTEM=="usb",ATTRS{idVendor}=="18d1",ATTRS{idProduct}=="9302",GROUP="plugdev"
+      '';
+    };
+  })];
 }
