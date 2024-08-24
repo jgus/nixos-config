@@ -2,45 +2,27 @@
 
 with (import ./functions.nix) { inherit pkgs; };
 let
-  service = "sabnzbd";
-  serviceMount = "var-lib-${builtins.replaceStrings ["-"] ["\\x2d"] service}.mount";
   user = "josh";
   group = "plex";
-  image = "lscr.io/linuxserver/sabnzbd";
-  addresses = import ./addresses.nix;
-  machine = import ./machine.nix;
 in
-if (machine.hostName != addresses.records."${service}".host) then {} else
 {
-  imports = [
-    ./docker.nix
-    (docker-services {
-      name = service;
-      image = image;
-      requires = [ serviceMount "nas.mount" ];
-    })
-  ];
-
-  virtualisation.oci-containers.containers."${service}" = {
-    image = image;
-    autoStart = true;
-    extraOptions = (addresses.dockerOptions service);
-    environment = {
-      PUID = toString config.users.users."${user}".uid;
-      PGID = toString config.users.groups."${group}".gid;
-      TZ = config.time.timeZone;
+  imports = [(homelabService {
+    name = "sabnzbd";
+    requires = [ "nas.mount" ];
+    docker = {
+      image = "lscr.io/linuxserver/sabnzbd";
+      environment = {
+        PUID = toString config.users.users.${user}.uid;
+        PGID = toString config.users.groups.${group}.gid;
+        TZ = config.time.timeZone;
+      };
+      ports = [
+        "8080"
+      ];
+      configVolume = "/config";
+      volumes = [
+        "/nas/scratch/usenet:/config/Downloads"
+      ];
     };
-    ports = [
-      "8080"
-    ];
-    volumes = [
-      "/var/lib/${service}:/config"
-      "/nas/scratch/usenet:/config/Downloads"
-    ];
-  };
-
-  fileSystems."/var/lib/${service}" = {
-    device = "localhost:/varlib-${service}";
-    fsType = "glusterfs";
-  };
+  })];
 }

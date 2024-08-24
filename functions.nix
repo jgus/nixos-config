@@ -164,6 +164,7 @@ in
       }
       // (if (docker ? dependsOn) then { dependsOn = docker.dependsOn; } else {})
       // (if (docker ? environment) then { environment = docker.environment; } else {})
+      // (if (docker ? environmentFiles) then { environmentFiles = docker.environmentFiles; } else {})
       // (if (docker ? ports) then { ports = docker.ports; } else {})
       ;
     } else {});
