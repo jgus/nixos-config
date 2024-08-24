@@ -67,6 +67,11 @@ in
         openssh.authorizedKeys.keys = [ pubkeys.josh-ed25519 pubkeys.josh-rsa ];
       };
 
+      nathaniel = {
+        uid = 1023;
+        isNormalUser = true;
+      };
+
       minecraft = {
         uid = 2000;
         isSystemUser = true;
