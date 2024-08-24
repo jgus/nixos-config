@@ -10,7 +10,7 @@ with (import ./functions.nix) { inherit pkgs; };
       requires = [ "var-lib-web_db_data.mount" ];
       docker = {
         image = "mysql:5.7";
-        volumes = [ (storagePath: "${storagePath "web_db_data"}:/var/lib/mysql") ];
+        volumes = storagePath: [ "${storagePath "web_db_data"}:/var/lib/mysql" ];
       };
     })
     (homelabService {
@@ -21,7 +21,7 @@ with (import ./functions.nix) { inherit pkgs; };
       docker = {
         image = "phpmyadmin/phpmyadmin";
         ports = [ "80" ];
-        volumes = [ (storagePath: "${storagePath "web_db_admin_sessions"}:/sessions") ];
+        volumes = storagePath: [ "${storagePath "web_db_admin_sessions"}:/sessions" ];
       };
     })
     (homelabService {
@@ -50,16 +50,16 @@ with (import ./functions.nix) { inherit pkgs; };
           "80"
           "443"
         ];
-        volumes = [
-          (storagePath: "${storagePath "swag_config"}/keys:/config/keys")
-          (storagePath: "${storagePath "swag_config"}/etc/letsencrypt:/config/etc/letsencrypt")
+        volumes = storagePath: [
+          "${storagePath "swag_config"}/keys:/config/keys"
+          "${storagePath "swag_config"}/etc/letsencrypt:/config/etc/letsencrypt"
           "/etc/nixos/www/site-confs/default.conf:/config/nginx/site-confs/default.conf"
           "/etc/nixos/www/location-confs:/config/nginx/location-confs"
           "/etc/nixos/www/proxy-confs/homeassistant.subdomain.conf:/config/nginx/proxy-confs/homeassistant.subdomain.conf"
           "/etc/nixos/www/proxy-confs/komga.subdomain.conf:/config/nginx/proxy-confs/komga.subdomain.conf"
-          (storagePath: "${storagePath "www"}:/config/www")
+          "${storagePath "www"}:/config/www"
           "/nas/photos/Published:/config/www/published:ro"
-          (storagePath: "${storagePath "dav"}:/config/www/dav")
+          "${storagePath "dav"}:/config/www/dav"
         ];
       };
     })

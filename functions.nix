@@ -157,10 +157,7 @@ in
         autoStart = true;
         user = "${uid}:${gid}";
         volumes =
-          let
-            callVolume = x: if (isFunction x) then (x storagePath) else x;
-          in
-          (if (docker ? volumes) then (map callVolume docker.volumes) else []) ++
+          (if (docker ? volumes) then (if (isFunction docker.volumes) then (docker.volumes storagePath) else docker.volumes) else []) ++
           (if configStorage then [ "${storagePath name}:${docker.configVolume}" ] else []);
         extraOptions = (if (docker ? extraOptions) then docker.extraOptions else [])
           ++ dockerOptions;
