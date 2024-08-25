@@ -72,8 +72,6 @@ in
     };
 
     fwupd.enable = machine.fwupd;
-
-    glusterfs.enable = true;
   };
 
   programs = {
