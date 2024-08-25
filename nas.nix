@@ -27,9 +27,9 @@ if (machine.hostName == addresses.records."${service}".host) then
   fileSystems."/nas/tmp" = { device = "tmpfs"; fsType = "tmpfs"; };
 
   services.nfs.server.exports = ''
-    /nas 172.22.1.0/22(rw,crossmnt,no_root_squash)
+    /home 172.22.1.0/24(rw,crossmnt,no_root_squash)
+    /nas 172.22.1.0/24(rw,crossmnt,no_root_squash)
   '';
-
 
   services.samba-wsdd.enable = true; # make shares visible for windows 10 clients
 
@@ -112,24 +112,20 @@ else
     nfs-utils
   ];
 
-  systemd.mounts = [
-    {
-      type = "nfs";
-      mountConfig = {
-        Options = "noatime";
-      };
-      what = "nfs:/nas";
-      where = "/nas";
-    }
-  ];
+  systemd.mounts = (map (x: {
+    type = "nfs";
+    mountConfig = {
+      Options = "noatime";
+    };
+    what = "nfs:/${x}";
+    where = "/${x}";
+  }) [ "home" "nas" ]);
 
-  systemd.automounts = [
-    {
-      wantedBy = [ "multi-user.target" ];
-      automountConfig = {
-        TimeoutIdleSec = "600";
-      };
-      where = "/nas";
-    }
-  ];
+  systemd.automounts = (map (x: {
+    wantedBy = [ "multi-user.target" ];
+    automountConfig = {
+      TimeoutIdleSec = "600";
+    };
+    where = "/${x}";
+  }) [ "home" "nas" ]);
 }

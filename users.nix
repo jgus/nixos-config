@@ -4,11 +4,6 @@ let
   pubkeys = import ./pubkeys.nix;
 in
 {
-  fileSystems."/home" = {
-    device = "localhost:/home";
-    fsType = "glusterfs";
-  };
-
   users = {
     mutableUsers = false;
 
