@@ -1,4 +1,4 @@
-{ lib, ... }:
+{ lib, pkgs, ... }:
 
 with builtins;
 let
@@ -29,6 +29,11 @@ let
       frigate = {
         machine = "d1";
         path = "/d/frigate";
+      };
+      home = {
+        machine = "c1-1";
+        path = "/home";
+        target = "/home";
       };
     };
   isLocal = name: let m = getAttr name mapping; in (m.machine == machine.hostName);
@@ -63,6 +68,7 @@ let
 in
 {
   services.nfs.server.enable = true;
+  services.rpcbind.enable = true;
   networking.firewall = {
     allowedTCPPorts = [
       2049 # rbind
@@ -70,6 +76,10 @@ in
     ];
     allowedUDPPorts = [ 3702 ]; # wsdd
   };
+  
+  environment.systemPackages = with pkgs; [
+    nfs-utils
+  ];
   
   fileSystems = listToAttrs (lib.lists.flatten (map (name: if (isLocal name) then (bindMount name) else []) (attrNames mapping)));
   services.nfs.server.exports = lib.concatStrings (map (name: if (isLocal name) then (nfsExport name) else "") (attrNames mapping));

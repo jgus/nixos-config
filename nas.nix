@@ -7,20 +7,7 @@ let
 in
 if (machine.hostName == addresses.records."${service}".host) then
 {
-  services.nfs.server.enable = true;
-  networking.firewall = {
-    allowedTCPPorts = [
-      2049 # rbind
-      5357 # wsdd
-    ];
-    allowedUDPPorts = [ 3702 ]; # wsdd
-  };
-  
   fileSystems."/storage/tmp" = { device = "tmpfs"; fsType = "tmpfs"; };
-
-  services.nfs.server.exports = ''
-    /home 172.22.1.0/24(rw,crossmnt,no_root_squash)
-  '';
 
   services.samba-wsdd.enable = true; # make shares visible for windows 10 clients
 
@@ -97,26 +84,4 @@ if (machine.hostName == addresses.records."${service}".host) then
 }
 else
 {
-  services.rpcbind.enable = true;
-  
-  environment.systemPackages = with pkgs; [
-    nfs-utils
-  ];
-
-  systemd.mounts = (map (x: {
-    type = "nfs";
-    mountConfig = {
-      Options = "noatime";
-    };
-    what = "nfs:/${x}";
-    where = "/${x}";
-  }) [ "home" ]);
-
-  systemd.automounts = (map (x: {
-    wantedBy = [ "multi-user.target" ];
-    automountConfig = {
-      TimeoutIdleSec = "600";
-    };
-    where = "/${x}";
-  }) [ "home" ]);
 }
