@@ -5,7 +5,7 @@ let
   addresses = import ./addresses.nix;
   machine = import ./machine.nix;
   mapping =
-    (listToAttrs (x: {
+    (listToAttrs (map (x: {
       name = x;
       value = {
         machine = "c1-1";
@@ -20,7 +20,7 @@ let
       "scratch"
       "service"
       "software"
-    ]) //
+    ])) //
     {
       media = {
         machine = "c1-1";
