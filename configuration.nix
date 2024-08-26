@@ -11,6 +11,7 @@ in
     ./host.nix
     ./users.nix
     ./vscode.nix
+    ./storage.nix
 
     ./pihole.nix
     ./ntp.nix
