@@ -49,6 +49,15 @@ let
   };
 in
 {
+  services.nfs.server.enable = true;
+  networking.firewall = {
+    allowedTCPPorts = [
+      2049 # rbind
+      5357 # wsdd
+    ];
+    allowedUDPPorts = [ 3702 ]; # wsdd
+  };
+  
   fileSystems = listToAttrs (lib.lists.flatten (map (name: if (isLocal name) then (bindMount name) else []) (attrNames mapping)));
   services.nfs.server.exports = lib.concatStrings (map (name: if (isLocal name) then (nfsExport name) else "") (attrNames mapping));
   systemd.mounts = lib.lists.flatten (map (name: if (isLocal name) then [] else [(systemdMount name)]) (attrNames mapping));
