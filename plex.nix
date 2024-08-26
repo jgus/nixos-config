@@ -8,7 +8,7 @@ in
 {
   imports = [(homelabService {
     name = "plex";
-    requires = [ "nas.mount" ];
+    requires = [ "storage-media.mount" "storage-photos.mount" ];
     docker = {
       image = "lscr.io/linuxserver/plex";
       environment = {
@@ -19,8 +19,8 @@ in
       };
       configVolume = "/config";
       volumes = [
-        "/nas/media:/media"
-        "/nas/photos:/shares/photos"
+        "/storage/media:/media"
+        "/storage/photos:/shares/photos"
       ];
       extraOptions = [
         "--gpus=all"

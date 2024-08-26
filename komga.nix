@@ -9,7 +9,7 @@ in
   imports = [(homelabService {
     name = "komga";
     inherit user group;
-    requires = [ "nas.mount" ];
+    requires = [ "storage-media.mount" ];
     docker = {
       image = "gotson/komga";
       environment = {
@@ -21,7 +21,7 @@ in
       ];
       configVolume = "/config";
       volumes = [
-        "/nas/media/Comics:/data"
+        "/storage/media/Comics:/data"
       ];
     };
   })];

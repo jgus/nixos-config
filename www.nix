@@ -28,7 +28,7 @@ with (import ./functions.nix) { inherit pkgs; };
       name = "web-swag";
       configStorage = false;
       extraStorage = [ "www" "dav" "swag_config" ];
-      requires = [ "var-lib-swag_config.mount" "var-lib-www.mount" "var-lib-dav.mount" "nas.mount" ];
+      requires = [ "var-lib-swag_config.mount" "var-lib-www.mount" "var-lib-dav.mount" "storage-photos.mount" ];
       docker = {
         image = "lscr.io/linuxserver/swag";
         dependsOn = [ "web-db" ];
@@ -58,7 +58,7 @@ with (import ./functions.nix) { inherit pkgs; };
           "/etc/nixos/www/proxy-confs/homeassistant.subdomain.conf:/config/nginx/proxy-confs/homeassistant.subdomain.conf"
           "/etc/nixos/www/proxy-confs/komga.subdomain.conf:/config/nginx/proxy-confs/komga.subdomain.conf"
           "${storagePath "www"}:/config/www"
-          "/nas/photos/Published:/config/www/published:ro"
+          "/storage/photos/Published:/config/www/published:ro"
           "${storagePath "dav"}:/config/www/dav"
         ];
       };

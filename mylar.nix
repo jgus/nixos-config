@@ -8,7 +8,7 @@ in
 {
   imports = [(homelabService {
     name = "mylar";
-    requires = [ "nas.mount" ];
+    requires = [ "storage-media.mount" "storage-scratch.mount" ];
     docker = {
       image = "lscr.io/linuxserver/mylar3";
       environment = {
@@ -21,10 +21,10 @@ in
       ];
       configVolume = "/config";
       volumes = [
-        "/nas/media/Comics:/comics"
-        "/nas/media/Comics.import:/import"
-        "/nas/scratch/peer:/peer"
-        "/nas/scratch/usenet:/usenet"
+        "/storage/media/Comics:/comics"
+        "/storage/media/Comics.import:/import"
+        "/storage/scratch/peer:/peer"
+        "/storage/scratch/usenet:/usenet"
       ];
       extraOptions = [
         "--tmpfs=/config/mylar/cache"

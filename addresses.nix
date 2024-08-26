@@ -59,7 +59,7 @@ let
     pihole =            { id = 1;   host = "b1"; aliases = [ "dhcp" "dns" ]; };
     ntp =               { id = 2;   host = "b1"; };
     landing =           { id = 3;   host = "b1"; };
-    nas =               { id = 10;  host = "c1-1"; dns = "host"; aliases = [ "samba" "smb" "nfs" ]; };
+    nas =               { id = 10;  host = "c1-1"; dns = "host"; aliases = [ "samba" "smb" ]; };
     syncthing =         { id = 11;  host = "c1-1"; };
     web-swag =          { id = 20;  host = "c1-2"; };
     web-db =            { id = 21;  host = "c1-2"; aliases = [ "db" ]; };

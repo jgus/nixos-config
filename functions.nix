@@ -4,12 +4,12 @@ let
   addresses = import ./addresses.nix;
   machine = import ./machine.nix;
   storagePath = name: "/service/${name}";
-  storageNasPath = name: "/nas/service/${name}";
+  storageBackupPath = name: "/storage/service/${name}";
 
   homelabServiceStorage = name: 
   let
     path = storagePath name;
-    nasPath = storageNasPath name;
+    backupPath = storageBackupPath name;
   in
   {
     systemd.services = {
@@ -19,14 +19,14 @@ let
           if ! [ -d ${path} ]
           then
             ${if machine.zfs then "zfs create r/service/${name}" else "mkdir -p ${path}"}
-            rsync -arPW --delete ${nasPath}/ ${path}/
+            rsync -arPW --delete ${backupPath}/ ${path}/
           fi
         '';
         serviceConfig = { Type = "oneshot"; };
       };
       "service-storage-${name}-backup" = {
         path = [ pkgs.rsync ];
-        script = "rsync -arPW --delete ${path}/ ${nasPath}/";
+        script = "rsync -arPW --delete ${path}/ ${backupPath}/";
         serviceConfig = { Type = "exec"; };
         startAt = "hourly";
       };

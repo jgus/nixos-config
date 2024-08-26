@@ -9,7 +9,7 @@ in
 {
   imports = [(homelabService {
     inherit name;
-    requires = [ "home.mount" "nas.mount" ];
+    requires = [ "home.mount" "storage-external.mount" ];
     systemd = {
       path = [ pkgs.docker pkgs.rsync ];
       script = { storagePath, dockerOptions, ... }: ''
@@ -22,7 +22,7 @@ in
           ${builtins.concatStringsSep " " dockerOptions} \
           -p 22/tcp \
           -v /home/${user}:/home/${user} \
-          -v /nas/external/${user}:/home/${user}/data \
+          -v /storage/external/${user}:/home/${user}/data \
           -v ${storagePath name}:/etc/ssh \
           -v /etc/${name}/etc/ssh/sshd_config:/etc/ssh/sshd_config \
           ${name}"

@@ -16,19 +16,10 @@ if (machine.hostName == addresses.records."${service}".host) then
     allowedUDPPorts = [ 3702 ]; # wsdd
   };
   
-  fileSystems."/nas" = {
-    device = "/d";
-    options = [ "rbind" ];
-  };
-  fileSystems."/nas/media" = {
-    device = "/m/media";
-    options = [ "rbind" ];
-  };
-  fileSystems."/nas/tmp" = { device = "tmpfs"; fsType = "tmpfs"; };
+  fileSystems."/storage/tmp" = { device = "tmpfs"; fsType = "tmpfs"; };
 
   services.nfs.server.exports = ''
     /home 172.22.1.0/24(rw,crossmnt,no_root_squash)
-    /nas 172.22.1.0/24(rw,crossmnt,no_root_squash)
   '';
 
   services.samba-wsdd.enable = true; # make shares visible for windows 10 clients
@@ -54,19 +45,19 @@ if (machine.hostName == addresses.records."${service}".host) then
     '';
     shares = {
       josh = { path = "/home/josh"; browseable = "yes"; "read only" = "no"; };
-      Media = { path = "/nas/media"; browseable = "yes"; "read only" = "no"; };
-      Backup = { path = "/nas/backup"; browseable = "yes"; "read only" = "no"; };
-      BackupHA = { path = "/nas/backup/Home Assistant"; browseable = "yes"; "read only" = "no"; };
-      TimeMachine = { path = "/nas/backup/timemachine"; browseable = "yes"; "read only" = "no"; "fruit:time machine" = "yes"; "fruit:time machine max size" = "1T"; };
-      Scratch = { path = "/nas/scratch"; browseable = "yes"; "read only" = "no"; };
-      Scan = { path = "/nas/scratch/scan"; browseable = "yes"; "read only" = "no"; };
-      Photos = { path = "/nas/photos"; browseable = "yes"; "read only" = "no"; };
-      Projects = { path = "/nas/projects"; browseable = "yes"; "read only" = "no"; };
-      Software = { path = "/nas/software"; browseable = "yes"; "read only" = "no"; };
+      Media = { path = "/storage/media"; browseable = "yes"; "read only" = "no"; };
+      Backup = { path = "/storage/backup"; browseable = "yes"; "read only" = "no"; };
+      BackupHA = { path = "/storage/backup/Home Assistant"; browseable = "yes"; "read only" = "no"; };
+      TimeMachine = { path = "/storage/backup/timemachine"; browseable = "yes"; "read only" = "no"; "fruit:time machine" = "yes"; "fruit:time machine max size" = "1T"; };
+      Scratch = { path = "/storage/scratch"; browseable = "yes"; "read only" = "no"; };
+      Scan = { path = "/storage/scratch/scan"; browseable = "yes"; "read only" = "no"; };
+      Photos = { path = "/storage/photos"; browseable = "yes"; "read only" = "no"; };
+      Projects = { path = "/storage/projects"; browseable = "yes"; "read only" = "no"; };
+      Software = { path = "/storage/software"; browseable = "yes"; "read only" = "no"; };
       Storage = { path = "/home/josh/Storage"; browseable = "yes"; "read only" = "no"; };
-      Temp = { path = "/nas/tmp"; browseable = "yes"; "read only" = "no"; };
-      Brown = { path = "/nas/external/brown"; browseable = "yes"; "read only" = "no"; };
-      Gustafson = { path = "/nas/external/Gustafson"; browseable = "yes"; "read only" = "no"; };
+      Temp = { path = "/storage/tmp"; browseable = "yes"; "read only" = "no"; };
+      Brown = { path = "/storage/external/brown"; browseable = "yes"; "read only" = "no"; };
+      Gustafson = { path = "/storage/external/Gustafson"; browseable = "yes"; "read only" = "no"; };
       www = { path = "/var/lib/www"; browseable = "yes"; "read only" = "no"; };
       dav = { path = "/var/lib/dav"; browseable = "yes"; "read only" = "no"; };
     };
@@ -119,7 +110,7 @@ else
     };
     what = "nfs:/${x}";
     where = "/${x}";
-  }) [ "home" "nas" ]);
+  }) [ "home" ]);
 
   systemd.automounts = (map (x: {
     wantedBy = [ "multi-user.target" ];
@@ -127,5 +118,5 @@ else
       TimeoutIdleSec = "600";
     };
     where = "/${x}";
-  }) [ "home" "nas" ]);
+  }) [ "home" ]);
 }

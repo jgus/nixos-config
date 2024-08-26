@@ -8,7 +8,7 @@ in
 {
   imports = [(homelabService {
     name = "sabnzbd";
-    requires = [ "nas.mount" ];
+    requires = [ "storage-scratch.mount" ];
     docker = {
       image = "lscr.io/linuxserver/sabnzbd";
       environment = {
@@ -21,7 +21,7 @@ in
       ];
       configVolume = "/config";
       volumes = [
-        "/nas/scratch/usenet:/config/Downloads"
+        "/storage/scratch/usenet:/config/Downloads"
       ];
     };
   })];

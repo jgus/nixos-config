@@ -8,7 +8,7 @@ in
 {
   imports = [(homelabService {
     name = "transmission";
-    requires = [ "nas.mount" ];
+    requires = [  "storage-scratch.mount" ];
     docker = {
       image = "haugene/transmission-openvpn";
       environmentFiles = [
@@ -36,7 +36,7 @@ in
       configVolume = "/config";
       volumes = [
         "/etc/localtime:/etc/localtime:ro"
-        "/nas/scratch/peer:/peer"
+        "/storage/scratch/peer:/peer"
       ];
       extraOptions = [
         "--cap-add=NET_ADMIN"

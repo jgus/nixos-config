@@ -8,7 +8,7 @@ in
 {
   imports = [(homelabService {
     name = "lidarr";
-    requires = [ "nas.mount" ];
+    requires = [ "storage-media.mount" "storage-scratch.mount" ];
     docker = {
       image = "lscr.io/linuxserver/lidarr";
       environment = {
@@ -21,9 +21,9 @@ in
       ];
       configVolume = "/config";
       volumes = [
-        "/nas/scratch/peer:/peer"
-        "/nas/scratch/usenet:/usenet"
-        "/nas/media:/media"
+        "/storage/scratch/peer:/peer"
+        "/storage/scratch/usenet:/usenet"
+        "/storage/media:/media"
       ];
     };
   })];

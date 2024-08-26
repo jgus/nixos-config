@@ -468,7 +468,6 @@ in
 {
   imports = [(homelabService {
     name = "frigate";
-    requires = [ "nas.mount" ];
     docker = {
       image = "ghcr.io/blakeblackshear/frigate:stable";
       environment = {

@@ -8,7 +8,7 @@ in
 {
   imports = [(homelabService {
     name = "syncthing";
-    requires = [ "home.mount" "nas.mount" ];
+    requires = [ "home.mount" "storage-media.mount" "storage-photos.mount" "storage-software.mount" ];
     docker = {
       image = "lscr.io/linuxserver/syncthing";
       environment = {
@@ -25,10 +25,10 @@ in
       configVolume = "/config";
       volumes = [
         "/home/${user}/sync:/shares/Sync"
-        "/nas/photos:/shares/Photos"
-        "/nas/software/Tools:/shares/Tools"
-        "/nas/media/Comics:/shares/Comics"
-        "/nas/media/Music:/shares/Music"
+        "/storage/photos:/shares/Photos"
+        "/storage/software/Tools:/shares/Tools"
+        "/storage/media/Comics:/shares/Comics"
+        "/storage/media/Music:/shares/Music"
       ];
     };
   })];
