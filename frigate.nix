@@ -468,6 +468,7 @@ in
 {
   imports = [(homelabService {
     name = "frigate";
+    requires = [ "storage-frigate.mount" ];
     docker = {
       image = "ghcr.io/blakeblackshear/frigate:stable";
       environment = {
@@ -484,7 +485,7 @@ in
       configVolume = "/config";
       volumes = [
         "${configFile}:/config/config.yml:ro"
-        "/d/frigate/media:/media/frigate"
+        "/storage/frigate/media:/media/frigate"
         "/etc/localtime:/etc/localtime:ro"
       ];
       extraOptions = [
