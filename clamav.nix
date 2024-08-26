@@ -1,11 +1,8 @@
 { config, pkgs, ... }:
 
+with builtins;
 {
   imports = [ ./msmtp.nix ];
-
-  environment.etc = {
-    "clamav/clamav-scan-zfs.sh".source = ./clamav/clamav-scan-zfs.sh;
-  };
 
   services = {
     clamav = {
@@ -30,7 +27,12 @@
         script = ''
           [ -d /var/lib/clamav ] || freshclam
           clamscan -r --cross-fs=no -i --move=/boot/INFECTED /boot/
-          /etc/clamav/clamav-scan-zfs.sh
+          EXCLUDE_FILES=(
+          )
+          EXCLUDE_DIRS=(
+            /nix/store/yzcyxsfc207vrwfysdldmjkswfhv7swg-source/tests/oss-fuzz/pe_fuzzer_corpus
+          )
+          ${readFile ./clamav/clamav-scan-zfs.sh}
         '';
         serviceConfig = {
           Type = "oneshot";

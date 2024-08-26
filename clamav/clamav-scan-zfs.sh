@@ -1,26 +1,7 @@
-#!/usr/bin/env -S bash -e
-
-LOCK=/tmp/clamav-scan-d.lock
-
-if [ -f ${LOCK} ]
-then
-    echo "Already in progress"
-    exit 0
-fi
-touch ${LOCK}
-
-function onexit {
-    rm ${LOCK}
-}
-trap onexit EXIT
-
 set -o pipefail
 
 EMAIL_TO=("j@gustafson.me")
-EXCLUDE_FILES=(
-)
 SCAN_MOUNT=/mnt/clam-scan
-BASE_MOUNT=/mnt/clam-base
 
 DATASETS=()
 for f in $(zfs list -H -o name -t filesystem)
@@ -33,15 +14,16 @@ done
 EXCLUDE_ARGS=()
 for f in "${EXCLUDE_FILES[@]}"
 do
-    EXCLUDE_ARGS+=(--exclude=${SCAN_MOUNT}${f})
+    EXCLUDE_ARGS+=(--exclude=${f})
+done
+for f in "${EXCLUDE_DIRS[@]}"
+do
+    EXCLUDE_ARGS+=(--exclude-dir=^${SCAN_MOUNT}${f})
 done
 
 umount ${SCAN_MOUNT} >/dev/null 2>&1 || true
-umount ${BASE_MOUNT} >/dev/null 2>&1 || true
 for d in "${DATASETS[@]}"
 do
-    CANMOUNT=$(zfs get -H -o value canmount ${d})
-    [[ "${CANMOUNT}" != "off" ]] || continue
     zfs destroy ${d}@clam-scanning >/dev/null 2>&1 || true
     zfs snapshot ${d}@clam-scanning
 done
@@ -55,16 +37,7 @@ CURRENT_LOG_FILE=/tmp/clamscan-current.log
 for d in "${DATASETS[@]}"
 do
     umount ${SCAN_MOUNT} >/dev/null 2>&1 || true
-    umount ${BASE_MOUNT} >/dev/null 2>&1 || true
-    MOUNTED=$(zfs get -H -o value mounted ${d})
-    CANMOUNT=$(zfs get -H -o value canmount ${d})
     MOUNTPOINT=$(zfs get -H -o value mountpoint ${d})
-    [[ "${CANMOUNT}" != "off" ]] || continue
-    if [[ "${MOUNTED}" != "yes" ]]
-    then
-        mkdir -p ${BASE_MOUNT}
-        mount -t zfs -o ro ${d} ${BASE_MOUNT}
-    fi
     mkdir -p ${SCAN_MOUNT}
     mount -t zfs ${d}@clam-scanning ${SCAN_MOUNT}
     : >${CURRENT_LOG_FILE}
@@ -96,12 +69,11 @@ do
     else
         echo "# Scanning ${d} completely as of $(zfs get -H -o value creation ${d}@clam-scanning)..." | tee -a ${LOG_FILE}
         set +e
-        clamscan -i -r --cross-fs=no "${SCAN_MOUNT}" 2>&1 | tee -a ${LOG_FILE} ${CURRENT_LOG_FILE}
+        clamscan -i "${EXCLUDE_ARGS[@]}" -r --cross-fs=no "${SCAN_MOUNT}" 2>&1 | tee -a ${LOG_FILE} ${CURRENT_LOG_FILE}
         RESULT=$?
         set -e
     fi
     umount ${SCAN_MOUNT}
-    umount ${BASE_MOUNT} >/dev/null 2>&1 || true
     if ((RESULT==2)) && ! grep "ERROR:" ${CURRENT_LOG_FILE}
     then
         RESULT=0
