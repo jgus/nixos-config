@@ -4,20 +4,33 @@ with builtins;
 let
   addresses = import ./addresses.nix;
   machine = import ./machine.nix;
-  mapping = {
-    backup = {
-      machine = "c1-1";
-      path = "/d/backup";
+  mapping =
+    (listToAttrs (x: {
+      name = x;
+      value = {
+        machine = "c1-1";
+        path = "/d/${x}";
+      };
+    }) [
+      "backup"
+      "external"
+      "offsite"
+      "photos"
+      "projects"
+      "scratch"
+      "service"
+      "software"
+    ]) //
+    {
+      media = {
+        machine = "c1-1";
+        path = "/m/media";
+      };
+      frigate = {
+        machine = "d1";
+        path = "/d/frigate";
+      };
     };
-    media = {
-      machine = "c1-1";
-      path = "/m/media";
-    };
-    frigate = {
-      machine = "d1";
-      path = "/d/frigate";
-    };
-  };
   isLocal = name: let m = getAttr name mapping; in (m.machine == machine.hostName);
   target = name: let m = getAttr name mapping; in (if (m ? target) then m.target else "/storage/" + name);
   bindMount = name: let m = getAttr name mapping; in (if ((target name) == m.path) then [] else [
