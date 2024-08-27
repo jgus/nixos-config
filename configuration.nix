@@ -17,7 +17,7 @@ in
     ./ntp.nix
     ./landing.nix
 
-    ./samba.nix
+    ./nas.nix
     ./syncthing.nix
 
     ./www.nix
