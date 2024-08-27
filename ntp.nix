@@ -6,7 +6,7 @@ with (import ./functions.nix) { inherit pkgs; };
     name = "ntp";
     configStorage = false;
     docker = {
-      image = "ntp";
+      image = "cturra/ntp";
       ports = [
         "123/udp"
       ];

@@ -12,13 +12,13 @@ in
     inherit name;
     systemd = {
       path = [ pkgs.docker pkgs.zfs ];
-      script = { uid, gid, storagePath, dockerOptions, ... }: ''
+      script = { storagePath, dockerOptions, ... }: ''
         docker container stop ${name} >/dev/null 2>&1 || true ; \
         docker container rm -f ${name} >/dev/null 2>&1 || true ; \
 
         docker build \
-          --build-arg uid=${uid} \
-          --build-arg gid=${gid} \
+          --build-arg uid=${toString config.users.users.${user}.uid} \
+          --build-arg gid=${toString config.users.groups.${group}.gid} \
           --build-arg java_ver=21 \
           -t ${name} \
           /etc/${name}/docker
