@@ -23,7 +23,7 @@ let
       # lan-interfaces = [ "eno1" "eno2" "eno3" "eno4" "enp5s0" ];
       lan-interface = "enp5s0";
       nvidia = true;
-      zfs-pools = [ "d" ];
+      zfs-pools = [ "d" "f" ];
       imports = [
         #./ddclient.nix
         #./vm-vm1.nix
