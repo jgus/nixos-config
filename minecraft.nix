@@ -21,7 +21,7 @@ in
           --build-arg gid=${toString config.users.groups.${group}.gid} \
           --build-arg java_ver=21 \
           -t ${name} \
-          /etc/${name}/docker
+          ${./minecraft/docker}
 
         docker run --rm --name ${name} \
           ${builtins.concatStringsSep " " dockerOptions} \
@@ -44,17 +44,6 @@ in
     };
     extraConfig = {
       imports = [ ./docker.nix ];
-      environment.etc =
-        lib.attrsets.mapAttrs'
-          (key: value:
-            lib.attrsets.nameValuePair
-              ("${name}/docker/${key}")
-              {
-                source = ./${name}/docker/${key};
-                mode = "0444";
-              }
-          )
-          (builtins.readDir ./${name}/docker);
     };
   })];
 }
