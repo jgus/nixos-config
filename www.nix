@@ -51,15 +51,15 @@ with (import ./functions.nix) { inherit pkgs; };
           "443"
         ];
         volumes = storagePath: [
+          "${./www/site-confs/default.conf}:/config/nginx/site-confs/default.conf"
+          "${./www/location-confs}:/config/nginx/location-confs"
+          "${./www/proxy-confs/homeassistant.subdomain.conf}:/config/nginx/proxy-confs/homeassistant.subdomain.conf"
+          "${./www/proxy-confs/komga.subdomain.conf}:/config/nginx/proxy-confs/komga.subdomain.conf"
           "${storagePath "swag_config"}/keys:/config/keys"
           "${storagePath "swag_config"}/etc/letsencrypt:/config/etc/letsencrypt"
-          "/etc/nixos/www/site-confs/default.conf:/config/nginx/site-confs/default.conf"
-          "/etc/nixos/www/location-confs:/config/nginx/location-confs"
-          "/etc/nixos/www/proxy-confs/homeassistant.subdomain.conf:/config/nginx/proxy-confs/homeassistant.subdomain.conf"
-          "/etc/nixos/www/proxy-confs/komga.subdomain.conf:/config/nginx/proxy-confs/komga.subdomain.conf"
           "${storagePath "www"}:/config/www"
-          "/storage/photos/Published:/config/www/published:ro"
           "${storagePath "dav"}:/config/www/dav"
+          "/storage/photos/Published:/config/www/published:ro"
         ];
       };
     })
