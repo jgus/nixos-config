@@ -1,12 +1,23 @@
 { pkgs, ... }:
 
 let
-  service = "nas";
+  name = "samba";
   addresses = import ./addresses.nix;
   machine = import ./machine.nix;
 in
-if (machine.hostName == addresses.records."${service}".host) then
+if (machine.hostName != addresses.records.${name}.host) then {} else
 {
+  networking = {
+    interfaces."lan-${name}" = let m = addresses.records.${name}; in {
+      macAddress = m.mac;
+      ipv4.addresses = [ { address = m.ip; prefixLength = addresses.network.prefixLength; } ];
+    };
+    macvlans."lan-${name}" = {
+      interface = machine.lan-interface;
+      mode = "bridge";
+    };
+  };
+
   fileSystems."/storage/tmp" = { device = "tmpfs"; fsType = "tmpfs"; };
 
   services.samba-wsdd.enable = true; # make shares visible for windows 10 clients
@@ -16,6 +27,8 @@ if (machine.hostName == addresses.records."${service}".host) then
     openFirewall = true;
     securityType = "user";
     extraConfig = ''
+      interfaces = lo lan-${name}
+      bind interfaces only = yes
       workgroup = WORKGROUP
       server string = nas
       netbios name = nas
@@ -81,7 +94,4 @@ if (machine.hostName == addresses.records."${service}".host) then
       '';
     };
   };
-}
-else
-{
 }
