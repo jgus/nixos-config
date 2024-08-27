@@ -25,7 +25,6 @@ let
       nvidia = true;
       zfs-pools = [ "d" "f" ];
       imports = [
-        #./ddclient.nix
         #./vm-vm1.nix
       ];
     };
