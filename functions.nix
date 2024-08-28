@@ -130,10 +130,12 @@ in
         extraOptions = (if (docker ? extraOptions) then docker.extraOptions else [])
           ++ dockerOptions;
       }
+      // (if (docker ? imageFile) then { imageFile = docker.imageFile; } else {})
       // (if (docker ? dependsOn) then { dependsOn = docker.dependsOn; } else {})
       // (if (docker ? environment) then { environment = docker.environment; } else {})
       // (if (docker ? environmentFiles) then { environmentFiles = docker.environmentFiles; } else {})
       // (if (docker ? ports) then { ports = docker.ports; } else {})
       ;
+      systemd.services."docker-${name}".serviceConfig.Restart = pkgs.lib.mkForce "no";
     } else {});
 }
