@@ -1,9 +1,7 @@
-{ config, pkgs, ... }:
-
+{ pkgs, ... }:
 with builtins;
-with (import ./functions.nix) { inherit pkgs; };
 let
-  pw = import ./.secrets/passwords.nix;
+  pw = import ./../.secrets/passwords.nix;
   passwordFileDer = pkgs.runCommand "passwordFileDer" {} (concatStringsSep "\n" (
     [
       "mkdir \${out}"
@@ -42,23 +40,20 @@ let
   '';
 in
 {
-  imports = [(homelabService {
-    name = "mosquitto";
-    docker = {
-      image = "eclipse-mosquitto";
-      configVolume = "/mosquitto/data";
-      ports = [
-        "1883"
-        "9001"
-      ];
-      volumes = [
-        "${passwordFileDer}/password.conf:/mosquitto/config/password_file.conf:ro"
-        "${aclFile}:/mosquitto/config/acl_file.conf:ro"
-        "${configFile}:/mosquitto/config/mosquitto.conf:ro"
-      ];
-      extraOptions = [
-        "--read-only"
-      ];
-    };
-  })];
+  docker = {
+    image = "eclipse-mosquitto";
+    configVolume = "/mosquitto/data";
+    ports = [
+      "1883"
+      "9001"
+    ];
+    volumes = [
+      "${passwordFileDer}/password.conf:/mosquitto/config/password_file.conf:ro"
+      "${aclFile}:/mosquitto/config/acl_file.conf:ro"
+      "${configFile}:/mosquitto/config/mosquitto.conf:ro"
+    ];
+    extraOptions = [
+      "--read-only"
+    ];
+  };
 }

@@ -1,4 +1,4 @@
-{ pkgs }:
+{ pkgs, ... }:
 with builtins;
 let
   addresses = import ./addresses.nix;

@@ -1,8 +1,6 @@
 { config, pkgs, ... }:
-
-with (import ./functions.nix) { inherit pkgs; };
 let
-  pw = import ./.secrets/passwords.nix;
+  pw = import ./../.secrets/passwords.nix;
   configFile = pkgs.writeText "config.yml" ''
     # logger:
     #   default: debug
@@ -466,43 +464,40 @@ let
   '';
 in
 {
-  imports = [(homelabService {
-    name = "frigate";
-    requires = [ "storage-frigate.mount" ];
-    docker = {
-      image = "ghcr.io/blakeblackshear/frigate:stable";
-      environment = {
-        FRIGATE_RTSP_PASSWORD = "password";
-      };
-      ports = [
-        "5000"
-        "1935"
-        "1984" # go2rtc API
-        "8554" # go2rtc RTSP
-        "8555" # go2rtc WebRTC
-        "8555/udp"
-      ];
-      configVolume = "/config";
-      volumes = [
-        "${configFile}:/config/config.yml:ro"
-        "/storage/frigate/media:/media/frigate"
-        "/etc/localtime:/etc/localtime:ro"
-      ];
-      extraOptions = [
-        "--shm-size=16g"
-        "--gpus=all"
-        "--device=/dev/apex_0:/dev/apex_0"
-        "--device=/dev/apex_1:/dev/apex_1"
-        "--privileged"
-      ];
+  requires = [ "storage-frigate.mount" ];
+  docker = {
+    image = "ghcr.io/blakeblackshear/frigate:stable";
+    environment = {
+      FRIGATE_RTSP_PASSWORD = "password";
     };
-    extraConfig = {
-      boot.extraModulePackages = with config.boot.kernelPackages; [ gasket ];
+    ports = [
+      "5000"
+      "1935"
+      "1984" # go2rtc API
+      "8554" # go2rtc RTSP
+      "8555" # go2rtc WebRTC
+      "8555/udp"
+    ];
+    configVolume = "/config";
+    volumes = [
+      "${configFile}:/config/config.yml:ro"
+      "/storage/frigate/media:/media/frigate"
+      "/etc/localtime:/etc/localtime:ro"
+    ];
+    extraOptions = [
+      "--shm-size=16g"
+      "--gpus=all"
+      "--device=/dev/apex_0:/dev/apex_0"
+      "--device=/dev/apex_1:/dev/apex_1"
+      "--privileged"
+    ];
+  };
+  extraConfig = {
+    boot.extraModulePackages = with config.boot.kernelPackages; [ gasket ];
 
-      services.udev.extraRules = ''
-        SUBSYSTEM=="usb",ATTRS{idVendor}=="1a6e",ATTRS{idProduct}=="089a",GROUP="plugdev"
-        SUBSYSTEM=="usb",ATTRS{idVendor}=="18d1",ATTRS{idProduct}=="9302",GROUP="plugdev"
-      '';
-    };
-  })];
+    services.udev.extraRules = ''
+      SUBSYSTEM=="usb",ATTRS{idVendor}=="1a6e",ATTRS{idProduct}=="089a",GROUP="plugdev"
+      SUBSYSTEM=="usb",ATTRS{idVendor}=="18d1",ATTRS{idProduct}=="9302",GROUP="plugdev"
+    '';
+  };
 }
