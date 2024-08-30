@@ -8,6 +8,7 @@ let
 in
 args@{ pkgs, lib, ... }:
 let
+  serviceNames = map (n: lib.strings.removeSuffix ".nix" n) (filter (n: serviceDir.${n} == "regular" && (lib.strings.hasSuffix ".nix" n) && !(lib.strings.hasPrefix "." n)) (attrNames serviceDir));
   homelabServiceStorage = name:
     let
       path = storagePath name;
@@ -138,7 +139,6 @@ let
       ;
       systemd.services."docker-${name}".serviceConfig.Restart = pkgs.lib.mkForce "no";
     } else { });
-  serviceNames = lib.lists.flatten (map (n: if (serviceDir.${n} == "regular" && (lib.strings.hasSuffix ".nix" n) && !(lib.strings.hasPrefix "." n)) then [ (lib.strings.removeSuffix ".nix" n) ] else [ ]) (attrNames serviceDir));
   importService = n:
     let
       i = (import ./services/${n}.nix) args;
