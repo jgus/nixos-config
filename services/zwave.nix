@@ -1,4 +1,4 @@
-{ config, pkgs, ... }: 
+{ config, ... }:
 let
   zwave-area = area: (
     let

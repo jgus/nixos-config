@@ -1,10 +1,10 @@
-{ config, ... }:
 let
   user = "josh";
   group = "plex";
 in
+{ config, ... }:
 {
-  requires = [  "storage-scratch.mount" ];
+  requires = [ "storage-scratch.mount" ];
   docker = {
     image = "haugene/transmission-openvpn";
     environmentFiles = [

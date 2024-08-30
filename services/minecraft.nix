@@ -1,10 +1,10 @@
-{ config, pkgs, ... }:
 with builtins;
 let
   name = "minecraft";
   user = "minecraft";
   group = "minecraft";
 in
+{ config, pkgs, ... }:
 {
   systemd = {
     path = [ pkgs.docker pkgs.zfs ];

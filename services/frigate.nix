@@ -1,5 +1,4 @@
 with builtins;
-{ config, pkgs, ... }:
 let
   pw = import ./../.secrets/passwords.nix;
   doorbell = {
@@ -207,6 +206,7 @@ let
       cameras;
   };
 in
+{ config, pkgs, ... }:
 {
   requires = [ "storage-frigate.mount" ];
   docker = {
