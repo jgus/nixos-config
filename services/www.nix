@@ -48,10 +48,10 @@
         "443"
       ];
       volumes = storagePath: [
-        "${./../www/site-confs/default.conf}:/config/nginx/site-confs/default.conf"
-        "${./../www/location-confs}:/config/nginx/location-confs"
-        "${./../www/proxy-confs/homeassistant.subdomain.conf}:/config/nginx/proxy-confs/homeassistant.subdomain.conf"
-        "${./../www/proxy-confs/komga.subdomain.conf}:/config/nginx/proxy-confs/komga.subdomain.conf"
+        "${./www/site-confs/default.conf}:/config/nginx/site-confs/default.conf"
+        "${./www/location-confs}:/config/nginx/location-confs"
+        "${./www/proxy-confs/homeassistant.subdomain.conf}:/config/nginx/proxy-confs/homeassistant.subdomain.conf"
+        "${./www/proxy-confs/komga.subdomain.conf}:/config/nginx/proxy-confs/komga.subdomain.conf"
         "${storagePath "swag_config"}/keys:/config/keys"
         "${storagePath "swag_config"}/etc/letsencrypt:/config/etc/letsencrypt"
         "${storagePath "www"}:/config/www"
