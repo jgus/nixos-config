@@ -3,9 +3,9 @@ let
   machine-id = builtins.readFile ./machine-id.nix;
   pw = import ./.secrets/passwords.nix;
   rpi = {
-      arch = "rpi";
-      lan-interface = "end0";
-      zfs = false;
+    arch = "rpi";
+    lan-interface = "end0";
+    zfs = false;
   };
   machine = {
     # Defaults
@@ -13,9 +13,9 @@ let
     arch = "x86";
     nvidia = false;
     zfs = true;
-    zfs-pools = [];
+    zfs-pools = [ ];
     clamav = pw ? gmail;
-    imports = [];
+    imports = [ ];
   } // {
     d1 = {
       stateVersion = "23.05";
@@ -31,33 +31,33 @@ let
     d2 = {
       stateVersion = "24.05";
       hostId = "b5d59608";
-      zfs-pools = [];
-      imports = [];
+      zfs-pools = [ ];
+      imports = [ ];
     };
     d3 = {
       stateVersion = "24.05";
       hostId = "d4f10aaf";
-      zfs-pools = [];
-      imports = [];
+      zfs-pools = [ ];
+      imports = [ ];
     };
     c1-1 = {
       stateVersion = "24.05";
       hostId = "dfc92a33";
       lan-interfaces = [ "eno1" "eno2" ];
       zfs-pools = [ "d" "m" ];
-      imports = [];
+      imports = [ ];
     };
     c1-2 = {
       stateVersion = "24.05";
       hostId = "39810e52";
       lan-interfaces = [ "eno1" "eno2" ];
-      zfs-pools = [];
+      zfs-pools = [ ];
     };
     b1 = {
       stateVersion = "24.05";
       hostId = "8f150749";
       lan-interface = "enp1s0";
-      zfs-pools = [];
+      zfs-pools = [ ];
       imports = [ ./machine/b1/ups.nix ];
     };
     pi-67cba1 = rpi // {
@@ -83,5 +83,5 @@ in
   fwupd = (machine.arch == "x86");
   python = (machine.arch == "x86");
 } //
-(if (machine ? lan-interfaces) then { lan-interface = "br0"; } else {}) //
+(if (machine ? lan-interfaces) then { lan-interface = "br0"; } else { }) //
 machine

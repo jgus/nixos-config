@@ -1,12 +1,16 @@
-{ config, pkgs, ... }:
-
 with builtins;
 let
   ip_net = "192.168.100";
   local_vm_addresses = import ./local-vm-addresses.nix;
-  hosts = concatStringsSep "\n" (map (name: let value = local_vm_addresses."${name}"; in ''
-    <host mac="${value.mac}" name="${name}" ip="${ip_net}.${toString value.ip}"/>
-  '') (attrNames local_vm_addresses));
+in
+{ config, pkgs, ... }:
+let
+  hosts = concatStringsSep "\n" (map
+    (name:
+      let value = local_vm_addresses."${name}"; in ''
+        <host mac="${value.mac}" name="${name}" ip="${ip_net}.${toString value.ip}"/>
+      '')
+    (attrNames local_vm_addresses));
   net_file = pkgs.writeText "net-local.xml" ''
     <network>
       <name>local</name>
@@ -22,9 +26,11 @@ let
 in
 {
   boot.kernelModules = [
-    "vfio_pci" "vfio" "vfio_iommu_type1"
+    "vfio_pci"
+    "vfio"
+    "vfio_iommu_type1"
   ];
-  boot.kernelParams = [ 
+  boot.kernelParams = [
     "intel_iommu=on"
   ];
 
@@ -48,10 +54,12 @@ in
       swtpm.enable = true;
       ovmf = {
         enable = true;
-        packages = [(pkgs.OVMF.override {
-          secureBoot = true;
-          tpmSupport = true;
-        }).fd];
+        packages = [
+          (pkgs.OVMF.override {
+            secureBoot = true;
+            tpmSupport = true;
+          }).fd
+        ];
       };
     };
   };

@@ -1,5 +1,3 @@
-{ pkgs, lib, ... }:
-
 with builtins;
 let
   machine = import ./machine.nix;
@@ -13,7 +11,8 @@ let
     threads = 2;
   };
   pci_devices = [
-    { # GPU
+    {
+      # GPU
       domain = "0000";
       bus = "04";
       slot = "00";
@@ -21,7 +20,8 @@ let
       vendor = "0x10de";
       device = "0x1bb1";
     }
-    { # Audio
+    {
+      # Audio
       domain = "0000";
       bus = "04";
       slot = "00";
@@ -30,19 +30,28 @@ let
       device = "0x10f0";
     }
   ];
-  ### Derivations
   local_vm_addresses = import ./local-vm-addresses.nix;
-  vcpupins = concatStringsSep "\n" (lib.lists.flatten (genList (core: genList (thread: ''
-    <vcpupin vcpu="${toString (core*cpu.threads + thread)}" cpuset="${toString (1 + 2*core + 16*thread)}"/>
-  '') cpu.threads) cpu.cores));
-  hostdevs = concatStringsSep "\n" (map (d: ''
-    <hostdev mode="subsystem" type="pci" managed="yes">
-      <source>
-        <address domain="0x${d.domain}" bus="0x${d.bus}" slot="0x${d.slot}" function="0x${d.function}"/>
-      </source>
-      <address type="pci" domain="0x${d.domain}" bus="0x${d.bus}" slot="0x${d.slot}" function="0x${d.function}"/>
-    </hostdev>
-  '') pci_devices);
+  ### Derivations
+  hostdevs = concatStringsSep "\n" (map
+    (d: ''
+      <hostdev mode="subsystem" type="pci" managed="yes">
+        <source>
+          <address domain="0x${d.domain}" bus="0x${d.bus}" slot="0x${d.slot}" function="0x${d.function}"/>
+        </source>
+        <address type="pci" domain="0x${d.domain}" bus="0x${d.bus}" slot="0x${d.slot}" function="0x${d.function}"/>
+      </hostdev>
+    '')
+    pci_devices);
+in
+{ pkgs, lib, ... }:
+let
+  vcpupins = concatStringsSep "\n" (lib.lists.flatten (genList
+    (core: genList
+      (thread: ''
+        <vcpupin vcpu="${toString (core*cpu.threads + thread)}" cpuset="${toString (1 + 2*core + 16*thread)}"/>
+      '')
+      cpu.threads)
+    cpu.cores));
   domain_xml = ''
     <domain type="kvm">
       <name>${name}</name>
@@ -156,36 +165,37 @@ in
 
   virtualisation.libvirtd.hooks = {
     qemu = {
-      "${name}.sh" = let
-        prepare_pci = concatStringsSep "\n" (
-          (map (d: ''echo "${d.domain}:${d.bus}:${d.slot}.${d.function}" > "/sys/bus/pci/devices/${d.domain}:${d.bus}:${d.slot}.${d.function}/driver/unbind"'') pci_devices) ++ 
-          (map (d: ''echo "${d.vendor} ${d.device}" > /sys/bus/pci/drivers/vfio-pci/new_id'') pci_devices)
-        );
-        release_pci = concatStringsSep "\n" (
-          (map (d: ''echo "${d.vendor} ${d.device}" > /sys/bus/pci/drivers/vfio-pci/remove_id'') pci_devices) ++ 
-          (map (d: ''echo 1 > "/sys/bus/pci/devices/${d.domain}:${d.bus}:${d.slot}.${d.function}/remove"'') pci_devices)
-        );
-      in
-      pkgs.writeShellScript "${name}.sh" ''
-        [ "$1" == "${name}" ] || exit 0
-        case "$2" in
-          "prepare")
-            for x in system.slice user.slice init.scope
-            do
-              systemctl set-property --runtime -- $x AllowedCPUs=0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30
-            done
-            ${prepare_pci}
-            ;;
-          "release")
-            ${release_pci}
-            echo 1 > /sys/bus/pci/rescan
-            for x in system.slice user.slice init.scope
-            do
-              systemctl set-property --runtime -- $x AllowedCPUs=0-31
-            done
-            ;;
-        esac
-      '';
+      "${name}.sh" =
+        let
+          prepare_pci = concatStringsSep "\n" (
+            (map (d: ''echo "${d.domain}:${d.bus}:${d.slot}.${d.function}" > "/sys/bus/pci/devices/${d.domain}:${d.bus}:${d.slot}.${d.function}/driver/unbind"'') pci_devices) ++
+            (map (d: ''echo "${d.vendor} ${d.device}" > /sys/bus/pci/drivers/vfio-pci/new_id'') pci_devices)
+          );
+          release_pci = concatStringsSep "\n" (
+            (map (d: ''echo "${d.vendor} ${d.device}" > /sys/bus/pci/drivers/vfio-pci/remove_id'') pci_devices) ++
+            (map (d: ''echo 1 > "/sys/bus/pci/devices/${d.domain}:${d.bus}:${d.slot}.${d.function}/remove"'') pci_devices)
+          );
+        in
+        pkgs.writeShellScript "${name}.sh" ''
+          [ "$1" == "${name}" ] || exit 0
+          case "$2" in
+            "prepare")
+              for x in system.slice user.slice init.scope
+              do
+                systemctl set-property --runtime -- $x AllowedCPUs=0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30
+              done
+              ${prepare_pci}
+              ;;
+            "release")
+              ${release_pci}
+              echo 1 > /sys/bus/pci/rescan
+              for x in system.slice user.slice init.scope
+              do
+                systemctl set-property --runtime -- $x AllowedCPUs=0-31
+              done
+              ;;
+          esac
+        '';
     };
   };
 }
