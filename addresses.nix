@@ -91,6 +91,7 @@ let
     c1-imc =      { id = 2; mac = "70:0f:6a:3b:46:01"; };
     d1-bmc =      { id = 4; mac = "18:66:da:b6:45:d8"; };
     josh-pc-bmc = { id = 5; mac = "18:31:bf:cf:20:0b"; };
+    server-ups =  { id = 6; mac = "28:29:86:7f:bf:21"; };
   } //
   mapAttrs (k: v: { g = group.office; } // v) {
     josh-pc =             { id = 1; mac = "3c:fd:fe:e1:b9:d6"; };

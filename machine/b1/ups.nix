@@ -10,10 +10,21 @@ in
     enable = true;
     mode = "netserver";
     openFirewall = true;
-    ups.net = {
-      driver = "usbhid-ups";
-      port = "auto";
-      description = "Network Rack";
+    ups = {
+      net = {
+        driver = "usbhid-ups";
+        port = "auto";
+        description = "Network Rack";
+      };
+      server = {
+        driver = "snmp-ups";
+        description = "Server Rack";
+        port = "server-ups";
+        directives = [
+          "snmp_version=v3"
+          "secName=nut"
+        ];
+      };
     };
     upsd = {
       enable = true;
