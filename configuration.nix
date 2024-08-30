@@ -1,8 +1,7 @@
-{ config, pkgs, ... }:
-
 let
   machine = import ./machine.nix;
 in
+{ config, pkgs, ... }:
 {
   imports = [
     ./machine/${machine.hostName}/hardware-configuration.nix
@@ -14,9 +13,9 @@ in
     ./storage.nix
     ./services.nix
   ]
-  ++ (if machine.nvidia then [ ./nvidia.nix ] else [])
-  ++ (if machine.zfs then [ ./zfs.nix ] else [])
-  ++ (if machine.clamav then [ ./clamav.nix ] else [])
-  ++ (if machine.python then [ ./python.nix ] else [])
+  ++ (if machine.nvidia then [ ./nvidia.nix ] else [ ])
+  ++ (if machine.zfs then [ ./zfs.nix ] else [ ])
+  ++ (if machine.clamav then [ ./clamav.nix ] else [ ])
+  ++ (if machine.python then [ ./python.nix ] else [ ])
   ++ machine.imports;
 }

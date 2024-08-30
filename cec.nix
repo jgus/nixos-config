@@ -1,5 +1,4 @@
 { pkgs, ... }:
-
 {
   nixpkgs.overlays = [
     (self: super: {
@@ -7,7 +6,7 @@
     }
     )
   ];
-  
+
   environment.systemPackages = [
     pkgs.libcec
   ];
@@ -26,7 +25,7 @@
         path = [ pkgs.netcat pkgs.libcec ];
         script = ''
           nc -ulk 9526 | cec-client
-          '';
+        '';
         serviceConfig = {
           Restart = "no";
         };

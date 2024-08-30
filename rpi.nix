@@ -1,5 +1,4 @@
-{ config, pkgs, lib, ... }:
-
+{ pkgs, lib, ... }:
 {
   imports = [ <nixos-hardware/raspberry-pi/4> ];
 

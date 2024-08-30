@@ -1,6 +1,8 @@
-{ pkgs, ... }:
 let
   pubkeys = import ./../pubkeys.nix;
+in
+{ pkgs, ... }:
+let
   dockerfile = pkgs.writeText "Dockerfile" ''
     FROM alpine
 

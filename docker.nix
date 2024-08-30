@@ -1,8 +1,7 @@
-{ config, pkgs, lib, ... }:
-
 let
   machine = import ./machine.nix;
 in
+{ config, pkgs, lib, ... }:
 {
   virtualisation = {
     docker = {
@@ -16,7 +15,7 @@ in
     };
     oci-containers = {
       backend = "docker";
-      containers = {};
+      containers = { };
     };
   };
 
@@ -33,7 +32,7 @@ in
         requiredBy = [ "docker.service" ];
         before = [ "docker.service" ];
       };
-    } else {}) // {
+    } else { }) // {
       docker-configure = {
         path = [ pkgs.docker ];
         script = ''

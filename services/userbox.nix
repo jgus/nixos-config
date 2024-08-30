@@ -1,8 +1,10 @@
-{ pkgs, config, ... }:
 let
   user = "nathaniel";
   group = "users";
   name = "userbox-${user}";
+in
+{ pkgs, config, ... }:
+let
   dockerfile = pkgs.writeText "Dockerfile" ''
     FROM alpine
 

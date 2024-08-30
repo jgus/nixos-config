@@ -1,8 +1,8 @@
-{ config, ... }:
 let
   user = "josh";
   group = "users";
 in
+{ config, ... }:
 {
   requires = [ "home.mount" "storage-media.mount" "storage-photos.mount" "storage-software.mount" ];
   docker = {

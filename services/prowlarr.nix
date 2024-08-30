@@ -1,8 +1,8 @@
-{ config, ... }:
 let
   user = "josh";
   group = "plex";
 in
+{ config, ... }:
 {
   docker = {
     image = "lscr.io/linuxserver/prowlarr";

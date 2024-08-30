@@ -1,8 +1,8 @@
-{ config, ... }:
 with builtins;
 let
   pw = import ./../.secrets/passwords.nix;
 in
+{ config, ... }:
 {
   configStorage = false;
   docker = {
@@ -25,16 +25,17 @@ in
           "fruit:time machine max size = 1T"
         ];
       } //
-      (listToAttrs (map (x:
-        {
-          name = "SAMBA_VOLUME_CONFIG_${x.name}";
-          value = concatStringsSep ";" [
-            "[${x.name}]"
-            "path = ${x.path}"
-            "browseable = yes"
-            "read only = no"
-          ];
-        }) [
+      (listToAttrs (map
+        (x:
+          {
+            name = "SAMBA_VOLUME_CONFIG_${x.name}";
+            value = concatStringsSep ";" [
+              "[${x.name}]"
+              "path = ${x.path}"
+              "browseable = yes"
+              "read only = no"
+            ];
+          }) [
         { name = "home"; path = "/home/%U"; }
         { name = "Media"; path = "/storage/media"; }
         { name = "Backup"; path = "/storage/backup"; }

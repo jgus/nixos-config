@@ -1,8 +1,8 @@
-{ config, ... }:
 let
   user = "plex";
   group = "plex";
 in
+{ config, ... }:
 {
   requires = [ "storage-media.mount" "storage-photos.mount" ];
   docker = {
@@ -19,7 +19,7 @@ in
       "/storage/photos:/shares/photos"
     ];
     extraOptions = [
-      "--gpus=all"
+      "--device=nvidia.com/gpu=all"
       "--device=/dev/dri:/dev/dri"
       "--tmpfs=/tmp"
     ];

@@ -1,9 +1,8 @@
-{ config, pkgs, lib, ... }:
-
 let
   addresses = import ./addresses.nix;
   machine = import ./machine.nix;
 in
+{ config, pkgs, lib, ... }:
 {
   boot = {
     initrd.secrets."/etc/nixos/.secrets/vkey" = ./.secrets/vkey;
@@ -35,7 +34,7 @@ in
     hosts = addresses.hosts;
     interfaces.lan0 = let m = addresses.records."${machine.hostName}"; in {
       macAddress = m.mac;
-      ipv4.addresses = [ { address = m.ip; prefixLength = addresses.network.prefixLength; } ];
+      ipv4.addresses = [{ address = m.ip; prefixLength = addresses.network.prefixLength; }];
     };
     macvlans.lan0 = {
       interface = machine.lan-interface;
@@ -43,7 +42,7 @@ in
     };
   } // (if (machine ? lan-interfaces) then {
     bridges."${machine.lan-interface}".interfaces = machine.lan-interfaces;
-  } else {});
+  } else { });
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget

@@ -1,6 +1,5 @@
-{ config, pkgs, ... }:
-
 with builtins;
+{ config, pkgs, ... }:
 {
   imports = [ ./msmtp.nix ];
 

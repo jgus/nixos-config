@@ -1,8 +1,7 @@
-{ ... }:
-
 let
   pubkeys = import ./pubkeys.nix;
 in
+{ ... }:
 {
   users = {
     mutableUsers = false;

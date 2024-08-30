@@ -1,8 +1,7 @@
-{ pkgs, config, ... }:
-
 let
   machine = import ./machine.nix;
 in
+{ pkgs, config, ... }:
 {
   boot = {
     kernelPackages = config.boot.zfs.package.latestCompatibleLinuxPackages;
@@ -19,7 +18,7 @@ in
     zfs
     zfs-autobackup
   ];
-  
+
   services.zfs.autoScrub.enable = true;
 
   systemd = {

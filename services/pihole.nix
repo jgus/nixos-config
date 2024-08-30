@@ -1,9 +1,11 @@
-{ config, pkgs, lib, ... }:
 with builtins;
 let
   name = "pihole";
   addresses = import ./../addresses.nix;
   pw = import ./../.secrets/passwords.nix;
+in
+{ config, pkgs, lib, ... }:
+let
   dnsmasq-dns = lib.concatStrings (map (ip: "host-record=" + (lib.concatStrings (map (s: "${s},") (getAttr ip addresses.hosts))) + ip + "\n") (attrNames addresses.hosts));
   dnsmasq-dhcp = lib.concatStrings (map (r: "dhcp-host=" + r.mac + "," + r.ip + "," + r.name + ",infinite\n") addresses.dhcpReservations);
   dnsmasq-config = ''

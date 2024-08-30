@@ -1,8 +1,8 @@
-{ config, pkgs, ... }:
 let
   user = "josh";
   group = "plex";
 in
+{ config, pkgs, ... }:
 {
   requires = [ "storage-scratch.mount" ];
   docker = {

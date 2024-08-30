@@ -1,10 +1,11 @@
-args@{ pkgs, lib, ... }:
-
 with builtins;
-with (import ./functions.nix) args;
 let
   serviceDir = readDir ./services;
-  serviceNames = lib.lists.flatten (map (n: if (serviceDir.${n} == "regular" && (lib.strings.hasSuffix ".nix" n) && !(lib.strings.hasPrefix "." n)) then [(lib.strings.removeSuffix ".nix" n)] else []) (attrNames serviceDir));
+in
+args@{ pkgs, lib, ... }:
+with (import ./functions.nix) args;
+let
+  serviceNames = lib.lists.flatten (map (n: if (serviceDir.${n} == "regular" && (lib.strings.hasSuffix ".nix" n) && !(lib.strings.hasPrefix "." n)) then [ (lib.strings.removeSuffix ".nix" n) ] else [ ]) (attrNames serviceDir));
   importService = n:
     let
       i = (import ./services/${n}.nix) args;

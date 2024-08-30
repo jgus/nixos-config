@@ -1,49 +1,51 @@
-{ pkgs, ... }:
 with builtins;
 let
   addresses = import ./addresses.nix;
   machine = import ./machine.nix;
   storagePath = name: "/service/${name}";
   storageBackupPath = name: "/storage/service/${name}";
-
-  homelabServiceStorage = name: 
-  let
-    path = storagePath name;
-    backupPath = storageBackupPath name;
-  in
-  {
-    systemd.services = {
-      "service-storage-${name}-setup" = {
-        path = [ pkgs.rsync ] ++ (if machine.zfs then [ pkgs.zfs ] else []);
-        script = ''
-          if ! [ -d ${path} ]
-          then
-            ${if machine.zfs then "zfs create r/service/${name}" else "mkdir -p ${path}"}
-            rsync -arPW --delete ${backupPath}/ ${path}/
-          fi
-        '';
-        serviceConfig = { Type = "oneshot"; };
-      };
-      "service-storage-${name}-backup" = {
-        path = [ pkgs.rsync ];
-        script = "rsync -arPW --delete ${path}/ ${backupPath}/";
-        serviceConfig = { Type = "exec"; };
-        startAt = "hourly";
+in
+{ pkgs, ... }:
+let
+  homelabServiceStorage = name:
+    let
+      path = storagePath name;
+      backupPath = storageBackupPath name;
+    in
+    {
+      systemd.services = {
+        "service-storage-${name}-setup" = {
+          path = [ pkgs.rsync ] ++ (if machine.zfs then [ pkgs.zfs ] else [ ]);
+          script = ''
+            if ! [ -d ${path} ]
+            then
+              ${if machine.zfs then "zfs create r/service/${name}" else "mkdir -p ${path}"}
+              rsync -arPW --delete ${backupPath}/ ${path}/
+            fi
+          '';
+          serviceConfig = { Type = "oneshot"; };
+        };
+        "service-storage-${name}-backup" = {
+          path = [ pkgs.rsync ];
+          script = "rsync -arPW --delete ${path}/ ${backupPath}/";
+          serviceConfig = { Type = "exec"; };
+          startAt = "hourly";
+        };
       };
     };
-  };
 in
 {
-  homelabService = {
-      name,
-      user ? "root",
-      group ? "root",
-      configStorage ? true,
-      extraStorage ? [],
-      requires ? [],
-      docker ? {},
-      systemd ? {},
-      extraConfig ? {},
+  homelabService =
+    { name
+    , user ? "root"
+    , group ? "root"
+    , configStorage ? true
+    , extraStorage ? [ ]
+    , requires ? [ ]
+    , docker ? { }
+    , systemd ? { }
+    , extraConfig ? { }
+    ,
     }: { config, ... }:
     let
       args = {
@@ -51,14 +53,14 @@ in
       };
       uid = toString config.users.users.${user}.uid;
       gid = toString config.users.groups.${group}.gid;
-      storageNames = (extraStorage ++ (if configStorage then [ name ] else []));
+      storageNames = (extraStorage ++ (if configStorage then [ name ] else [ ]));
       dockerOptions = addresses.dockerOptions name;
     in
-    if (machine.hostName != addresses.records.${name}.host) then {} else
+    if (machine.hostName != addresses.records.${name}.host) then { } else
     {
       imports =
-        (if (docker ? image) then [ ./docker.nix ] else []) ++
-        (map (s: homelabServiceStorage s) storageNames) ++ 
+        (if (docker ? image) then [ ./docker.nix ] else [ ]) ++
+        (map (s: homelabServiceStorage s) storageNames) ++
         [ extraConfig ];
 
       systemd = {
@@ -68,8 +70,7 @@ in
           requiredBy = [ "${name}.service" ];
           before = requiredBy;
         };
-        services = {
-        } // (if (docker ? image) then {
+        services = { } // (if (docker ? image) then {
           "docker-${name}" = {
             aliases = [ "${name}.service" ];
           };
@@ -102,7 +103,7 @@ in
             wantedBy = [ "multi-user.target" ];
             requires = args.requires ++ [ "network-online.target" "${name}-requires.target" ];
             after = requires;
-            path = (if (systemd ? path) then systemd.path else []);
+            path = (if (systemd ? path) then systemd.path else [ ]);
             script = (if (systemd ? script) then (systemd.script { inherit name uid gid storagePath dockerOptions; }) else "");
             postStop = "systemctl restart ${name}-backup";
           };
@@ -125,17 +126,17 @@ in
         autoStart = true;
         user = "${uid}:${gid}";
         volumes =
-          (if (docker ? volumes) then (if (isFunction docker.volumes) then (docker.volumes storagePath) else docker.volumes) else []) ++
-          (if configStorage then [ "${storagePath name}:${docker.configVolume}" ] else []);
-        extraOptions = (if (docker ? extraOptions) then docker.extraOptions else [])
-          ++ dockerOptions;
+          (if (docker ? volumes) then (if (isFunction docker.volumes) then (docker.volumes storagePath) else docker.volumes) else [ ]) ++
+          (if configStorage then [ "${storagePath name}:${docker.configVolume}" ] else [ ]);
+        extraOptions = (if (docker ? extraOptions) then docker.extraOptions else [ ])
+        ++ dockerOptions;
       }
-      // (if (docker ? imageFile) then { imageFile = docker.imageFile; } else {})
-      // (if (docker ? dependsOn) then { dependsOn = docker.dependsOn; } else {})
-      // (if (docker ? environment) then { environment = docker.environment; } else {})
-      // (if (docker ? environmentFiles) then { environmentFiles = docker.environmentFiles; } else {})
-      // (if (docker ? ports) then { ports = docker.ports; } else {})
+      // (if (docker ? imageFile) then { imageFile = docker.imageFile; } else { })
+      // (if (docker ? dependsOn) then { dependsOn = docker.dependsOn; } else { })
+      // (if (docker ? environment) then { environment = docker.environment; } else { })
+      // (if (docker ? environmentFiles) then { environmentFiles = docker.environmentFiles; } else { })
+      // (if (docker ? ports) then { ports = docker.ports; } else { })
       ;
       systemd.services."docker-${name}".serviceConfig.Restart = pkgs.lib.mkForce "no";
-    } else {});
+    } else { });
 }

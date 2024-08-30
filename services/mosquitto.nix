@@ -1,8 +1,10 @@
-{ pkgs, ... }:
 with builtins;
 let
   pw = import ./../.secrets/passwords.nix;
-  passwordFileDer = pkgs.runCommand "passwordFileDer" {} (concatStringsSep "\n" (
+in
+{ pkgs, ... }:
+let
+  passwordFileDer = pkgs.runCommand "passwordFileDer" { } (concatStringsSep "\n" (
     [
       "mkdir \${out}"
       "touch \${out}/password.conf"
