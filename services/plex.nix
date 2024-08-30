@@ -19,7 +19,7 @@ in
       "/storage/photos:/shares/photos"
     ];
     extraOptions = [
-      "--gpus=all"
+      "--device=nvidia.com/gpu=all"
       "--device=/dev/dri:/dev/dri"
       "--tmpfs=/tmp"
     ];

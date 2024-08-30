@@ -381,7 +381,7 @@ in
     ];
     extraOptions = [
       "--shm-size=16g"
-      "--gpus=all"
+      "--device=nvidia.com/gpu=all"
       "--device=/dev/apex_0:/dev/apex_0"
       "--device=/dev/apex_1:/dev/apex_1"
       "--privileged"
