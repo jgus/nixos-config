@@ -22,6 +22,9 @@ let
     "dining_room_upper_shade"
     "eden_hope_room_shade_1"
     "eden_hope_room_shade_2"
+    "garage_shade_1"
+    "garage_shade_2"
+    "garage_shade_3"
     "great_room_lower_left_shade"
     "great_room_lower_right_shade"
     "great_room_upper_left_shade"
@@ -53,7 +56,8 @@ let
     "toy_room_shade_1"
     "toy_room_shade_2"
     "toy_room_shade_3"
-    "workshop_north_shade"
+    "workshop_shade_1"
+    "workshop_shade_2"
   ];
   theater_devices = [
     {
