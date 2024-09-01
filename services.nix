@@ -55,90 +55,106 @@ let
       gid = toString config.users.groups.${group}.gid;
       storageNames = (extraStorage ++ (if configStorage then [ name ] else [ ]));
       dockerOptions = addresses.dockerOptions name;
-    in
-    if (machine.hostName != addresses.records.${name}.host) then { } else
-    {
-      imports =
-        (if (docker ? image) then [ ./docker.nix ] else [ ]) ++
-        (map (s: homelabServiceStorage s) storageNames) ++
-        [ extraConfig ];
+      isDocker = docker ? image;
+      dockerConfig = {
+        imports = [ ./docker.nix extraConfig ] ++ (map (s: homelabServiceStorage s) storageNames);
 
-      systemd = {
-        targets."${name}-requires" = rec {
-          requires = (map (s: "service-storage-${s}-setup.service") storageNames);
-          after = requires;
-          requiredBy = [ "${name}.service" ];
-          before = requiredBy;
-        };
-        services = { } // (if (docker ? image) then {
-          "docker-${name}" = {
-            aliases = [ "${name}.service" ];
-          };
-          "${name}-onstop" = rec {
-            path = [ pkgs.docker pkgs.rsync ];
-            script = ''
-              while ! docker container ls --format {{.Names}} | grep ^${name}$; do sleep 1; done
-              docker container wait ${name}
-              systemctl restart ${name}-backup
-            '';
-            serviceConfig = { Type = "oneshot"; };
-            requiredBy = [ "${name}.service" ];
-            after = requiredBy;
-          };
-          "${name}-update" = {
-            path = [ pkgs.docker ];
-            script = ''
-              if docker pull ${docker.image} | grep "Status: Downloaded"
-              then
-                systemctl restart ${name}
-              fi
-            '';
-            serviceConfig = { Type = "exec"; };
-            startAt = "hourly";
-          };
-        } else {
-          "${name}" = rec {
-            enable = true;
-            description = name;
-            wantedBy = [ "multi-user.target" ];
-            requires = args.requires ++ [ "network-online.target" "${name}-requires.target" ];
+        systemd = {
+          targets."${name}-requires" = rec {
+            requires = (map (s: "service-storage-${s}-setup.service") storageNames);
             after = requires;
-            path = (if (systemd ? path) then systemd.path else [ ]);
-            script = (if (systemd ? script) then (systemd.script { inherit name uid gid storagePath dockerOptions; }) else "");
-            postStop = "systemctl restart ${name}-backup";
+            requiredBy = [ "${name}.service" ];
+            before = requiredBy;
           };
-        }) // {
-          "${name}-backup" = {
-            script = ''
-              ${concatStringsSep "\n" (map (s: "systemctl restart service-storage-${s}-backup") storageNames)}
-              true
-            '';
-            serviceConfig = { Type = "exec"; };
-            startAt = "hourly";
+          services = {
+            "docker-${name}" = {
+              aliases = [ "${name}.service" ];
+              serviceConfig.Restart = pkgs.lib.mkForce "no";
+            };
+            "${name}-onstop" = rec {
+              path = [ pkgs.docker pkgs.rsync ];
+              script = ''
+                while ! docker container ls --format {{.Names}} | grep ^${name}$; do sleep 1; done
+                docker container wait ${name}
+                systemctl restart ${name}-backup
+              '';
+              serviceConfig = { Type = "oneshot"; };
+              requiredBy = [ "${name}.service" ];
+              after = requiredBy;
+            };
+            "${name}-update" = {
+              path = [ pkgs.docker ];
+              script = ''
+                if docker pull ${docker.image} | grep "Status: Downloaded"
+                then
+                  systemctl restart ${name}
+                fi
+              '';
+              serviceConfig = { Type = "exec"; };
+              startAt = "hourly";
+            };
+            "${name}-backup" = {
+              script = ''
+                ${concatStringsSep "\n" (map (s: "systemctl restart service-storage-${s}-backup") storageNames)}
+                true
+              '';
+              serviceConfig = { Type = "exec"; };
+              startAt = "hourly";
+            };
+          };
+        };
+        virtualisation.oci-containers.containers.${name} = {
+          image = docker.image;
+          autoStart = true;
+          user = "${uid}:${gid}";
+          volumes =
+            (if (docker ? volumes) then (if (isFunction docker.volumes) then (docker.volumes storagePath) else docker.volumes) else [ ]) ++
+              (if configStorage then [ "${storagePath name}:${docker.configVolume}" ] else [ ]);
+          extraOptions = (if (docker ? extraOptions) then docker.extraOptions else [ ])
+            ++ dockerOptions;
+        }
+        // (if (docker ? imageFile) then { imageFile = docker.imageFile; } else { })
+        // (if (docker ? dependsOn) then { dependsOn = docker.dependsOn; } else { })
+        // (if (docker ? environment) then { environment = docker.environment; } else { })
+        // (if (docker ? environmentFiles) then { environmentFiles = docker.environmentFiles; } else { })
+        // (if (docker ? ports) then { ports = docker.ports; } else { })
+        ;
+      };
+      systemdConfig = {
+        imports = [ extraConfig ] ++ (map (s: homelabServiceStorage s) storageNames);
+
+        systemd = {
+          targets."${name}-requires" = rec {
+            requires = (map (s: "service-storage-${s}-setup.service") storageNames);
+            after = requires;
+            requiredBy = [ "${name}.service" ];
+            before = requiredBy;
+          };
+          services = {
+            "${name}" = rec {
+              enable = true;
+              description = name;
+              wantedBy = [ "multi-user.target" ];
+              requires = args.requires ++ [ "network-online.target" "${name}-requires.target" ];
+              after = requires;
+              path = (if (systemd ? path) then systemd.path else [ ]);
+              script = (if (systemd ? script) then (systemd.script { inherit name uid gid storagePath dockerOptions; }) else "");
+              postStop = "systemctl restart ${name}-backup";
+            };
+            "${name}-backup" = {
+              script = ''
+                ${concatStringsSep "\n" (map (s: "systemctl restart service-storage-${s}-backup") storageNames)}
+                true
+              '';
+              serviceConfig = { Type = "exec"; };
+              startAt = "hourly";
+            };
           };
         };
       };
-    }
-    //
-    (if (docker ? image) then {
-      virtualisation.oci-containers.containers.${name} = {
-        image = docker.image;
-        autoStart = true;
-        user = "${uid}:${gid}";
-        volumes =
-          (if (docker ? volumes) then (if (isFunction docker.volumes) then (docker.volumes storagePath) else docker.volumes) else [ ]) ++
-          (if configStorage then [ "${storagePath name}:${docker.configVolume}" ] else [ ]);
-        extraOptions = (if (docker ? extraOptions) then docker.extraOptions else [ ])
-        ++ dockerOptions;
-      }
-      // (if (docker ? imageFile) then { imageFile = docker.imageFile; } else { })
-      // (if (docker ? dependsOn) then { dependsOn = docker.dependsOn; } else { })
-      // (if (docker ? environment) then { environment = docker.environment; } else { })
-      // (if (docker ? environmentFiles) then { environmentFiles = docker.environmentFiles; } else { })
-      // (if (docker ? ports) then { ports = docker.ports; } else { })
-      ;
-      systemd.services."docker-${name}".serviceConfig.Restart = pkgs.lib.mkForce "no";
-    } else { });
+      serviceConfig = if isDocker then dockerConfig else systemdConfig;
+    in
+    if (machine.hostName == addresses.records.${name}.host) then serviceConfig else { };
   importService = n:
     let
       i = (import ./services/${n}.nix) args;
