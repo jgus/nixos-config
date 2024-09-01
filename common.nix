@@ -48,10 +48,9 @@ in
   # $ nix search wget
   environment = {
     systemPackages = with pkgs; [
-      parted
       clang-tools # TODO
+      comma
       nixpkgs-fmt
-      iperf
     ];
     variables = {
       SERVER_NAMES = builtins.concatStringsSep " " addresses.serverNames;
@@ -74,12 +73,13 @@ in
   };
 
   programs = {
-    command-not-found.enable = true;
+    command-not-found.enable = false;
     direnv.enable = true;
     git.enable = true;
     git.lfs.enable = true;
     htop.enable = true;
     mosh.enable = true;
+    nix-index.enable = true;
     ssh.startAgent = true;
     tmux.enable = true;
   };
