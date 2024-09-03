@@ -17,6 +17,8 @@ let
     {
       systemd.services = {
         "service-storage-${name}-setup" = {
+          requires = (if machine.zfs then [ "zfs.target" ] else [ ]);
+          after = (if machine.zfs then [ "zfs.target" ] else [ ]);
           path = [ pkgs.rsync ] ++ (if machine.zfs then [ pkgs.zfs ] else [ ]);
           script = ''
             if ! [ -d ${path} ]

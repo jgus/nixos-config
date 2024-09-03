@@ -27,7 +27,7 @@ let
       };
       frigate = {
         machine = "d1";
-        path = "/f/frigate";
+        path = "/storage/frigate";
       };
       home = {
         machine = "c1-1";
