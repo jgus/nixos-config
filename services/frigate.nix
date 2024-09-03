@@ -161,8 +161,8 @@ let
     detectors = {
       coral1 = { type = "edgetpu"; device = "pci:0"; };
       coral2 = { type = "edgetpu"; device = "pci:1"; };
-      # coral3 = { type = "edgetpu"; device = "usb:0"; };
-      # coral4 = { type = "edgetpu"; device = "usb:1"; };
+      coral3 = { type = "edgetpu"; device = "usb:0"; };
+      coral4 = { type = "edgetpu"; device = "usb:1"; };
     };
     record = {
       retain = { days = 180; mode = "motion"; };
@@ -233,6 +233,8 @@ in
       "--device=nvidia.com/gpu=all"
       "--device=/dev/apex_0:/dev/apex_0"
       "--device=/dev/apex_1:/dev/apex_1"
+      "--device=/dev/usb/006/004:/dev/usb/006/004"
+      "--device=/dev/usb/006/005:/dev/usb/006/005"
       "--privileged"
     ];
   };

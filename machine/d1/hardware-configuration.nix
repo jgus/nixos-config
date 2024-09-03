@@ -35,6 +35,13 @@
       options = [ "zfsutil" ];
     };
 
+  fileSystems."/service" =
+    {
+      device = "r/service";
+      fsType = "zfs";
+      options = [ "zfsutil" ];
+    };
+
   fileSystems."/var/lib" =
     {
       device = "r/varlib";
@@ -52,13 +59,6 @@
     {
       device = "/dev/disk/by-uuid/9523-82A9";
       fsType = "vfat";
-    };
-
-  fileSystems."/d" =
-    { 
-      device = "d";
-      fsType = "zfs";
-      options = [ "zfsutil" ];
     };
 
   swapDevices = [ ];

@@ -46,9 +46,9 @@ let
       c1-2 = { id = 3; };
       d1 = { id = 4; };
       pi-67cba1 = { id = 65; aliases = [ "theater-pi" "theater-cec" ]; };
-      pi-67db40 = { id = 66; };
-      pi-67dbcd = { id = 67; };
-      pi-67dc75 = { id = 68; };
+      pi-67db40 = { id = 66; aliases = [ "zwave-main-pi" ]; };
+      pi-67dbcd = { id = 67; aliases = [ "zwave-upstairs-pi" ]; };
+      pi-67dc75 = { id = 68; aliases = [ "zwave-basement-pi" ]; };
     } //
     mapAttrs (k: v: { g = group.home-automation; } // v) {
       zigbee = { id = 6; mac = "b0:a7:32:05:7d:f3"; };
@@ -91,6 +91,8 @@ let
     mapAttrs (k: v: { g = group.admin; } // v) {
       c1-imc = { id = 2; mac = "70:0f:6a:3b:46:01"; };
       d1-bmc = { id = 4; mac = "18:66:da:b6:45:d8"; };
+      d2-bmc = { id = 100; mac = "84:2b:2b:57:53:84"; };
+      d3-bmc = { id = 101; mac = "00:26:b9:49:cb:ff"; };
       josh-pc-bmc = { id = 5; mac = "18:31:bf:cf:20:0b"; };
       server-ups = { id = 6; mac = "28:29:86:7f:bf:21"; };
     } //
