@@ -6,11 +6,28 @@ let
 in
 { config, pkgs, lib, ... }:
 let
-  dnsmasq-dns = lib.concatStrings (map (ip: "host-record=" + (lib.concatStrings (map (s: "${s},") (getAttr ip addresses.hosts))) + ip + "\n") (attrNames addresses.hosts));
-  dnsmasq-dhcp = lib.concatStrings (map (r: "dhcp-host=" + r.mac + "," + r.ip + "," + r.name + ",infinite\n") addresses.dhcpReservations);
-  dnsmasq-config = ''
-    dhcp-option=option:ntp-server,${addresses.nameToIp.ntp}
-  '';
+  tftpFiles = {
+    "netboot.xyz.kpxe" = fetchurl {
+      url = "https://github.com/netbootxyz/netboot.xyz/releases/download/2.0.81/netboot.xyz.kpxe";
+      sha256 = "1dy6rnd70yycli0j0gzw0h2px0fvlr25b8df0ak9idy7ww26pmd6";
+    };
+    "netboot.xyz.efi" = fetchurl {
+      url = "https://github.com/netbootxyz/netboot.xyz/releases/download/2.0.81/netboot.xyz.efi";
+      sha256 = "0f7mmrv8yp6m8xzrlir04xf8nq7jmqfpkhaxacnjkiasjv07nryr";
+    };
+  };
+  dnsmasqConf = {
+    dns = lib.concatStrings (map (ip: "host-record=" + (lib.concatStrings (map (s: "${s},") (getAttr ip addresses.hosts))) + ip + "\n") (attrNames addresses.hosts));
+    dhcp = lib.concatStrings (map (r: "dhcp-host=" + r.mac + "," + r.ip + "," + r.name + ",infinite\n") addresses.dhcpReservations);
+    config = ''
+      dhcp-option=option:ntp-server,${addresses.nameToIp.ntp}
+      enable-tftp
+      tftp-root=/tftp
+      # dhcp-boot=netboot.xyz.kpxe
+      pxe-service=x86PC,"NetBoot.xyz (BIOS)",netboot.xyz.kpxe
+      pxe-service=X86-64_EFI,"NetBoot.xyz (EFI)",netboot.xyz.efi
+    '';
+  };
 in
 {
   docker = {
@@ -38,10 +55,9 @@ in
     volumes = storagePath: [
       "${storagePath name}/pihole:/etc/pihole"
       "${storagePath name}/dnsmasq.d:/etc/dnsmasq.d"
-      "${pkgs.writeText "50-nixos-dns.conf" dnsmasq-dns}:/etc/dnsmasq.d/50-nixos-dns.conf"
-      "${pkgs.writeText "50-nixos-dhcp.conf" dnsmasq-dhcp}:/etc/dnsmasq.d/50-nixos-dhcp.conf"
-      "${pkgs.writeText "50-nixos-config.conf" dnsmasq-config}:/etc/dnsmasq.d/50-nixos-config.conf"
-    ];
+    ]
+    ++ (map (n: "${pkgs.writeText "50-nixos-${n}.conf" dnsmasqConf.${n}}:/etc/dnsmasq.d/50-nixos-${n}.conf") (attrNames dnsmasqConf))
+    ++ (map (n: "${tftpFiles.${n}}:/tftp/${n}") (attrNames tftpFiles));
     extraOptions = [
       "--cap-add=NET_ADMIN"
     ];
