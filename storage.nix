@@ -8,7 +8,7 @@ let
         name = x;
         value = {
           machine = "c1-1";
-          path = "/d/${x}";
+          path = "/storage/${x}";
         };
       }) [
       "backup"
@@ -23,7 +23,7 @@ let
     {
       media = {
         machine = "c1-1";
-        path = "/m/media";
+        path = "/storage/media";
       };
       frigate = {
         machine = "d1";
