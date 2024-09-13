@@ -18,7 +18,7 @@ let
     adduser -D user
     passwd -ud user
     mkdir /home/user/.ssh
-    cp ${./pubkeys/backup-rsa} >/home/user/.ssh/authorized_keys
+    echo "${builtins.readFile ./../pubkeys/backup-rsa}" >/home/user/.ssh/authorized_keys
     chmod 700 /home/user/.ssh
     chmod 400 /home/user/.ssh/authorized_keys
     chown -R user:user /home/user/.ssh
