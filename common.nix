@@ -98,7 +98,7 @@ in
     gc = {
       automatic = true;
       persistent = true;
-      options = "--delete-older-than 30d";
+      options = "--delete-older-than 3d";
     };
     extraOptions = ''
       experimental-features = nix-command flakes
