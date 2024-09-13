@@ -12,6 +12,7 @@ in
     ./vscode.nix
     ./storage.nix
     ./services.nix
+    ./backup.nix
   ]
   ++ (if machine.nvidia then [ ./nvidia.nix ] else [ ])
   ++ (if machine.zfs then [ ./zfs.nix ] else [ ])
