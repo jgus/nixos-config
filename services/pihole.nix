@@ -21,11 +21,19 @@ let
     dhcp = lib.concatStrings (map (r: "dhcp-host=" + r.mac + "," + r.ip + "," + r.name + ",infinite\n") addresses.dhcpReservations);
     config = ''
       dhcp-option=option:ntp-server,${addresses.nameToIp.ntp}
+
       enable-tftp
       tftp-root=/tftp
       # dhcp-boot=netboot.xyz.kpxe
-      pxe-service=x86PC,"NetBoot.xyz (BIOS)",netboot.xyz.kpxe
-      pxe-service=X86-64_EFI,"NetBoot.xyz (EFI)",netboot.xyz.efi
+      # pxe-service=x86PC,"NetBoot.xyz (BIOS)",netboot.xyz.kpxe
+      # pxe-service=X86-64_EFI,"NetBoot.xyz (EFI)",netboot.xyz.efi
+      dhcp-match=set:efi-x86_64,option:client-arch,7
+      dhcp-match=set:efi-x86_64,option:client-arch,9
+      dhcp-match=set:efi-x86,option:client-arch,6
+      dhcp-match=set:bios,option:client-arch,0
+      dhcp-boot=tag:efi-x86_64,netboot.xyz.efi
+      dhcp-boot=tag:efi-x86,netboot.xyz.efi
+      dhcp-boot=tag:bios,netboot.xyz.kpxe
     '';
   };
 in
