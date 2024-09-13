@@ -4,7 +4,7 @@ let
 in
 { pkgs, ... }:
 let
-  passwordFileDer = pkgs.runCommand "passwordFileDer" { } (concatStringsSep "\n" (
+  passwordFileDer = pkgs.runCommandLocal "passwordFile" { } (concatStringsSep "\n" (
     [
       "mkdir \${out}"
       "touch \${out}/password.conf"

@@ -1,6 +1,3 @@
-let
-  pubkeys = import ./pubkeys.nix;
-in
 { ... }:
 {
   users = {
@@ -18,7 +15,7 @@ in
     users = {
       root = {
         hashedPassword = "$y$j9T$kPkXW3Xo/TsdmLvo5eQE9/$z1/r/jzXvqtH/0xXO.pwtFYqlkt4LN7mnBEU1gjKNR2";
-        openssh.authorizedKeys.keys = [ pubkeys.josh-ed25519 pubkeys.josh-rsa ];
+        openssh.authorizedKeys.keyFiles = [ ./pubkeys/josh-ed25519 ./pubkeys/josh-rsa ];
       };
 
       plex = {
@@ -55,7 +52,7 @@ in
         isNormalUser = true;
         extraGroups = [ "wheel" "www" "docker" "libvirtd" ];
         hashedPassword = "$y$j9T$ejqS3R1wFPz6VoSCPm6l31$e60wSoEFUtCCklzlwnCxdzre4vuNnmbJE8E/b6/tJ72";
-        openssh.authorizedKeys.keys = [ pubkeys.josh-ed25519 pubkeys.josh-rsa ];
+        openssh.authorizedKeys.keyFiles = [ ./pubkeys/josh-ed25519 ./pubkeys/josh-rsa ];
       };
 
       nathaniel = {

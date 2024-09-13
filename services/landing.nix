@@ -1,6 +1,3 @@
-let
-  pubkeys = import ./../pubkeys.nix;
-in
 { pkgs, ... }:
 let
   dockerfile = pkgs.writeText "Dockerfile" ''
@@ -21,7 +18,7 @@ let
     adduser -D user
     passwd -ud user
     mkdir /home/user/.ssh
-    echo "${pubkeys.backup-rsa}" >/home/user/.ssh/authorized_keys
+    cp ${./pubkeys/backup-rsa} >/home/user/.ssh/authorized_keys
     chmod 700 /home/user/.ssh
     chmod 400 /home/user/.ssh/authorized_keys
     chown -R user:user /home/user/.ssh

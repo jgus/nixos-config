@@ -11,6 +11,7 @@ in
     ./users.nix
     ./vscode.nix
     ./storage.nix
+    ./backup.nix
     ./services.nix
     ./backup.nix
   ]
