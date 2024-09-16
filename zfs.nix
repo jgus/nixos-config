@@ -4,7 +4,7 @@ in
 { pkgs, config, ... }:
 {
   boot = {
-    kernelPackages = config.boot.zfs.package.latestCompatibleLinuxPackages;
+    # kernelPackages = config.boot.zfs.package.latestCompatibleLinuxPackages;
     supportedFilesystems = [
       "zfs"
     ];
