@@ -233,8 +233,8 @@ in
       "--device=nvidia.com/gpu=all"
       "--device=/dev/apex_0:/dev/apex_0"
       "--device=/dev/apex_1:/dev/apex_1"
-      "--device=/dev/usb/006/004:/dev/usb/006/004"
-      "--device=/dev/usb/006/005:/dev/usb/006/005"
+      "--device=/dev/bus/usb/006/004:/dev/bus/usb/006/004"
+      "--device=/dev/bus/usb/006/005:/dev/bus/usb/006/005"
       "--privileged"
     ];
   };
