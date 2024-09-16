@@ -62,6 +62,7 @@ let
       landing = { id = 3; host = "b1"; };
       samba = { id = 10; host = "c1-1"; aliases = [ "smb" "nas" ]; };
       syncthing = { id = 11; host = "c1-1"; };
+      garage = { id = 12; host = "d1"; };
       web-swag = { id = 20; host = "c1-2"; };
       web-db = { id = 21; host = "c1-2"; aliases = [ "db" ]; };
       web-db-admin = { id = 22; host = "c1-2"; };
