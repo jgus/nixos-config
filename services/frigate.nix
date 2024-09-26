@@ -157,7 +157,8 @@ let
         threshold = 0.8;
       };
     };
-    audio.enabled = true;
+    # audio.enabled = true;
+    audio.enabled = false;
     detectors = {
       coral1 = { type = "edgetpu"; device = "pci:0"; };
       coral2 = { type = "edgetpu"; device = "pci:1"; };
