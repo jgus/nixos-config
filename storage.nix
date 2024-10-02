@@ -9,16 +9,36 @@ let
         value = {
           machine = "c1-1";
           path = "/storage/${x}";
+          backup = [ "garage" "cloud" ];
+        };
+      }) [
+      "photos"
+      "projects"
+      "service"
+    ])) //
+    (listToAttrs (map
+      (x: {
+        name = x;
+        value = {
+          machine = "c1-1";
+          path = "/storage/${x}";
+          backup = [ "garage" ];
+        };
+      }) [
+      "software"
+    ])) //
+    (listToAttrs (map
+      (x: {
+        name = x;
+        value = {
+          machine = "c1-1";
+          path = "/storage/${x}";
         };
       }) [
       "backup"
       "external"
       "offsite"
-      "photos"
-      "projects"
       "scratch"
-      "service"
-      "software"
     ])) //
     {
       media = {
@@ -33,6 +53,7 @@ let
         machine = "c1-1";
         path = "/home";
         target = "/home";
+        backup = [ "garage" "cloud" ];
       };
     };
   isLocal = name: let m = getAttr name mapping; in (m.machine == machine.hostName);
@@ -68,8 +89,27 @@ let
       };
       where = target name;
     };
+  scaledKeepFlags = base: scale:
+    let
+      daily = base;
+      weekly = ceil (base * scale / 7.0);
+      monthly = ceil (base * scale * scale / (365.0 / 12));
+      yearly = ceil (base * scale * scale * scale / 365.0);
+    in
+    [
+      "--keep-daily=${toString daily}"
+      "--keep-weekly=${toString weekly}"
+      "--keep-monthly=${toString monthly}"
+      "--keep-yearly=${toString yearly}"
+    ];
 in
 { lib, pkgs, ... }:
+let
+  backupPaths = {
+    garage = (lib.lists.flatten (map (name: if ((isLocal name) && (mapping.${name} ? backup) && (elem "garage" mapping.${name}.backup)) then [ (target name) ] else [ ]) (attrNames mapping)));
+  };
+in
+# trace (toJSON backupPaths.garage)
 {
   services.nfs.server.enable = true;
   services.rpcbind.enable = true;
@@ -89,4 +129,17 @@ in
   services.nfs.server.exports = lib.concatStrings (map (name: if (isLocal name) then (nfsExport name) else "") (attrNames mapping));
   systemd.mounts = lib.lists.flatten (map (name: if (isLocal name) then [ ] else [ (systemdMount name) ]) (attrNames mapping));
   systemd.automounts = lib.lists.flatten (map (name: if (isLocal name) then [ ] else [ (systemdAutomount name) ]) (attrNames mapping));
+
+  services.restic.backups =
+    if ((length backupPaths.garage) > 0) then {
+      garage = {
+        initialize = true;
+        paths = backupPaths.garage;
+        repository = "s3:http://garage.home.gustafson.me:3900/backup";
+        environmentFile = "/etc/nixos/.secrets/restic/garage/env";
+        passwordFile = "/etc/nixos/.secrets/restic/garage/password";
+        extraBackupArgs = [ "-v" "--compression=max" ];
+        pruneOpts = [ "-v" ] ++ (scaledKeepFlags 20 6);
+      };
+    } else { };
 }
