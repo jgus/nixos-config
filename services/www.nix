@@ -36,7 +36,7 @@
       environment = {
         URL = "gustafson.me";
         SUBDOMAINS = "www,homeassistant,komga,";
-        EXTRA_DOMAINS = "gushome.org,www.gushome.org";
+        # EXTRA_DOMAINS = "gushome.org,www.gushome.org";
         VALIDATION = "http";
         EMAIL = "joshgstfsn@gmail.com";
         PUID = toString config.users.users.www.uid;
@@ -56,8 +56,14 @@
         "${storagePath "swag_config"}/etc/letsencrypt:/config/etc/letsencrypt"
         "${storagePath "www"}:/config/www"
         "${storagePath "dav"}:/config/www/dav"
-        "/storage/photos/Published:/config/www/published:ro"
       ];
+    };
+    extraConfig = {
+      systemd.mounts = [{
+        what = "/storage/photos/Published";
+        where = "/service/www/published";
+        options = "rbind,uid=${toString config.users.users.www.uid},gid=${toString config.users.groups.www.gid},ro";
+      }];
     };
   }
 ]
