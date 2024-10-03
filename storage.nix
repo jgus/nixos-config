@@ -105,8 +105,10 @@ let
 in
 { lib, pkgs, ... }:
 let
+  backupPath = name: (lib.lists.flatten (map (i: if ((isLocal i) && (mapping.${i} ? backup) && (elem name mapping.${i}.backup)) then [ (target i) ] else [ ]) (attrNames mapping)));
   backupPaths = {
-    garage = (lib.lists.flatten (map (name: if ((isLocal name) && (mapping.${name} ? backup) && (elem "garage" mapping.${name}.backup)) then [ (target name) ] else [ ]) (attrNames mapping)));
+    garage = backupPath "garage";
+    cloud = backupPath "cloud";
   };
 in
 # trace (toJSON backupPaths.garage)
@@ -131,7 +133,7 @@ in
   systemd.automounts = lib.lists.flatten (map (name: if (isLocal name) then [ ] else [ (systemdAutomount name) ]) (attrNames mapping));
 
   services.restic.backups =
-    if ((length backupPaths.garage) > 0) then {
+    (if ((length backupPaths.garage) > 0) then {
       garage = {
         initialize = true;
         paths = backupPaths.garage;
@@ -141,5 +143,17 @@ in
         extraBackupArgs = [ "-v" "--compression=max" ];
         pruneOpts = [ "-v" ] ++ (scaledKeepFlags 20 6);
       };
-    } else { };
+    } else { })
+    //
+    (if ((length backupPaths.cloud) > 0) then {
+      cloud = {
+        initialize = true;
+        paths = backupPaths.cloud;
+        repository = "s3:https://s3.us-west-004.backblazeb2.com/jgus-backup";
+        environmentFile = "/etc/nixos/.secrets/restic/cloud/env";
+        passwordFile = "/etc/nixos/.secrets/restic/cloud/password";
+        extraBackupArgs = [ "-v" "--compression=max" ];
+        pruneOpts = [ "-v" ] ++ (scaledKeepFlags 10 6);
+      };
+    } else { });
 }
