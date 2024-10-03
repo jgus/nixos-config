@@ -149,9 +149,6 @@ let
       objectMasks = [ [ 3369 0 3840 0 3840 285 ] [ 331 0 0 0 0 287 ] ];
     };
   };
-in
-{ config, pkgs, lib, ... }:
-let
   configuration = {
     # logger.default = "debug";
     mqtt = {
@@ -192,7 +189,7 @@ let
     cameras = mapAttrs
       (key: value:
         let
-          numlist = (list: lib.strings.concatStringsSep "," (map toString list));
+          numlist = (list: concatStringsSep "," (map toString list));
           scaleList = (list: map (x: floor (x * value.scale)) list);
           motionMasks = map (list: numlist (scaleList list)) value.motionMask;
           objectMasks = map (list: numlist (scaleList list)) value.objectMasks;
@@ -235,6 +232,7 @@ let
       cameras;
   };
 in
+{ config, pkgs, ... }:
 {
   requires = [ "storage-frigate.mount" ];
   docker = {
