@@ -7,8 +7,7 @@ let
     width = 2560;
     height = 1920;
     detectStream = 0;
-    scale = 1;
-    motionMask = [ [ 2560 52 2560 0 1970 0 1970 52 ] ];
+    masks = [ [ 1 0.027 1 0 0.77 0 0.77 0.027 ] ];
   };
   amcrestIP8M = {
     user = "admin";
@@ -16,8 +15,7 @@ let
     width = 3840;
     height = 2160;
     detectStream = 2;
-    scale = 0.5;
-    motionMask = [ [ 2596 188 3696 188 3696 80 2596 80 ] ];
+    masks = [ [ 0.676 0.087 0.963 0.087 0.963 0.037 0.676 0.037 ] ];
   };
   empireTechT180 = {
     user = "admin";
@@ -25,133 +23,126 @@ let
     width = 4096;
     height = 1800;
     detectStream = 2;
-    scale = (1920.0 / 4096);
-    motionMask = [ [ 3020 154 3950 154 3950 76 3020 76 ] ];
+    masks = [ [ 0.737 0.087 0.964 0.087 0.964 0.042 0.737 0.042 ] ];
   };
   cameras = {
     doorbell-front = doorbell // {
-      motionMask = doorbell.motionMask ++ [
-        [ 764 226 2560 641 2560 880 2397 886 2135 1057 1418 1119 725 1132 ]
+      masks = doorbell.masks ++ [
+        [ 0.298 0.118 1 0.334 1 0.458 0.936 0.461 0.834 0.551 0.554 0.583 0.283 0.59 ]
       ];
       zones = {
-        porch = [ 0 1920 0 1457 860 1465 1039 1335 1818 1291 2275 1280 2560 1164 2560 1920 ];
-        front_yard = [ 2560 919 2428 909 2218 1047 1854 1078 1351 1112 738 1119 766 1436 849 1436 836 1304 1574 1283 1995 1249 2384 1205 2560 1143 ];
+        porch = [ 0 1 0 0.759 0.336 0.763 0.406 0.695 0.71 0.672 0.889 0.667 1 0.606 1 1 ];
+        front_yard = [ 1 0.479 0.948 0.473 0.866 0.545 0.724 0.561 0.528 0.579 0.288 0.583 0.299 0.748 0.332 0.748 0.327 0.679 0.615 0.668 0.779 0.651 0.931 0.628 1 0.595 ];
       };
-      objectMasks = [ [ 764 226 2560 641 2560 880 2397 886 2135 1057 1418 1119 725 1132 ] ];
     };
     camera-porch-n = amcrestIP8M // {
-      motionMask = amcrestIP8M.motionMask ++ [
-        [ 3485 0 3840 0 3840 225 ]
-        [ 985 0 305 0 375 209 ]
+      masks = amcrestIP8M.masks ++ [
+        [ 0.907 0 1 0 1 0.104 ]
+        [ 0.256 0 0.079 0 0.097 0.096 ]
       ];
       zones = {
-        porch = [ 573 1815 0 1223 0 315 293 72 551 592 940 1207 ];
-        front_yard = [ 1053 2160 3840 2160 3840 0 983 0 543 144 405 237 888 1117 1119 1255 716 1899 ];
+        porch = [ 0.149 0.84 0 0.566 0 0.145 0.076 0.033 0.143 0.274 0.245 0.558 ];
+        front_yard = [ 0.274 1 1 1 1 0 0.256 0 0.141 0.067 0.105 0.109 0.231 0.517 0.291 0.581 0.186 0.879 ];
       };
-      objectMasks = [ [ 3485 0 3840 0 3840 225 ] [ 985 0 305 0 375 209 ] ];
     };
     camera-porch-s = amcrestIP8M // {
-      motionMask = amcrestIP8M.motionMask ++ [
-        [ 826 0 245 0 401 284 ]
+      masks = amcrestIP8M.masks ++ [
+        [ 0.215 0 0.064 0 0.104 0.131 ]
       ];
       zones = {
-        porch = [ 1620 0 3840 0 3840 2160 824 2160 2051 704 1670 537 ];
-        front_yard = [ 666 836 347 0 1590 0 1616 469 1564 674 1905 824 1219 1662 ];
+        porch = [ 0.422 0 1 0 1 1 0.215 1 0.534 0.326 0.435 0.248 ];
+        front_yard = [ 0.173 0.387 0.09 0 0.414 0 0.421 0.217 0.407 0.312 0.496 0.381 0.317 0.769 ];
       };
-      objectMasks = [ [ 826 0 245 0 401 284 ] ];
     };
     camera-driveway = amcrestIP8M // {
-      motionMask = amcrestIP8M.motionMask ++ [
-        [ 3840 0 3840 874 2914 419 1969 134 1249 247 463 497 399 0 ]
+      masks = amcrestIP8M.masks ++ [
+        [ 1 0 1 0.405 0.759 0.194 0.512 0.062 0.325 0.114 0.12 0.23 0.104 0 ]
+        [ 0.755 0.294 0.853 0.374 0.841 0.276 0.808 0.245 ]
       ];
       zones = {
-        front_yard = [ 3481 686 3108 499 2821 652 2908 902 3299 1183 ];
-        driveway = [ 2867 2160 3313 1195 2908 912 2813 650 3104 499 2202 188 1632 193 499 505 772 1426 582 1522 969 2160 ];
+        front_yard = [ 0.906 0.318 0.809 0.231 0.734 0.302 0.757 0.418 0.859 0.547 ];
+        driveway = [ 0.746 1 0.863 0.553 0.757 0.422 0.732 0.301 0.808 0.231 0.573 0.087 0.425 0.089 0.13 0.233 0.201 0.66 0.152 0.705 0.252 1 ];
       };
-      objectMasks = [ [ 3840 0 3840 874 2914 419 1969 134 1249 247 463 497 399 0 ] ];
     };
     camera-garage-n = amcrestIP8M // {
       zones = {
-        garage = [ 0 2160 3840 2160 3840 1021 2292 26 2240 547 816 920 598 0 0 0 ];
+        garage = [ 0 1 1 1 1 0.472 0.597 0.012 0.583 0.253 0.212 0.426 0.156 0 0 0 ];
       };
     };
     camera-garage-s = amcrestIP8M // {
       zones = {
-        garage = [ 3840 0 3840 2160 0 2160 0 0 2649 0 2565 561 3240 983 3571 0 ];
+        garage = [ 1 0 1 1 0 1 0 0 0.437 0.029 0.668 0.259 0.844 0.455 0.93 0 ];
       };
     };
     camera-garage-rear = amcrestIP8M // {
-      motionMask = amcrestIP8M.motionMask ++ [
-        [ 2569 0 3840 0 3840 979 ]
+      masks = amcrestIP8M.masks ++ [
+        [ 0.669 0 1 0 1 0.453 ]
       ];
       zones = {
-        garage_rear = [ 2396 0 1279 0 600 176 1237 2160 2537 2160 3613 898 ];
+        garage_rear = [ 0.624 0 0.333 0 0.156 0.081 0.322 1 0.66 1 0.941 0.416 ];
       };
     };
     camera-s-side = amcrestIP8M // {
-      motionMask = amcrestIP8M.motionMask ++ [
-        [ 3840 0 0 0 0 582 991 265 1953 166 2900 223 3413 323 3648 463 3840 754 ]
+      masks = amcrestIP8M.masks ++ [
+        [ 1 0 0 0 0 0.269 0.258 0.122 0.508 0.077 0.755 0.103 0.889 0.149 0.95 0.214 1 0.349 ]
       ];
       zones = {
-        s_side = [ 0 2160 2298 2160 3262 1528 3633 1125 3012 253 1861 269 904 407 0 696 ];
+        s_side = [ 0 1 1 1 1 1 1 1 1 0.473 0.875 0.157 0.729 0.114 0.511 0.099 0.262 0.139 0 0.302 ];
       };
-      objectMasks = [ [ 3840 0 0 0 0 582 991 265 1953 166 2900 223 3413 323 3648 463 3840 754 ] ];
     };
     camera-pool = amcrestIP8M // {
-      motionMask = amcrestIP8M.motionMask ++ [
-        [ 3337 0 3840 0 3840 449 ]
-        [ 166 0 0 0 0 136 ]
+      masks = amcrestIP8M.masks ++ [
+        [ 0.869 0 1 0 1 0.207 ]
+        [ 0.043 0 0 0 0 0.063 ]
       ];
+      zones = {
+        back_yard = [ 0 1 0 0 1 0 1 1 ];
+      };
     };
     camera-back-yard = amcrestIP8M // {
-      motionMask = amcrestIP8M.motionMask ++ [
-        [ 866 0 0 609 0 0 ]
-        [ 2995 86 2608 0 3840 0 3840 730 ]
+      masks = amcrestIP8M.masks ++ [
+        [ 0.226 0 0 0.281 0 0 ]
+        [ 0.78 0.04 0.679 0 1 0 1 0.338 ]
       ];
       zones = {
-        patio = [ 3124 2160 3036 1855 2651 1919 2430 1039 1975 1037 1807 874 1472 940 1219 884 987 1031 481 2160 ];
-        back_yard = [ 822 1309 991 1011 1231 864 1811 864 1983 1033 2434 1031 2821 1121 3788 802 3042 156 1781 30 804 116 0 766 0 1185 ];
+        patio = [ 0.814 1 0.791 0.858 0.69 0.888 0.633 0.481 0.514 0.48 0.47 0.405 0.383 0.435 0.317 0.409 0.257 0.477 0.125 1 ];
+        back_yard = [ 0.214 0.606 0.258 0.468 0.32 0.4 0.471 0.4 0.516 0.478 0.634 0.477 0.734 0.519 0.986 0.371 0.792 0.072 0.464 0.014 0.209 0.054 0 0.355 0 0.548 ];
       };
-      objectMasks = [ [ 866 0 0 609 0 0 ] [ 2995 86 2608 0 3840 0 3840 730 ] ];
     };
     camera-patio = empireTechT180 // {
-      motionMask = empireTechT180.motionMask ++ [
-        [ 0 0 370 0 0 728 ]
-        [ 3681 251 3870 68 4030 415 3853 623 ]
+      masks = empireTechT180.masks ++ [
+        [ 0 0 0.09 0 0 0.41 ]
+        [ 0.898 0.141 0.945 0.037 0.984 0.233 0.941 0.351 ]
       ];
       zones = {
-        patio = [ 1375 0 2862 0 3126 617 3749 757 3964 1347 3415 1800 764 1800 377 1468 619 926 866 945 ];
+        patio = [ 0.335 0 0.698 0 0.763 0.347 0.915 0.425 0.968 0.758 0.833 1 0.186 1 0.092 0.827 0.151 0.522 0.211 0.531 ];
       };
     };
     doorbell-basement = doorbell // {
       zones = {
-        basement_patio = [ 0 1920 2560 1920 2560 719 584 857 0 823 ];
+        basement_patio = [ 1 1 1 0.037 0.841 0.388 0.716 0.404 0.246 0.434 0 0.415 0 1 0.275 1 ];
       };
     };
     camera-guest-patio = amcrestIP8M // {
-      motionMask = amcrestIP8M.motionMask ++ [
-        [ 3840 0 3453 0 3840 475 ]
+      masks = amcrestIP8M.masks ++ [
+        [ 1 0 0.899 0 1 0.219 ]
       ];
       zones = {
-        basement_patio = [ 928 2160 229 1344 606 600 1035 160 2288 82 2859 251 3449 620 3631 985 3840 1646 3840 2160 ];
+        basement_patio = [ 0.242 1 0.059 0.622 0.158 0.278 0.269 0.074 0.596 0.038 0.744 0.116 0.898 0.287 0.945 0.456 1 0.762 1 1 ];
       };
     };
     camera-n-side = amcrestIP8M // {
-      motionMask = amcrestIP8M.motionMask ++ [
-        [ 3369 0 3840 0 3840 285 ]
-        [ 331 0 0 0 0 287 ]
-        [ 1737 2160 1883 2160 2085 1779 1650 1574 1362 1935 ]
-        [ 2055 1153 2342 1283 2208 1530 1895 1400 ]
+      masks = amcrestIP8M.masks ++ [
+        [ 0.877 0 1 0 1 0.131 ]
+        [ 0.086 0 0 0 0 0.132 ]
+        [ 0.452 1 0.49 1 0.543 0.823 0.43 0.729 0.355 0.895 ]
+        [ 0.535 0.533 0.61 0.594 0.575 0.708 0.493 0.648 ]
       ];
       zones = {
-        n_side = [ 0 826 453 1444 1263 2160 2731 2160 3090 1500 3840 1785 3840 758 2134 0 592 0 0 555 ];
+        n_side = [ 0 0.382 0.118 0.669 0.329 1 0.711 1 0.805 0.694 1 0.826 1 0.351 0.556 0 0.154 0 0 0.256 ];
       };
-      objectMasks = [ [ 3369 0 3840 0 3840 285 ] [ 331 0 0 0 0 287 ] ];
     };
   };
-in
-{ config, pkgs, lib, ... }:
-let
   configuration = {
     # logger.default = "debug";
     mqtt = {
@@ -166,8 +157,7 @@ let
         threshold = 0.8;
       };
     };
-    # audio.enabled = true;
-    audio.enabled = false;
+    audio.enabled = true;
     detectors = {
       coral1 = { type = "edgetpu"; device = "pci:0"; };
       coral2 = { type = "edgetpu"; device = "pci:1"; };
@@ -192,10 +182,8 @@ let
     cameras = mapAttrs
       (key: value:
         let
-          numlist = (list: lib.strings.concatStringsSep "," (map toString list));
-          scaleList = (list: map (x: floor (x * value.scale)) list);
-          motionMasks = map (list: numlist (scaleList list)) value.motionMask;
-          objectMasks = map (list: numlist (scaleList list)) value.objectMasks;
+          numlist = (list: concatStringsSep "," (map toString list));
+          masks = map numlist value.masks;
         in
         {
           ffmpeg.inputs =
@@ -219,13 +207,13 @@ let
               ];
           record.enabled = true;
           snapshots.enabled = true;
-          motion.mask = motionMasks;
+          motion.mask = masks;
         } // (if (value ? zones) then {
-          zones = mapAttrs (key: value: { coordinates = numlist (scaleList value); }) value.zones;
-        } else { }) // (if (value ? objectMasks) then {
+          zones = mapAttrs (key: value: { coordinates = numlist value; }) value.zones;
+        } else { }) // (if (value ? masks) then {
           objects.filters = {
-            car.mask = objectMasks;
-            person.mask = objectMasks;
+            car.mask = masks;
+            person.mask = masks;
           };
         } else { })
       )
@@ -235,6 +223,7 @@ let
       cameras;
   };
 in
+{ config, pkgs, ... }:
 {
   requires = [ "storage-frigate.mount" ];
   docker = {
