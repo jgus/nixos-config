@@ -104,9 +104,9 @@ let
     } //
     mapAttrs (k: v: { g = group.study; } // v) {
       printer = { id = 2; mac = "f4:81:39:e4:0a:83"; };
-      kitchen-lappy = { id = 10; mac = "74:e5:f9:e4:3f:59"; };
-      kayleigh-lappy-eth = { id = 20; mac = "b4:45:06:82:81:47"; };
-      kayleigh-lappy = { id = 21; mac = "f0:d4:15:30:c4:a6"; };
+      kitchen-lappy = { id = 3; mac = "74:e5:f9:e4:3f:59"; };
+      melissa-lappy-eth = { id = 10; mac = "b4:45:06:82:81:47"; };
+      melissa-lappy = { id = 11; mac = "f0:d4:15:30:c4:a6"; };
       john-lappy-eth = { id = 30; mac = "b4:45:06:82:81:46"; };
       john-lappy = { id = 31; mac = "f4:c8:8a:e8:8e:83"; };
       william-lappy-eth = { id = 40; mac = "b4:45:06:82:7e:db"; };
