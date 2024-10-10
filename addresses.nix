@@ -124,7 +124,7 @@ let
       game-room-tv = { g = 56; id = 1; mac = "a0:6a:44:0f:bd:83"; };
       theater-projector = { g = 59; id = 1; mac = "e0:da:dc:17:ec:ef"; };
       theater-preamp = { g = 59; id = 2; mac = "00:1b:7c:0b:21:fb"; };
-      theater-shield = { g = 59; id = 3; mac = "00:04:4b:a4:b0:84"; };
+      theater-shield = { g = 59; id = 3; mac = "3c:6d:66:08:af:01"; };
       theater-bluray = { g = 59; id = 5; mac = "34:31:7f:dd:db:9b"; };
       camera-garage-s = { g = 100; id = 16; mac = "9c:8e:cd:3d:72:89"; };
       camera-garage-n = { g = 100; id = 17; mac = "9c:8e:cd:3d:7c:0b"; };
