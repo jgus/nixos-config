@@ -115,19 +115,19 @@ let
       id = "server_climate";
       name = "Server Climate";
       host = "server-climate";
-      mac = "94:24:b8:6c:0f:41";
+      mac = "9424b86c0f41";
     }
     {
       id = "theater_climate_unit";
       name = "Theater Climate Unit";
       host = "theater-climate";
-      mac = "94:24:b8:6c:10:13";
+      mac = "9424b86c1013";
     }
     {
       id = "workshop_climate_unit";
       name = "Workshop Climate Unit";
       host = "workshop-climate";
-      mac = "94:24:b8:6d:47:92";
+      mac = "9424b86d4792";
     }
   ];
 in
@@ -295,6 +295,7 @@ in
                 port: 7000
                 mac: ${i.mac}
                 target_temp_step: 1
+                encryption_version: 2
                 # lights: input_boolean.${i.id}_lights
                 # xfan: input_boolean.${i.id}_xfan
                 # health: input_boolean.${i.id}_health
