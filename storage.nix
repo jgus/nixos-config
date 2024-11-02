@@ -137,7 +137,7 @@ in
       garage = {
         initialize = true;
         paths = backupPaths.garage;
-        repository = "s3:http://garage.home.gustafson.me:3900/backup";
+        repository = (readFile "/etc/nixos/.secrets/restic/garage/repository");
         environmentFile = "/etc/nixos/.secrets/restic/garage/env";
         passwordFile = "/etc/nixos/.secrets/restic/garage/password";
         extraBackupArgs = [ "-v" "--compression=max" ];
@@ -149,11 +149,11 @@ in
       cloud = {
         initialize = true;
         paths = backupPaths.cloud;
-        repository = "s3:https://s3.us-west-004.backblazeb2.com/jgus-backup";
+        repository = (readFile "/etc/nixos/.secrets/restic/cloud/repository");
         environmentFile = "/etc/nixos/.secrets/restic/cloud/env";
         passwordFile = "/etc/nixos/.secrets/restic/cloud/password";
         extraBackupArgs = [ "-v" "--compression=max" ];
-        pruneOpts = [ "-v" ] ++ (scaledKeepFlags 10 6);
+        pruneOpts = [ "-v" ] ++ (scaledKeepFlags 3 6);
       };
     } else { });
 }
