@@ -21,10 +21,13 @@ let
           after = (if machine.zfs then [ "zfs.target" ] else [ ]);
           path = [ pkgs.rsync ] ++ (if machine.zfs then [ pkgs.zfs ] else [ ]);
           script = ''
-            if ! [ -d ${path} ]
+            if ! [ -d "${path}" ]
             then
               ${if machine.zfs then "zfs create r/service/${name}" else "mkdir -p ${path}"}
-              rsync -arPW --delete ${backupPath}/ ${path}/
+              if [ -d "${backupPath}" ]
+              then
+                rsync -arPW --delete ${backupPath}/ ${path}/
+              fi
             fi
           '';
           serviceConfig = { Type = "oneshot"; };

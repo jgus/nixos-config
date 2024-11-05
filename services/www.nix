@@ -35,7 +35,7 @@
       ];
       environment = {
         URL = "gustafson.me";
-        SUBDOMAINS = "www,homeassistant,komga,";
+        SUBDOMAINS = "www,homeassistant,komga,drive,";
         # EXTRA_DOMAINS = "gushome.org,www.gushome.org";
         VALIDATION = "http";
         EMAIL = "joshgstfsn@gmail.com";
@@ -52,6 +52,7 @@
         "${./www/location-confs}:/config/nginx/location-confs"
         "${./www/proxy-confs/homeassistant.subdomain.conf}:/config/nginx/proxy-confs/homeassistant.subdomain.conf"
         "${./www/proxy-confs/komga.subdomain.conf}:/config/nginx/proxy-confs/komga.subdomain.conf"
+        "${./www/proxy-confs/owncloud.subdomain.conf}:/config/nginx/proxy-confs/owncloud.subdomain.conf"
         "${storagePath "swag_config"}/keys:/config/keys"
         "${storagePath "swag_config"}/etc/letsencrypt:/config/etc/letsencrypt"
         "${storagePath "www"}:/config/www"

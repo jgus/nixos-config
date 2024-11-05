@@ -25,6 +25,7 @@ let
           backup = [ "garage" ];
         };
       }) [
+      "owncloud"
       "software"
     ])) //
     (listToAttrs (map
