@@ -7,7 +7,7 @@ let
     {
       name = "zwave-${area}";
       docker = {
-        image = "zwavejs/zwave-js-ui";
+        image = "zwavejs/zwave-js-ui:9.26";
         environment = {
           TZ = config.time.timeZone;
         };
