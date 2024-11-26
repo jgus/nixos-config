@@ -44,7 +44,7 @@ in
       TZ = config.time.timeZone;
       WEBPASSWORD = pw.pihole;
       FTLCONF_LOCAL_IPV4 = addresses.records.${name}.ip;
-      PIHOLE_DNS_ = "1.1.1.1;1.0.0.1;8.8.8.8;8.8.4.4";
+      PIHOLE_DNS_ = "1.1.1.1;1.0.0.1;8.8.8.8;8.8.4.4;75.75.75.75;75.75.76.76";
       DNSSEC = "true";
       DHCP_ACTIVE = "true";
       DHCP_START = "172.22.200.1";
