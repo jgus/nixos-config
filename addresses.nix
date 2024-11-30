@@ -6,7 +6,7 @@ let
     prefix = "172.22.";
     prefixLength = 16;
     defaultGateway = prefix + "0.1";
-    prefix6 = "2001:55d:b00b::";
+    prefix6 = "2001:55d:b00b:1::";
     prefix6Length = 64;
     domain = "home.gustafson.me";
   };
