@@ -31,7 +31,7 @@ in
     domain = addresses.network.domain;
     nameservers = [ addresses.records.pihole.ip "1.1.1.1" "1.0.0.1" ];
     timeServers = [ "ntp.home.gustafson.me" ];
-    hosts = addresses.hosts;
+    hosts = addresses.hosts // addresses.hosts6;
     interfaces.lan0 = let m = addresses.records."${machine.hostName}"; in {
       macAddress = m.mac;
       ipv4.addresses = [{ address = m.ip; prefixLength = addresses.network.prefixLength; }];

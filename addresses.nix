@@ -181,7 +181,7 @@ let
         //
         (if (v ? dns) then { } else
         let
-          mac = lib.concatStrings [ "00:24:0b:16:" (toHex2 v.g) ":" (toHex2 v.id) ];
+          mac = if (v ? mac) then v.mac else (lib.concatStrings [ "00:24:0b:16:" (toHex2 v.g) ":" (toHex2 v.id) ]);
           ip6 = readFile (derivation {
             name = "ipv6";
             builder = "/bin/sh";
@@ -201,10 +201,25 @@ let
       [{ name = k; value = r.ip; }] ++ (if (r ? aliases) then (map (a: { name = a; value = r.ip; }) r.aliases) else [ ])
     )
     (attrNames records)));
+  nameToIp6 = listToAttrs (lib.lists.flatten (map
+    (k:
+      let r = (getAttr k records); in
+      if (r ? ip6) then ([{ name = k; value = r.ip6; }] ++ (if (r ? aliases) then (map (a: { name = a; value = r.ip6; }) r.aliases) else [ ])) else [ ]
+    )
+    (attrNames records)));
   names = attrNames nameToIp;
+  names6 = attrNames nameToIp6;
   serverNames = filter (n: (hasAttr n records) && (records."${n}" ? g) && (records."${n}".g == 1)) (attrNames records);
   ipToNames = lib.lists.groupBy (n: getAttr n nameToIp) names;
+  ip6ToNames = lib.lists.groupBy (n: getAttr n nameToIp6) names6;
   hosts = mapAttrs (key: value: lib.lists.flatten (map (e: [ e (e + "." + network.domain) ]) value)) ipToNames;
+  hosts6 = mapAttrs (key: value: lib.lists.flatten (map (e: [ e (e + "." + network.domain) ]) value)) ip6ToNames;
+  ipToIp6 = listToAttrs (lib.lists.flatten (map
+    (k:
+      let r = (getAttr k records); in
+      if (r ? ip6) then [{ name = r.ip; value = r.ip6; }] else [ ]
+    )
+    (attrNames records)));
   dhcpReservations = lib.lists.flatten [
     (map
       (k:
@@ -226,4 +241,4 @@ let
     "--dns-search=${network.domain}"
   ] ++ (map (n: "--add-host=${n}:${getAttr n nameToIp}") names) ++ (map (n: "--add-host=${n}.${network.domain}:${getAttr n nameToIp}") names);
 in
-{ inherit network group records nameToIp serverNames hosts dhcpReservations dockerOptions; }
+{ inherit network group records nameToIp ipToIp6 serverNames hosts hosts6 dhcpReservations dockerOptions; }

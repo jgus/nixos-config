@@ -17,7 +17,7 @@ let
     };
   };
   dnsmasqConf = {
-    dns = lib.concatStrings (map (ip: "host-record=" + (lib.concatStrings (map (s: "${s},") (getAttr ip addresses.hosts))) + ip + "\n") (attrNames addresses.hosts));
+    dns = lib.concatStrings (map (ip: "host-record=" + (lib.concatStrings (map (s: "${s},") (getAttr ip addresses.hosts))) + ip + (if ((hasAttr ip addresses.ipToIp6)) then ("," + addresses.ipToIp6.${ip}) else "") + "\n") (attrNames addresses.hosts));
     dhcp = lib.concatStrings (map (r: "dhcp-host=" + r.mac + "," + r.ip + "," + r.name + ",infinite\n") addresses.dhcpReservations);
     config = ''
       dhcp-option=option:ntp-server,${addresses.nameToIp.ntp}
