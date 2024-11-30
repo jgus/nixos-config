@@ -35,6 +35,7 @@ in
     interfaces.lan0 = let m = addresses.records."${machine.hostName}"; in {
       macAddress = m.mac;
       ipv4.addresses = [{ address = m.ip; prefixLength = addresses.network.prefixLength; }];
+      ipv6.addresses = [{ address = m.ip6; prefixLength = addresses.network.prefix6Length; }];
     };
     macvlans.lan0 = {
       interface = machine.lan-interface;

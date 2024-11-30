@@ -1,10 +1,13 @@
 with builtins;
 let
+  pkgs = import <nixpkgs> { };
   lib = import <nixpkgs/lib>;
   network = rec {
     prefix = "172.22.";
     prefixLength = 16;
     defaultGateway = prefix + "0.1";
+    prefix6 = "2001:55d:b00b::";
+    prefix6Length = 64;
     domain = "home.gustafson.me";
   };
   group = {
@@ -176,7 +179,18 @@ let
     (k: v:
       { ip = getIp k; }
         //
-        (if (v ? dns) then { } else { mac = lib.concatStrings [ "00:24:0b:16:" (toHex2 v.g) ":" (toHex2 v.id) ]; })
+        (if (v ? dns) then { } else
+        let
+          mac = lib.concatStrings [ "00:24:0b:16:" (toHex2 v.g) ":" (toHex2 v.id) ];
+          ip6 = readFile (derivation {
+            name = "ipv6";
+            builder = "/bin/sh";
+            args = [ "-c" "${pkgs.ipv6calc}/bin/ipv6calc --in prefix+mac --out ipv6addr --action prefixmac2ipv6 ${network.prefix6}/${toString network.prefix6Length} ${mac} | ${pkgs.coreutils}/bin/tr -d '\n' | ${pkgs.gnused}/bin/sed 's|/.*||' >$out" ];
+            system = builtins.currentSystem;
+          });
+        in
+        { inherit mac ip6; }
+        )
         //
         v
     )
