@@ -221,6 +221,7 @@ let
     "--mac-address=${records."${service}".mac}"
     "--hostname=${service}"
     "--ip=${records."${service}".ip}"
+    "--ip6=${records."${service}".ip6}"
     "--dns=${records.pihole.ip}"
     "--dns-search=${network.domain}"
   ] ++ (map (n: "--add-host=${n}:${getAttr n nameToIp}") names) ++ (map (n: "--add-host=${n}.${network.domain}:${getAttr n nameToIp}") names);
