@@ -283,7 +283,7 @@ in
           # { name = "${name}/input_boolean/${i.id}_health.yaml"; value = { text = ""; }; }
           # { name = "${name}/input_boolean/${i.id}_sleep.yaml"; value = { text = ""; }; }
           # { name = "${name}/input_boolean/${i.id}_powersave.yaml"; value = { text = ""; }; }
-          # { name = "${name}/input_boolean/${i.id}_eightdegheat.yaml"; value = { text = ""; }; }
+          { name = "${name}/input_boolean/${i.id}_eightdegheat.yaml"; value = { text = ""; }; }
           # { name = "${name}/input_boolean/${i.id}_air.yaml"; value = { text = ""; }; }
           {
             name = "${name}/climate/${i.id}.yaml";
@@ -301,7 +301,7 @@ in
                 # health: input_boolean.${i.id}_health
                 # sleep: input_boolean.${i.id}_sleep
                 # powersave: input_boolean.${i.id}_powersave
-                # eightdegheat: input_boolean.${i.id}_eightdegheat
+                eightdegheat: input_boolean.${i.id}_eightdegheat
                 # air: input_boolean.${i.id}_air
               '';
             };
