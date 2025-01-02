@@ -14,7 +14,7 @@ let
     nvidia = false;
     zfs = true;
     zfs-pools = [ ];
-    clamav = pw ? gmail;
+    clamav = pw ? smtp2go;
     imports = [ ];
   } // {
     d1 = {
