@@ -48,11 +48,11 @@
         "443"
       ];
       volumes = storagePath: [
-        "${./www/site-confs/default.conf}:/config/nginx/site-confs/default.conf"
-        "${./www/location-confs}:/config/nginx/location-confs"
-        "${./www/proxy-confs/homeassistant.subdomain.conf}:/config/nginx/proxy-confs/homeassistant.subdomain.conf"
-        "${./www/proxy-confs/komga.subdomain.conf}:/config/nginx/proxy-confs/komga.subdomain.conf"
-        "${./www/proxy-confs/owncloud.subdomain.conf}:/config/nginx/proxy-confs/owncloud.subdomain.conf"
+        "/etc/nixos/services/www/site-confs/default.conf:/config/nginx/site-confs/default.conf"
+        "/etc/nixos/services/www/location-confs:/config/nginx/location-confs"
+        "/etc/nixos/services/www/proxy-confs/homeassistant.subdomain.conf:/config/nginx/proxy-confs/homeassistant.subdomain.conf"
+        "/etc/nixos/services/www/proxy-confs/komga.subdomain.conf:/config/nginx/proxy-confs/komga.subdomain.conf"
+        "/etc/nixos/services/www/proxy-confs/owncloud.subdomain.conf:/config/nginx/proxy-confs/owncloud.subdomain.conf"
         "${storagePath "swag_config"}/keys:/config/keys"
         "${storagePath "swag_config"}/etc/letsencrypt:/config/etc/letsencrypt"
         "${storagePath "www"}:/config/www"
