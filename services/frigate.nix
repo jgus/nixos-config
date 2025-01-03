@@ -165,8 +165,8 @@ let
       # coral4 = { type = "edgetpu"; device = "usb:1"; };
     };
     record = {
-      retain = { days = 180; mode = "motion"; };
-      events.retain = { default = 365; mode = "active_objects"; };
+      retain = { days = 7; mode = "motion"; };
+      events.retain = { default = 60; mode = "active_objects"; };
     };
     ffmpeg = {
       hwaccel_args = "preset-nvidia-h264";
@@ -225,7 +225,7 @@ let
 in
 { config, pkgs, ... }:
 {
-  requires = [ "storage-frigate.mount" ];
+  requires = [ "storage-frigate.mount" "zfs-import-f.service" ];
   docker = {
     image = "ghcr.io/blakeblackshear/frigate:stable";
     environment = {
