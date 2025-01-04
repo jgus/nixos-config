@@ -101,7 +101,7 @@ in
         do
           for p in ${zpoolProperties}
           do
-            pub zpool/$i/$p "$(zpool get $p -H -o value $i | sed 's|%||g')"
+            pub zpool/$i/$p "$(zpool get $p -Hp -o value $i)"
           done
         done
       '' else "");
