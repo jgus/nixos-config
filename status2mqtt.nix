@@ -67,33 +67,33 @@ in
       ] ++ (if machine.zfs then [ zfs ] else [ ]);
       script = ''
         pub() {
-          local TOPIC=$1
-          local PAYLOAD=$2
-          mosquitto_pub -V 5 -h mqtt.home.gustafson.me -u server -P ${pw.mqtt.server} -t server/${machine.hostName}/''${TOPIC} -r -m ''${PAYLOAD}
+          local TOPIC="$1"
+          local PAYLOAD="$2"
+          mosquitto_pub -V 5 -h mqtt.home.gustafson.me -u server -P ${pw.mqtt.server} -t server/${machine.hostName}/''${TOPIC} -r -m "''${PAYLOAD}"
         }
 
         pub availability online
 
-        pub systemd/failed $(systemctl --failed -o json)
+        pub systemd/failed "$(systemctl --failed -o json)"
 
-        pub memory/used $(free -L | awk '{ print $6 }')
-        pub memory/free $(free -L | awk '{ print $8 }')
+        pub memory/used "$(free -L | awk '{ print $6 }')"
+        pub memory/free "$(free -L | awk '{ print $8 }')"
 
         df -x zfs -x tmpfs -x devtmpfs -x efivarfs -x nfs4 -x overlay | tail -n +2 | while read line
         do
-          NAME=$(echo ''${line} | awk '{print $1}' | sed 's|^/dev/||' | sed 's|/|_|g')
-          DEVICE=$(echo ''${line} | awk '{print $1}')
-          SIZE=$(echo ''${line} | awk '{print $2}')
-          USED=$(echo ''${line} | awk '{print $3}')
-          AVAILABLE=$(echo ''${line} | awk '{print $4}')
-          CAPACITY=$(echo ''${line} | awk '{print $5}' | sed 's|%||g')
-          MOUNT=$(echo ''${line} | awk '{print $6}')
-          pub drive/''${NAME}/device ''${DEVICE}
-          pub drive/''${NAME}/size $((SIZE*1024))
-          pub drive/''${NAME}/used $((USED*1024))
-          pub drive/''${NAME}/available $((AVAILABLE*1024))
-          pub drive/''${NAME}/capacity ''${CAPACITY}
-          pub drive/''${NAME}/mount ''${MOUNT}
+          NAME="$(echo ''${line} | awk '{print $1}' | sed 's|^/dev/||' | sed 's|/|_|g')"
+          DEVICE="$(echo ''${line} | awk '{print $1}')"
+          SIZE="$(echo ''${line} | awk '{print $2}')"
+          USED="$(echo ''${line} | awk '{print $3}')"
+          AVAILABLE="$(echo ''${line} | awk '{print $4}')"
+          CAPACITY="$(echo ''${line} | awk '{print $5}' | sed 's|%||g')"
+          MOUNT="$(echo ''${line} | awk '{print $6}')"
+          pub drive/''${NAME}/device "''${DEVICE}"
+          pub drive/''${NAME}/size "$((SIZE*1024))"
+          pub drive/''${NAME}/used "$((USED*1024))"
+          pub drive/''${NAME}/available "$((AVAILABLE*1024))"
+          pub drive/''${NAME}/capacity "''${CAPACITY}"
+          pub drive/''${NAME}/mount "''${MOUNT}"
         done
       ''
       + (if machine.zfs then ''
@@ -101,7 +101,7 @@ in
         do
           for p in ${zpoolProperties}
           do
-            pub zpool/$i/$p $(zpool get $p -H -o value $i | sed 's|%||g')
+            pub zpool/$i/$p "$(zpool get $p -H -o value $i | sed 's|%||g')"
           done
         done
       '' else "");
