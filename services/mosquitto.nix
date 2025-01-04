@@ -17,6 +17,9 @@ let
   aclFile = pkgs.writeText "acl.conf" ''
     user ha
     topic readwrite #
+    user server
+    topic readwrite server/#
+    topic readwrite homeassistant/#
     user frigate
     topic readwrite #
     user zigbee2mqtt
