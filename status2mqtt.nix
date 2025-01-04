@@ -48,7 +48,7 @@ in
       '' else "")
       + ''
 
-        mosquitto_pub -V 5 -h mqtt.home.gustafson.me -u server -P ${pw.mqtt.server} -t server/${machine.hostName}/availability -r -m online
+        systemctl start status2mqtt.service
 
         mosquitto_sub -V 5 -h mqtt.home.gustafson.me -u server -P ${pw.mqtt.server} -t server/${machine.hostName} --will-topic server/${machine.hostName}/availability --will-retain --will-payload offline
       '';
@@ -86,7 +86,7 @@ in
           SIZE=$(echo ''${line} | awk '{print $2}')
           USED=$(echo ''${line} | awk '{print $3}')
           AVAILABLE=$(echo ''${line} | awk '{print $4}')
-          CAPACITY=$(echo ''${line} | awk '{print $5}')
+          CAPACITY=$(echo ''${line} | awk '{print $5}' | sed 's|%||g')
           MOUNT=$(echo ''${line} | awk '{print $6}')
           pub drive/''${NAME}/device ''${DEVICE}
           pub drive/''${NAME}/size $((SIZE*1024))
@@ -101,7 +101,7 @@ in
         do
           for p in ${zpoolProperties}
           do
-            pub zpool/$i/$p $(zpool get $p -H -o value $i)
+            pub zpool/$i/$p $(zpool get $p -H -o value $i | sed 's|%||g')
           done
         done
       '' else "");
