@@ -50,7 +50,7 @@
       josh = {
         uid = 1001;
         isNormalUser = true;
-        extraGroups = [ "wheel" "www" "docker" "libvirtd" ];
+        extraGroups = [ "wheel" "www" "docker" "libvirtd" "davfs2" ];
         hashedPassword = "$y$j9T$ejqS3R1wFPz6VoSCPm6l31$e60wSoEFUtCCklzlwnCxdzre4vuNnmbJE8E/b6/tJ72";
         openssh.authorizedKeys.keyFiles = [ ./pubkeys/josh-ed25519 ./pubkeys/josh-rsa ];
       };
