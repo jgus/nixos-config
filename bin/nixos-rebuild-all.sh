@@ -7,7 +7,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" ; pwd)"
 source "${SCRIPT_DIR}/functions.sh"
 
 echo "#"
-echo "# Updating & Testing"
+echo "# Updating & Building"
 echo "#"
 
 on_all_servers "cd /etc/nixos; git pull && nixos-rebuild --upgrade build"
@@ -25,6 +25,6 @@ then
     on_all_servers "nixos-rebuild ${ARGS}"
 
     echo "#"
-    echo "# ${ARGS} successful"
+    echo "# nixos-rebuild ${ARGS} successful"
     echo "#"
 fi
