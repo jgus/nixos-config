@@ -13,7 +13,7 @@ echo "#"
 on_all_servers "cd /etc/nixos; git pull && nixos-rebuild --upgrade build"
 
 echo "#"
-echo "# Test successful"
+echo "# Build successful"
 echo "#"
 
 if [[ "x${ARGS}" != "x" ]]
@@ -25,6 +25,6 @@ then
     on_all_servers "nixos-rebuild ${ARGS}"
 
     echo "#"
-    echo "# Running successful"
+    echo "# ${ARGS} successful"
     echo "#"
 fi
