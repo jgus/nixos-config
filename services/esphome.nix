@@ -7,7 +7,7 @@ in
   name = "esphome";
   inherit user group;
   docker = {
-    image = "ghcr.io/esphome/esphome";
+    image = "ghcr.io/esphome/esphome:2024.11";
     environment = {
       PLATFORMIO_CORE_DIR = "/cache/.plattformio";
       PLATFORMIO_GLOBALLIB_DIR = "/cache/.plattformioLibs";
