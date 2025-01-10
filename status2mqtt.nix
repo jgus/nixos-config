@@ -2,7 +2,6 @@
 let
   pw = import ./.secrets/passwords.nix;
   machine = import ./machine.nix;
-  zpoolProperties = "health capacity size free allocated";
 in
 {
   systemd.services = {
@@ -13,36 +12,52 @@ in
       ] ++ (if machine.zfs then [ zfs ] else [ ]);
       script = ''
         advertize() {
-          local NAME="$1"
-          local PATH="$2"
-          local UNIQUE_ID="server_${machine.hostName}_$(echo $PATH | ${pkgs.gnused}/bin/sed 's|/|_|g')"
-          local PAYLOAD_JSON="{\"state_topic\":\"server/${machine.hostName}/$PATH\",\"name\":\"$NAME\",\"unique_id\":\"$UNIQUE_ID\",\"availability_topic\":\"server/${machine.hostName}/availability\",\"device\":{\"name\":\"Server ${machine.hostName}\",\"identifiers\":[\"server_${machine.hostName}\"]}}"
+          local UNIQUE_ID="server_${machine.hostName}_$(echo $TOPIC_PATH | ${pkgs.gnused}/bin/sed 's|/|_|g')"
+          local DEVICE_JSON="{\"name\":\"Server ${machine.hostName}\",\"identifiers\":[\"server_${machine.hostName}\"]}"
+          local PAYLOAD_JSON="{\"state_topic\":\"server/${machine.hostName}/$TOPIC_PATH\""
+          PAYLOAD_JSON="$PAYLOAD_JSON,\"name\":\"$NAME\""
+          PAYLOAD_JSON="$PAYLOAD_JSON,\"unique_id\":\"$UNIQUE_ID\""
+          PAYLOAD_JSON="$PAYLOAD_JSON,\"availability_topic\":\"server/${machine.hostName}/availability\""
+          PAYLOAD_JSON="$PAYLOAD_JSON,\"device\":$DEVICE_JSON"
+          if [[ "x$UNIT" != "x" ]]
+          then
+            PAYLOAD_JSON="$PAYLOAD_JSON,\"unit_of_measurement\":\"$UNIT\""
+          fi
+          PAYLOAD_JSON="$PAYLOAD_JSON}"
 
           ${pkgs.mosquitto}/bin/mosquitto_pub -V 5 -h mqtt.home.gustafson.me -u server -P ${pw.mqtt.server} -t homeassistant/sensor/server_${machine.hostName}/$UNIQUE_ID/config -r -m "$PAYLOAD_JSON"
         }
 
-        advertize "Failed Services" systemd/failed
+        NAME="Failed Services" TOPIC_PATH=systemd/failed advertize
 
-        advertize "Memory Used" memory/used
-        advertize "Memory Free" memory/free
+        NAME="Memory Used" TOPIC_PATH=memory/used UNIT="bytes" advertize
+        NAME="Memory Free" TOPIC_PATH=memory/free UNIT="bytes" advertize
 
-        df -x zfs -x tmpfs -x devtmpfs -x efivarfs -x nfs4 -x overlay | tail -n +2 | while read line
+        df -x zfs -x tmpfs -x devtmpfs -x efivarfs -x nfs4 -x overlay -x fuse | tail -n +2 | while read line
         do
-          NAME="$(echo ''${line} | awk '{print $1}' | sed 's|^/dev/||' | sed 's|/|_|g')"
-          advertize "Drive ''${NAME} Device" drive/''${NAME}/device
-          advertize "Drive ''${NAME} Size" drive/''${NAME}/size
-          advertize "Drive ''${NAME} Used" drive/''${NAME}/used
-          advertize "Drive ''${NAME} Available" drive/''${NAME}/available
-          advertize "Drive ''${NAME} Used %" drive/''${NAME}/capacity
-          advertize "Drive ''${NAME} Mount" drive/''${NAME}/mount
+          DNAME="$(echo ''${line} | awk '{print $1}' | sed 's|^/dev/||' | sed 's|/|_|g')"
+          NAME="Drive ''${DNAME} Device" TOPIC_PATH=drive/''${DNAME}/device advertize
+          NAME="Drive ''${DNAME} Size" TOPIC_PATH=drive/''${DNAME}/size UNIT="bytes" advertize
+          NAME="Drive ''${DNAME} Used" TOPIC_PATH=drive/''${DNAME}/used UNIT="bytes" advertize
+          NAME="Drive ''${DNAME} Available" TOPIC_PATH=drive/''${DNAME}/available UNIT="bytes" advertize
+          NAME="Drive ''${DNAME} Used %" TOPIC_PATH=drive/''${DNAME}/capacity UNIT="%" advertize
+          NAME="Drive ''${DNAME} Mount" TOPIC_PATH=drive/''${DNAME}/mount advertize
         done
       ''
       + (if machine.zfs then ''
         for i in $(zpool list -H -o name)
         do
-          for p in ${zpoolProperties}
+          for p in health
           do
-            advertize "ZPool $i $p" zpool/$i/$p
+            NAME="ZPool $i $p" TOPIC_PATH=zpool/$i/$p advertize
+          done
+          for p in capacity
+          do
+            NAME="ZPool $i $p" TOPIC_PATH=zpool/$i/$p UNIT="%" advertize
+          done
+          for p in size free allocated
+          do
+            NAME="ZPool $i $p" TOPIC_PATH=zpool/$i/$p UNIT="bytes" advertize
           done
         done
       '' else "")
@@ -99,7 +114,7 @@ in
       + (if machine.zfs then ''
         for i in $(zpool list -H -o name)
         do
-          for p in ${zpoolProperties}
+          for p in health capacity size free allocated
           do
             pub zpool/$i/$p "$(zpool get $p -Hp -o value $i)"
           done
