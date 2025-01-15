@@ -227,7 +227,12 @@ in
                       attribute: current_position
                       for:
                         seconds: 10
-                  condition: "{{ ([trigger.from_state.attributes.current_position | int, trigger.to_state.attributes.current_position | int, states('input_number.${i}_auto_target') | int] | sort)[1] != (trigger.to_state.attributes.current_position | int) }}"
+                  condition: >-
+                    {% if ("current_position" not in trigger.from_state.attributes) or ("current_position" not in trigger.to_state.attributes) %}
+                      false
+                    {% else %}
+                      {{ ([trigger.from_state.attributes.current_position | int, trigger.to_state.attributes.current_position | int, states('input_number.${i}_auto_target') | int] | sort)[1] != (trigger.to_state.attributes.current_position | int) }}
+                    {% endif %}
                   action:
                     - service: input_boolean.turn_on
                       target:
