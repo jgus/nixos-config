@@ -63,7 +63,4 @@ in
       "--cap-add=NET_ADMIN"
     ];
   };
-  extraConfig = {
-    fileSystems."/storage/tmp" = { device = "tmpfs"; fsType = "tmpfs"; };
-  };
 }

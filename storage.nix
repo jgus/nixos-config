@@ -40,6 +40,7 @@ let
       "external"
       "offsite"
       "scratch"
+      "tmp"
     ])) //
     {
       media = {
@@ -128,7 +129,9 @@ in
     nfs-utils
   ];
 
-  fileSystems = listToAttrs (lib.lists.flatten (map (name: if (isLocal name) then (bindMount name) else [ ]) (attrNames mapping)));
+  fileSystems =
+    listToAttrs (lib.lists.flatten (map (name: if (isLocal name) then (bindMount name) else [ ]) (attrNames mapping)))
+    // (if (isLocal "tmp") then { "/storage/tmp" = { device = "tmpfs"; fsType = "tmpfs"; }; } else { });
   services.nfs.server.exports = lib.concatStrings (map (name: if (isLocal name) then (nfsExport name) else "") (attrNames mapping));
   systemd.mounts = lib.lists.flatten (map (name: if (isLocal name) then [ ] else [ (systemdMount name) ]) (attrNames mapping));
   systemd.automounts = lib.lists.flatten (map (name: if (isLocal name) then [ ] else [ (systemdAutomount name) ]) (attrNames mapping));
