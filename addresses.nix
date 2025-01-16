@@ -54,9 +54,10 @@ let
       pi-67dc75 = { id = 68; aliases = [ "zwave-basement-pi" ]; };
     } //
     mapAttrs (k: v: { g = group.home-automation; } // v) {
+      sensor-hub-1 = { id = 2; mac = "70:b8:f6:9b:f3:83"; };
       zigbee = { id = 6; mac = "b0:a7:32:05:7d:f3"; };
-      smartwings-n = { id = 15; mac = "64:b7:08:17:38:53"; };
-      smartwings-s = { id = 16; mac = "08:3a:8d:b2:be:e3"; };
+      # smartwings-n = { id = 15; mac = "64:b7:08:17:38:53"; };
+      # smartwings-s = { id = 16; mac = "08:3a:8d:b2:be:e3"; };
       somfy = { id = 17; mac = "00:0e:c6:aa:0a:86"; };
     } //
     mapAttrs (k: v: { g = group.services; } // v) {
