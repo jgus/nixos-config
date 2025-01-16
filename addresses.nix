@@ -176,6 +176,12 @@ let
     doorbell-front = { ip = "172.21.118.2"; };
     doorbell-basement = { ip = "172.21.120.2"; };
   };
+  macToIp6 = mac: readFile (derivation {
+    name = "ipv6";
+    builder = "/bin/sh";
+    args = [ "-c" "${pkgs.ipv6calc}/bin/ipv6calc --in prefix+mac --out ipv6addr --action prefixmac2ipv6 ${network.prefix6}/${toString network.prefix6Length} ${mac} | ${pkgs.coreutils}/bin/tr -d '\n' | ${pkgs.gnused}/bin/sed 's|/.*||' >$out" ];
+    system = builtins.currentSystem;
+  });
   records = (mapAttrs
     (k: v:
       { ip = getIp k; }
@@ -183,12 +189,7 @@ let
         (if (v ? dns) then { } else
         let
           mac = if (v ? mac) then v.mac else (lib.concatStrings [ "00:24:0b:16:" (toHex2 v.g) ":" (toHex2 v.id) ]);
-          ip6 = readFile (derivation {
-            name = "ipv6";
-            builder = "/bin/sh";
-            args = [ "-c" "${pkgs.ipv6calc}/bin/ipv6calc --in prefix+mac --out ipv6addr --action prefixmac2ipv6 ${network.prefix6}/${toString network.prefix6Length} ${mac} | ${pkgs.coreutils}/bin/tr -d '\n' | ${pkgs.gnused}/bin/sed 's|/.*||' >$out" ];
-            system = builtins.currentSystem;
-          });
+          ip6 = macToIp6 mac;
         in
         { inherit mac ip6; }
         )
@@ -196,18 +197,24 @@ let
         v
     )
     records-conf) // iot;
-  nameToIp = listToAttrs (lib.lists.flatten (map
+  hostedNames = filter (n: (getAttr n records) ? host) (attrNames records);
+  assignedAliasList = lib.lists.flatten (map (n: let r = (getAttr n records); in (if (r ? aliases) then (map (a: { name = a; value = n; }) r.aliases) else [ ])) (attrNames records));
+  hostAliasList = map (n: let r = (getAttr n records); in { name = "${n}-host"; value = r.host; }) hostedNames;
+  aliases = listToAttrs (assignedAliasList ++ hostAliasList);
+  realNameToIp = listToAttrs (lib.lists.flatten (map
     (k:
       let r = (getAttr k records); in
       [{ name = k; value = r.ip; }] ++ (if (r ? aliases) then (map (a: { name = a; value = r.ip; }) r.aliases) else [ ])
     )
     (attrNames records)));
-  nameToIp6 = listToAttrs (lib.lists.flatten (map
+  nameToIp = realNameToIp // (mapAttrs (k: v: getAttr v realNameToIp) aliases);
+  realNameToIp6 = listToAttrs (lib.lists.flatten (map
     (k:
       let r = (getAttr k records); in
       if (r ? ip6) then ([{ name = k; value = r.ip6; }] ++ (if (r ? aliases) then (map (a: { name = a; value = r.ip6; }) r.aliases) else [ ])) else [ ]
     )
     (attrNames records)));
+  nameToIp6 = realNameToIp6 // (mapAttrs (k: v: getAttr v realNameToIp6) aliases);
   names = attrNames nameToIp;
   names6 = attrNames nameToIp6;
   serverNames = filter (n: (hasAttr n records) && (records."${n}" ? g) && (records."${n}".g == 1)) (attrNames records);
