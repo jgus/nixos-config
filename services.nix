@@ -34,7 +34,7 @@ let
         };
         "service-storage-${name}-backup" = {
           path = [ pkgs.rsync ];
-          script = "rsync -arPW --delete ${path}/ ${backupPath}/";
+          script = "(r=5; while ! rsync -arPW --delete ${path}/ ${backupPath}/; do ((--r))||exit; sleep 60; done)";
           serviceConfig = { Type = "exec"; };
           startAt = "hourly";
         };
