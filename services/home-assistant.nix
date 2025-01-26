@@ -134,21 +134,40 @@ let
   light_groups = {
     great_room = [
       "light.dining_room_light"
+      "light.dining_room_switch_virtual"
       "light.great_room_light"
+      "light.great_room_switch_virtual_e"
+      "light.great_room_switch_virtual_s"
+      "light.great_room_switch_virtual_w"
       "light.loft_light"
       "light.main_hall_light"
+      "light.main_hall_switch_virtual_c"
+      "light.main_hall_switch_virtual_n"
       "light.stair_lights"
+      "light.stairs_switch_virtual"
       "light.upstairs_hall_east_light"
       "light.upstairs_hall_north_light"
+      "light.upstairs_hall_north_switch_virtual_n"
+      "light.upstairs_hall_north_switch_virtual_s"
     ];
   };
   device_ids = {
     "light.dining_room_light" = "e1590e93793f8a474586e38dfb4ac92b";
+    "light.dining_room_switch_virtual" = "612e6c3ea0dd262fd0f5d576222bc51d";
     "light.great_room_light" = "f4590329c3ef0b500910721f23162451";
+    "light.great_room_switch_virtual_e" = "d62ae3c5c11c2971b89b0d257776e7ad";
+    "light.great_room_switch_virtual_s" = "a7cdf2bd153b628a7c8965ea8a944e28";
+    "light.great_room_switch_virtual_w" = "d1cba419cc50f544714a950bee822436";
     "light.loft_light" = "c3ca6b4a3f527f4a03d850844948db66";
     "light.main_hall_light" = "5accedf8ff58eeeb44c8e7afcfb497b1";
+    "light.main_hall_switch_virtual_c" = "051537710dbd32b63bde7d8f993c692e";
+    "light.main_hall_switch_virtual_n" = "29f3d260c0c67fce1236717096a6257d";
+    "light.stair_lights" = null;
+    "light.stairs_switch_virtual" = "a2af70357e94775f40f9332628ff0123";
     "light.upstairs_hall_east_light" = "def24a95c302daa49ca40cd50139cd1f";
     "light.upstairs_hall_north_light" = "256bc73b6c63fac342e6936f7187fb58";
+    "light.upstairs_hall_north_switch_virtual_n" = "b0dd43b9273d7b0ccde86cfd1dead619";
+    "light.upstairs_hall_north_switch_virtual_s" = "1c74e3a6baf321724a557775e3c20cbc";
   };
 in
 { config, pkgs, lib, ... }:
@@ -191,29 +210,35 @@ in
               event = "start";
               id = "setup";
             }];
-          actions = (map
+          actions = lib.lists.flatten (map
             (entity_id:
               let
                 device_id = (getAttr entity_id device_ids);
-                notification_id = "nix_device_id_incorrect_${replaceStrings ["."] ["_"] entity_id}";
               in
-              {
-                "if" = "{{ device_id('${entity_id}') == '${device_id}' }}";
-                "then" = [{
-                  action = "persistent_notification.dismiss";
-                  data = {
-                    inherit notification_id;
-                  };
-                }];
-                "else" = [{
-                  action = "persistent_notification.create";
-                  data = {
-                    message = "Entry should be: \"${entity_id}\" = \"{{ device_id('${entity_id}') }}\";";
-                    title = "Nix Device ID Map is incorrect for ${entity_id}";
-                    inherit notification_id;
-                  };
-                }];
-              }
+              if (device_id == null) then [ ] else [
+                (
+                  let
+                    notification_id = "nix_device_id_incorrect_${replaceStrings ["."] ["_"] entity_id}";
+                  in
+                  {
+                    "if" = "{{ device_id('${entity_id}') == '${device_id}' }}";
+                    "then" = [{
+                      action = "persistent_notification.dismiss";
+                      data = {
+                        inherit notification_id;
+                      };
+                    }];
+                    "else" = [{
+                      action = "persistent_notification.create";
+                      data = {
+                        message = "Entry should be: \"${entity_id}\" = \"{{ device_id('${entity_id}') }}\";";
+                        title = "Nix Device ID Map is incorrect for ${entity_id}";
+                        inherit notification_id;
+                      };
+                    }];
+                  }
+                )
+              ]
             )
             (attrNames device_ids));
         };
@@ -383,7 +408,7 @@ in
         k:
         let
           entities = (getAttr k light_groups);
-          devices = lib.lists.flatten (map (e: if (hasAttr e device_ids) then [ (getAttr e device_ids) ] else [ ]) entities);
+          devices = lib.lists.flatten (map (e: if ((getAttr e device_ids) != null) then [ (getAttr e device_ids) ] else [ ]) entities);
         in
         [
           {
@@ -394,7 +419,7 @@ in
                 unique_id = "${k}_light_group";
                 name = "${k} Light Group";
                 all = true;
-                entities = entities;
+                entities = filter (e: (match ".*_virtual.*" e) == null) entities;
               };
             };
           }
