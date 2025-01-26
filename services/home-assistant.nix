@@ -1,3 +1,4 @@
+with builtins;
 let
   pw = import ./../.secrets/passwords.nix;
   name = "home-assistant";
@@ -130,6 +131,25 @@ let
       mac = "9424b86d4792";
     }
   ];
+  light_groups = {
+    great_room = [
+      "light.dining_room_light"
+      "light.great_room_light"
+      "light.loft_light"
+      "light.main_hall_light"
+      "light.stair_lights"
+      "light.upstairs_hall_east_light"
+      "light.upstairs_hall_north_light"
+    ];
+  };
+  device_ids = {
+    "light.dining_room_light" = "e1590e93793f8a474586e38dfb4ac92b";
+    "light.great_room_light" = "f4590329c3ef0b500910721f23162451";
+    "light.loft_light" = "c3ca6b4a3f527f4a03d850844948db66";
+    "light.main_hall_light" = "5accedf8ff58eeeb44c8e7afcfb497b1";
+    "light.upstairs_hall_east_light" = "def24a95c302daa49ca40cd50139cd1f";
+    "light.upstairs_hall_north_light" = "256bc73b6c63fac342e6936f7187fb58";
+  };
 in
 { config, pkgs, lib, ... }:
 let
@@ -159,7 +179,48 @@ in
     ];
   };
   extraConfig = {
-    environment.etc = builtins.listToAttrs
+    environment.etc = {
+      "${name}/automation/verify_device_ids.yaml" = {
+        source = (pkgs.formats.yaml { }).generate "verify_device_ids.yaml" {
+          id = "verify_device_ids";
+          alias = "Verify Nix Device ID Map";
+          mode = "single";
+          triggers =
+            [{
+              trigger = "homeassistant";
+              event = "start";
+              id = "setup";
+            }];
+          actions = (map
+            (entity_id:
+              let
+                device_id = (getAttr entity_id device_ids);
+                notification_id = "nix_device_id_incorrect_${replaceStrings ["."] ["_"] entity_id}";
+              in
+              {
+                "if" = "{{ device_id('${entity_id}') == '${device_id}' }}";
+                "then" = [{
+                  action = "persistent_notification.dismiss";
+                  data = {
+                    inherit notification_id;
+                  };
+                }];
+                "else" = [{
+                  action = "persistent_notification.create";
+                  data = {
+                    message = "Entry should be: \"${entity_id}\" = \"{{ device_id('${entity_id}') }}\";";
+                    title = "Nix Device ID Map is incorrect for ${entity_id}";
+                    inherit notification_id;
+                  };
+                }];
+              }
+            )
+            (attrNames device_ids));
+        };
+      };
+    }
+    //
+    listToAttrs
       (lib.lists.flatten (map
         (
           i: [
@@ -263,8 +324,9 @@ in
             }
           ]
         )
-        shades)) //
-    builtins.listToAttrs (lib.lists.flatten (map
+        shades))
+    //
+    listToAttrs (lib.lists.flatten (map
       (
         i: lib.lists.flatten (map
           (
@@ -279,8 +341,9 @@ in
           )
           cec_map)
       )
-      theater_devices)) //
-    builtins.listToAttrs (lib.lists.flatten (map
+      theater_devices))
+    //
+    listToAttrs (lib.lists.flatten (map
       (
         i: [
           # { name = "${name}/input_boolean/${i.id}_lights.yaml"; value = { text = ""; }; }
@@ -313,6 +376,124 @@ in
           }
         ]
       )
-      gree_climate_devices));
+      gree_climate_devices))
+    //
+    listToAttrs (lib.lists.flatten (map
+      (
+        k:
+        let
+          entities = (getAttr k light_groups);
+          devices = lib.lists.flatten (map (e: if (hasAttr e device_ids) then [ (getAttr e device_ids) ] else [ ]) entities);
+        in
+        [
+          {
+            name = "${name}/light/${k}_light_group.yaml";
+            value = {
+              source = (pkgs.formats.yaml { }).generate "${k}_light_group.yaml" {
+                platform = "group";
+                unique_id = "${k}_light_group";
+                name = "${k} Light Group";
+                all = true;
+                entities = entities;
+              };
+            };
+          }
+          {
+            name = "${name}/automation/${k}_light_group.yaml";
+            value = {
+              source = (pkgs.formats.yaml { }).generate "${k}_light_group.yaml" {
+                id = "${k}_light_group";
+                alias = "${k} Light Group";
+                mode = "restart";
+                triggers =
+                  [{
+                    trigger = "homeassistant";
+                    event = "start";
+                    id = "setup";
+                  }]
+                  ++
+                  (map
+                    (i: {
+                      device_id = i;
+                      domain = "zwave_js";
+                      type = "event.value_notification.central_scene";
+                      property = "scene";
+                      property_key = "001";
+                      endpoint = 0;
+                      command_class = 91;
+                      subtype = "Endpoint 0 Scene 001";
+                      trigger = "device";
+                      value = 3;
+                      id = "on";
+                    })
+                    devices)
+                  ++
+                  (map
+                    (i: {
+                      device_id = i;
+                      domain = "zwave_js";
+                      type = "event.value_notification.central_scene";
+                      property = "scene";
+                      property_key = "002";
+                      endpoint = 0;
+                      command_class = 91;
+                      subtype = "Endpoint 0 Scene 002";
+                      trigger = "device";
+                      value = 3;
+                      id = "off";
+                    })
+                    devices);
+                actions = [{
+                  choose = [
+                    {
+                      conditions = [{ condition = "trigger"; id = [ "setup" ]; }];
+                      sequence = (map
+                        (i: {
+                          action = "zwave_js.set_config_parameter";
+                          data = {
+                            device_id = devices;
+                          } // i;
+                        }) [
+                        {
+                          parameter = 32; # LED Indicator: Confirm Configuration Change
+                          value = 1; # Disable
+                        }
+                        {
+                          parameter = 12; # Double-Tap Upper Paddle Behavior
+                          value = 3; # Disable
+                        }
+                        {
+                          parameter = 13; # Scene Control
+                          value = 1; # Enable
+                        }
+                        {
+                          parameter = 26; # Local Programming
+                          value = 1; # Disable
+                        }
+                      ]);
+                    }
+                    {
+                      conditions = [{ condition = "trigger"; id = [ "on" ]; }];
+                      sequence = [{
+                        action = "light.turn_on";
+                        data = { brightness_pct = "100"; };
+                        target = { entity_id = "light.${k}_light_group"; };
+                      }];
+                    }
+                    {
+                      conditions = [{ condition = "trigger"; id = [ "off" ]; }];
+                      sequence = [{
+                        action = "light.turn_off";
+                        target = { entity_id = "light.${k}_light_group"; };
+                      }];
+                    }
+                  ];
+                }];
+              };
+            };
+          }
+        ]
+      )
+      (attrNames light_groups)));
   };
 }
