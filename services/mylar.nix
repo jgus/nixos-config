@@ -22,8 +22,8 @@ in
       "/storage/scratch/peer:/peer"
       "/storage/scratch/usenet:/usenet"
     ];
-    extraOptions = [
-      "--tmpfs=/config/mylar/cache"
-    ];
+    # extraOptions = [
+    #   "--tmpfs=/config/mylar/cache"
+    # ];
   };
 }
