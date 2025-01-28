@@ -132,7 +132,7 @@ let
     }
   ];
   light_groups = {
-    great_room = [
+    "Great Room" = [
       "light.dining_room_light"
       "light.dining_room_switch_virtual"
       "light.great_room_light"
@@ -407,16 +407,17 @@ in
       (
         k:
         let
+          group_id = "${replaceStrings [" "] ["_"] (lib.strings.toLower k)}_light_group";
           entities = (getAttr k light_groups);
           devices = lib.lists.flatten (map (e: if ((getAttr e device_ids) != null) then [ (getAttr e device_ids) ] else [ ]) entities);
         in
         [
           {
-            name = "${name}/light/${k}_light_group.yaml";
+            name = "${name}/light/${group_id}.yaml";
             value = {
-              source = (pkgs.formats.yaml { }).generate "${k}_light_group.yaml" {
+              source = (pkgs.formats.yaml { }).generate "${group_id}.yaml" {
                 platform = "group";
-                unique_id = "${k}_light_group";
+                unique_id = "${group_id}";
                 name = "${k} Light Group";
                 all = true;
                 entities = filter (e: (match ".*_virtual.*" e) == null) entities;
@@ -424,10 +425,10 @@ in
             };
           }
           {
-            name = "${name}/automation/${k}_light_group.yaml";
+            name = "${name}/automation/${group_id}.yaml";
             value = {
-              source = (pkgs.formats.yaml { }).generate "${k}_light_group.yaml" {
-                id = "${k}_light_group";
+              source = (pkgs.formats.yaml { }).generate "${group_id}.yaml" {
+                id = "${group_id}";
                 alias = "${k} Light Group";
                 mode = "restart";
                 triggers =
@@ -502,14 +503,14 @@ in
                       sequence = [{
                         action = "light.turn_on";
                         data = { brightness_pct = "100"; };
-                        target = { entity_id = "light.${k}_light_group"; };
+                        target = { entity_id = "light.${group_id}"; };
                       }];
                     }
                     {
                       conditions = [{ condition = "trigger"; id = [ "off" ]; }];
                       sequence = [{
                         action = "light.turn_off";
-                        target = { entity_id = "light.${k}_light_group"; };
+                        target = { entity_id = "light.${group_id}"; };
                       }];
                     }
                   ];
