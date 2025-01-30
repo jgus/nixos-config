@@ -62,8 +62,6 @@ in
   services = {
     davfs2.enable = true;
 
-    ntp.enable = true;
-
     openssh = {
       enable = true;
       openFirewall = true;
