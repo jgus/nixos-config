@@ -35,7 +35,7 @@
       ];
       environment = {
         URL = "gustafson.me";
-        SUBDOMAINS = "www,homeassistant,komga,drive,";
+        SUBDOMAINS = "www,homeassistant,komga,drive,office,";
         # EXTRA_DOMAINS = "gushome.org,www.gushome.org";
         VALIDATION = "http";
         EMAIL = "joshgstfsn@gmail.com";
@@ -50,9 +50,11 @@
       volumes = storagePath: [
         "/etc/nixos/services/www/site-confs/default.conf:/config/nginx/site-confs/default.conf"
         "/etc/nixos/services/www/location-confs:/config/nginx/location-confs"
-        "/etc/nixos/services/www/proxy-confs/homeassistant.subdomain.conf:/config/nginx/proxy-confs/homeassistant.subdomain.conf"
-        "/etc/nixos/services/www/proxy-confs/komga.subdomain.conf:/config/nginx/proxy-confs/komga.subdomain.conf"
-        "/etc/nixos/services/www/proxy-confs/owncloud.subdomain.conf:/config/nginx/proxy-confs/owncloud.subdomain.conf"
+      ]
+      ++
+      (map (i: "/etc/nixos/services/www/proxy-confs/${i}.subdomain.conf:/config/nginx/proxy-confs/${i}.subdomain.conf") [ "homeassistant" "komga" "owncloud" "onlyoffice" ])
+      ++
+      [
         "${storagePath "swag_config"}/keys:/config/keys"
         "${storagePath "swag_config"}/etc/letsencrypt:/config/etc/letsencrypt"
         "${storagePath "www"}:/config/www"
