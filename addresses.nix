@@ -70,9 +70,10 @@ let
       web-swag = { id = 20; host = "c1-2"; };
       web-db = { id = 21; host = "c1-2"; aliases = [ "db" ]; };
       web-db-admin = { id = 22; host = "c1-2"; };
-      owncloud = { id = 23; host = "c1-1"; };
+      owncloud = { id = 23; host = "c1-1"; aliases = [ "drive" ]; };
       owncloud-db = { id = 24; host = "c1-1"; };
       owncloud-redis = { id = 25; host = "c1-1"; };
+      onlyoffice = { id = 26; host = "c1-2"; aliases = [ "office" ]; };
       home-assistant = { id = 30; host = "b1"; aliases = [ "homeassistant" "ha" ]; };
       esphome = { id = 31; host = "c1-2"; };
       mosquitto = { id = 32; host = "b1"; aliases = [ "mqtt" ]; };
