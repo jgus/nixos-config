@@ -78,7 +78,7 @@ let
     let m = getAttr name mapping; in {
       type = "nfs";
       mountConfig = {
-        Options = "noatime";
+        Options = "noatime,bg";
       };
       what = "${m.machine}:${m.path}";
       where = target name;
