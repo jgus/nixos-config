@@ -150,6 +150,15 @@ let
       "light.upstairs_hall_north_switch_virtual_n"
       "light.upstairs_hall_north_switch_virtual_s"
     ];
+    "Kitchen" = [
+      "light.kitchen_leds"
+      "light.kitchen_light"
+      "light.kitchen_pendant_light"
+      "light.kitchen_switch_virtual_nw"
+      "light.kitchen_switch_virtual_se"
+      "light.kitchen_switch_virtual_sw"
+      "light.range_hood_light"
+    ];
   };
   device_ids = {
     "light.dining_room_light" = "e1590e93793f8a474586e38dfb4ac92b";
@@ -158,10 +167,17 @@ let
     "light.great_room_switch_virtual_e" = "d62ae3c5c11c2971b89b0d257776e7ad";
     "light.great_room_switch_virtual_s" = "a7cdf2bd153b628a7c8965ea8a944e28";
     "light.great_room_switch_virtual_w" = "d1cba419cc50f544714a950bee822436";
+    "light.kitchen_leds" = "302d19cfd2fe0b2a2f3a6c076f5d3f29";
+    "light.kitchen_light" = "584bac53fe98027ddd194be977c1060e";
+    "light.kitchen_pendant_light" = "fc605fa06114f6cf73247982688cbd93";
+    "light.kitchen_switch_virtual_nw" = "78f9c391edc3967489ba6bd945a54007";
+    "light.kitchen_switch_virtual_se" = "bc3ae78c7f4869b3a14d784df468fde7";
+    "light.kitchen_switch_virtual_sw" = "1fafbcb70f54e15aabb6e35c1e857f71";
     "light.loft_light" = "c3ca6b4a3f527f4a03d850844948db66";
     "light.main_hall_light" = "5accedf8ff58eeeb44c8e7afcfb497b1";
     "light.main_hall_switch_virtual_c" = "051537710dbd32b63bde7d8f993c692e";
     "light.main_hall_switch_virtual_n" = "29f3d260c0c67fce1236717096a6257d";
+    "light.range_hood_light" = null;
     "light.stair_lights" = null;
     "light.stairs_switch_virtual" = "a2af70357e94775f40f9332628ff0123";
     "light.upstairs_hall_east_light" = "def24a95c302daa49ca40cd50139cd1f";
