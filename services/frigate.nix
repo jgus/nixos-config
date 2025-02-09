@@ -227,7 +227,7 @@ in
 {
   requires = [ "storage-frigate.mount" "zfs-import-f.service" ];
   docker = {
-    image = "ghcr.io/blakeblackshear/frigate:stable";
+    image = "ghcr.io/blakeblackshear/frigate:0.14.1";
     environment = {
       FRIGATE_RTSP_PASSWORD = "password";
     };
