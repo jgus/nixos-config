@@ -250,7 +250,7 @@ in
     ];
     extraOptions = [
       "--shm-size=4g"
-      "--ulimit=nofile=4096:16384"
+      "--ulimit=nofile=${toString (4*1024)}:${toString (16*1024)}"
       "--device=nvidia.com/gpu=all"
       "--device=/dev/apex_0:/dev/apex_0"
       "--device=/dev/apex_1:/dev/apex_1"
