@@ -51,6 +51,7 @@ in
     systemPackages = with pkgs; [
       clang-tools # TODO
       comma
+      nixd
       nixpkgs-fmt
     ];
     variables = {
