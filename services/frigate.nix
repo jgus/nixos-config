@@ -144,6 +144,7 @@ let
     };
   };
   configuration = {
+    version = "0.15-1";
     # logger.default = "debug";
     mqtt = {
       host = "mqtt.home.gustafson.me";
@@ -165,12 +166,14 @@ let
       # coral4 = { type = "edgetpu"; device = "usb:1"; };
     };
     record = {
+      enabled = true;
       retain = { days = 7; mode = "motion"; };
-      events.retain = { default = 60; mode = "active_objects"; };
+      alerts.retain = { days = 60; mode = "active_objects"; };
+      detections.retain = { days = 60; mode = "active_objects"; };
     };
     ffmpeg = {
-      hwaccel_args = "preset-nvidia-h264";
-      output_args.record = "-f segment -segment_time 10 -segment_format mp4 -reset_timestamps 1 -strftime 1 -c copy";
+      hwaccel_args = "preset-nvidia";
+      output_args.record = "preset-record-generic-audio-copy";
     };
     birdseye = {
       enabled = true;
@@ -227,7 +230,7 @@ in
 {
   requires = [ "storage-frigate.mount" "zfs-import-f.service" ];
   docker = {
-    image = "ghcr.io/blakeblackshear/frigate:0.14.1";
+    image = "ghcr.io/blakeblackshear/frigate:stable";
     environment = {
       FRIGATE_RTSP_PASSWORD = "password";
     };
@@ -246,7 +249,8 @@ in
       "/etc/localtime:/etc/localtime:ro"
     ];
     extraOptions = [
-      "--shm-size=16g"
+      "--shm-size=4g"
+      "--ulimit=nofile=4096:16384"
       "--device=nvidia.com/gpu=all"
       "--device=/dev/apex_0:/dev/apex_0"
       "--device=/dev/apex_1:/dev/apex_1"
