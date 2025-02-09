@@ -66,7 +66,7 @@ let
     };
     camera-garage-n = amcrestIP8M // {
       zones = {
-        garage = [ 0 1 1 1 1 0.472 0.597 0.012 0.583 0.253 0.212 0.426 0.156 0 0 0 ];
+        garage = [ 0 1 1 1 1 0.472 0.597 0.012 0.583 0.253 0.212 0.426 0.152 0.327 0 0.421 ];
       };
     };
     camera-garage-s = amcrestIP8M // {
