@@ -53,7 +53,8 @@ in
       WEBPASSWORD = pw.pihole;
       FTLCONF_LOCAL_IPV4 = addresses.records.${name}.ip;
       PIHOLE_DNS_ = concatStringsSep ";" upstream;
-      DNSSEC = "true";
+      # DNSSEC = "true";
+      DNSSEC = "false";
       DHCP_ACTIVE = "true";
       DHCP_START = "172.22.200.1";
       DHCP_END = "172.22.254.254";
