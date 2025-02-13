@@ -36,6 +36,14 @@ let
       dhcp-boot=tag:bios,netboot.xyz.kpxe
     '';
   };
+  upstream = [
+    "1.1.1.1"
+    "1.0.0.1"
+    "8.8.8.8"
+    "8.8.4.4"
+    "75.75.75.75"
+    "75.75.76.76"
+  ];
 in
 {
   docker = {
@@ -44,7 +52,7 @@ in
       TZ = config.time.timeZone;
       WEBPASSWORD = pw.pihole;
       FTLCONF_LOCAL_IPV4 = addresses.records.${name}.ip;
-      PIHOLE_DNS_ = "1.1.1.1;1.0.0.1;8.8.8.8;8.8.4.4;75.75.75.75;75.75.76.76";
+      PIHOLE_DNS_ = concatStringsSep ";" upstream;
       DNSSEC = "true";
       DHCP_ACTIVE = "true";
       DHCP_START = "172.22.200.1";
@@ -68,6 +76,6 @@ in
     ++ (map (n: "${tftpFiles.${n}}:/tftp/${n}") (attrNames tftpFiles));
     extraOptions = [
       "--cap-add=NET_ADMIN"
-    ];
+    ] ++ (map (x: "--dns=${x}") upstream);
   };
 }
