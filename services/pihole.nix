@@ -16,9 +16,8 @@ let
       sha256 = "0f7mmrv8yp6m8xzrlir04xf8nq7jmqfpkhaxacnjkiasjv07nryr";
     };
   };
+  dhcpHosts = (map (r: r.mac + "," + r.ip + "," + r.name + ",infinite") addresses.dhcpReservations);
   dnsmasqConf = {
-    dns = lib.concatStrings (map (ip: "host-record=" + (lib.concatStrings (map (s: "${s},") (getAttr ip addresses.hosts))) + ip + (if ((hasAttr ip addresses.ipToIp6)) then ("," + addresses.ipToIp6.${ip}) else "") + "\n") (attrNames addresses.hosts));
-    dhcp = lib.concatStrings (map (r: "dhcp-host=" + r.mac + "," + r.ip + "," + r.name + ",infinite\n") addresses.dhcpReservations);
     config = ''
       dhcp-option=option:ntp-server,${addresses.nameToIp.ntp}
 
@@ -50,16 +49,25 @@ in
     image = "pihole/pihole";
     environment = {
       TZ = config.time.timeZone;
-      WEBPASSWORD = pw.pihole;
-      FTLCONF_LOCAL_IPV4 = addresses.records.${name}.ip;
-      PIHOLE_DNS_ = concatStringsSep ";" upstream;
-      DNSSEC = "true";
-      DHCP_ACTIVE = "true";
-      DHCP_START = "172.22.200.1";
-      DHCP_END = "172.22.254.254";
-      DHCP_ROUTER = addresses.network.defaultGateway;
-      PIHOLE_DOMAIN = addresses.network.domain;
-      VIRTUAL_HOST = "${name}.${addresses.network.domain}";
+      FTLCONF_dns_upstreams = concatStringsSep ";" upstream;
+      FTLCONF_dns_domainNeeded = "true";
+      FTLCONF_dns_expandHosts = "true";
+      FTLCONF_dns_domain = addresses.network.domain;
+      FTLCONF_dns_dnssec = "true";
+      FTLCONF_dns_interface = "eth0";
+      FTLCONF_dns_listeningMode = "SINGLE";
+      FTLCONF_dhcp_active = "true";
+      FTLCONF_dhcp_start = "172.22.200.1";
+      FTLCONF_dhcp_end = "172.22.200.254";
+      FTLCONF_dhcp_router = addresses.network.defaultGateway;
+      FTLCONF_dhcp_leaseTime = "24h";
+      FTLCONF_dhcp_rapidCommit = "true";
+      FTLCONF_dhcp_hosts = concatStringsSep ";" dhcpHosts;
+      FTLCONF_dhcp_ntp_ipv4_active = "false";
+      FTLCONF_dhcp_ntp_ipv6_active = "false";
+      FTLCONF_dhcp_ntp_sync_active = "false";
+      FTLCONF_dhcp_ntp_sync_server = "172.22.3.2";
+      FTLCONF_webserver_api_password = pw.pihole;
     };
     ports = [
       "53"

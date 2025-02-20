@@ -248,6 +248,14 @@ let
     "--ip6=${records."${service}".ip6}"
     "--dns=${records.pihole.ip}"
     "--dns-search=${network.domain}"
-  ] ++ (map (n: "--add-host=${n}:${getAttr n nameToIp}") names) ++ (map (n: "--add-host=${n}.${network.domain}:${getAttr n nameToIp}") names);
+  ]
+  ++
+  (map (n: "--add-host=${n}:${getAttr n nameToIp}") names)
+  ++
+  (map (n: "--add-host=${n}.${network.domain}:${getAttr n nameToIp}") names)
+  ++
+  (map (n: "--add-host=${n}:${getAttr n nameToIp6}") names6)
+  ++
+  (map (n: "--add-host=${n}.${network.domain}:${getAttr n nameToIp6}") names6);
 in
 { inherit network group records nameToIp ipToIp6 serverNames hosts hosts6 dhcpReservations dockerOptions; }
