@@ -7,7 +7,7 @@ in
   name = "esphome";
   inherit user group;
   docker = {
-    image = "ghcr.io/esphome/esphome:2024.11";
+    image = "ghcr.io/esphome/esphome";
     environment = {
       PLATFORMIO_CORE_DIR = "/cache/.plattformio";
       PLATFORMIO_GLOBALLIB_DIR = "/cache/.plattformioLibs";
@@ -23,7 +23,7 @@ in
       in
       [
         "--tmpfs=/cache:exec,uid=${uid},gid=${gid}"
-        "--tmpfs=/.cache/pip:exec,uid=${uid},gid=${gid}"
+        "--tmpfs=/.cache:exec,uid=${uid},gid=${gid}"
         "--tmpfs=/config/.esphome/build:exec,uid=${uid},gid=${gid}"
         "--tmpfs=/config/.esphome/external_components:exec,uid=${uid},gid=${gid}"
       ];
