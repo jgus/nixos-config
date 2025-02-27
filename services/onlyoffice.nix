@@ -12,6 +12,12 @@ in
       environment = {
         JWT_SECRET = pw.onlyoffice;
       };
+      volumes = [
+        "${pkgs.vistafonts}:/usr/share/fonts/truetype/vistafonts:ro"
+      ];
+    };
+    extraConfig = {
+      nixpkgs.config.allowUnfree = true;
     };
   }
 ]
