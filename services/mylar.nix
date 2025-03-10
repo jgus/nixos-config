@@ -19,7 +19,7 @@ in
     volumes = [
       "/storage/media/Comics:/comics"
       "/storage/media/Comics.import:/import"
-      "/storage/scratch/peer:/peer"
+      "/storage/scratch/torrent:/torrent"
       "/storage/scratch/usenet:/usenet"
     ];
     # extraOptions = [

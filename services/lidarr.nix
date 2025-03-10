@@ -17,7 +17,7 @@ in
     ];
     configVolume = "/config";
     volumes = [
-      "/storage/scratch/peer:/peer"
+      "/storage/scratch/torrent:/torrent"
       "/storage/scratch/usenet:/usenet"
       "/storage/media:/media"
     ];
