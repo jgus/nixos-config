@@ -45,7 +45,6 @@ in
         { name = "Photos"; path = "/storage/photos"; }
         { name = "Projects"; path = "/storage/projects"; }
         { name = "Software"; path = "/storage/software"; }
-        { name = "Storage"; path = "/home/josh/Storage"; }
         { name = "Temp"; path = "/storage/tmp"; }
         { name = "Brown"; path = "/storage/external/brown"; }
         { name = "Gustafson"; path = "/storage/external/Gustafson"; }

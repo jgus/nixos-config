@@ -20,7 +20,6 @@ in
     ];
     configVolume = "/config";
     volumes = [
-      "/home/${user}/sync:/shares/Sync"
       "/storage/photos:/shares/Photos"
       "/storage/software/Tools:/shares/Tools"
       "/storage/media/Comics:/shares/Comics"
