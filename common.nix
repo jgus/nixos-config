@@ -105,6 +105,9 @@ in
     extraOptions = ''
       experimental-features = nix-command flakes
     '';
+    settings = {
+      auto-optimise-store = true;
+    };
   };
 
   security.polkit.enable = true;
