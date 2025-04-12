@@ -4,62 +4,6 @@ let
   name = "home-assistant";
   user = "home-assistant";
   group = "home-assistant";
-  shades = [
-    "basement_east_bedroom_shade"
-    "basement_living_room_shade_1"
-    "basement_living_room_shade_2"
-    "basement_master_bedroom_shade_1"
-    "basement_master_bedroom_shade_2"
-    "basement_west_bedroom_shade"
-    "boy_room_shade_1"
-    "boy_room_shade_2"
-    "boy_room_shade_3"
-    "boy_room_shade_4"
-    "boy_room_shade_5"
-    "craft_room_shade_1"
-    "craft_room_shade_2"
-    "dining_room_shade_1"
-    "dining_room_shade_2"
-    "dining_room_upper_shade"
-    "eden_hope_room_shade_1"
-    "eden_hope_room_shade_2"
-    "garage_shade_1"
-    "garage_shade_2"
-    "garage_shade_3"
-    "great_room_lower_left_shade"
-    "great_room_lower_right_shade"
-    "great_room_upper_left_shade"
-    "great_room_upper_right_shade"
-    "kayleigh_lyra_room_shade_1"
-    "kayleigh_lyra_room_shade_2"
-    "kayleigh_lyra_room_shade_3"
-    "kitchen_shade_1"
-    "kitchen_shade_2"
-    "kitchen_shade_3"
-    "loft_shade_1"
-    "loft_shade_2"
-    "loft_shade_3"
-    "loft_shade_4"
-    "master_bedroom_shade_1"
-    "master_bedroom_shade_2"
-    "master_bedroom_shade_3"
-    "master_bedroom_shade_4"
-    "master_bedroom_shade_5"
-    "music_room_shade_1"
-    "music_room_shade_2"
-    "office_shade_1"
-    "office_shade_2"
-    "office_shade_3"
-    "office_shade_4"
-    "office_shade_5"
-    "study_shade_1"
-    "study_shade_2"
-    "toy_room_shade_1"
-    "toy_room_shade_2"
-    "toy_room_shade_3"
-    "workshop_shade_1"
-    "workshop_shade_2"
-  ];
   theater_devices = [
     {
       device = "bluray";
@@ -188,6 +132,31 @@ let
 in
 { config, pkgs, lib, ... }:
 let
+  windows =
+    map
+      (line:
+        let
+          parts = lib.strings.splitString "," line;
+          location = elemAt parts 0;
+          index = elemAt parts 1;
+          suffix = if (index == "") then "" else "_${index}";
+          has_shade = (elemAt parts 2) == "Y";
+          type = elemAt parts 3;
+          on_ground = (elemAt parts 4) == "Y";
+          opens = type != "F";
+          open_limit = if (type == "V") then 50 else 100;
+          window_name = "${location}_window${suffix}";
+          shade_name = "${location}_shade${suffix}";
+          # window_open_name = "${window_name}_open";
+          window_open_name = "${shade_name}_window_open";
+          target_name = "${shade_name}_auto_target";
+          override_name = "${shade_name}_user_override";
+        in
+        {
+          inherit location index has_shade type on_ground opens open_limit window_name shade_name window_open_name target_name override_name;
+        }
+      )
+      (lib.lists.drop 1 (lib.lists.remove "" (lib.strings.splitString "\n" (readFile ./home-assistant/windows.csv))));
   secretsYaml = pkgs.writeText "secrets.yaml" ''
     doorbell_password: ${pw.doorbell}
   '';
@@ -264,9 +233,16 @@ in
     listToAttrs
       (lib.lists.flatten (map
         (
-          i: [
+          w:
+          (if w.opens then [
             {
-              name = "${name}/input_number/${i}_auto_target.yaml";
+              name = "${name}/input_boolean/${w.window_open_name}.yaml";
+              value = { text = ""; };
+            }
+          ] else [ ]) ++
+          (if w.has_shade then [
+            {
+              name = "${name}/input_number/${w.target_name}.yaml";
               value = {
                 text = ''
                   min: 0
@@ -275,57 +251,65 @@ in
               };
             }
             {
-              name = "${name}/input_boolean/${i}_window_open.yaml";
-              value = { text = ""; };
-            }
-            {
-              name = "${name}/input_boolean/${i}_user_override.yaml";
+              name = "${name}/input_boolean/${w.override_name}.yaml";
               value = { text = "initial: false"; };
             }
             {
-              name = "${name}/automation/${i}_auto_set.yaml";
+              name = "${name}/automation/${w.shade_name}_auto_set.yaml";
               value = {
-                text = ''
-                  alias: ${i} auto set
-                  id: ${i}_auto_set
-                  mode: restart
-                  trigger:
-                    - platform: state
-                      entity_id:
-                        - input_number.${i}_auto_target
-                    - platform: state
-                      entity_id:
-                        - input_boolean.${i}_user_override
-                      to: "off"
-                    - platform: state
-                      entity_id:
-                        - input_boolean.${i}_window_open
-                  condition:
-                    - condition: state
-                      entity_id: input_boolean.${i}_user_override
-                      state: "off"
-                  action:
-                    - variables:
-                        p: "{{ [states('input_number.${i}_auto_target') | int, 50 if is_state('input_boolean.${i}_window_open', 'on') else 0] | max }}"
-                    - service: cover.set_cover_position
-                      target:
-                        entity_id: cover.${i}
-                      data:
-                        position: "{{ p }}"
-                '';
+                source = (pkgs.formats.yaml { }).generate "${w.shade_name}_auto_set.yaml" {
+                  alias = "${w.shade_name} auto set";
+                  id = "${w.shade_name}_auto_set";
+                  mode = "restart";
+                  trigger = [
+                    {
+                      platform = "state";
+                      entity_id = [ "input_number.${w.target_name}" ];
+                    }
+                    {
+                      platform = "state";
+                      entity_id = [ "input_boolean.${w.override_name}" ];
+                      to = "off";
+                    }
+                  ] ++ (if w.opens then [
+                    {
+                      platform = "state";
+                      entity_id = [ "input_boolean.${w.window_open_name}" ];
+                    }
+                  ] else [ ]);
+                  condition = [
+                    {
+                      condition = "state";
+                      entity_id = "input_boolean.${w.override_name}";
+                      state = "off";
+                    }
+                  ];
+                  action = [
+                    {
+                      variables = {
+                        p = if w.opens then "{{ [states('input_number.${w.target_name}') | int, ${toString w.open_limit} if is_state('input_boolean.${w.window_open_name}', 'on') else 0] | max }}" else "{{ states('input_number.${w.target_name}') | int }}";
+                      };
+                    }
+                    {
+                      service = "cover.set_cover_position";
+                      target = { entity_id = "cover.${w.shade_name}"; };
+                      data = { position = "{{ p }}"; };
+                    }
+                  ];
+                };
               };
             }
             {
-              name = "${name}/automation/${i}_user_set.yaml";
+              name = "${name}/automation/${w.shade_name}_user_set.yaml";
               value = {
                 text = ''
-                  alias: ${i} user set
-                  id: ${i}_user_set
+                  alias: ${w.shade_name} user set
+                  id: ${w.shade_name}_user_set
                   mode: restart
                   trigger:
                     - platform: state
                       entity_id:
-                        - cover.${i}
+                        - cover.${w.shade_name}
                       attribute: current_position
                       for:
                         seconds: 10
@@ -333,39 +317,39 @@ in
                     {% if ("current_position" not in trigger.from_state.attributes) or ("current_position" not in trigger.to_state.attributes) %}
                       false
                     {% else %}
-                      {{ ([trigger.from_state.attributes.current_position | int, trigger.to_state.attributes.current_position | int, states('input_number.${i}_auto_target') | int] | sort)[1] != (trigger.to_state.attributes.current_position | int) }}
+                      {{ ([trigger.from_state.attributes.current_position | int, trigger.to_state.attributes.current_position | int, states('input_number.${w.target_name}') | int] | sort)[1] != (trigger.to_state.attributes.current_position | int) }}
                     {% endif %}
                   action:
                     - service: input_boolean.turn_on
                       target:
-                        entity_id: input_boolean.${i}_user_override
+                        entity_id: input_boolean.${w.override_name}
                 '';
               };
             }
             {
-              name = "${name}/automation/${i}_user_reset.yaml";
+              name = "${name}/automation/${w.shade_name}_user_reset.yaml";
               value = {
                 text = ''
-                  alias: ${i} user reset
-                  id: ${i}_user_reset
+                  alias: ${w.shade_name} user reset
+                  id: ${w.shade_name}_user_reset
                   mode: restart
                   trigger:
                     - platform: state
                       entity_id:
-                        - input_boolean.${i}_user_override
+                        - input_boolean.${w.override_name}
                       to: "on"
                       for:
                         hours: 2
                   action:
                     - service: input_boolean.turn_off
                       target:
-                        entity_id: input_boolean.${i}_user_override
+                        entity_id: input_boolean.${w.override_name}
                 '';
               };
             }
-          ]
+          ] else [ ])
         )
-        shades))
+        windows))
     //
     listToAttrs (lib.lists.flatten (map
       (
