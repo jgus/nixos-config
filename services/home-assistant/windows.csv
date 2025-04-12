@@ -26,7 +26,7 @@ great_room_upper_left,,Y,F,N,N,100%,-
 great_room_upper_right,,Y,F,N,N,100%,-
 kayleigh_lyra_room,1,Y,V,N,Y,50%,
 kayleigh_lyra_room,2,Y,V,N,Y,50%,
-kayleigh_lyra_room,3,Y,V,N,Y,50%,
+kayleigh_lyra_room,3,Y,H,N,Y,50%,
 kitchen,1,Y,C,Y,Y,100%,
 kitchen,2,Y,F,Y,N,100%,-
 kitchen,3,Y,C,Y,Y,100%,
