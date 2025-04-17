@@ -143,17 +143,18 @@ let
           has_shade = (elemAt parts 2) == "Y";
           type = elemAt parts 3;
           on_ground = (elemAt parts 4) == "Y";
+          actual_sensor = elemAt parts 7;
+          target_sensor = elemAt parts 8;
           opens = type != "F";
           open_limit = if (type == "V") then 50 else 100;
+          dummy_sensor = opens && (actual_sensor != target_sensor);
           window_name = "${location}_window${suffix}";
           shade_name = "${location}_shade${suffix}";
-          # window_open_name = "${window_name}_open";
-          window_open_name = "${shade_name}_window_open";
           target_name = "${shade_name}_auto_target";
           override_name = "${shade_name}_user_override";
         in
         {
-          inherit location index has_shade type on_ground opens open_limit window_name shade_name window_open_name target_name override_name;
+          inherit location index has_shade type on_ground opens open_limit dummy_sensor window_name shade_name target_name override_name;
         }
       )
       (lib.lists.drop 1 (lib.lists.remove "" (lib.strings.splitString "\n" (readFile ./home-assistant/windows.csv))));
@@ -234,10 +235,20 @@ in
       (lib.lists.flatten (map
         (
           w:
-          (if w.opens then [
+          (if w.dummy_sensor then [
             {
-              name = "${name}/input_boolean/${w.window_open_name}.yaml";
+              name = "${name}/input_boolean/${w.window_name}_open.yaml";
               value = { text = ""; };
+            }
+            {
+              name = "${name}/binary_switch/template/${w.window_name}.yaml";
+              value = {
+                text = ''
+                  unique_id: ${w.window_name}
+                  state: "{{ input_boolean.${w.window_name}_open }}"
+                  device_class: window
+                '';
+              };
             }
           ] else [ ]) ++
           (if w.has_shade then [
@@ -274,7 +285,7 @@ in
                   ] ++ (if w.opens then [
                     {
                       platform = "state";
-                      entity_id = [ "input_boolean.${w.window_open_name}" ];
+                      entity_id = [ "binary_sensor.${w.window_name}" ];
                     }
                   ] else [ ]);
                   condition = [
@@ -287,7 +298,7 @@ in
                   action = [
                     {
                       variables = {
-                        p = if w.opens then "{{ [states('input_number.${w.target_name}') | int, ${toString w.open_limit} if is_state('input_boolean.${w.window_open_name}', 'on') else 0] | max }}" else "{{ states('input_number.${w.target_name}') | int }}";
+                        p = if w.opens then "{{ [states('input_number.${w.target_name}') | int, ${toString w.open_limit} if is_state('binary_sensor.${w.window_name}', 'on') else 0] | max }}" else "{{ states('input_number.${w.target_name}') | int }}";
                       };
                     }
                     {
