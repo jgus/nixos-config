@@ -240,16 +240,18 @@ in
               name = "${name}/input_boolean/${w.window_name}_open.yaml";
               value = { text = ""; };
             }
-            {
-              name = "${name}/binary_switch/template/${w.window_name}.yaml";
-              value = {
-                text = ''
-                  unique_id: ${w.window_name}
-                  state: "{{ input_boolean.${w.window_name}_open }}"
-                  device_class: window
-                '';
-              };
-            }
+            # {
+            #   name = "${name}/template/${w.window_name}.yaml";
+            #   value = {
+            #     text = ''
+            #       binary_sensor:
+            #         - name: ${w.window_name}
+            #           unique_id: ${w.window_name}
+            #           state: "{{ states('input_boolean.${w.window_name}_open') }}"
+            #           device_class: window
+            #     '';
+            #   };
+            # }
           ] else [ ]) ++
           (if w.has_shade then [
             {
