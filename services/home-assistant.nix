@@ -143,18 +143,15 @@ let
           has_shade = (elemAt parts 2) == "Y";
           type = elemAt parts 3;
           on_ground = (elemAt parts 4) == "Y";
-          actual_sensor = elemAt parts 7;
-          target_sensor = elemAt parts 8;
           opens = type != "F";
           open_limit = if (type == "V") then 50 else 100;
-          dummy_sensor = opens && (actual_sensor != target_sensor);
           window_name = "${location}_window${suffix}";
           shade_name = "${location}_shade${suffix}";
           target_name = "${shade_name}_auto_target";
           override_name = "${shade_name}_user_override";
         in
         {
-          inherit location index has_shade type on_ground opens open_limit dummy_sensor window_name shade_name target_name override_name;
+          inherit location index has_shade type on_ground opens open_limit window_name shade_name target_name override_name;
         }
       )
       (lib.lists.drop 1 (lib.lists.remove "" (lib.strings.splitString "\n" (readFile ./home-assistant/windows.csv))));
@@ -235,24 +232,6 @@ in
       (lib.lists.flatten (map
         (
           w:
-          (if w.dummy_sensor then [
-            {
-              name = "${name}/input_boolean/${w.window_name}_open.yaml";
-              value = { text = ""; };
-            }
-            # {
-            #   name = "${name}/template/${w.window_name}.yaml";
-            #   value = {
-            #     text = ''
-            #       binary_sensor:
-            #         - name: ${w.window_name}
-            #           unique_id: ${w.window_name}
-            #           state: "{{ states('input_boolean.${w.window_name}_open') }}"
-            #           device_class: window
-            #     '';
-            #   };
-            # }
-          ] else [ ]) ++
           (if w.has_shade then [
             {
               name = "${name}/input_number/${w.target_name}.yaml";
