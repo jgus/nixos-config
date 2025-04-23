@@ -78,6 +78,7 @@ let
       esphome = { id = 31; host = "c1-2"; };
       mosquitto = { id = 32; host = "b1"; aliases = [ "mqtt" ]; };
       zigbee2mqtt = { id = 33; host = "b1"; aliases = [ "z2m" ]; };
+      ipmi-server = { id = 34; host = "b1"; };
       zwave-main = { id = 40; host = "pi-67db40"; };
       zwave-upstairs = { id = 41; host = "pi-67dbcd"; };
       zwave-basement = { id = 42; host = "pi-67dc75"; };
@@ -99,7 +100,10 @@ let
       vm1 = { id = 1; host = "d1"; dns = "host"; };
     } //
     mapAttrs (k: v: { g = group.admin; } // v) {
-      c1-imc = { id = 2; mac = "70:0f:6a:3b:46:01"; };
+      c1-imc-1 = { id = 2; mac = "70:0f:6a:3b:46:01"; aliases = [ "c1-imc" ]; };
+      c1-imc-2 = { id = 3; mac = "70:79:b3:09:49:16"; };
+      c1-bmc-1 = { id = 12; mac = "b4:de:31:bd:a8:be"; };
+      c1-bmc-2 = { id = 13; mac = "00:be:75:e0:a2:3e"; };
       d1-bmc = { id = 4; mac = "18:66:da:b6:45:d8"; };
       d2-bmc = { id = 100; mac = "84:2b:2b:57:53:84"; };
       d3-bmc = { id = 101; mac = "00:26:b9:49:cb:ff"; };
