@@ -35,7 +35,7 @@
       ];
       environment = {
         URL = "gustafson.me";
-        SUBDOMAINS = "www,homeassistant,komga,drive,office,";
+        SUBDOMAINS = "www,homeassistant,komga,drive,office,n-kvm,";
         # EXTRA_DOMAINS = "gushome.org,www.gushome.org";
         VALIDATION = "http";
         EMAIL = "joshgstfsn@gmail.com";
@@ -52,7 +52,7 @@
         "/etc/nixos/services/www/location-confs:/config/nginx/location-confs"
       ]
       ++
-      (map (i: "/etc/nixos/services/www/proxy-confs/${i}.subdomain.conf:/config/nginx/proxy-confs/${i}.subdomain.conf") [ "homeassistant" "komga" "owncloud" "onlyoffice" ])
+      (map (i: "/etc/nixos/services/www/proxy-confs/${i}.subdomain.conf:/config/nginx/proxy-confs/${i}.subdomain.conf") [ "homeassistant" "komga" "owncloud" "onlyoffice" "n-kvm" ])
       ++
       [
         "${storagePath "swag_config"}/keys:/config/keys"
