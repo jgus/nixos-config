@@ -2,7 +2,7 @@ let
   addresses = import ./addresses.nix;
   machine = import ./machine.nix;
 in
-{ config, pkgs, lib, ... }:
+{ pkgs, lib, ... }:
 {
   boot = {
     initrd.secrets."/etc/nixos/.secrets/vkey" = ./.secrets/vkey;
@@ -29,7 +29,7 @@ in
     tempAddresses = "disabled";
     defaultGateway.address = addresses.network.defaultGateway;
     domain = addresses.network.domain;
-    nameservers = [ addresses.records.pihole.ip "1.1.1.1" "1.0.0.1" ];
+    nameservers = [ addresses.records.pihole-1.ip addresses.records.pihole-2.ip addresses.records.pihole-3.ip "1.1.1.1" "1.0.0.1" ];
     timeServers = [ "ntp.home.gustafson.me" ];
     hosts = addresses.hosts // addresses.hosts6;
     interfaces.lan0 = let m = addresses.records."${machine.hostName}"; in {

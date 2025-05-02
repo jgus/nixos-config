@@ -4,7 +4,7 @@ let
   addresses = import ./../addresses.nix;
   pw = import ./../.secrets/passwords.nix;
 in
-{ config, pkgs, lib, ... }:
+{ config, pkgs, ... }:
 let
   tftpFiles = {
     "netboot.xyz.kpxe" = fetchurl {
@@ -19,6 +19,7 @@ let
   dhcpHosts = (map (r: r.mac + "," + r.ip + "," + r.name + ",infinite") addresses.dhcpReservations);
   dnsmasqConf = {
     config = ''
+      dhcp-option=option:dns-server,${addresses.nameToIp.dns-1},${addresses.nameToIp.dns-2},${addresses.nameToIp.dns-3}
       dhcp-option=option:ntp-server,${addresses.nameToIp.ntp}
 
       enable-tftp
@@ -44,46 +45,47 @@ let
     "75.75.76.76"
   ];
 in
-{
-  docker = {
-    image = "pihole/pihole";
-    environment = {
-      TZ = config.time.timeZone;
-      FTLCONF_dns_upstreams = concatStringsSep ";" upstream;
-      FTLCONF_dns_domainNeeded = "true";
-      FTLCONF_dns_expandHosts = "true";
-      FTLCONF_dns_domain = addresses.network.domain;
-      FTLCONF_dns_dnssec = "true";
-      FTLCONF_dns_interface = "eth0";
-      FTLCONF_dns_listeningMode = "SINGLE";
-      FTLCONF_dhcp_active = "true";
-      FTLCONF_dhcp_start = "172.22.200.1";
-      FTLCONF_dhcp_end = "172.22.200.254";
-      FTLCONF_dhcp_router = addresses.network.defaultGateway;
-      FTLCONF_dhcp_leaseTime = "24h";
-      FTLCONF_dhcp_rapidCommit = "true";
-      FTLCONF_dhcp_hosts = concatStringsSep ";" dhcpHosts;
-      FTLCONF_dhcp_ntp_ipv4_active = "false";
-      FTLCONF_dhcp_ntp_ipv6_active = "false";
-      FTLCONF_dhcp_ntp_sync_active = "false";
-      FTLCONF_dhcp_ntp_sync_server = "172.22.3.2";
-      FTLCONF_webserver_api_password = pw.pihole;
+map
+  (n: {
+    name = "pihole-${toString n}";
+    docker = {
+      image = "pihole/pihole";
+      environment = {
+        TZ = config.time.timeZone;
+        FTLCONF_dns_upstreams = concatStringsSep ";" upstream;
+        FTLCONF_dns_domainNeeded = "true";
+        FTLCONF_dns_expandHosts = "true";
+        FTLCONF_dns_domain = addresses.network.domain;
+        FTLCONF_dns_dnssec = "true";
+        FTLCONF_dns_interface = "eth0";
+        FTLCONF_dns_listeningMode = "SINGLE";
+        FTLCONF_dhcp_active = "true";
+        FTLCONF_dhcp_start = "172.22.${toString (200+n)}.1";
+        FTLCONF_dhcp_end = "172.22.${toString (200+n)}.254";
+        FTLCONF_dhcp_router = addresses.network.defaultGateway;
+        FTLCONF_dhcp_leaseTime = "24h";
+        FTLCONF_dhcp_rapidCommit = "true";
+        FTLCONF_dhcp_hosts = concatStringsSep ";" dhcpHosts;
+        FTLCONF_ntp_ipv4_active = "false";
+        FTLCONF_ntp_ipv6_active = "false";
+        FTLCONF_ntp_sync_active = "false";
+        FTLCONF_ntp_sync_server = "172.22.3.2";
+        FTLCONF_webserver_api_password = pw.pihole;
+        FTLCONF_misc_etc_dnsmasq_d = "true";
+      };
+      ports = [
+        "53"
+        "67/udp"
+        "80/tcp"
+        "443/tcp"
+      ];
+      configVolume = "/etc/pihole";
+      volumes = storagePath: [
+      ]
+      ++ (map (n: "${pkgs.writeText "50-nixos-${n}.conf" dnsmasqConf.${n}}:/etc/dnsmasq.d/50-nixos-${n}.conf") (attrNames dnsmasqConf))
+      ++ (map (n: "${tftpFiles.${n}}:/tftp/${n}") (attrNames tftpFiles));
+      extraOptions = [
+        "--cap-add=NET_ADMIN"
+      ] ++ (map (x: "--dns=${x}") upstream);
     };
-    ports = [
-      "53"
-      "67/udp"
-      "80/tcp"
-      "443/tcp"
-    ];
-    configVolume = "/config";
-    volumes = storagePath: [
-      "${storagePath name}/pihole:/etc/pihole"
-      "${storagePath name}/dnsmasq.d:/etc/dnsmasq.d"
-    ]
-    ++ (map (n: "${pkgs.writeText "50-nixos-${n}.conf" dnsmasqConf.${n}}:/etc/dnsmasq.d/50-nixos-${n}.conf") (attrNames dnsmasqConf))
-    ++ (map (n: "${tftpFiles.${n}}:/tftp/${n}") (attrNames tftpFiles));
-    extraOptions = [
-      "--cap-add=NET_ADMIN"
-    ] ++ (map (x: "--dns=${x}") upstream);
-  };
-}
+  }) [ 1 2 3 ]

@@ -62,9 +62,11 @@ let
       somfy = { id = 17; mac = "00:0e:c6:aa:0a:86"; };
     } //
     mapAttrs (k: v: { g = group.services; } // v) {
-      pihole = { id = 1; host = "b1"; aliases = [ "dhcp" "dns" ]; };
+      pihole-1 = { id = 1; host = "b1"; aliases = [ "dhcp-1" "dns-1" "pihole" "dhcp" "dns" ]; };
       ntp = { id = 2; host = "b1"; };
       landing = { id = 3; host = "b1"; };
+      pihole-2 = { id = 4; host = "c1-1"; aliases = [ "dhcp-2" "dns-2" ]; };
+      pihole-3 = { id = 5; host = "d1"; aliases = [ "dhcp-3" "dns-3" ]; };
       samba = { id = 10; host = "c1-1"; aliases = [ "smb" "nas" ]; };
       syncthing = { id = 11; host = "c1-1"; };
       garage = { id = 12; host = "d1"; };
@@ -252,7 +254,9 @@ let
     "--hostname=${service}"
     "--ip=${records."${service}".ip}"
     "--ip6=${records."${service}".ip6}"
-    "--dns=${records.pihole.ip}"
+    "--dns=${records.pihole-1.ip}"
+    "--dns=${records.pihole-2.ip}"
+    "--dns=${records.pihole-3.ip}"
     "--dns-search=${network.domain}"
   ]
   ++
