@@ -42,7 +42,7 @@ let
         switch-study = { id = 24; mac = "f4:e2:c6:59:9c:4d"; };
         switch-c = { id = 30; mac = "f8:c2:88:23:8c:10"; };
         switch-d = { id = 31; mac = "ec:f4:bb:fe:71:f8"; };
-        pi-8df558 = { id = 101; mac = "e4:5f:01:8d:f5:58"; aliases = [ "n-kvm" ]; };
+        pi-be4492 = { id = 101; mac = "dc:a6:32:be:44:92"; aliases = [ "n-kvm" ]; };
       } //
     mapAttrs (k: v: { g = group.servers; } // v) {
       b1 = { id = 1; };
