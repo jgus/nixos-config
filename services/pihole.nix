@@ -1,6 +1,5 @@
 with builtins;
 let
-  name = "pihole";
   addresses = import ./../addresses.nix;
   pw = import ./../.secrets/passwords.nix;
 in
@@ -8,34 +7,15 @@ in
 let
   tftpFiles = {
     "netboot.xyz.kpxe" = fetchurl {
-      url = "https://github.com/netbootxyz/netboot.xyz/releases/download/2.0.81/netboot.xyz.kpxe";
-      sha256 = "1dy6rnd70yycli0j0gzw0h2px0fvlr25b8df0ak9idy7ww26pmd6";
+      url = "https://github.com/netbootxyz/netboot.xyz/releases/download/2.0.87/netboot.xyz.kpxe";
+      sha256 = "115cacqv2k86wifzymqp1ndw5yx8wvmh2zll4dn2873wdvfxmlcl";
     };
     "netboot.xyz.efi" = fetchurl {
-      url = "https://github.com/netbootxyz/netboot.xyz/releases/download/2.0.81/netboot.xyz.efi";
-      sha256 = "0f7mmrv8yp6m8xzrlir04xf8nq7jmqfpkhaxacnjkiasjv07nryr";
+      url = "https://github.com/netbootxyz/netboot.xyz/releases/download/2.0.87/netboot.xyz.efi";
+      sha256 = "0zqqq8d10gn9hy5rbxg5c46q8cjlmg6kv7gkwx3yabka53n7aizj";
     };
   };
   dhcpHosts = (map (r: r.mac + "," + r.ip + "," + r.name + ",infinite") addresses.dhcpReservations);
-  dnsmasqConf = {
-    config = ''
-      dhcp-option=option:dns-server,${addresses.nameToIp.dns-1},${addresses.nameToIp.dns-2},${addresses.nameToIp.dns-3}
-      dhcp-option=option:ntp-server,${addresses.nameToIp.ntp}
-
-      enable-tftp
-      tftp-root=/tftp
-      # dhcp-boot=netboot.xyz.kpxe
-      # pxe-service=x86PC,"NetBoot.xyz (BIOS)",netboot.xyz.kpxe
-      # pxe-service=X86-64_EFI,"NetBoot.xyz (EFI)",netboot.xyz.efi
-      dhcp-match=set:efi-x86_64,option:client-arch,7
-      dhcp-match=set:efi-x86_64,option:client-arch,9
-      dhcp-match=set:efi-x86,option:client-arch,6
-      dhcp-match=set:bios,option:client-arch,0
-      dhcp-boot=tag:efi-x86_64,netboot.xyz.efi
-      dhcp-boot=tag:efi-x86,netboot.xyz.efi
-      dhcp-boot=tag:bios,netboot.xyz.kpxe
-    '';
-  };
   upstream = [
     "1.1.1.1"
     "1.0.0.1"
@@ -46,8 +26,33 @@ let
   ];
 in
 map
-  (n: {
+  (n:
+  let
     name = "pihole-${toString n}";
+    dnsmasqConf = {
+      config = ''
+        dhcp-option=option:dns-server,${addresses.nameToIp.dns-1},${addresses.nameToIp.dns-2},${addresses.nameToIp.dns-3}
+        dhcp-option=option:ntp-server,${addresses.nameToIp.ntp}
+
+        enable-tftp
+        tftp-root=/tftp
+        dhcp-match=set:bios,60,PXEClient:Arch:00000
+        dhcp-boot=tag:bios,netboot.xyz.kpxe,,${addresses.nameToIp.${name}}
+        dhcp-match=set:efi32,60,PXEClient:Arch:00002
+        dhcp-boot=tag:efi32,netboot.xyz.efi,,${addresses.nameToIp.${name}}
+        dhcp-match=set:efi32-1,60,PXEClient:Arch:00006
+        dhcp-boot=tag:efi32-1,netboot.xyz.efi,,${addresses.nameToIp.${name}}
+        dhcp-match=set:efi64,60,PXEClient:Arch:00007
+        dhcp-boot=tag:efi64,netboot.xyz.efi,,${addresses.nameToIp.${name}}
+        dhcp-match=set:efi64-1,60,PXEClient:Arch:00008
+        dhcp-boot=tag:efi64-1,netboot.xyz.efi,,${addresses.nameToIp.${name}}
+        dhcp-match=set:efi64-2,60,PXEClient:Arch:00009
+        dhcp-boot=tag:efi64-2,netboot.xyz.efi,,${addresses.nameToIp.${name}}
+      '';
+    };
+  in
+  {
+    inherit name;
     docker = {
       image = "pihole/pihole";
       environment = {
