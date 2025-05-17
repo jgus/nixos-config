@@ -24,7 +24,7 @@
   {
     name = "web-swag";
     configStorage = false;
-    extraStorage = [ "www" "dav" "swag_config" ];
+    extraStorage = [ "swag_config" ];
     requires = [ "var-lib-swag_config.mount" "var-lib-www.mount" "var-lib-dav.mount" "storage-photos.mount" ];
     docker = {
       image = "lscr.io/linuxserver/swag";
@@ -57,8 +57,8 @@
       [
         "${storagePath "swag_config"}/keys:/config/keys"
         "${storagePath "swag_config"}/etc/letsencrypt:/config/etc/letsencrypt"
-        "${storagePath "www"}:/config/www"
-        "${storagePath "dav"}:/config/www/dav"
+        "/storage/service/www:/config/www"
+        "/storage/service/dav:/config/www/dav"
       ];
     };
     extraConfig = {
