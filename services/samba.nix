@@ -48,8 +48,8 @@ in
         { name = "Temp"; path = "/storage/tmp"; }
         { name = "Brown"; path = "/storage/external/brown"; }
         { name = "Gustafson"; path = "/storage/external/Gustafson"; }
-        { name = "www"; path = "/var/lib/www"; }
-        { name = "dav"; path = "/var/lib/dav"; }
+        { name = "www"; path = "/storage/service/www"; }
+        { name = "dav"; path = "/storage/service/dav"; }
       ])) //
       (listToAttrs (map (g: { name = "GROUP_${g}"; value = toString config.users.groups.${g}.gid; }) (attrNames config.users.groups))) //
       (listToAttrs (map (u: { name = "UID_${u}"; value = toString config.users.users.${u}.uid; }) (attrNames config.users.users))) //
