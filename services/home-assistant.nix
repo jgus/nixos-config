@@ -363,13 +363,38 @@ in
     listToAttrs (lib.lists.flatten (map
       (
         i: [
-          # { name = "${name}/input_boolean/${i.id}_lights.yaml"; value = { text = ""; }; }
+          {
+            name = "${name}/input_boolean/${i.id}_lights.yaml";
+            value = {
+              text = ''
+                name: ${i.name} Display Ligts
+                icon: mdi:numeric
+              '';
+            };
+          }
           # { name = "${name}/input_boolean/${i.id}_xfan.yaml"; value = { text = ""; }; }
           # { name = "${name}/input_boolean/${i.id}_health.yaml"; value = { text = ""; }; }
           # { name = "${name}/input_boolean/${i.id}_sleep.yaml"; value = { text = ""; }; }
           # { name = "${name}/input_boolean/${i.id}_powersave.yaml"; value = { text = ""; }; }
-          { name = "${name}/input_boolean/${i.id}_eightdegheat.yaml"; value = { text = ""; }; }
+          {
+            name = "${name}/input_boolean/${i.id}_eightdegheat.yaml";
+            value = {
+              text = ''
+                name: ${i.name} Maintenance Heat
+                icon: mdi:fire
+              '';
+            };
+          }
           # { name = "${name}/input_boolean/${i.id}_air.yaml"; value = { text = ""; }; }
+          {
+            name = "${name}/input_boolean/${i.id}_beeper.yaml";
+            value = {
+              text = ''
+                name: ${i.name} Beeper
+                icon: mdi:volume-high
+              '';
+            };
+          }
           {
             name = "${name}/climate/${i.id}.yaml";
             value = {
@@ -381,13 +406,14 @@ in
                 mac: ${i.mac}
                 target_temp_step: 1
                 encryption_version: 2
-                # lights: input_boolean.${i.id}_lights
+                lights: input_boolean.${i.id}_lights
                 # xfan: input_boolean.${i.id}_xfan
                 # health: input_boolean.${i.id}_health
                 # sleep: input_boolean.${i.id}_sleep
                 # powersave: input_boolean.${i.id}_powersave
                 eightdegheat: input_boolean.${i.id}_eightdegheat
                 # air: input_boolean.${i.id}_air
+                beeper: input_boolean.${i.id}_beeper
               '';
             };
           }
