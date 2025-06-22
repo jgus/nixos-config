@@ -154,7 +154,7 @@ let
     objects = {
       track = [ "person" "car" ];
       filters.person = {
-        min_score = 0.5;
+        min_score = 0.7;
         threshold = 0.8;
       };
     };
