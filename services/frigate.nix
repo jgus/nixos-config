@@ -1,6 +1,8 @@
 with builtins;
 let
   pw = import ./../.secrets/passwords.nix;
+  # detector = "coral";
+  detector = "tensorrt";
   doorbell = {
     user = "admin";
     password = pw.doorbell;
@@ -159,12 +161,23 @@ let
       };
     };
     audio.enabled = true;
-    detectors = {
+    detectors = (if (detector == "coral") then {
       coral1 = { type = "edgetpu"; device = "pci:0"; };
       coral2 = { type = "edgetpu"; device = "pci:1"; };
       # coral3 = { type = "edgetpu"; device = "usb:0"; };
       # coral4 = { type = "edgetpu"; device = "usb:1"; };
-    };
+    } else if (detector == "tensorrt") then {
+      tensorrt0 = { type = "tensorrt"; device = "0"; };
+      # tensorrt1 = { type = "tensorrt"; device = "1"; };
+    } else { });
+    model = (if (detector == "tensorrt") then {
+      path = "/config/model_cache/tensorrt/yolov7-320.trt";
+      labelmap_path = "/labelmap/coco-80.txt";
+      input_tensor = "nchw";
+      input_pixel_format = "rgb";
+      width = 320;
+      height = 320;
+    } else { });
     record = {
       enabled = true;
       retain = { days = 7; mode = "motion"; };
@@ -230,9 +243,12 @@ in
 {
   requires = [ "storage-frigate.mount" "zfs-import-f.service" ];
   docker = {
-    image = "ghcr.io/blakeblackshear/frigate:stable";
+    image = "ghcr.io/blakeblackshear/frigate:stable-tensorrt";
     environment = {
       FRIGATE_RTSP_PASSWORD = "password";
+      # YOLO_MODELS = "yolov7-320,yolov7-416,yolov7-640";
+      YOLO_MODELS = "yolov7-320";
+      USE_FP16 = "false";
     };
     ports = [
       "5000"
