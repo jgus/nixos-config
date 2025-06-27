@@ -53,7 +53,7 @@ let
     } //
     mapAttrs (k: v: { g = group.home-automation; } // v) {
       sensor-hub-1 = { id = 2; mac = "70:b8:f6:9b:f3:83"; };
-      zigbee = { id = 6; mac = "ec:c9:ff:bc:7c:ef"; };
+      zigbee-radio = { id = 6; mac = "ec:c9:ff:bc:7c:ef"; };
       zwave-radio-main = { id = 7; mac = "b0:b2:1c:93:62:4f"; };
       zwave-radio-upstairs = { id = 8; mac = "a0:b7:65:fa:bf:03"; };
       zwave-radio-basement = { id = 9; mac = "a0:b7:65:fa:be:97"; };
