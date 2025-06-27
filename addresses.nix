@@ -50,9 +50,6 @@ let
       c1-2 = { id = 3; };
       d1 = { id = 4; };
       pi-67cba1 = { id = 65; aliases = [ "theater-pi" "theater-cec" ]; };
-      pi-67db40 = { id = 66; aliases = [ "zwave-main-pi" ]; };
-      pi-67dbcd = { id = 67; aliases = [ "zwave-upstairs-pi" ]; };
-      pi-67dc75 = { id = 68; aliases = [ "zwave-basement-pi" ]; };
     } //
     mapAttrs (k: v: { g = group.home-automation; } // v) {
       sensor-hub-1 = { id = 2; mac = "70:b8:f6:9b:f3:83"; };
@@ -86,9 +83,9 @@ let
       zigbee2mqtt = { id = 33; host = "b1"; aliases = [ "z2m" ]; };
       ipmi-server = { id = 34; host = "b1"; };
       node-red = { id = 35; host = "b1"; };
-      zwave-main = { id = 40; host = "pi-67db40"; };
-      zwave-upstairs = { id = 41; host = "pi-67dbcd"; };
-      zwave-basement = { id = 42; host = "pi-67dc75"; };
+      zwave-main = { id = 40; host = "b1"; };
+      zwave-upstairs = { id = 41; host = "b1"; };
+      zwave-basement = { id = 42; host = "b1"; };
       frigate = { id = 50; host = "d1"; };
       plex = { id = 60; host = "d1"; };
       sabnzbd = { id = 70; host = "c1-2"; };

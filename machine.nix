@@ -65,18 +65,6 @@ let
       hostId = "62c05afa";
       imports = [ ./cec.nix ];
     };
-    pi-67db40 = rpi // {
-      stateVersion = "23.05";
-      hostId = "1f758e73";
-    };
-    pi-67dbcd = rpi // {
-      stateVersion = "23.05";
-      hostId = "da46f0cf";
-    };
-    pi-67dc75 = rpi // {
-      stateVersion = "23.05";
-      hostId = "39a18894";
-    };
   }."${machine-id}";
 in
 {

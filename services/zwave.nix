@@ -1,9 +1,6 @@
 { config, ... }:
 let
   zwave-area = area: (
-    let
-      device = "/dev/serial/by-id/usb-Zooz_800_Z-Wave_Stick_533D004242-if00";
-    in
     {
       name = "zwave-${area}";
       docker = {
@@ -16,9 +13,6 @@ let
           "3000"
         ];
         configVolume = "/usr/src/app/store";
-        extraOptions = [
-          "--device=${device}:/dev/zwave"
-        ];
       };
     }
   );
