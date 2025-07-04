@@ -143,6 +143,7 @@ let
       theater-preamp = { g = 59; id = 2; mac = "00:1b:7c:0b:21:fb"; };
       theater-shield = { g = 59; id = 3; mac = "3c:6d:66:08:af:01"; };
       theater-bluray = { g = 59; id = 5; mac = "34:31:7f:dd:db:9b"; };
+      theater-uc-dock = { g = 59; id = 9; mac = "28:37:2f:0c:25:df"; };
       camera-garage-s = { g = 100; id = 16; mac = "9c:8e:cd:3d:72:89"; };
       camera-garage-n = { g = 100; id = 17; mac = "9c:8e:cd:3d:7c:0b"; };
       camera-back-yard = { g = 110; id = 16; mac = "9c:8e:cd:3d:72:a6"; };
@@ -177,8 +178,7 @@ let
     merry = { ip = "172.21.40.13"; };
     pippin = { ip = "172.21.40.14"; };
     theater-remote = { ip = "172.21.59.7"; };
-    theater-uc-remote = { ip = "172.21.59.8"; mac = "50:26:ef:b0:b8:0e"; };
-    theater-uc-dock = { ip = "172.21.59.9"; mac = "28:37:2f:0c:25:df"; };
+    theater-uc-remote = { ip = "172.21.59.8"; };
     theater-climate = { ip = "172.21.59.20"; };
     ratgdo-1 = { ip = "172.21.100.11"; };
     ratgdo-2 = { ip = "172.21.100.12"; };
