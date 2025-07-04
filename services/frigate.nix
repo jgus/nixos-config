@@ -2,7 +2,8 @@ with builtins;
 let
   pw = import ./../.secrets/passwords.nix;
   # detector = "coral";
-  detector = "tensorrt";
+  # detector = "tensorrt";
+  detector = "onnx";
   doorbell = {
     user = "admin";
     password = pw.doorbell;
@@ -154,11 +155,11 @@ let
       password = pw.mqtt.frigate;
     };
     objects = {
-      track = [ "person" "car" ];
-      filters.person = {
-        min_score = 0.7;
-        threshold = 0.8;
-      };
+      track = [ "person" "face" "car" "license_plate" "amazon" "usps" "ups" "fedex" "package" ];
+      # filters.person = {
+      #   min_score = 0.5;
+      #   threshold = 0.8;
+      # };
     };
     audio.enabled = true;
     detectors = (if (detector == "coral") then {
@@ -169,12 +170,23 @@ let
     } else if (detector == "tensorrt") then {
       tensorrt0 = { type = "tensorrt"; device = "0"; };
       # tensorrt1 = { type = "tensorrt"; device = "1"; };
+    } else if (detector == "onnx") then {
+      onnx0 = { type = "onnx"; device = "0"; };
+      onnx1 = { type = "onnx"; device = "1"; };
     } else { });
     model = (if (detector == "tensorrt") then {
       path = "/config/model_cache/tensorrt/yolov7-320.trt";
       labelmap_path = "/labelmap/coco-80.txt";
       input_tensor = "nchw";
       input_pixel_format = "rgb";
+      width = 320;
+      height = 320;
+    } else if (detector == "onnx") then {
+      model_type = "yolonas";
+      path = "/config/yolo_nas_s.onnx";
+      labelmap_path = "/labelmap/coco-80.txt";
+      input_tensor = "nchw";
+      input_pixel_format = "bgr";
       width = 320;
       height = 320;
     } else { });
@@ -245,6 +257,7 @@ in
   docker = {
     image = "ghcr.io/blakeblackshear/frigate:stable-tensorrt";
     environment = {
+      PLUS_API_KEY = pw.frigate_plus;
       FRIGATE_RTSP_PASSWORD = "password";
       # YOLO_MODELS = "yolov7-320,yolov7-416,yolov7-640";
       YOLO_MODELS = "yolov7-320";
