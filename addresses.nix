@@ -177,6 +177,8 @@ let
     merry = { ip = "172.21.40.13"; };
     pippin = { ip = "172.21.40.14"; };
     theater-remote = { ip = "172.21.59.7"; };
+    theater-uc-remote = { ip = "172.21.59.8"; mac = "50:26:ef:b0:b8:0e"; };
+    theater-uc-dock = { ip = "172.21.59.9"; mac = "28:37:2f:0c:25:df"; };
     theater-climate = { ip = "172.21.59.20"; };
     ratgdo-1 = { ip = "172.21.100.11"; };
     ratgdo-2 = { ip = "172.21.100.12"; };
