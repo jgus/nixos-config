@@ -156,10 +156,10 @@ let
     };
     objects = {
       track = [ "person" "face" "car" "license_plate" "amazon" "usps" "ups" "fedex" "package" ];
-      # filters.person = {
-      #   min_score = 0.5;
-      #   threshold = 0.8;
-      # };
+      filters.person = {
+        min_score = 0.5;
+        threshold = 0.8;
+      };
     };
     audio.enabled = true;
     detectors = (if (detector == "coral") then {
@@ -182,13 +182,7 @@ let
       width = 320;
       height = 320;
     } else if (detector == "onnx") then {
-      model_type = "yolonas";
-      path = "/config/yolo_nas_s.onnx";
-      labelmap_path = "/labelmap/coco-80.txt";
-      input_tensor = "nchw";
-      input_pixel_format = "bgr";
-      width = 320;
-      height = 320;
+      path = "plus://7efe1d2424d8522a3f292a4efbb92324";
     } else { });
     record = {
       enabled = true;
