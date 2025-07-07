@@ -98,7 +98,6 @@ let
       komga = { id = 77; host = "c1-2"; };
       flaresolverr = { id = 78; host = "c1-2"; };
       minecraft = { id = 100; host = "c1-2"; };
-      userbox-nathaniel = { id = 110; host = "c1-2"; };
     } //
     mapAttrs (k: v: { g = group.vms; } // v) {
       vm1 = { id = 1; host = "d1"; dns = "host"; };
