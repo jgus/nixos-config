@@ -22,8 +22,9 @@ in
         gid = toString config.users.groups.${group}.gid;
       in
       [
-        "--tmpfs=/cache:exec,uid=${uid},gid=${gid}"
         "--tmpfs=/.cache:exec,uid=${uid},gid=${gid}"
+        "--tmpfs=/.local:exec,uid=${uid},gid=${gid}"
+        "--tmpfs=/cache:exec,uid=${uid},gid=${gid}"
         "--tmpfs=/config/.esphome/build:exec,uid=${uid},gid=${gid}"
         "--tmpfs=/config/.esphome/external_components:exec,uid=${uid},gid=${gid}"
       ];
