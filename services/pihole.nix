@@ -90,6 +90,7 @@ map
       ++ (map (n: "${pkgs.writeText "50-nixos-${n}.conf" dnsmasqConf.${n}}:/etc/dnsmasq.d/50-nixos-${n}.conf") (attrNames dnsmasqConf))
       ++ (map (n: "${tftpFiles.${n}}:/tftp/${n}") (attrNames tftpFiles));
       extraOptions = [
+        "--shm-size=256m"
         "--cap-add=NET_ADMIN"
       ] ++ (map (x: "--dns=${x}") upstream);
     };
