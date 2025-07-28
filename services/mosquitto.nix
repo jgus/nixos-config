@@ -19,6 +19,7 @@ let
     topic readwrite #
     user server
     topic readwrite server/#
+    topic readwrite systemctl/#
     topic readwrite homeassistant/#
     user frigate
     topic readwrite #
