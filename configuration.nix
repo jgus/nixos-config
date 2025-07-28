@@ -15,6 +15,7 @@ in
     ./services.nix
     ./backup.nix
     ./status2mqtt.nix
+    ./systemctl-mqtt.nix
   ]
   ++ (if machine.nvidia then [ ./nvidia.nix ] else [ ])
   ++ (if machine.zfs then [ ./zfs.nix ] else [ ])
