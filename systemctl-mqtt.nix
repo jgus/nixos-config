@@ -11,13 +11,13 @@ let
     , aiomqtt
     , jeepney
     }:
-    buildPythonApplication rec {
+    buildPythonApplication {
       pname = "systemctl-mqtt";
       version = "1.1.0";
       src = fetchFromGitHub {
         owner = "jgus";
         repo = "systemctl-mqtt";
-        rev = "4e8e9acc4ae8d46b543b2d9f4ab51d75728e1a2f";
+        rev = "c4623fd070749d8ef858ce9082e6e6d4316441cf";
         sha256 = "sha256-UH8GdLBkee0RwGi1Ee5nZf/fF4LdeDPUsayvOOj46Ks=";
       };
       dependencies = [
