@@ -23,7 +23,7 @@ let
 
   systemctlMqttPackage =
     { buildPythonApplication
-    , fetchPypi
+    , fetchFromGitHub
     , setuptools
     , setuptools-scm
     , wheel
@@ -33,9 +33,11 @@ let
     buildPythonApplication rec {
       pname = "systemctl-mqtt";
       version = "1.1.0";
-      src = fetchPypi {
-        inherit pname version;
-        hash = "sha256-JFx05LQIqrA2W2r7wzP7dwWDY7cutMGcS42DpM0gGsw=";
+      src = fetchFromGitHub {
+        owner = "jgus";
+        repo = "systemctl-mqtt";
+        rev = "e69f34c444dbb3a5fffd113e9439e46068c256ab";
+        sha256 = "sha256-cDTjgJDCTFn/fQ4Q09txdZbM0iiFm+OSHgDI1L7OP2Q=";
       };
       dependencies = [
         aiomqtt
