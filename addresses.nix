@@ -77,6 +77,8 @@ let
       owncloud-db = { id = 24; host = "c1-1"; };
       owncloud-redis = { id = 25; host = "c1-1"; };
       onlyoffice = { id = 26; host = "c1-2"; aliases = [ "office" ]; };
+      joyfulsong = { id = 27; host = "c1-2"; };
+      joyfulsong-db = { id = 28; host = "c1-2"; };
       home-assistant = { id = 30; host = "b1"; aliases = [ "homeassistant" "ha" ]; };
       esphome = { id = 31; host = "c1-2"; };
       mosquitto = { id = 32; host = "b1"; aliases = [ "mqtt" ]; };

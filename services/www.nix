@@ -36,7 +36,7 @@
       environment = {
         URL = "gustafson.me";
         SUBDOMAINS = "www,homeassistant,komga,drive,office,n-kvm,";
-        # EXTRA_DOMAINS = "gushome.org,www.gushome.org";
+        EXTRA_DOMAINS = "joyfulsong.org,www.joyfulsong.org";
         VALIDATION = "http";
         EMAIL = "joshgstfsn@gmail.com";
         PUID = toString config.users.users.www.uid;
