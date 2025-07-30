@@ -131,7 +131,7 @@ let
       lyra-lappy = { id = 51; mac = "f0:d4:15:30:c3:75"; };
       eden-lappy-eth = { id = 60; mac = "b4:45:06:82:82:e4"; };
       eden-lappy = { id = 61; mac = "f0:d4:15:30:c5:5a"; };
-      hope-lappy-eth = { id = 70; mac = "f4:c8:8a:e8:e1:a8"; };
+      hope-lappy-eth = { id = 70; mac = "b4:45:06:82:7e:e7"; };
       hope-lappy = { id = 71; mac = "f0:d4:15:30:c5:00"; };
       peter-lappy-eth = { id = 80; mac = "b4:45:06:82:7e:ff"; };
     } // {
