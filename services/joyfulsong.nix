@@ -6,20 +6,20 @@ in
   {
     name = "joyfulsong-db";
     docker = {
-      image = "mysql:9";
+      image = "mariadb";
       configVolume = "/var/lib/mysql";
       environment = {
-        MYSQL_DATABASE = "joyfulsong";
-        MYSQL_USER = "joyfulsong";
-        MYSQL_PASSWORD = "${pw.joyfulsong.dbPassword}";
-        MYSQL_RANDOM_ROOT_PASSWORD = "1";
+        MARIADB_DATABASE = "joyfulsong";
+        MARIADB_USER = "joyfulsong";
+        MARIADB_PASSWORD = "${pw.joyfulsong.dbPassword}";
+        MARIADB_RANDOM_ROOT_PASSWORD = "1";
       };
     };
   }
   {
     name = "joyfulsong";
     docker = {
-      image = "wordpress";
+      image = "wordpress:php8.3-apache";
       dependsOn = [ "joyfulsong-db" ];
       configVolume = "/var/www/html";
       ports = [
@@ -38,6 +38,9 @@ in
         WORDPRESS_SECURE_AUTH_SALT = pw.joyfulsong.SECURE_AUTH_SALT;
         WORDPRESS_LOGGED_IN_SALT = pw.joyfulsong.LOGGED_IN_SALT;
         WORDPRESS_NONCE_SALT = pw.joyfulsong.NONCE_SALT;
+        # WORDPRESS_ENVIRONMENT_TYPE = "production";
+        WORDPRESS_HOME = "http://joyfulsong.home.gustafson.me/";
+        WORDPRESS_SITEURL = "http://joyfulsong.home.gustafson.me/";
       };
     };
   }
