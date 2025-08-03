@@ -94,6 +94,11 @@ map
         "--shm-size=256m"
         "--cap-add=NET_ADMIN"
         "--tmpfs=/etc/pihole"
-      ] ++ (map (x: "--dns=${x}") upstream);
+      ]
+      ++
+      (map (x: "--dns=${x}") upstream)
+      ++
+      addresses.dockerAddAllHosts
+      ;
     };
   }) [ 1 2 3 ]

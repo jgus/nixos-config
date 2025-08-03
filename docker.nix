@@ -11,7 +11,7 @@ in
       autoPrune.enable = true;
       storageDriver = if machine.zfs then "zfs" else null;
       daemon.settings = {
-        dns = [ "172.22.0.1" ];
+        dns = [ "${addresses.records.pihole-1.ip}" "${addresses.records.pihole-2.ip}" "${addresses.records.pihole-3.ip}" ];
       };
     };
     oci-containers = {
