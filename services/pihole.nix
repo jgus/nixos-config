@@ -53,6 +53,7 @@ map
   in
   {
     inherit name;
+    configStorage = false;
     docker = {
       image = "pihole/pihole";
       environment = {
@@ -84,7 +85,7 @@ map
         "80/tcp"
         "443/tcp"
       ];
-      configVolume = "/etc/pihole";
+      # configVolume = "/etc/pihole";
       volumes = storagePath: [
       ]
       ++ (map (n: "${pkgs.writeText "50-nixos-${n}.conf" dnsmasqConf.${n}}:/etc/dnsmasq.d/50-nixos-${n}.conf") (attrNames dnsmasqConf))
@@ -92,6 +93,7 @@ map
       extraOptions = [
         "--shm-size=256m"
         "--cap-add=NET_ADMIN"
+        "--tmpfs=/etc/pihole"
       ] ++ (map (x: "--dns=${x}") upstream);
     };
   }) [ 1 2 3 ]
