@@ -25,7 +25,7 @@ in
         -p 19132/udp \
         -p 19133/udp \
         -p 25565/udp \
-        -p 25565/tcp \journ 
+        -p 25565/tcp \
         -p 8123/tcp \
         -v ${storagePath name}:/home/${name}/config \
         ${name}
