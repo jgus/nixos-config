@@ -30,7 +30,6 @@ in
           }) [
         { name = "joyfulsong"; path = "/service/joyfulsong"; }
       ])) // {
-        GROUP_joyfulsong = "33";
         UID_joyfulsong = "33";
         ACCOUNT_joyfulsong = "joyfulsong";
       };
