@@ -19,6 +19,7 @@ COPY auth.conf /etc/ssh/sshd_config.d/
 COPY entrypoint.sh /
 COPY start.sh /usr/local/bin
 COPY stop.sh /usr/local/bin
+COPY command.sh /usr/local/bin
 
 RUN groupadd --gid $gid minecraft && \
     useradd --uid $uid --gid $gid --password $pw --create-home --shell /bin/bash minecraft && \
