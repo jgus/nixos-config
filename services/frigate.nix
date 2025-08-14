@@ -182,7 +182,7 @@ let
       width = 320;
       height = 320;
     } else if (detector == "onnx") then {
-      path = "plus://7efe1d2424d8522a3f292a4efbb92324";
+      path = "plus://e6a3aa40b94b1494f5beac6f427343cb";
     } else { });
     record = {
       enabled = true;
