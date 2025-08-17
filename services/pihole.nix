@@ -91,7 +91,7 @@ map
       ++ (map (n: "${pkgs.writeText "50-nixos-${n}.conf" dnsmasqConf.${n}}:/etc/dnsmasq.d/50-nixos-${n}.conf") (attrNames dnsmasqConf))
       ++ (map (n: "${tftpFiles.${n}}:/tftp/${n}") (attrNames tftpFiles));
       extraOptions = [
-        "--shm-size=256m"
+        "--shm-size=1g"
         "--cap-add=NET_ADMIN"
         "--tmpfs=/etc/pihole"
       ]
