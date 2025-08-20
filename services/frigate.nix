@@ -1,9 +1,8 @@
 with builtins;
 let
   pw = import ./../.secrets/passwords.nix;
-  # detector = "coral";
-  # detector = "tensorrt";
-  detector = "onnx";
+  detector = "coral";
+  # detector = "onnx";
   doorbell = {
     user = "admin";
     password = pw.doorbell;
@@ -147,7 +146,7 @@ let
     };
   };
   configuration = {
-    version = "0.15-1";
+    version = "0.16-0";
     # logger.default = "debug";
     mqtt = {
       host = "mqtt.home.gustafson.me";
@@ -167,23 +166,19 @@ let
       coral2 = { type = "edgetpu"; device = "pci:1"; };
       # coral3 = { type = "edgetpu"; device = "usb:0"; };
       # coral4 = { type = "edgetpu"; device = "usb:1"; };
-    } else if (detector == "tensorrt") then {
-      tensorrt0 = { type = "tensorrt"; device = "0"; };
-      # tensorrt1 = { type = "tensorrt"; device = "1"; };
     } else if (detector == "onnx") then {
       onnx0 = { type = "onnx"; device = "0"; };
       onnx1 = { type = "onnx"; device = "1"; };
     } else { });
-    model = (if (detector == "tensorrt") then {
-      path = "/config/model_cache/tensorrt/yolov7-320.trt";
-      labelmap_path = "/labelmap/coco-80.txt";
-      input_tensor = "nchw";
-      input_pixel_format = "rgb";
-      width = 320;
-      height = 320;
+    model = (if (detector == "coral") then {
+      path = "plus://89f920ad4116b84bfa004741fef7db93"; # custom 8/19/2025
     } else if (detector == "onnx") then {
-      path = "plus://e6a3aa40b94b1494f5beac6f427343cb";
+      # path = "plus://717c77b1c548a9f5371b44e1ec8466fd"; # stock 2025.2
+      path = "plus://e6a3aa40b94b1494f5beac6f427343cb"; # custom 8/13/2025
     } else { });
+    detect = {
+      enabled = true;
+    };
     record = {
       enabled = true;
       retain = { days = 7; mode = "motion"; };
@@ -253,9 +248,6 @@ in
     environment = {
       PLUS_API_KEY = pw.frigate_plus;
       FRIGATE_RTSP_PASSWORD = "password";
-      # YOLO_MODELS = "yolov7-320,yolov7-416,yolov7-640";
-      YOLO_MODELS = "yolov7-320";
-      USE_FP16 = "false";
     };
     ports = [
       "5000"
@@ -273,6 +265,7 @@ in
     ];
     extraOptions = [
       "--shm-size=4g"
+      "--tmpfs=/tmp"
       "--ulimit=nofile=${toString (4*1024)}:${toString (16*1024)}"
       "--device=nvidia.com/gpu=all"
       "--device=/dev/apex_0:/dev/apex_0"
