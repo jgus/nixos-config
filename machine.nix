@@ -58,7 +58,10 @@ let
       hostId = "8f150749";
       lan-interface = "enp1s0";
       zfs-pools = [ ];
-      imports = [ ./machine/b1/ups.nix ];
+      imports = [
+        ./machine/b1/nebula-sync.nix
+        ./machine/b1/ups.nix
+      ];
     };
     pi-67cba1 = rpi // {
       stateVersion = "23.05";
