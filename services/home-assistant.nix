@@ -1,5 +1,6 @@
 with builtins;
 let
+  addresses = import ./../addresses.nix;
   pw = import ./../.secrets/passwords.nix;
   name = "home-assistant";
   user = "home-assistant";
@@ -182,6 +183,17 @@ in
   };
   extraConfig = {
     environment.etc = {
+      "${name}/http.yaml" = {
+        source = (pkgs.formats.yaml { }).generate "http.yaml" {
+          use_x_forwarded_for = true;
+          trusted_proxies = [
+            addresses.nameToIp.web-swag
+            addresses.nameToIp6.web-swag
+            addresses.nameToIp.cloudflared
+            addresses.nameToIp6.cloudflared
+          ];
+        };
+      };
       "${name}/automation/verify_device_ids.yaml" = {
         source = (pkgs.formats.yaml { }).generate "verify_device_ids.yaml" {
           id = "verify_device_ids";

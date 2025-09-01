@@ -275,4 +275,4 @@ let
     (map (n: "--add-host=${n}.${network.domain}:${getAttr n nameToIp6}") names6)
   ;
 in
-{ inherit network group records nameToIp ipToIp6 serverNames hosts hosts6 dhcpReservations dockerOptions dockerAddAllHosts; }
+{ inherit network group records nameToIp nameToIp6 ipToIp6 serverNames hosts hosts6 dhcpReservations dockerOptions dockerAddAllHosts; }
