@@ -117,6 +117,8 @@ let
               (if configStorage then [ "${storagePath name}:${docker.configVolume}" ] else [ ]);
           extraOptions = (if (docker ? extraOptions) then docker.extraOptions else [ ])
             ++ dockerOptions;
+          entrypoint = (if (docker ? entrypoint) then docker.entrypoint else null);
+          cmd = (if (docker ? entrypointOptions) then docker.entrypointOptions else [ ]);
         }
         // (if (docker ? imageFile) then { imageFile = docker.imageFile; } else { })
         // (if (docker ? dependsOn) then { dependsOn = docker.dependsOn; } else { })

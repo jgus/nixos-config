@@ -100,6 +100,7 @@ let
       mylar = { id = 76; host = "c1-2"; };
       komga = { id = 77; host = "c1-2"; };
       flaresolverr = { id = 78; host = "c1-2"; };
+      cloudflared = { id = 80; host = "c1-2"; };
       minecraft = { id = 100; host = "c1-2"; };
     } //
     mapAttrs (k: v: { g = group.vms; } // v) {
