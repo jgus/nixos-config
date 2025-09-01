@@ -39,8 +39,8 @@ in
         WORDPRESS_LOGGED_IN_SALT = pw.joyfulsong.LOGGED_IN_SALT;
         WORDPRESS_NONCE_SALT = pw.joyfulsong.NONCE_SALT;
         # WORDPRESS_ENVIRONMENT_TYPE = "production";
-        WORDPRESS_HOME = "http://joyfulsong.home.gustafson.me/";
-        WORDPRESS_SITEURL = "http://joyfulsong.home.gustafson.me/";
+        WORDPRESS_HOME = "http://joyfulsong.org/";
+        WORDPRESS_SITEURL = "http://joyfulsong.org/";
       };
     };
   }
