@@ -79,6 +79,7 @@ in
     direnv.enable = true;
     git.enable = true;
     git.lfs.enable = true;
+    gnupg.agent.enable = true;
     htop.enable = true;
     mosh.enable = true;
     nix-index.enable = true;
