@@ -145,6 +145,18 @@ let
       };
     };
   };
+  zone_objects = {
+    back_yard = [ "person" "face" ];
+    basement_patio = [ "person" "face" ];
+    driveway = [ "person" "face" "car" "license_plate" "amazon" "usps" "ups" "fedex" "package" ];
+    front_yard = [ "person" "face" "car" "license_plate" "amazon" "usps" "ups" "fedex" "package" ];
+    garage = [ "person" "face" "car" ];
+    garage_rear = [ "person" "face" ];
+    n_side = [ "person" "face" ];
+    patio = [ "person" "face" ];
+    porch = [ "person" "face" "car" "license_plate" "amazon" "usps" "ups" "fedex" "package" ];
+    s_side = [ "person" "face" "car" "license_plate" "amazon" "usps" "ups" "fedex" "package" ];
+  };
   configuration = {
     version = "0.16-0";
     # logger.default = "debug";
@@ -226,7 +238,14 @@ let
           snapshots.enabled = true;
           motion.mask = masks;
         } // (if (value ? zones) then {
-          zones = mapAttrs (key: value: { coordinates = numlist value; }) value.zones;
+          zones = mapAttrs
+            (key: value:
+              {
+                coordinates = numlist value;
+                objects = (getAttr key zone_objects);
+              }
+            )
+            value.zones;
         } else { }) // (if (value ? masks) then {
           objects.filters = {
             car.mask = masks;
