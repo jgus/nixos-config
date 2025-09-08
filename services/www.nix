@@ -58,7 +58,6 @@
         "${storagePath "swag_config"}/keys:/config/keys"
         "${storagePath "swag_config"}/etc/letsencrypt:/config/etc/letsencrypt"
         "/storage/service/www:/config/www"
-        "/storage/service/dav:/config/www/dav"
       ];
     };
     extraConfig = {
