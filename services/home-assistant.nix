@@ -56,26 +56,6 @@ let
     { command = "f4"; code = "74"; }
     { command = "f5"; code = "75"; }
   ];
-  gree_climate_devices = [
-    {
-      id = "server_climate";
-      name = "Server Climate";
-      host = "server-climate";
-      mac = "9424b86c0f41";
-    }
-    {
-      id = "theater_climate_unit";
-      name = "Theater Climate Unit";
-      host = "theater-climate";
-      mac = "9424b86c1013";
-    }
-    {
-      id = "workshop_climate_unit";
-      name = "Workshop Climate Unit";
-      host = "workshop-climate";
-      mac = "9424b86d4792";
-    }
-  ];
   light_groups = {
     "Great Room" = [
       "light.dining_room_light"
@@ -240,120 +220,119 @@ in
       };
     }
     //
-    listToAttrs
-      (lib.lists.flatten (map
-        (
-          w:
-          (if w.has_shade then [
-            {
-              name = "${name}/input_number/${w.target_name}.yaml";
-              value = {
-                text = ''
-                  min: 0
-                  max: 100
-                '';
+    listToAttrs (lib.lists.flatten (map
+      (
+        w:
+        (if w.has_shade then [
+          {
+            name = "${name}/input_number/${w.target_name}.yaml";
+            value = {
+              text = ''
+                min: 0
+                max: 100
+              '';
+            };
+          }
+          {
+            name = "${name}/input_boolean/${w.override_name}.yaml";
+            value = { text = "initial: false"; };
+          }
+          {
+            name = "${name}/automation/${w.shade_name}_auto_set.yaml";
+            value = {
+              source = (pkgs.formats.yaml { }).generate "${w.shade_name}_auto_set.yaml" {
+                alias = "${w.shade_name} auto set";
+                id = "${w.shade_name}_auto_set";
+                mode = "restart";
+                trigger = [
+                  {
+                    platform = "state";
+                    entity_id = [ "input_number.${w.target_name}" ];
+                  }
+                  {
+                    platform = "state";
+                    entity_id = [ "input_boolean.${w.override_name}" ];
+                    to = "off";
+                  }
+                ] ++ (if w.opens then [
+                  {
+                    platform = "state";
+                    entity_id = [ "binary_sensor.${w.window_name}" ];
+                  }
+                ] else [ ]);
+                condition = [
+                  {
+                    condition = "state";
+                    entity_id = "input_boolean.${w.override_name}";
+                    state = "off";
+                  }
+                ];
+                action = [
+                  {
+                    variables = {
+                      p = if w.opens then "{{ [states('input_number.${w.target_name}') | int, ${toString w.open_limit} if is_state('binary_sensor.${w.window_name}', 'on') else 0] | max }}" else "{{ states('input_number.${w.target_name}') | int }}";
+                    };
+                  }
+                  {
+                    service = "cover.set_cover_position";
+                    target = { entity_id = "cover.${w.shade_name}"; };
+                    data = { position = "{{ p }}"; };
+                  }
+                ];
               };
-            }
-            {
-              name = "${name}/input_boolean/${w.override_name}.yaml";
-              value = { text = "initial: false"; };
-            }
-            {
-              name = "${name}/automation/${w.shade_name}_auto_set.yaml";
-              value = {
-                source = (pkgs.formats.yaml { }).generate "${w.shade_name}_auto_set.yaml" {
-                  alias = "${w.shade_name} auto set";
-                  id = "${w.shade_name}_auto_set";
-                  mode = "restart";
-                  trigger = [
-                    {
-                      platform = "state";
-                      entity_id = [ "input_number.${w.target_name}" ];
-                    }
-                    {
-                      platform = "state";
-                      entity_id = [ "input_boolean.${w.override_name}" ];
-                      to = "off";
-                    }
-                  ] ++ (if w.opens then [
-                    {
-                      platform = "state";
-                      entity_id = [ "binary_sensor.${w.window_name}" ];
-                    }
-                  ] else [ ]);
-                  condition = [
-                    {
-                      condition = "state";
-                      entity_id = "input_boolean.${w.override_name}";
-                      state = "off";
-                    }
-                  ];
-                  action = [
-                    {
-                      variables = {
-                        p = if w.opens then "{{ [states('input_number.${w.target_name}') | int, ${toString w.open_limit} if is_state('binary_sensor.${w.window_name}', 'on') else 0] | max }}" else "{{ states('input_number.${w.target_name}') | int }}";
-                      };
-                    }
-                    {
-                      service = "cover.set_cover_position";
-                      target = { entity_id = "cover.${w.shade_name}"; };
-                      data = { position = "{{ p }}"; };
-                    }
-                  ];
-                };
-              };
-            }
-            {
-              name = "${name}/automation/${w.shade_name}_user_set.yaml";
-              value = {
-                text = ''
-                  alias: ${w.shade_name} user set
-                  id: ${w.shade_name}_user_set
-                  mode: restart
-                  trigger:
-                    - platform: state
-                      entity_id:
-                        - cover.${w.shade_name}
-                      attribute: current_position
-                      for:
-                        seconds: 10
-                  condition: >-
-                    {% if ("current_position" not in trigger.from_state.attributes) or ("current_position" not in trigger.to_state.attributes) %}
-                      false
-                    {% else %}
-                      {{ ([trigger.from_state.attributes.current_position | int, trigger.to_state.attributes.current_position | int, states('input_number.${w.target_name}') | int] | sort)[1] != (trigger.to_state.attributes.current_position | int) }}
-                    {% endif %}
-                  action:
-                    - service: input_boolean.turn_on
-                      target:
-                        entity_id: input_boolean.${w.override_name}
-                '';
-              };
-            }
-            {
-              name = "${name}/automation/${w.shade_name}_user_reset.yaml";
-              value = {
-                text = ''
-                  alias: ${w.shade_name} user reset
-                  id: ${w.shade_name}_user_reset
-                  mode: restart
-                  trigger:
-                    - platform: state
-                      entity_id:
-                        - input_boolean.${w.override_name}
-                      to: "on"
-                      for:
-                        hours: 2
-                  action:
-                    - service: input_boolean.turn_off
-                      target:
-                        entity_id: input_boolean.${w.override_name}
-                '';
-              };
-            }
-          ] else [ ])
-        )
-        windows))
+            };
+          }
+          {
+            name = "${name}/automation/${w.shade_name}_user_set.yaml";
+            value = {
+              text = ''
+                alias: ${w.shade_name} user set
+                id: ${w.shade_name}_user_set
+                mode: restart
+                trigger:
+                  - platform: state
+                    entity_id:
+                      - cover.${w.shade_name}
+                    attribute: current_position
+                    for:
+                      seconds: 10
+                condition: >-
+                  {% if ("current_position" not in trigger.from_state.attributes) or ("current_position" not in trigger.to_state.attributes) %}
+                    false
+                  {% else %}
+                    {{ ([trigger.from_state.attributes.current_position | int, trigger.to_state.attributes.current_position | int, states('input_number.${w.target_name}') | int] | sort)[1] != (trigger.to_state.attributes.current_position | int) }}
+                  {% endif %}
+                action:
+                  - service: input_boolean.turn_on
+                    target:
+                      entity_id: input_boolean.${w.override_name}
+              '';
+            };
+          }
+          {
+            name = "${name}/automation/${w.shade_name}_user_reset.yaml";
+            value = {
+              text = ''
+                alias: ${w.shade_name} user reset
+                id: ${w.shade_name}_user_reset
+                mode: restart
+                trigger:
+                  - platform: state
+                    entity_id:
+                      - input_boolean.${w.override_name}
+                    to: "on"
+                    for:
+                      hours: 2
+                action:
+                  - service: input_boolean.turn_off
+                    target:
+                      entity_id: input_boolean.${w.override_name}
+              '';
+            };
+          }
+        ] else [ ])
+      )
+      windows))
     //
     listToAttrs (lib.lists.flatten (map
       (
@@ -371,67 +350,6 @@ in
           cec_map)
       )
       theater_devices))
-    //
-    listToAttrs (lib.lists.flatten (map
-      (
-        i: [
-          {
-            name = "${name}/input_boolean/${i.id}_lights.yaml";
-            value = {
-              text = ''
-                name: ${i.name} Display Ligts
-                icon: mdi:numeric
-              '';
-            };
-          }
-          # { name = "${name}/input_boolean/${i.id}_xfan.yaml"; value = { text = ""; }; }
-          # { name = "${name}/input_boolean/${i.id}_health.yaml"; value = { text = ""; }; }
-          # { name = "${name}/input_boolean/${i.id}_sleep.yaml"; value = { text = ""; }; }
-          # { name = "${name}/input_boolean/${i.id}_powersave.yaml"; value = { text = ""; }; }
-          {
-            name = "${name}/input_boolean/${i.id}_eightdegheat.yaml";
-            value = {
-              text = ''
-                name: ${i.name} Maintenance Heat
-                icon: mdi:fire
-              '';
-            };
-          }
-          # { name = "${name}/input_boolean/${i.id}_air.yaml"; value = { text = ""; }; }
-          {
-            name = "${name}/input_boolean/${i.id}_beeper.yaml";
-            value = {
-              text = ''
-                name: ${i.name} Beeper
-                icon: mdi:volume-high
-              '';
-            };
-          }
-          {
-            name = "${name}/climate/${i.id}.yaml";
-            value = {
-              text = ''
-                platform: gree
-                name: ${i.name}
-                host: ${i.host}.home.gustafson.me
-                port: 7000
-                mac: ${i.mac}
-                target_temp_step: 1
-                encryption_version: 2
-                lights: input_boolean.${i.id}_lights
-                # xfan: input_boolean.${i.id}_xfan
-                # health: input_boolean.${i.id}_health
-                # sleep: input_boolean.${i.id}_sleep
-                # powersave: input_boolean.${i.id}_powersave
-                eightdegheat: input_boolean.${i.id}_eightdegheat
-                # air: input_boolean.${i.id}_air
-                beeper: input_boolean.${i.id}_beeper
-              '';
-            };
-          }
-        ]
-      )
-      gree_climate_devices))
     //
     listToAttrs (lib.lists.flatten (map
       (
