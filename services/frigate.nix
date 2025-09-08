@@ -208,6 +208,20 @@ let
       height = 2160;
       restream = true;
     };
+    semantic_search = {
+      enabled = true;
+      model = "jinav1";
+      model_size = "large";
+    };
+    face_recognition = {
+      enabled = true;
+      model_size = "large";
+    };
+    lpr = {
+      enabled = true;
+      device = "GPU";
+      model_size = "small";
+    };
     cameras = mapAttrs
       (key: value:
         let
