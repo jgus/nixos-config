@@ -35,7 +35,7 @@
       ];
       environment = {
         URL = "gustafson.me";
-        SUBDOMAINS = "www,homeassistant,komga,drive,office,n-kvm,";
+        SUBDOMAINS = "www";
         EXTRA_DOMAINS = "joyfulsong.org,www.joyfulsong.org";
         VALIDATION = "http";
         EMAIL = "joshgstfsn@gmail.com";
@@ -51,8 +51,6 @@
         "/etc/nixos/services/www/site-confs/default.conf:/config/nginx/site-confs/default.conf"
         "/etc/nixos/services/www/location-confs:/config/nginx/location-confs"
       ]
-      ++
-      (map (i: "/etc/nixos/services/www/proxy-confs/${i}.subdomain.conf:/config/nginx/proxy-confs/${i}.subdomain.conf") [ "homeassistant" "komga" "owncloud" "onlyoffice" "n-kvm" ])
       ++
       [
         "${storagePath "swag_config"}/keys:/config/keys"
