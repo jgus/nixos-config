@@ -97,7 +97,7 @@ let
       sonarr = { id = 73; host = "c1-2"; };
       radarr = { id = 74; host = "c1-2"; };
       lidarr = { id = 75; host = "c1-2"; };
-      mylar = { id = 76; host = "c1-2"; };
+      kapowarr = { id = 76; host = "c1-2"; };
       komga = { id = 77; host = "c1-2"; };
       flaresolverr = { id = 78; host = "c1-2"; };
       cloudflared = { id = 80; host = "c1-2"; };
