@@ -67,6 +67,7 @@ let
       landing = { id = 3; host = "b1"; };
       pihole-2 = { id = 4; host = "c1-1"; aliases = [ "dhcp-2" "dns-2" ]; };
       pihole-3 = { id = 5; host = "d1"; aliases = [ "dhcp-3" "dns-3" ]; };
+      cloudflared = { id = 6; host = "c1-2"; };
       samba = { id = 10; host = "c1-1"; aliases = [ "smb" "nas" ]; };
       syncthing = { id = 11; host = "c1-1"; };
       garage = { id = 12; host = "d1"; };
@@ -100,7 +101,9 @@ let
       kapowarr = { id = 76; host = "c1-2"; };
       komga = { id = 77; host = "c1-2"; };
       flaresolverr = { id = 78; host = "c1-2"; };
-      cloudflared = { id = 80; host = "c1-2"; };
+      lazylibrarian = { id = 79; host = "c1-2"; };
+      calibre = { id = 80; host = "c1-2"; };
+      audiobookshelf = { id = 81; host = "c1-2"; };
       minecraft = { id = 100; host = "c1-2"; };
     } //
     mapAttrs (k: v: { g = group.vms; } // v) {
