@@ -2,7 +2,7 @@ let
   addresses = import ./addresses.nix;
   machine = import ./machine.nix;
 in
-{ pkgs, lib, ... }:
+{ pkgs, lib, options, ... }:
 {
   boot = {
     initrd.secrets."/etc/nixos/.secrets/vkey" = ./.secrets/vkey;
@@ -83,6 +83,14 @@ in
     htop.enable = true;
     mosh.enable = true;
     nix-index.enable = true;
+    nix-ld = {
+      enable = true;
+      libraries = options.programs.nix-ld.libraries.default ++ (
+        with pkgs; [
+          glib # libglib-2.0.so.0, libgthread-2.0.so.0
+        ]
+      );
+    };
     ssh.startAgent = true;
     tmux.enable = true;
   };
