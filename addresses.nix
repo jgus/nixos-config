@@ -104,6 +104,7 @@ let
       lazylibrarian = { id = 79; host = "c1-2"; };
       calibre = { id = 80; host = "c1-2"; };
       audiobookshelf = { id = 81; host = "c1-2"; };
+      qbittorrent = { id = 82; host = "c1-2"; };
       minecraft = { id = 100; host = "c1-2"; };
     } //
     mapAttrs (k: v: { g = group.vms; } // v) {
