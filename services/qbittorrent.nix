@@ -1,5 +1,4 @@
 let
-  pw = import ./../.secrets/passwords.nix;
   user = "josh";
   group = "plex";
 in
@@ -7,25 +6,22 @@ in
 {
   requires = [ "storage-scratch.mount" ];
   docker = {
-    image = "lscr.io/linuxserver/transmission";
+    image = "lscr.io/linuxserver/qbittorrent";
     environment = {
       PUID = toString config.users.users.${user}.uid;
       PGID = toString config.users.groups.${group}.gid;
       TZ = config.time.timeZone;
-      USER = "josh";
-      PASS = pw.transmission;
+      WEBUI_PORT = "80";
+      TORRENTING_PORT = "6881";
     };
     ports = [
-      "9091"
-      "51413"
-      "51413/udp"
+      "80"
+      "6881"
+      "6881/udp"
     ];
     configVolume = "/config";
     volumes = [
       "/storage/scratch/torrent:/torrent"
     ];
-    # extraOptions = [
-    #   "--cap-add=NET_ADMIN"
-    # ];
   };
 }
