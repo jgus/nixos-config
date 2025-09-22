@@ -6,7 +6,7 @@ in
 {
   requires = [ "storage-media.mount" ];
   docker = {
-    image = "lscr.io/linuxserver/lazylibrarian";
+    image = "lscr.io/linuxserver/lazylibrarian:version-1746a35a";
     environment = {
       PUID = toString config.users.users.${user}.uid;
       PGID = toString config.users.groups.${group}.gid;
