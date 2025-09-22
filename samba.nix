@@ -19,14 +19,14 @@
     samba = {
       enable = true;
       openFirewall = true;
-      securityType = "user";
-      extraConfig = ''
-        server role = standalone server
-        wins support = yes
-        workgroup = WORKGROUP
-        server string = Gustafson-NAS
-      '';
-      shares = {
+      settings = {
+	global = {
+	  "server role" = "standalone server";
+          "wins support" = "yes";
+          "workgroup" = "WORKGROUP";
+          "server string" = "Gustafson-NAS";
+          "security" = "user";
+	};
         Files = {
           path = "/d/Files";
           browseable = "yes";
