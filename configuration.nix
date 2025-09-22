@@ -13,7 +13,7 @@
       ./users.nix
 
       #./backup-gateway-client.nix
-      ./dyndns.nix
+      #./dyndns.nix
       ./tailscale.nix
       ./plex.nix
       ./samba.nix
