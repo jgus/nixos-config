@@ -68,6 +68,7 @@ let
       pihole-2 = { id = 4; host = "c1-1"; aliases = [ "dhcp-2" "dns-2" ]; };
       pihole-3 = { id = 5; host = "d1"; aliases = [ "dhcp-3" "dns-3" ]; };
       cloudflared = { id = 6; host = "c1-2"; };
+      headscale = { id = 7; host = "c1-2"; };
       samba = { id = 10; host = "c1-1"; aliases = [ "smb" "nas" ]; };
       syncthing = { id = 11; host = "c1-1"; };
       garage = { id = 12; host = "d1"; };
