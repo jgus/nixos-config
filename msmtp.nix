@@ -1,5 +1,4 @@
 { ... }:
-
 {
   programs.msmtp = {
     enable = true;
@@ -9,11 +8,11 @@
     };
     accounts = {
       default = {
-        host = "smtp.gmail.com";
+        host = "mail.smtp2go.com";
         port = 587;
-        from = "joshgstfsn@gmail.com";
-        user = "joshgstfsn";
-        password = import .secrets/gmail-password.nix;
+        from = "alert@gustafson.me";
+        user = "gustafsonme";
+        password = (import .secrets/passwords.nix).smtp2go;
       };
     };
   };
