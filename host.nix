@@ -1,7 +1,7 @@
 { ... }:
 
 {
-  time.timeZone = "America/Los_Angeles";
+  time.timeZone = "America/Denver";
 
   networking = {
     hostName = "gustafson-nas";
