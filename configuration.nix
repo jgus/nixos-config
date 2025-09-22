@@ -12,8 +12,9 @@
       ./host.nix
       ./users.nix
 
-      ./backup-gateway-client.nix
+      #./backup-gateway-client.nix
       ./dyndns.nix
+      ./tailscale.nix
       ./plex.nix
       ./samba.nix
       ./vscode.nix
