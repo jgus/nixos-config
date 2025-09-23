@@ -4,7 +4,6 @@ let
 in
 { config, ... }:
 {
-  name = "esphome";
   inherit user group;
   docker = {
     image = "ghcr.io/esphome/esphome";
