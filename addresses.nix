@@ -92,6 +92,7 @@ let
       zwave-basement = { id = 42; host = "b1"; };
       frigate = { id = 50; host = "d1"; };
       plex = { id = 60; host = "d1"; };
+      jellyfin = { id = 61; host = "d1"; };
       sabnzbd = { id = 70; host = "c1-2"; };
       transmission = { id = 71; host = "c1-2"; };
       prowlarr = { id = 72; host = "c1-2"; };
