@@ -93,6 +93,7 @@ let
       frigate = { id = 50; host = "d1"; };
       ollama = { id = 51; host = "d1"; };
       open-webui = { id = 52; host = "d1"; };
+      searxng = { id = 53; host = "c1-2"; };
       plex = { id = 60; host = "d1"; };
       jellyfin = { id = 61; host = "d1"; };
       sabnzbd = { id = 70; host = "c1-2"; };
