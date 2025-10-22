@@ -1,17 +1,22 @@
 let
+  addresses = import ./../addresses.nix;
   user = "plex";
   group = "plex";
 in
 { config, ... }:
+let
+  uid = toString config.users.users.${user}.uid;
+  gid = toString config.users.groups.${group}.gid;
+in
 {
   requires = [ "storage-media.mount" "storage-photos.mount" ];
   docker = {
-    image = "lscr.io/linuxserver/jellyfin:10.10.7";
+    image = "lscr.io/linuxserver/jellyfin";
     environment = {
-      PUID = toString config.users.users.${user}.uid;
-      PGID = toString config.users.groups.${group}.gid;
+      PUID = uid;
+      PGID = gid;
       TZ = config.time.timeZone;
-      VERSION = "latest";
+      JELLYFIN_PublishedServerUrl = "http://jellyfin.${addresses.network.domain}:8096";
     };
     configVolume = "/config";
     volumes = [
@@ -21,8 +26,8 @@ in
     extraOptions = [
       "--device=nvidia.com/gpu=0"
       "--device=/dev/dri:/dev/dri"
-      "--tmpfs=/tmp"
-      "--tmpfs=/config/cache/transcodes"
+      "--tmpfs=/tmp:exec,uid=${uid},gid=${gid}"
+      "--tmpfs=/config/cache/transcodes:exec,uid=${uid},gid=${gid}"
     ];
   };
 }
