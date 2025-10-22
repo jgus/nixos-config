@@ -6,7 +6,7 @@ in
 {
   requires = [ "storage-media.mount" "storage-photos.mount" ];
   docker = {
-    image = "lscr.io/linuxserver/jellyfin";
+    image = "lscr.io/linuxserver/jellyfin:10.10.7";
     environment = {
       PUID = toString config.users.users.${user}.uid;
       PGID = toString config.users.groups.${group}.gid;
