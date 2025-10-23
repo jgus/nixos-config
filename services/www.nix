@@ -1,4 +1,57 @@
-{ config, pkgs, ... }:
+with builtins;
+{ config, lib, pkgs, ... }:
+let
+  publicDomain = "gustafson.me";
+  forwards = {
+    homeassistant = {
+      host = "ha";
+      port = 8123;
+      extraPaths = "^/(api|local|media)/";
+    };
+    komga = {
+      host = "komga";
+      port = 25600;
+      extraPaths = "(/komga)?/api";
+    };
+    office = {
+      host = "onlyoffice";
+      port = 80;
+    };
+    drive = {
+      host = "owncloud";
+      port = 8080;
+    };
+  };
+  forwardConfig = name:
+    let
+      forward = getAttr name forwards;
+      locationConfig = ''
+        include /config/nginx/proxy.conf;
+        include /config/nginx/resolver.conf;
+        set $upstream_app ${forward.host};
+        set $upstream_port ${toString forward.port};
+        set $upstream_proto http;
+        proxy_pass $upstream_proto://$upstream_app:$upstream_port;
+      '';
+    in
+    (pkgs.writeText "${name}.subdomain.conf" (''
+      server {
+        listen 443 ssl;
+        listen [::]:443 ssl;
+        server_name ${name}.${publicDomain};
+        include /config/nginx/ssl.conf;
+        client_max_body_size 0;
+        location / {
+          ${locationConfig}
+        }
+    '' + (if (hasAttr "extraPaths" forward) then ''
+      location ~ ${forward.extraPaths} {
+        ${locationConfig}
+      }
+    '' else "") + ''
+      }
+    ''));
+in
 [
   {
     name = "web-db-admin";
@@ -35,7 +88,7 @@
       ];
       environment = {
         URL = "gustafson.me";
-        SUBDOMAINS = "www";
+        SUBDOMAINS = "www,${lib.strings.concatStringsSep "," (attrNames forwards)},";
         EXTRA_DOMAINS = "joyfulsong.org,www.joyfulsong.org";
         VALIDATION = "http";
         EMAIL = "joshgstfsn@gmail.com";
@@ -51,6 +104,8 @@
         "/etc/nixos/services/www/site-confs/default.conf:/config/nginx/site-confs/default.conf"
         "/etc/nixos/services/www/location-confs:/config/nginx/location-confs"
       ]
+      ++
+      (map (i: "${forwardConfig i}:/config/nginx/proxy-confs/${i}.subdomain.conf") (attrNames forwards))
       ++
       [
         "${storagePath "swag_config"}/keys:/config/keys"
