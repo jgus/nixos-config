@@ -3,7 +3,7 @@ with builtins;
 let
   publicDomain = "gustafson.me";
   forwards = {
-    homeassistant = {
+    ha = {
       host = "ha";
       port = 8123;
       extraPaths = "^/(api|local|media)/";
@@ -21,6 +21,27 @@ let
       host = "owncloud";
       port = 8080;
     };
+    audiobookshelf = {
+      host = "audiobookshelf";
+      port = 80;
+    };
+    calibre = {
+      host = "calibre";
+      port = 8083;
+    };
+    search = {
+      host = "audiobookshelf";
+      port = 80;
+    };
+    open-webui = {
+      host = "open-webui";
+      port = 8080;
+    };
+    jellyfin = {
+      host = "jellyfin";
+      port = 8096;
+      extraPaths = "/socket";
+    };
   };
   forwardConfig = name:
     let
@@ -32,12 +53,20 @@ let
         set $upstream_port ${toString forward.port};
         set $upstream_proto http;
         proxy_pass $upstream_proto://$upstream_app:$upstream_port;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Protocol $scheme;
+        proxy_set_header X-Forwarded-Host $http_host;
+        proxy_buffering off;
       '';
     in
     (pkgs.writeText "${name}.subdomain.conf" (''
       server {
         listen 443 ssl;
+        # listen 443 quic reuseport;
         listen [::]:443 ssl;
+        # listen [::]:443 quic reuseport;
         server_name ${name}.${publicDomain};
         include /config/nginx/ssl.conf;
         client_max_body_size 0;
@@ -89,8 +118,10 @@ in
       environment = {
         URL = "gustafson.me";
         SUBDOMAINS = "www,${lib.strings.concatStringsSep "," (attrNames forwards)},";
-        EXTRA_DOMAINS = "joyfulsong.org,www.joyfulsong.org";
+        # EXTRA_DOMAINS = "joyfulsong.org,www.joyfulsong.org";
         VALIDATION = "http";
+        # VALIDATION = "dns";
+        # DNSPLUGIN = "cloudflare";
         EMAIL = "joshgstfsn@gmail.com";
         PUID = toString config.users.users.www.uid;
         PGID = toString config.users.groups.www.gid;
