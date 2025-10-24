@@ -1,20 +1,17 @@
-with builtins;
-{ config, lib, pkgs, ... }:
+{ pkgs, ... }:
 let
   addresses = import ./../addresses.nix;
   publicDomain = "gustafson.me";
   caddyFile = ''
     ${publicDomain}, www.${publicDomain} {
-      root * /usr/share/caddy
-      encode gzip
-      php_fastcgi unix//run/php/php-version-fpm.sock
-      file_server
-      @disallowed {
-        path /xmlrpc.php
-        path *.sql
-        path /wp-content/uploads/*.php
+      handle_path /journal/* {
+        reverse_proxy journal.${addresses.network.domain}:80
       }
-      rewrite @disallowed '/index.php'
+      handle {
+        root * /usr/share/caddy
+        encode gzip
+        file_server
+      }
     }
     ha.${publicDomain} {
       reverse_proxy ha.${addresses.network.domain}:8123
@@ -50,7 +47,6 @@ in
   extraStorage = [ "web_data" ];
   docker = {
     image = "caddy";
-    dependsOn = [ "web-db" ];
     ports = [
       "80"
       "443"
