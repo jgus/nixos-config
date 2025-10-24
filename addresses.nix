@@ -73,7 +73,8 @@ let
       garage = { id = 12; host = "d1"; };
       samba-c1-2 = { id = 13; host = "c1-2"; };
       web = { id = 20; host = "c1-2"; };
-      web-db = { id = 21; host = "c1-2"; aliases = [ "db" ]; };
+      journal = { id = 21; host = "c1-2"; };
+      journal-db = { id = 22; host = "c1-2"; };
       owncloud = { id = 23; host = "c1-1"; aliases = [ "drive" ]; };
       owncloud-db = { id = 24; host = "c1-1"; };
       owncloud-redis = { id = 25; host = "c1-1"; };
