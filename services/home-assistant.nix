@@ -167,8 +167,8 @@ in
         source = (pkgs.formats.yaml { }).generate "http.yaml" {
           use_x_forwarded_for = true;
           trusted_proxies = [
-            addresses.nameToIp.web-swag
-            addresses.nameToIp6.web-swag
+            addresses.nameToIp.web
+            addresses.nameToIp6.web
             addresses.nameToIp.cloudflared
             addresses.nameToIp6.cloudflared
           ];
