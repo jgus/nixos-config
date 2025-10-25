@@ -17,4 +17,4 @@ let
     }
   );
 in
-map zwave-area [ "basement" "main" "upstairs" ]
+map zwave-area [ "basement" "main" "north" "upstairs" ]

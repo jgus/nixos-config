@@ -90,6 +90,7 @@ let
       zwave-main = { id = 40; host = "b1"; };
       zwave-upstairs = { id = 41; host = "b1"; };
       zwave-basement = { id = 42; host = "b1"; };
+      zwave-north = { id = 43; host = "b1"; };
       frigate = { id = 50; host = "d1"; };
       ollama = { id = 51; host = "d1"; };
       open-webui = { id = 52; host = "d1"; };
