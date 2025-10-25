@@ -1,17 +1,23 @@
+with builtins;
 { pkgs, ... }:
 let
   addresses = import ./../addresses.nix;
+  pw = import ./../.secrets/passwords.nix;
+  encodeCaddyPassword = password: readFile (derivation {
+    name = "encodeCaddyPassword";
+    builder = "/bin/sh";
+    args = [ "-c" "${pkgs.caddy}/bin/caddy hash-password -p '${password}' >$out" ];
+    system = builtins.currentSystem;
+  });
   publicDomain = "gustafson.me";
   caddyFile = ''
     ${publicDomain}, www.${publicDomain} {
-      handle_path /journal/* {
-        reverse_proxy journal.${addresses.network.domain}:80
-      }
-      handle {
-        root * /usr/share/caddy
-        encode gzip
-        file_server
-      }
+      root * /usr/share/caddy
+      encode gzip
+      file_server
+    }
+    journal.${publicDomain} {
+      reverse_proxy journal.${addresses.network.domain}:80
     }
     ha.${publicDomain} {
       reverse_proxy ha.${addresses.network.domain}:8123
@@ -39,6 +45,36 @@ let
     }
     jellyfin.${publicDomain} {
       reverse_proxy jellyfin.${addresses.network.domain}:8096
+    }
+    esphome.${publicDomain} {
+      reverse_proxy esphome.${addresses.network.domain}:6052
+      basic_auth {
+        josh ${encodeCaddyPassword pw.esphome}
+      }
+    }
+    zwave-main.${publicDomain} {
+      reverse_proxy zwave-main.${addresses.network.domain}:8091
+      basic_auth {
+        josh ${encodeCaddyPassword pw.zwave}
+      }
+    }
+    zwave-upstrairs.${publicDomain} {
+      reverse_proxy zwave-upstrairs.${addresses.network.domain}:8091
+      basic_auth {
+        josh ${encodeCaddyPassword pw.zwave}
+      }
+    }
+    zwave-basement.${publicDomain} {
+      reverse_proxy zwave-basement.${addresses.network.domain}:8091
+      basic_auth {
+        josh ${encodeCaddyPassword pw.zwave}
+      }
+    }
+    zwave-north.${publicDomain} {
+      reverse_proxy zwave-north.${addresses.network.domain}:8091
+      basic_auth {
+        josh ${encodeCaddyPassword pw.zwave}
+      }
     }
   '';
 in

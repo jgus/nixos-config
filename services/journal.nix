@@ -6,14 +6,8 @@ in
   {
     name = "journal-db";
     docker = {
-      image = "mariadb";
+      image = "mysql:5.7";
       configVolume = "/var/lib/mysql";
-      environment = {
-        MARIADB_DATABASE = "wordpress";
-        MARIADB_USER = "wordpress";
-        MARIADB_PASSWORD = "${pw.journal.dbPassword}";
-        MARIADB_RANDOM_ROOT_PASSWORD = "1";
-      };
     };
   }
   {
@@ -38,9 +32,10 @@ in
         WORDPRESS_SECURE_AUTH_SALT = pw.journal.SECURE_AUTH_SALT;
         WORDPRESS_LOGGED_IN_SALT = pw.journal.LOGGED_IN_SALT;
         WORDPRESS_NONCE_SALT = pw.journal.NONCE_SALT;
+        WORDPRESS_TABLE_PREFIX = "journal_";
         # WORDPRESS_ENVIRONMENT_TYPE = "production";
-        WORDPRESS_HOME = "http://journal.org/";
-        WORDPRESS_SITEURL = "http://journal.org/";
+        WORDPRESS_HOME = "http://journal.gustafson.me/";
+        WORDPRESS_SITEURL = "http://journal.gustafson.me/";
       };
     };
   }
