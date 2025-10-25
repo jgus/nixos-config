@@ -16,7 +16,7 @@ in
       PUID = uid;
       PGID = gid;
       TZ = config.time.timeZone;
-      JELLYFIN_PublishedServerUrl = "http://jellyfin.${addresses.network.domain}:8096";
+      JELLYFIN_PublishedServerUrl = "all=https://jellyfin.gustafson.me";
     };
     configVolume = "/config";
     volumes = [
