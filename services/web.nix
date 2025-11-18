@@ -16,6 +16,9 @@ let
       encode gzip
       file_server
     }
+    joyfulsong.org, www.joyfulsong.org {
+      reverse_proxy joyfulsong.${addresses.network.domain}:80
+    }
     journal.${publicDomain} {
       reverse_proxy journal.${addresses.network.domain}:80
     }
@@ -58,8 +61,8 @@ let
         josh ${encodeCaddyPassword pw.zwave}
       }
     }
-    zwave-upstrairs.${publicDomain} {
-      reverse_proxy zwave-upstrairs.${addresses.network.domain}:8091
+    zwave-upstairs.${publicDomain} {
+      reverse_proxy zwave-upstairs.${addresses.network.domain}:8091
       basic_auth {
         josh ${encodeCaddyPassword pw.zwave}
       }
