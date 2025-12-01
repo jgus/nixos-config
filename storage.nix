@@ -42,6 +42,20 @@ let
       "scratch"
       "tmp"
     ])) //
+    (listToAttrs (map
+      (x: {
+        name = "home-${x}";
+        value = {
+          machine = "c1-1";
+          path = "/home/${x}";
+          target = "/home/${x}";
+          backup = [ "garage" "cloud" ];
+        };
+      }) [
+      "josh"
+      "gustafson"
+      "nathaniel"
+    ])) //
     {
       media = {
         machine = "c1-1";
@@ -50,12 +64,6 @@ let
       frigate = {
         machine = "d1";
         path = "/storage/frigate";
-      };
-      home = {
-        machine = "c1-1";
-        path = "/home";
-        target = "/home";
-        backup = [ "garage" "cloud" ];
       };
     };
   isLocal = name: let m = getAttr name mapping; in (m.machine == machine.hostName);
