@@ -1,7 +1,7 @@
 { pkgs, ... }:
 {
   environment.systemPackages = with pkgs; [
-    python311Full
-    python311Packages.pip
+    python311
+    # python311Packages.pip
   ];
 }
