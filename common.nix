@@ -112,6 +112,7 @@ in
       options = "--delete-older-than 3d";
     };
     extraOptions = ''
+      download-buffer-size = ${toString (512*1024*1024)}
       experimental-features = nix-command flakes
     '';
     settings = {
