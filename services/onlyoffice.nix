@@ -13,7 +13,7 @@ in
         JWT_SECRET = pw.onlyoffice;
       };
       volumes = [
-        "${pkgs.vistafonts}:/usr/share/fonts/truetype/vistafonts:ro"
+        "${pkgs.vista-fonts}:/usr/share/fonts/truetype/vista-fonts:ro"
       ];
     };
     extraConfig = {
