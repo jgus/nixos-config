@@ -21,7 +21,7 @@ let
       stateVersion = "23.05";
       hostId = "2bec4b05";
       # lan-interfaces = [ "eno1" "eno2" "eno3" "eno4" "enp5s0" ];
-      lan-interface = "enp5s0";
+      lan-interface = "enp131s0d1";
       nvidia = true;
       zfs-pools = [ "d" "f" ];
       imports = [

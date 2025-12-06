@@ -176,8 +176,6 @@ let
     detectors = (if (detector == "coral") then {
       coral1 = { type = "edgetpu"; device = "pci:0"; };
       coral2 = { type = "edgetpu"; device = "pci:1"; };
-      # coral3 = { type = "edgetpu"; device = "usb:0"; };
-      # coral4 = { type = "edgetpu"; device = "usb:1"; };
     } else if (detector == "onnx") then {
       onnx0 = { type = "onnx"; device = "0"; };
       onnx1 = { type = "onnx"; device = "1"; };
@@ -281,6 +279,7 @@ in
     environment = {
       PLUS_API_KEY = pw.frigate_plus;
       FRIGATE_RTSP_PASSWORD = "password";
+      # NVIDIA_VISIBLE_DEVICES = "GPU-35f1dd5f-a7af-1980-58e4-61bec60811dd";
     };
     ports = [
       "5000"
@@ -300,20 +299,13 @@ in
       "--shm-size=4g"
       "--tmpfs=/tmp"
       "--ulimit=nofile=${toString (4*1024)}:${toString (16*1024)}"
-      "--device=nvidia.com/gpu=all"
+      "--device=nvidia.com/gpu=GPU-35f1dd5f-a7af-1980-58e4-61bec60811dd"
       "--device=/dev/apex_0:/dev/apex_0"
       "--device=/dev/apex_1:/dev/apex_1"
-      "--device=/dev/bus/usb/006/004:/dev/bus/usb/006/004"
-      "--device=/dev/bus/usb/006/005:/dev/bus/usb/006/005"
-      "--privileged"
+      # "--privileged"
     ];
   };
   extraConfig = {
     boot.extraModulePackages = with config.boot.kernelPackages; [ gasket ];
-
-    services.udev.extraRules = ''
-      SUBSYSTEM=="usb",ATTRS{idVendor}=="1a6e",ATTRS{idProduct}=="089a",GROUP="plugdev"
-      SUBSYSTEM=="usb",ATTRS{idVendor}=="18d1",ATTRS{idProduct}=="9302",GROUP="plugdev"
-    '';
   };
 }

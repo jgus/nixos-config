@@ -9,6 +9,7 @@
   hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.stable;
   hardware.nvidia-container-toolkit = {
     enable = true;
+    device-name-strategy = "uuid";
     # mount-nvidia-docker-1-directories = true;
     # mount-nvidia-executables = true;
     # mounts = [
