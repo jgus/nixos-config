@@ -94,7 +94,6 @@ let
       zwave-basement = { id = 42; host = "b1"; };
       zwave-north = { id = 43; host = "b1"; };
       frigate = { id = 50; host = "d1"; };
-      ollama = { id = 51; host = "d1"; };
       open-webui = { id = 52; host = "d1"; };
       searxng = { id = 53; host = "c1-2"; };
       plex = { id = 60; host = "d1"; };
@@ -112,6 +111,8 @@ let
       calibre = { id = 80; host = "c1-2"; };
       audiobookshelf = { id = 81; host = "c1-2"; };
       qbittorrent = { id = 82; host = "c1-2"; };
+      ollama-gpu = { id = 90; host = "d1"; };
+      ollama-cpu = { id = 91; host = "d1"; };
       minecraft = { id = 100; host = "c1-2"; };
     } //
     mapAttrs (k: v: { g = group.vms; } // v) {
