@@ -30,18 +30,6 @@ let
         #./vm-vm1.nix
       ];
     };
-    d2 = {
-      stateVersion = "24.05";
-      hostId = "b5d59608";
-      zfs-pools = [ ];
-      imports = [ ];
-    };
-    d3 = {
-      stateVersion = "24.05";
-      hostId = "d4f10aaf";
-      zfs-pools = [ ];
-      imports = [ ];
-    };
     c1-1 = {
       stateVersion = "24.05";
       hostId = "dfc92a33";
