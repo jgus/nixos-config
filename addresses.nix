@@ -71,7 +71,6 @@ let
       pihole-3 = { id = 5; host = "d1"; aliases = [ "dhcp-3" "dns-3" ]; };
       cloudflared = { id = 6; host = "c1-2"; };
       samba = { id = 10; host = "c1-1"; aliases = [ "smb" "nas" ]; };
-      syncthing = { id = 11; host = "c1-1"; };
       garage = { id = 12; host = "d1"; };
       samba-c1-2 = { id = 13; host = "c1-2"; };
       web = { id = 20; host = "c1-2"; };
@@ -101,7 +100,6 @@ let
       plex = { id = 60; host = "d1"; };
       jellyfin = { id = 61; host = "d1"; };
       sabnzbd = { id = 70; host = "c1-2"; };
-      transmission = { id = 71; host = "c1-2"; };
       prowlarr = { id = 72; host = "c1-2"; };
       sonarr = { id = 73; host = "c1-2"; };
       radarr = { id = 74; host = "c1-2"; };

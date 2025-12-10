@@ -1,5 +1,6 @@
 { ... }:
 {
+  autoStart = false;
   configStorage = false;
   docker = {
     image = "ghcr.io/ggml-org/llama.cpp:server-cuda";
