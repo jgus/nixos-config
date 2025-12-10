@@ -47,6 +47,7 @@ let
     , configStorage ? true
     , extraStorage ? [ ]
     , requires ? [ ]
+    , autoStart ? true
     , docker ? { }
     , systemd ? { }
     , extraConfig ? { }
@@ -110,7 +111,7 @@ let
         };
         virtualisation.oci-containers.containers.${name} = {
           image = docker.image;
-          autoStart = true;
+          autoStart = autoStart;
           user = "${uid}:${gid}";
           volumes =
             (if (docker ? volumes) then (if (isFunction docker.volumes) then (docker.volumes storagePath) else docker.volumes) else [ ]) ++
@@ -141,7 +142,7 @@ let
             "${name}" = rec {
               enable = true;
               description = name;
-              wantedBy = [ "multi-user.target" ];
+              wantedBy = (if autoStart then [ "multi-user.target" ] else [ ]);
               requires = args.requires ++ [ "network-online.target" "${name}-requires.target" ];
               after = requires;
               path = (if (systemd ? path) then systemd.path else [ ]);
