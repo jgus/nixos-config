@@ -1,3 +1,4 @@
 .secrets
 result
+/gcroots
 machine-id.nix
