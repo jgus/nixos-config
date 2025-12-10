@@ -1,6 +1,8 @@
 # hostId: head -c4 /dev/urandom | od -A none -t x4
+with builtins;
 let
-  machine-id = builtins.readFile ./machine-id.nix;
+  machineIdEnv = builtins.getEnv "MACHINE_ID";
+  machineId = if (machineIdEnv != "") then machineIdEnv else (builtins.readFile ./machine-id.nix);
   pw = import ./.secrets/passwords.nix;
   rpi = {
     arch = "rpi";
@@ -9,14 +11,14 @@ let
   };
   machine = {
     # Defaults
-    hostName = machine-id;
+    hostName = machineId;
     arch = "x86";
     nvidia = false;
     zfs = true;
     zfs-pools = [ ];
     clamav = pw ? smtp2go;
     imports = [ ];
-  } // {
+  } // (getAttr machineId {
     d1 = {
       stateVersion = "23.05";
       hostId = "2bec4b05";
@@ -68,11 +70,17 @@ let
       hostId = "62c05afa";
       imports = [ ./cec.nix ];
     };
-  }."${machine-id}";
+  });
 in
 {
+  system = getAttr machine.arch {
+    rpi = "aarch64-linux";
+    x86 = "x86_64-linux";
+  };
   fwupd = (machine.arch == "x86");
   python = (machine.arch == "x86");
-} //
-(if (machine ? lan-interfaces) then { lan-interface = "br0"; } else { }) //
+}
+//
+(if (machine ? lan-interfaces) then { lan-interface = "br0"; } else { })
+  //
 machine
