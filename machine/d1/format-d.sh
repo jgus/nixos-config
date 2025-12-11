@@ -15,14 +15,14 @@ ZPOOL_OPTS=(
     -O autobackup:snap-$(hostname)=true
 )
 
-D_DISKS=(
-    /dev/disk/by-path/pci-0000:03:00.0-scsi-0:0:18:0
-    /dev/disk/by-path/pci-0000:03:00.0-scsi-0:0:19:0
-    /dev/disk/by-path/pci-0000:03:00.0-scsi-0:0:20:0
-    /dev/disk/by-path/pci-0000:03:00.0-scsi-0:0:21:0
-    /dev/disk/by-path/pci-0000:03:00.0-scsi-0:0:22:0
-    /dev/disk/by-path/pci-0000:03:00.0-scsi-0:0:23:0
-)
+# D_DISKS=(
+#     /dev/disk/by-path/pci-0000:03:00.0-scsi-0:0:18:0
+#     /dev/disk/by-path/pci-0000:03:00.0-scsi-0:0:19:0
+#     /dev/disk/by-path/pci-0000:03:00.0-scsi-0:0:20:0
+#     /dev/disk/by-path/pci-0000:03:00.0-scsi-0:0:21:0
+#     /dev/disk/by-path/pci-0000:03:00.0-scsi-0:0:22:0
+#     /dev/disk/by-path/pci-0000:03:00.0-scsi-0:0:23:0
+# )
 
 F_DISKS=(
     /dev/disk/by-path/pci-0000:03:00.0-scsi-0:0:0:0
@@ -45,6 +45,20 @@ F_DISKS=(
     /dev/disk/by-path/pci-0000:03:00.0-scsi-0:0:17:0
 )
 
-zpool create -f "${ZPOOL_OPTS[@]}" -O recordsize=16K -O mountpoint=/d d raidz2 "${D_DISKS[@]}"
+F2_DISKS=(
+    /dev/disk/by-path/pci-0000:03:00.0-scsi-0:0:19:0
+    /dev/disk/by-path/pci-0000:03:00.0-scsi-0:0:20:0
+    /dev/disk/by-path/pci-0000:03:00.0-scsi-0:0:21:0
+    /dev/disk/by-path/pci-0000:03:00.0-scsi-0:0:22:0
+    /dev/disk/by-path/pci-0000:03:00.0-scsi-0:0:23:0
+)
+
+# Available:
+#    /dev/disk/by-path/pci-0000:03:00.0-scsi-0:0:18:0
+
+
+# zpool create -f "${ZPOOL_OPTS[@]}" -O recordsize=16K -O mountpoint=/d d raidz2 "${D_DISKS[@]}"
 
 zpool create -f "${ZPOOL_OPTS[@]}" -O recordsize=64K -O mountpoint=/f f raidz2 "${F_DISKS[@]}"
+
+zpool create -f "${ZPOOL_OPTS[@]}" -O recordsize=16K -O mountpoint=/f2 f2 raidz "${F2_DISKS[@]}"
