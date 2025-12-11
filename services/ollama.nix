@@ -1,5 +1,6 @@
 { ... }:
 {
+  autoStart = false;
   docker = {
     image = "ollama/ollama";
     ports = [
