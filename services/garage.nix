@@ -34,7 +34,7 @@ let
     };
   };
 in
-{ config, pkgs, ... }:
+{ pkgs, ... }:
 {
   configStorage = false;
   docker = {

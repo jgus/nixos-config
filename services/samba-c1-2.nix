@@ -1,8 +1,5 @@
 with builtins;
-let
-  pw = import ./../.secrets/passwords.nix;
-in
-{ config, ... }:
+{ ... }:
 {
   configStorage = false;
   docker = {

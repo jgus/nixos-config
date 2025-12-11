@@ -1,4 +1,3 @@
-with builtins;
 let
   name = "minecraft";
   user = "minecraft";

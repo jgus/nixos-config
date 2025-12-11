@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ ... }:
 let
   addresses = import ./../addresses.nix;
   pw = import ./../.secrets/passwords.nix;
