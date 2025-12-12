@@ -51,13 +51,13 @@
 
   fileSystems."/boot" =
     {
-      device = "/dev/disk/by-uuid/951F-042C";
+      device = "/dev/disk/by-uuid/12CE-A600";
       fsType = "vfat";
     };
 
   fileSystems."/boot/1" =
     {
-      device = "/dev/disk/by-uuid/9523-82A9";
+      device = "/dev/disk/by-uuid/ED86-22BC";
       fsType = "vfat";
     };
 
