@@ -36,7 +36,6 @@ let
 in
 { pkgs, ... }:
 {
-  autoStart = false;
   configStorage = false;
   docker = {
     image = "dxflrs/garage:v1.0.0";
