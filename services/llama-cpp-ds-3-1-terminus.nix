@@ -8,7 +8,7 @@
       "8080"
     ];
     volumes = [
-      "/d/llama.cpp:/root/.cache/llama.cpp"
+      "/storage/llama.cpp:/root/.cache/llama.cpp"
     ];
     extraOptions = [
       "--read-only"

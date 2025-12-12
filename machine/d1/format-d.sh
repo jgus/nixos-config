@@ -1,10 +1,10 @@
 #!/usr/bin/env -S bash -e
 
-ZPOOL_OPTS=(
+HDD_ZPOOL_OPTS=(
     -o ashift=12
+    -O compression=lz4
     -O acltype=posixacl
     -O aclinherit=passthrough
-    -O compression=lz4
     -O dnodesize=auto
     -O normalization=formD
     -O relatime=on
@@ -15,12 +15,25 @@ ZPOOL_OPTS=(
     -O autobackup:snap-$(hostname)=true
 )
 
-# Available
-    # /dev/disk/by-path/pci-0000:03:00.0-scsi-0:0:0:0
-    # /dev/disk/by-path/pci-0000:03:00.0-scsi-0:0:1:0
-    # /dev/disk/by-path/pci-0000:03:00.0-scsi-0:0:2:0
-    # /dev/disk/by-path/pci-0000:03:00.0-scsi-0:0:3:0
-    # /dev/disk/by-path/pci-0000:03:00.0-scsi-0:0:4:0
+SSD_ZPOOL_OPTS=(
+    -o ashift=12
+    -O compression=lz4
+    -O acltype=posixacl
+    -O aclinherit=passthrough
+    -O dnodesize=auto
+    -O normalization=formD
+    -O relatime=on
+    -O xattr=sa
+    -O autobackup:snap-$(hostname)=true
+)
+
+S_DISKS=(
+    /dev/disk/by-path/pci-0000:03:00.0-scsi-0:0:0:0
+    /dev/disk/by-path/pci-0000:03:00.0-scsi-0:0:1:0
+    /dev/disk/by-path/pci-0000:03:00.0-scsi-0:0:2:0
+    /dev/disk/by-path/pci-0000:03:00.0-scsi-0:0:3:0
+    /dev/disk/by-path/pci-0000:03:00.0-scsi-0:0:4:0
+)
 
 
 D_DISKS=(
@@ -49,6 +62,8 @@ F_DISKS=(
 )
 
 
-zpool create -f "${ZPOOL_OPTS[@]}" -O recordsize=128K -O mountpoint=/d d raidz3 "${D_DISKS[@]}"
+zpool create "${SSD_ZPOOL_OPTS[@]}" -O recordsize=1M -O mountpoint=/s s "${S_DISKS[@]}"
 
-zpool create -f "${ZPOOL_OPTS[@]}" -O recordsize=16K -O mountpoint=/f f raidz "${F_DISKS[@]}"
+zpool create "${HDD_ZPOOL_OPTS[@]}" -O recordsize=128K -O mountpoint=/d d raidz3 "${D_DISKS[@]}"
+
+zpool create "${HDD_ZPOOL_OPTS[@]}" -O recordsize=16K -O mountpoint=/f f raidz "${F_DISKS[@]}"
