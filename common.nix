@@ -27,7 +27,10 @@ in
     };
     useDHCP = false;
     tempAddresses = "disabled";
-    defaultGateway.address = addresses.network.defaultGateway;
+    defaultGateway = {
+      address = addresses.network.defaultGateway;
+      interface = "lan0";
+    };
     domain = addresses.network.domain;
     nameservers = [ addresses.records.pihole-1.ip addresses.records.pihole-2.ip addresses.records.pihole-3.ip "1.1.1.1" "1.0.0.1" ];
     timeServers = [ "ntp.home.gustafson.me" ];
@@ -35,7 +38,17 @@ in
     interfaces.lan0 = let m = addresses.records."${machine.hostName}"; in {
       macAddress = m.mac;
       ipv4.addresses = [{ address = m.ip; prefixLength = addresses.network.prefixLength; }];
+      ipv4.routes = [{
+        address = addresses.network.prefix + "0.0";
+        prefixLength = addresses.network.prefixLength;
+        options.metric = "100";
+      }];
       ipv6.addresses = [{ address = m.ip6; prefixLength = addresses.network.prefix6Length; }];
+      ipv6.routes = [{
+        address = addresses.network.prefix6;
+        prefixLength = addresses.network.prefix6Length;
+        options.metric = "100";
+      }];
     };
     macvlans.lan0 = {
       interface = machine.lan-interface;

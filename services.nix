@@ -180,9 +180,19 @@ let
             address = serviceRecord.ip;
             prefixLength = addresses.network.prefixLength;
           }];
+          ipv4.routes = [{
+            address = addresses.network.prefix + "0.0";
+            prefixLength = addresses.network.prefixLength;
+            options.metric = "1000";
+          }];
           ipv6.addresses = [{
             address = serviceRecord.ip6;
             prefixLength = addresses.network.prefix6Length;
+          }];
+          ipv6.routes = [{
+            address = addresses.network.prefix6;
+            prefixLength = addresses.network.prefix6Length;
+            options.metric = "1000";
           }];
         };
       } else { });
