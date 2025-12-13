@@ -112,6 +112,7 @@ let
       audiobookshelf = { id = 81; host = "c1-2"; };
       qbittorrent = { id = 82; host = "c1-2"; };
       minecraft = { id = 100; host = "c1-2"; };
+      echo = { id = 101; host = "d1"; };
     } //
     mapAttrs (k: v: { g = group.vms; } // v) {
       vm1 = { id = 1; host = "d1"; dns = "host"; };

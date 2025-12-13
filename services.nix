@@ -128,6 +128,9 @@ let
         // (if (docker ? ports) then { ports = docker.ports; } else { })
         ;
       };
+      useMacvlan = systemd ? macvlan && systemd.macvlan;
+      macvlanInterfaceName = "mv-${name}";
+      serviceRecord = addresses.records.${name};
       systemdConfig = {
         imports = [ extraConfig ] ++ (map (s: homelabServiceStorage s) storageNames);
 
@@ -143,10 +146,17 @@ let
               enable = true;
               description = name;
               wantedBy = (if autoStart then [ "multi-user.target" ] else [ ]);
-              requires = args.requires ++ [ "network-online.target" "${name}-requires.target" ];
+              requires = args.requires ++ [ "network-online.target" "${name}-requires.target" ]
+                ++ (if useMacvlan then [ "${macvlanInterfaceName}-netdev.service" ] else [ ]);
               after = requires;
               path = (if (systemd ? path) then systemd.path else [ ]);
-              script = (if (systemd ? script) then (systemd.script { inherit name uid gid storagePath dockerOptions; }) else "");
+              script = (if (systemd ? script) then
+                (systemd.script {
+                  inherit name uid gid storagePath dockerOptions;
+                  interface = if useMacvlan then macvlanInterfaceName else null;
+                  ip = serviceRecord.ip;
+                  ip6 = serviceRecord.ip6;
+                }) else "");
               postStop = "systemctl restart ${name}-backup";
             };
             "${name}-backup" = {
@@ -159,7 +169,23 @@ let
             };
           };
         };
-      };
+      } // (if useMacvlan then {
+        networking.macvlans.${macvlanInterfaceName} = {
+          interface = machine.lan-interface;
+          mode = "bridge";
+        };
+        networking.interfaces.${macvlanInterfaceName} = {
+          macAddress = serviceRecord.mac;
+          ipv4.addresses = [{
+            address = serviceRecord.ip;
+            prefixLength = addresses.network.prefixLength;
+          }];
+          ipv6.addresses = [{
+            address = serviceRecord.ip6;
+            prefixLength = addresses.network.prefix6Length;
+          }];
+        };
+      } else { });
       serviceConfig = if isDocker then dockerConfig else systemdConfig;
     in
     if (machine.hostName == addresses.records.${name}.host) then serviceConfig else { };
