@@ -97,6 +97,7 @@ let
       open-webui = { id = 52; host = "d1"; };
       searxng = { id = 53; host = "c1-2"; };
       llama-cpp-ds-3-1-terminus = { id = 54; host = "d1"; };
+      lm-proxy = { id = 55; host = "d1"; aliases = [ "large-model-proxy" ]; };
       plex = { id = 60; host = "d1"; };
       jellyfin = { id = 61; host = "d1"; };
       sabnzbd = { id = 70; host = "c1-2"; };
