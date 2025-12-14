@@ -152,6 +152,166 @@ let
         }
       )
 
+      # Kimi K2 Instruct via llama.cpp
+      # https://docs.unsloth.ai/models/kimi-k2-thinking-how-to-run-locally
+      (
+        let
+          name = "kimi-k2-instruct";
+          localPort = 8080;
+          exposePort = 8081;
+          ip = "${dockerNetworkPrefix}3";
+          containerName = "lmp-${name}";
+        in
+        {
+          Name = "Kimi K2 Instruct (UD-Q2_K_XL)";
+          OpenAiApi = true;
+          ListenPort = toString exposePort;
+          ProxyTargetHost = ip;
+          ProxyTargetPort = toString localPort;
+          Command = "docker";
+          Args = lib.concatStringsSep " " [
+            "run"
+
+            ### Begin Docker Args ###
+
+            "--rm"
+            "--read-only"
+            "--name=${containerName}"
+            "--network=${dockerNetworkName}"
+            "--ip=${ip}"
+            "--device=nvidia.com/gpu=GPU-8bb9f199-be89-462d-8e68-6ba4fe870ce4"
+            # NUMA Binding - GPU on PCIe connected to CPU 2 (NUMA node 1)
+            "--cpuset-cpus=${numaCpusNearGpu1}"
+            "-v /storage/llama.cpp:/root/.cache/llama.cpp"
+
+            ### End Docker Args ###
+
+            "ghcr.io/ggml-org/llama.cpp:server-cuda"
+
+            ### Begin Llama.cpp Args ###
+
+            "--port ${toString localPort}"
+
+            # CPU Threading
+            "--threads ${toString numaCpuCountPerNode}"
+            "--threads-batch ${toString numaCpuCountPerNode}"
+            # Model
+            "-hf unsloth/Kimi-K2-Instruct-GGUF:UD-Q2_K_XL"
+            "--jinja"
+            # Sampling Parameters
+            "--temp 0.6"
+            "--min-p 0.01"
+            # Batch Size for Prompt Processing
+            "--batch-size 8192"
+            "--ubatch-size 2048"
+            # Context Size
+            "--ctx-size ${toString (16 * 1024)}"
+            # KV Cache Quantization
+            "--cache-type-k q8_0"
+            "--cache-type-v q8_0"
+            # Flash Attention
+            "--flash-attn on"
+            # "Everything" on GPU...
+            "--n-gpu-layers 999"
+            # ...except MoE Offloading (ie most of it)
+            "-ot .ffn_.*_exps.=CPU"
+            # Prompt Caching
+            "--slot-save-path /root/.cache/llama.cpp/prompt-cache"
+
+            ### End Llama.cpp Args ###
+          ];
+          HealthcheckCommand = "docker exec ${containerName} curl --fail http://localhost:${toString localPort}/health";
+          HealthcheckIntervalMilliseconds = 10000;
+          KillCommand = "docker stop ${containerName}";
+          RestartOnConnectionFailure = true;
+          ResourceRequirements = {
+            VRAM-1 = 21;
+            RAM = 271;
+          };
+        }
+      )
+
+      # Kimi K2 Thinking via llama.cpp
+      # https://docs.unsloth.ai/models/kimi-k2-thinking-how-to-run-locally
+      (
+        let
+          name = "kimi-k2-thinking";
+          localPort = 8080;
+          exposePort = 8082;
+          ip = "${dockerNetworkPrefix}4";
+          containerName = "lmp-${name}";
+        in
+        {
+          Name = "Kimi K2 Thinking (UD-Q2_K_XL)";
+          OpenAiApi = true;
+          ListenPort = toString exposePort;
+          ProxyTargetHost = ip;
+          ProxyTargetPort = toString localPort;
+          Command = "docker";
+          Args = lib.concatStringsSep " " [
+            "run"
+
+            ### Begin Docker Args ###
+
+            "--rm"
+            "--read-only"
+            "--name=${containerName}"
+            "--network=${dockerNetworkName}"
+            "--ip=${ip}"
+            "--device=nvidia.com/gpu=GPU-8bb9f199-be89-462d-8e68-6ba4fe870ce4"
+            # NUMA Binding - GPU on PCIe connected to CPU 2 (NUMA node 1)
+            "--cpuset-cpus=${numaCpusNearGpu1}"
+            "-v /storage/llama.cpp:/root/.cache/llama.cpp"
+
+            ### End Docker Args ###
+
+            "ghcr.io/ggml-org/llama.cpp:server-cuda"
+
+            ### Begin Llama.cpp Args ###
+
+            "--port ${toString localPort}"
+
+            # CPU Threading
+            "--threads ${toString numaCpuCountPerNode}"
+            "--threads-batch ${toString numaCpuCountPerNode}"
+            # Model
+            "-hf unsloth/Kimi-K2-Thinking-GGUF:UD-Q2_K_XL"
+            "--jinja"
+            # Sampling Parameters - Note: temp 1.0 for Thinking model
+            "--temp 1.0"
+            "--min-p 0.01"
+            # Batch Size for Prompt Processing
+            "--batch-size 8192"
+            "--ubatch-size 2048"
+            # Context Size - Recommended 98,304 for Thinking
+            "--ctx-size ${toString (96 * 1024)}"
+            # KV Cache Quantization
+            "--cache-type-k q8_0"
+            "--cache-type-v q8_0"
+            # Flash Attention
+            "--flash-attn on"
+            # "Everything" on GPU...
+            "--n-gpu-layers 999"
+            # ...except MoE Offloading (ie most of it)
+            "-ot .ffn_.*_exps.=CPU"
+            # Prompt Caching
+            "--slot-save-path /root/.cache/llama.cpp/prompt-cache"
+            # Special flag to show thinking tags
+            "--special"
+
+            ### End Llama.cpp Args ###
+          ];
+          HealthcheckCommand = "docker exec ${containerName} curl --fail http://localhost:${toString localPort}/health";
+          HealthcheckIntervalMilliseconds = 10000;
+          KillCommand = "docker stop ${containerName}";
+          RestartOnConnectionFailure = true;
+          ResourceRequirements = {
+            VRAM-1 = 21;
+            RAM = 271;
+          };
+        }
+      )
+
       # Example: Ollama service
       # {
       #   Name = "ollama";
@@ -179,7 +339,7 @@ in
   configStorage = true;
   systemd = {
     macvlan = true;
-    tcpPorts = [ 7070 7071 8080 ];
+    tcpPorts = [ 7070 7071 8080 8081 8082 ];
     path = [ largeModelProxyPackage pkgs.curl pkgs.docker pkgs.bash ];
     script = { interface, ip, ip6, storagePath, name, ... }: ''
       # Create dedicated Docker network for LMP if it doesn't exist
