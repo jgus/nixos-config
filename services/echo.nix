@@ -25,4 +25,9 @@
       wait
     '';
   };
+  extraConfig = {
+    # Open firewall ports on the macvlan interface
+    networking.firewall.interfaces."mv-echo".allowedTCPPorts = [ 7 ];
+    networking.firewall.interfaces."mv-echo".allowedUDPPorts = [ 7 ];
+  };
 }
