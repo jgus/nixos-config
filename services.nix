@@ -139,10 +139,9 @@ let
           udpPorts = if (systemd ? udpPorts) then systemd.udpPorts else [ ];
           macvlanNetwork =
             let
-              # Routing table ID: use service group*100 + id to ensure uniqueness
-              # Avoid reserved tables: 253=default, 254=main, 255=local
-              rawTableId = serviceRecord.g * 100 + serviceRecord.id;
-              routeTableId = toString (if rawTableId >= 253 then rawTableId + 10 else rawTableId);
+              # Routing table ID: base offset of 1000 avoids reserved tables (253-255)
+              # g * 256 ensures no overlap since id is 0-255
+              routeTableId = 1000 + serviceRecord.g * 256 + serviceRecord.id;
             in
             {
               # Create the macvlan netdev
@@ -185,29 +184,29 @@ let
                   # Routes in custom table for source-based policy routing
                   {
                     Destination = "${addresses.network.prefix}0.0/${toString addresses.network.prefixLength}";
-                    Table = lib.strings.toInt routeTableId;
+                    Table = routeTableId;
                   }
                   {
                     Destination = "0.0.0.0/0";
                     Gateway = addresses.network.defaultGateway;
-                    Table = lib.strings.toInt routeTableId;
+                    Table = routeTableId;
                   }
                   {
                     Destination = "${addresses.network.prefix6}/${toString addresses.network.prefix6Length}";
-                    Table = lib.strings.toInt routeTableId;
+                    Table = routeTableId;
                   }
                 ];
                 # Source-based policy routing rules - declarative!
                 routingPolicyRules = [
                   {
                     From = serviceRecord.ip;
-                    Table = lib.strings.toInt routeTableId;
-                    Priority = lib.strings.toInt routeTableId;
+                    Table = routeTableId;
+                    Priority = 200;
                   }
                   {
                     From = serviceRecord.ip6;
-                    Table = lib.strings.toInt routeTableId;
-                    Priority = lib.strings.toInt routeTableId;
+                    Table = routeTableId;
+                    Priority = 200;
                   }
                 ];
               };
