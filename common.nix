@@ -154,12 +154,14 @@ in
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
+  nixpkgs.config.allowUnfree = true;
   environment = {
     systemPackages = with pkgs; [
       clang-tools # TODO
       comma
       nixd
       nixpkgs-fmt
+      claude-code
     ];
     variables = {
       SERVER_NAMES = builtins.concatStringsSep " " addresses.serverNames;
