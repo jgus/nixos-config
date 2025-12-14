@@ -4,7 +4,7 @@
   nixpkgs.config.cudaSupport = true;
   services.xserver.videoDrivers = [ "nvidia" ];
   hardware.graphics.enable = true;
-  hardware.graphics.enable32Bit = true;
+  # hardware.graphics.enable32Bit = true;
   hardware.nvidia.open = false;
   hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.stable;
   hardware.nvidia-container-toolkit = {
@@ -20,5 +20,5 @@
     # ];
   };
   # virtualisation.docker.daemon.settings.features.cdi = true;
-  virtualisation.docker.enableNvidia = true;
+  # virtualisation.docker.enableNvidia = true;
 }
