@@ -1,7 +1,12 @@
 # Large Model Proxy - manages multiple resource-heavy LLMs on the same machine
 # https://github.com/perk11/large-model-proxy
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 let
+  machine = import ../machine.nix;
+  numaCpusStrs = map (cpuSet: lib.concatMapStringsSep "," toString cpuSet) machine.numaCpus;
+  numaCpusNearGpu1 = (builtins.elemAt numaCpusStrs 1);
+  numaCpuCountPerNode = builtins.length (builtins.elemAt machine.numaCpus 0);
+
   version = "0.7.1";
   # To update hashes when version changes:
   # 1. Update the version above
@@ -63,6 +68,72 @@ let
 
     # Services to proxy (example configuration - customize as needed)
     Services = [
+      # DeepSeek-V3.1-Terminus via llama.cpp
+      # https://docs.unsloth.ai/models/deepseek-v3.1-how-to-run-locally
+      {
+        Name = "DeepSeek V3.1 Terminus (UD-Q2_K_XL)";
+        OpenAiApi = true;
+        ListenPort = "8080";
+        ProxyTargetHost = "localhost";
+        ProxyTargetPort = "28080";
+        Command = "docker";
+        Args = lib.concatStringsSep " " [
+          "run"
+
+          ### Begin Docker Srgs ###
+
+          "--rm"
+          "--read-only"
+          "--device=nvidia.com/gpu=GPU-8bb9f199-be89-462d-8e68-6ba4fe870ce4"
+          # NUMA Binding - GPU on PCIe connected to CPU 2 (NUMA node 1)
+          "--cpuset-cpus=${numaCpusNearGpu1}"
+          "-v /storage/llama.cpp:/root/.cache/llama.cpp"
+          "-p 28080:8080"
+
+          ### End Docker Args ###
+
+          "ghcr.io/ggml-org/llama.cpp:server-cuda"
+
+          ### Begin Llama.cpp Args ###
+
+          # CPU Threading
+          "--threads ${toString numaCpuCountPerNode}"
+          "--threads-batch ${toString numaCpuCountPerNode}"
+          # Model
+          "-hf unsloth/DeepSeek-V3.1-Terminus-GGUF:UD-Q2_K_XL"
+          "--jinja"
+          # Sampling Parameters
+          "--temp 0.6"
+          "--top-p 0.95"
+          "--min-p 0.01"
+          # Batch Size for Prompt Processing
+          "--batch-size 8192"
+          "--ubatch-size 2048"
+          # Context Size
+          "--ctx-size ${toString (32 * 1024)}"
+          # KV Cache Quantization
+          "--cache-type-k q8_0"
+          "--cache-type-v q8_0"
+          # Flash Attention
+          "--flash-attn on"
+          # "Everything" on GPU...
+          "--n-gpu-layers 999"
+          # ...except MoE Offloading (ie most of it)
+          "-ot .ffn_.*_exps.=CPU"
+          # Prompt Caching
+          "--slot-save-path /root/.cache/llama.cpp/prompt-cache"
+
+          ### End Llama.cpp Args ###
+        ];
+        HealthcheckCommand = "curl --fail http://localhost:28080/health";
+        HealthcheckIntervalMilliseconds = 1000;
+        RestartOnConnectionFailure = true;
+        ResourceRequirements = {
+          VRAM-GPU-1 = 21;
+          RAM = 271;
+        };
+      }
+
       # Example: Ollama service
       # {
       #   Name = "ollama";
@@ -90,8 +161,8 @@ in
   configStorage = true;
   systemd = {
     macvlan = true;
-    tcpPorts = [ 7070 7071 ];
-    path = [ largeModelProxyPackage pkgs.curl ];
+    tcpPorts = [ 7070 7071 8080 ];
+    path = [ largeModelProxyPackage pkgs.curl pkgs.docker pkgs.bash ];
     script = { interface, ip, ip6, storagePath, name, ... }: ''
       cd ${storagePath name}
       exec large-model-proxy -c ${configFile}
