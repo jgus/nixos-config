@@ -110,6 +110,7 @@ in
   configStorage = true;
   systemd = {
     macvlan = true;
+    tcpPorts = [ 7070 7071 ];
     path = [ large-model-proxy pkgs.curl ];
     script = { interface, ip, ip6, storagePath, name, ... }: ''
       # Create logs directory
@@ -119,9 +120,5 @@ in
       cd ${storagePath name}
       exec large-model-proxy -c ${configFile}
     '';
-  };
-  extraConfig = {
-    # Open firewall ports on the macvlan interface
-    networking.firewall.interfaces."mv-lm-proxy".allowedTCPPorts = [ 7070 7071 ];
   };
 }

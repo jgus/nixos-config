@@ -5,6 +5,8 @@
   configStorage = false;
   systemd = {
     macvlan = true;
+    tcpPorts = [ 7 ];
+    udpPorts = [ 7 ];
     path = [ pkgs.socat ];
     script = { interface, ip, ip6, ... }: ''
       # Start TCP echo server on IPv4
@@ -24,10 +26,5 @@
       # Wait forever (until service is stopped)
       wait
     '';
-  };
-  extraConfig = {
-    # Open firewall ports on the macvlan interface
-    networking.firewall.interfaces."mv-echo".allowedTCPPorts = [ 7 ];
-    networking.firewall.interfaces."mv-echo".allowedUDPPorts = [ 7 ];
   };
 }

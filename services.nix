@@ -59,6 +59,7 @@ let
       };
       uid = toString config.users.users.${user}.uid;
       gid = toString config.users.groups.${group}.gid;
+      serviceRecord = addresses.records.${name};
       storageNames = (extraStorage ++ (if configStorage then [ name ] else [ ]));
       dockerOptions = addresses.dockerOptions name;
       isDocker = docker ? image;
@@ -128,129 +129,140 @@ let
         // (if (docker ? ports) then { ports = docker.ports; } else { })
         ;
       };
-      useMacvlan = systemd ? macvlan && systemd.macvlan;
-      macvlanInterfaceName = "mv-${name}";
-      # Systemd escapes '-' as '\x2d' in device unit names (since '-' means path separator)
-      macvlanDeviceUnit = "sys-subsystem-net-devices-${lib.strings.replaceStrings ["-"] ["\\x2d"] macvlanInterfaceName}.device";
-      serviceRecord = addresses.records.${name};
-      # Routing table ID: use service group*100 + id to ensure uniqueness
-      # Avoid reserved tables: 253=default, 254=main, 255=local
-      rawTableId = serviceRecord.g * 100 + serviceRecord.id;
-      routeTableId = toString (if rawTableId >= 253 then rawTableId + 10 else rawTableId);
-      routeTableName = macvlanInterfaceName;
-      baseSystemdConfig = {
-        imports = [ extraConfig ] ++ (map (s: homelabServiceStorage s) storageNames);
+      systemdConfig =
+        let
+          useMacvlan = systemd ? macvlan && systemd.macvlan;
+          macvlanInterfaceName = "mv${toString serviceRecord.g}x${toString serviceRecord.id}";
+          macvlanDeviceUnit = "sys-subsystem-net-devices-${macvlanInterfaceName}.device";
+          # Firewall port options for macvlan interface
+          tcpPorts = if (systemd ? tcpPorts) then systemd.tcpPorts else [ ];
+          udpPorts = if (systemd ? udpPorts) then systemd.udpPorts else [ ];
+          macvlanNetwork =
+            let
+              # Routing table ID: use service group*100 + id to ensure uniqueness
+              # Avoid reserved tables: 253=default, 254=main, 255=local
+              rawTableId = serviceRecord.g * 100 + serviceRecord.id;
+              routeTableId = toString (if rawTableId >= 253 then rawTableId + 10 else rawTableId);
+            in
+            {
+              # Create the macvlan netdev
+              netdevs."30-${macvlanInterfaceName}" = {
+                netdevConfig = {
+                  Kind = "macvlan";
+                  Name = macvlanInterfaceName;
+                  MACAddress = serviceRecord.mac;
+                };
+                macvlanConfig = {
+                  Mode = "bridge";
+                };
+              };
 
-        systemd = {
-          targets."${name}-requires" = rec {
-            requires = (map (s: "service-storage-${s}-setup.service") storageNames);
-            after = requires;
-            requiredBy = [ "${name}.service" ];
-            before = requiredBy;
-          };
-          services = {
-            "${name}" = rec {
-              enable = true;
-              description = name;
-              wantedBy = (if autoStart then [ "multi-user.target" ] else [ ]);
-              # With systemd-networkd, macvlans are managed via netdevs, not separate services
-              # network-online.target ensures all interfaces are configured
-              requires = args.requires ++ [ "network-online.target" "${name}-requires.target" ]
-                ++ (if useMacvlan then [ macvlanDeviceUnit ] else [ ]);
+              # Attach macvlan to physical interface
+              networks."05-${machine.lan-interface}".macvlan = [ macvlanInterfaceName ];
+
+              # Configure the macvlan network
+              networks."40-${macvlanInterfaceName}" = {
+                matchConfig.Name = macvlanInterfaceName;
+                networkConfig = {
+                  DHCP = "no";
+                  IPv6AcceptRA = "yes";
+                  LinkLocalAddressing = "ipv6";
+                };
+                address = [
+                  "${serviceRecord.ip}/${toString addresses.network.prefixLength}"
+                  "${serviceRecord.ip6}/${toString addresses.network.prefix6Length}"
+                ];
+                routes = [
+                  # Routes in main table (for direct connectivity)
+                  {
+                    Destination = "${addresses.network.prefix}0.0/${toString addresses.network.prefixLength}";
+                    Metric = 1000;
+                  }
+                  {
+                    Destination = "${addresses.network.prefix6}/${toString addresses.network.prefix6Length}";
+                    Metric = 1000;
+                  }
+                  # Routes in custom table for source-based policy routing
+                  {
+                    Destination = "${addresses.network.prefix}0.0/${toString addresses.network.prefixLength}";
+                    Table = lib.strings.toInt routeTableId;
+                  }
+                  {
+                    Destination = "0.0.0.0/0";
+                    Gateway = addresses.network.defaultGateway;
+                    Table = lib.strings.toInt routeTableId;
+                  }
+                  {
+                    Destination = "${addresses.network.prefix6}/${toString addresses.network.prefix6Length}";
+                    Table = lib.strings.toInt routeTableId;
+                  }
+                ];
+                # Source-based policy routing rules - declarative!
+                routingPolicyRules = [
+                  {
+                    From = serviceRecord.ip;
+                    Table = lib.strings.toInt routeTableId;
+                    Priority = lib.strings.toInt routeTableId;
+                  }
+                  {
+                    From = serviceRecord.ip6;
+                    Table = lib.strings.toInt routeTableId;
+                    Priority = lib.strings.toInt routeTableId;
+                  }
+                ];
+              };
+            };
+        in
+        {
+          imports = [ extraConfig ] ++ (map (s: homelabServiceStorage s) storageNames);
+
+          systemd = {
+            targets."${name}-requires" = rec {
+              requires = (map (s: "service-storage-${s}-setup.service") storageNames);
               after = requires;
-              path = (if (systemd ? path) then systemd.path else [ ]);
-              script = (if (systemd ? script) then
-                (systemd.script {
-                  inherit name uid gid storagePath dockerOptions;
-                  interface = if useMacvlan then macvlanInterfaceName else null;
-                  ip = serviceRecord.ip;
-                  ip6 = serviceRecord.ip6;
-                }) else "");
-              postStop = "systemctl restart ${name}-backup";
+              requiredBy = [ "${name}.service" ];
+              before = requiredBy;
             };
-            "${name}-backup" = {
-              script = ''
-                ${concatStringsSep "\n" (map (s: "systemctl restart service-storage-${s}-backup") storageNames)}
-                true
-              '';
-              serviceConfig = { Type = "exec"; };
-              startAt = "hourly";
+            services = {
+              "${name}" = rec {
+                enable = true;
+                description = name;
+                wantedBy = (if autoStart then [ "multi-user.target" ] else [ ]);
+                # With systemd-networkd, macvlans are managed via netdevs, not separate services
+                # network-online.target ensures all interfaces are configured
+                requires =
+                  args.requires ++
+                  [ "network-online.target" "${name}-requires.target" ] ++
+                  (if useMacvlan then [ macvlanDeviceUnit ] else [ ]);
+                after = requires;
+                path = (if (systemd ? path) then systemd.path else [ ]);
+                script = (if (systemd ? script) then
+                  (systemd.script {
+                    inherit name uid gid storagePath dockerOptions;
+                    interface = if useMacvlan then macvlanInterfaceName else null;
+                    ip = serviceRecord.ip;
+                    ip6 = serviceRecord.ip6;
+                  }) else "");
+                postStop = "systemctl restart ${name}-backup";
+              };
+              "${name}-backup" = {
+                script = ''
+                  ${concatStringsSep "\n" (map (s: "systemctl restart service-storage-${s}-backup") storageNames)}
+                  true
+                '';
+                serviceConfig = { Type = "exec"; };
+                startAt = "hourly";
+              };
             };
-          };
-        };
-      };
-      macvlanNetworkConfig = {
-        # Use systemd-networkd for macvlan configuration (native routing policy rule support)
-        systemd.network = {
-          # Create the macvlan netdev
-          netdevs."30-${macvlanInterfaceName}" = {
-            netdevConfig = {
-              Kind = "macvlan";
-              Name = macvlanInterfaceName;
-              MACAddress = serviceRecord.mac;
-            };
-            macvlanConfig = {
-              Mode = "bridge";
-            };
+            network = if useMacvlan then macvlanNetwork else null;
           };
 
-          # Attach macvlan to physical interface
-          networks."05-${machine.lan-interface}".macvlan = [ macvlanInterfaceName ];
-
-          # Configure the macvlan network
-          networks."40-${macvlanInterfaceName}" = {
-            matchConfig.Name = macvlanInterfaceName;
-            networkConfig = {
-              DHCP = "no";
-              IPv6AcceptRA = "yes";
-              LinkLocalAddressing = "ipv6";
-            };
-            address = [
-              "${serviceRecord.ip}/${toString addresses.network.prefixLength}"
-              "${serviceRecord.ip6}/${toString addresses.network.prefix6Length}"
-            ];
-            routes = [
-              # Routes in main table (for direct connectivity)
-              {
-                Destination = "${addresses.network.prefix}0.0/${toString addresses.network.prefixLength}";
-                Metric = 1000;
-              }
-              {
-                Destination = "${addresses.network.prefix6}/${toString addresses.network.prefix6Length}";
-                Metric = 1000;
-              }
-              # Routes in custom table for source-based policy routing
-              {
-                Destination = "${addresses.network.prefix}0.0/${toString addresses.network.prefixLength}";
-                Table = lib.strings.toInt routeTableId;
-              }
-              {
-                Destination = "0.0.0.0/0";
-                Gateway = addresses.network.defaultGateway;
-                Table = lib.strings.toInt routeTableId;
-              }
-              {
-                Destination = "${addresses.network.prefix6}/${toString addresses.network.prefix6Length}";
-                Table = lib.strings.toInt routeTableId;
-              }
-            ];
-            # Source-based policy routing rules - declarative!
-            routingPolicyRules = [
-              {
-                From = serviceRecord.ip;
-                Table = lib.strings.toInt routeTableId;
-                Priority = lib.strings.toInt routeTableId;
-              }
-              {
-                From = serviceRecord.ip6;
-                Table = lib.strings.toInt routeTableId;
-                Priority = lib.strings.toInt routeTableId;
-              }
-            ];
+          # Open firewall ports on the macvlan interface if tcpPorts/udpPorts are specified
+          networking.firewall.interfaces.${macvlanInterfaceName} = lib.mkIf useMacvlan {
+            allowedTCPPorts = tcpPorts;
+            allowedUDPPorts = udpPorts;
           };
         };
-      };
-      systemdConfig = if useMacvlan then lib.recursiveUpdate baseSystemdConfig macvlanNetworkConfig else baseSystemdConfig;
       serviceConfig = if isDocker then dockerConfig else systemdConfig;
     in
     if (machine.hostName == addresses.records.${name}.host) then serviceConfig else { };
