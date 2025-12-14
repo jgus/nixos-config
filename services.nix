@@ -62,31 +62,34 @@ let
       storageNames = extraStorage ++ lib.optional configStorage name;
       dockerOptions = addresses.dockerOptions name;
       isDocker = docker ? image;
+
+      # Shared service components used by both docker and systemd configs
+      requiresTarget = rec {
+        requires = map (s: "service-storage-${s}-setup.service") storageNames;
+        after = requires;
+        requiredBy = [ "${name}.service" ];
+        before = requiredBy;
+      };
+
+      backupService = {
+        script = ''
+          ${concatStringsSep "\n" (map (s: "systemctl restart service-storage-${s}-backup") storageNames)}
+          true
+        '';
+        serviceConfig = { Type = "exec"; };
+        startAt = "hourly";
+      };
+
       dockerConfig = {
         imports = [ ./docker.nix extraConfig ] ++ map homelabServiceStorage storageNames;
 
         systemd = {
-          targets."${name}-requires" = rec {
-            requires = map (s: "service-storage-${s}-setup.service") storageNames;
-            after = requires;
-            requiredBy = [ "${name}.service" ];
-            before = requiredBy;
-          };
+          targets."${name}-requires" = requiresTarget;
           services = {
             "docker-${name}" = {
               aliases = [ "${name}.service" ];
               serviceConfig.Restart = pkgs.lib.mkForce "no";
-            };
-            "${name}-onstop" = rec {
-              path = [ pkgs.docker pkgs.rsync ];
-              script = ''
-                while ! docker container ls --format {{.Names}} | grep ^${name}$; do sleep 1; done
-                docker container wait ${name}
-                systemctl restart ${name}-backup
-              '';
-              serviceConfig = { Type = "oneshot"; };
-              requiredBy = [ "${name}.service" ];
-              after = requiredBy;
+              postStop = "systemctl restart ${name}-backup";
             };
             "${name}-update" = {
               path = [ pkgs.docker ];
@@ -99,14 +102,7 @@ let
               serviceConfig = { Type = "exec"; };
               startAt = "hourly";
             };
-            "${name}-backup" = {
-              script = ''
-                ${concatStringsSep "\n" (map (s: "systemctl restart service-storage-${s}-backup") storageNames)}
-                true
-              '';
-              serviceConfig = { Type = "exec"; };
-              startAt = "hourly";
-            };
+            "${name}-backup" = backupService;
           };
         };
         virtualisation.oci-containers.containers.${name} = {
@@ -209,12 +205,7 @@ let
           imports = [ extraConfig ] ++ map homelabServiceStorage storageNames;
 
           systemd = {
-            targets."${name}-requires" = rec {
-              requires = map (s: "service-storage-${s}-setup.service") storageNames;
-              after = requires;
-              requiredBy = [ "${name}.service" ];
-              before = requiredBy;
-            };
+            targets."${name}-requires" = requiresTarget;
             services = {
               "${name}" = rec {
                 enable = true;
@@ -234,14 +225,7 @@ let
                 });
                 postStop = "systemctl restart ${name}-backup";
               };
-              "${name}-backup" = {
-                script = ''
-                  ${concatStringsSep "\n" (map (s: "systemctl restart service-storage-${s}-backup") storageNames)}
-                  true
-                '';
-                serviceConfig = { Type = "exec"; };
-                startAt = "hourly";
-              };
+              "${name}-backup" = backupService;
             };
             network = lib.mkIf useMacvlan macvlanNetwork;
           };
