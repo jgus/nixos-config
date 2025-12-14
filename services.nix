@@ -13,13 +13,14 @@ let
     let
       path = storagePath name;
       backupPath = storageBackupPath name;
+      zfsDeps = if machine.zfs then [ "zfs.target" ] else [ ];
     in
     {
       systemd.services = {
         "service-storage-${name}-setup" = {
-          requires = (if machine.zfs then [ "zfs.target" ] else [ ]);
-          after = (if machine.zfs then [ "zfs.target" ] else [ ]);
-          path = [ pkgs.rsync ] ++ (if machine.zfs then [ pkgs.zfs ] else [ ]);
+          requires = zfsDeps;
+          after = zfsDeps;
+          path = [ pkgs.rsync ] ++ lib.optional machine.zfs pkgs.zfs;
           script = ''
             if ! [ -d "${path}" ]
             then
@@ -54,21 +55,19 @@ let
     ,
     }: { config, ... }:
     let
-      args = {
-        inherit requires;
-      };
+      serviceRequires = requires;
       uid = toString config.users.users.${user}.uid;
       gid = toString config.users.groups.${group}.gid;
       serviceRecord = addresses.records.${name};
-      storageNames = (extraStorage ++ (if configStorage then [ name ] else [ ]));
+      storageNames = extraStorage ++ lib.optional configStorage name;
       dockerOptions = addresses.dockerOptions name;
       isDocker = docker ? image;
       dockerConfig = {
-        imports = [ ./docker.nix extraConfig ] ++ (map (s: homelabServiceStorage s) storageNames);
+        imports = [ ./docker.nix extraConfig ] ++ map homelabServiceStorage storageNames;
 
         systemd = {
           targets."${name}-requires" = rec {
-            requires = (map (s: "service-storage-${s}-setup.service") storageNames);
+            requires = map (s: "service-storage-${s}-setup.service") storageNames;
             after = requires;
             requiredBy = [ "${name}.service" ];
             before = requiredBy;
@@ -115,28 +114,22 @@ let
           autoStart = autoStart;
           user = "${uid}:${gid}";
           volumes =
-            (if (docker ? volumes) then (if (isFunction docker.volumes) then (docker.volumes storagePath) else docker.volumes) else [ ]) ++
-              (if configStorage then [ "${storagePath name}:${docker.configVolume}" ] else [ ]);
-          extraOptions = (if (docker ? extraOptions) then docker.extraOptions else [ ])
-            ++ dockerOptions;
-          entrypoint = (if (docker ? entrypoint) then docker.entrypoint else null);
-          cmd = (if (docker ? entrypointOptions) then docker.entrypointOptions else [ ]);
+            (let v = docker.volumes or [ ]; in if isFunction v then v storagePath else v) ++
+              lib.optional configStorage "${storagePath name}:${docker.configVolume}";
+          extraOptions = docker.extraOptions or [ ] ++ dockerOptions;
+          entrypoint = docker.entrypoint or null;
+          cmd = docker.entrypointOptions or [ ];
         }
-        // (if (docker ? imageFile) then { imageFile = docker.imageFile; } else { })
-        // (if (docker ? dependsOn) then { dependsOn = docker.dependsOn; } else { })
-        // (if (docker ? environment) then { environment = docker.environment; } else { })
-        // (if (docker ? environmentFiles) then { environmentFiles = docker.environmentFiles; } else { })
-        // (if (docker ? ports) then { ports = docker.ports; } else { })
-        ;
+        // lib.optionalAttrs (docker ? imageFile) { inherit (docker) imageFile; }
+        // lib.optionalAttrs (docker ? dependsOn) { inherit (docker) dependsOn; }
+        // lib.optionalAttrs (docker ? environment) { inherit (docker) environment; }
+        // lib.optionalAttrs (docker ? environmentFiles) { inherit (docker) environmentFiles; }
+        // lib.optionalAttrs (docker ? ports) { inherit (docker) ports; };
       };
       systemdConfig =
         let
-          useMacvlan = systemd ? macvlan && systemd.macvlan;
+          useMacvlan = systemd.macvlan or false;
           macvlanInterfaceName = "mv${toString serviceRecord.g}x${toString serviceRecord.id}";
-          macvlanDeviceUnit = "sys-subsystem-net-devices-${macvlanInterfaceName}.device";
-          # Firewall port options for macvlan interface
-          tcpPorts = if (systemd ? tcpPorts) then systemd.tcpPorts else [ ];
-          udpPorts = if (systemd ? udpPorts) then systemd.udpPorts else [ ];
           macvlanNetwork =
             let
               # Routing table ID: base offset of 1000 avoids reserved tables (253-255)
@@ -213,11 +206,11 @@ let
             };
         in
         {
-          imports = [ extraConfig ] ++ (map (s: homelabServiceStorage s) storageNames);
+          imports = [ extraConfig ] ++ map homelabServiceStorage storageNames;
 
           systemd = {
             targets."${name}-requires" = rec {
-              requires = (map (s: "service-storage-${s}-setup.service") storageNames);
+              requires = map (s: "service-storage-${s}-setup.service") storageNames;
               after = requires;
               requiredBy = [ "${name}.service" ];
               before = requiredBy;
@@ -226,22 +219,19 @@ let
               "${name}" = rec {
                 enable = true;
                 description = name;
-                wantedBy = (if autoStart then [ "multi-user.target" ] else [ ]);
-                # With systemd-networkd, macvlans are managed via netdevs, not separate services
-                # network-online.target ensures all interfaces are configured
+                wantedBy = lib.optional autoStart "multi-user.target";
                 requires =
-                  args.requires ++
+                  serviceRequires ++
                   [ "network-online.target" "${name}-requires.target" ] ++
-                  (if useMacvlan then [ macvlanDeviceUnit ] else [ ]);
+                  lib.optional useMacvlan "sys-subsystem-net-devices-${macvlanInterfaceName}.device";
                 after = requires;
-                path = (if (systemd ? path) then systemd.path else [ ]);
-                script = (if (systemd ? script) then
-                  (systemd.script {
-                    inherit name uid gid storagePath dockerOptions;
-                    interface = if useMacvlan then macvlanInterfaceName else null;
-                    ip = serviceRecord.ip;
-                    ip6 = serviceRecord.ip6;
-                  }) else "");
+                path = systemd.path or [ ];
+                script = lib.optionalString (systemd ? script) (systemd.script {
+                  inherit name uid gid storagePath dockerOptions;
+                  interface = if useMacvlan then macvlanInterfaceName else null;
+                  ip = serviceRecord.ip;
+                  ip6 = serviceRecord.ip6;
+                });
                 postStop = "systemctl restart ${name}-backup";
               };
               "${name}-backup" = {
@@ -253,13 +243,11 @@ let
                 startAt = "hourly";
               };
             };
-            network = if useMacvlan then macvlanNetwork else null;
+            network = lib.mkIf useMacvlan macvlanNetwork;
           };
-
-          # Open firewall ports on the macvlan interface if tcpPorts/udpPorts are specified
           networking.firewall.interfaces.${macvlanInterfaceName} = lib.mkIf useMacvlan {
-            allowedTCPPorts = tcpPorts;
-            allowedUDPPorts = udpPorts;
+            allowedTCPPorts = systemd.tcpPorts or [ ];
+            allowedUDPPorts = systemd.udpPorts or [ ];
           };
         };
       serviceConfig = if isDocker then dockerConfig else systemdConfig;
