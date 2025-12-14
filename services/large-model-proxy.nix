@@ -3,6 +3,11 @@
 { pkgs, ... }:
 let
   version = "0.7.1";
+  # To update hashes when version changes:
+  # 1. Update the version above
+  # 2. Set gitHash = "" and vendorHash = ""
+  # 3. Run nixos-rebuild (it will fail and display the correct hashes)
+  # 4. Copy the correct hashes from the error message and update below
   gitHash = "sha256-FAu8YGJRH0V5kDCI5UezxE/A8N0XQI6c/jsqUvGBkzM=";
   vendorHash = "sha256-zMAapi6RDlXM7ewk8+vzUQftxGUy6PfBB27RQEeM+3A=";
   largeModelProxyPackage = pkgs.buildGoModule {
