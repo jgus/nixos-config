@@ -1,7 +1,6 @@
+{ lib }:
 with builtins;
 let
-  pkgs = import <nixpkgs> { };
-  lib = import <nixpkgs/lib>;
   network = rec {
     prefix = "172.22.";
     prefixLength = 16;

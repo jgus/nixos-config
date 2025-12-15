@@ -1,8 +1,8 @@
 with builtins;
-{ pkgs, config, ... }:
+{ config, pkgs, lib, ... }:
 let
   pw = import ./../../.secrets/passwords.nix;
-  addresses = import ./../../addresses.nix;
+  addresses = import ./../../addresses.nix { inherit lib; };
   image = "ghcr.io/lovelaze/nebula-sync:latest";
 in
 {

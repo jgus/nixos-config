@@ -1,5 +1,6 @@
+{ lib, pkgs, ... }:
 let
-  addresses = import ./../addresses.nix;
+  addresses = import ./../addresses.nix { inherit lib; };
   configuration = {
     metadata_dir = "/var/lib/garage/meta";
     data_dir = "/var/lib/garage/data";
@@ -34,7 +35,6 @@ let
     };
   };
 in
-{ pkgs, ... }:
 {
   configStorage = false;
   docker = {

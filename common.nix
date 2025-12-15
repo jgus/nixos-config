@@ -1,9 +1,9 @@
+{ pkgs, lib, options, ... }:
 let
-  addresses = import ./addresses.nix;
+  addresses = import ./addresses.nix { inherit lib; };
   machine = import ./machine.nix;
   hostRecord = addresses.records."${machine.hostName}";
 in
-{ pkgs, lib, options, ... }:
 {
   boot = {
     initrd.secrets."/etc/nixos/.secrets/vkey" = ./.secrets/vkey;

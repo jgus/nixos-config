@@ -1,5 +1,4 @@
 let
-  addresses = import ./../addresses.nix;
   user = "plex";
   group = "plex";
 in

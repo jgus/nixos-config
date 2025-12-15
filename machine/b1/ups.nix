@@ -1,9 +1,9 @@
-{ config, pkgs, ... }:
+{ pkgs, lib, ... }:
 
 let
   pw = import ./../../.secrets/passwords.nix;
   machine = import ./../../machine.nix;
-  addresses = import ./../../addresses.nix;
+  addresses = import ./../../addresses.nix { inherit lib; };
 in
 {
   power.ups = {

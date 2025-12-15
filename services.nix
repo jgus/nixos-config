@@ -1,6 +1,5 @@
 with builtins;
 let
-  addresses = import ./addresses.nix;
   machine = import ./machine.nix;
   storagePath = name: "/service/${name}";
   storageBackupPath = name: "/storage/service/${name}";
@@ -8,6 +7,7 @@ let
 in
 args@{ pkgs, lib, ... }:
 let
+  addresses = import ./addresses.nix { inherit lib; };
   serviceNames = map (n: lib.strings.removeSuffix ".nix" n) (filter (n: serviceDir.${n} == "regular" && (lib.strings.hasSuffix ".nix" n) && !(lib.strings.hasPrefix "." n)) (attrNames serviceDir));
   homelabServiceStorage = name:
     let

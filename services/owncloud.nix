@@ -1,6 +1,6 @@
-{ ... }:
+{ lib, ... }:
 let
-  addresses = import ./../addresses.nix;
+  addresses = import ./../addresses.nix { inherit lib; };
   pw = import ./../.secrets/passwords.nix;
   adminUser = "admin";
   adminPass = pw.owncloud.admin;

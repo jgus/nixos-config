@@ -1,6 +1,5 @@
 with builtins;
 let
-  addresses = import ./addresses.nix;
   machine = import ./machine.nix;
   mapping =
     (listToAttrs (map
@@ -78,10 +77,6 @@ let
         };
       }
     ]);
-  nfsExport = name:
-    let m = getAttr name mapping; in ''
-      ${m.path} ${addresses.network.prefix}${toString addresses.group.servers}.0/24(rw,crossmnt,no_root_squash)
-    '';
   systemdMount = name:
     let m = getAttr name mapping; in {
       type = "nfs";
@@ -115,6 +110,11 @@ let
 in
 { lib, pkgs, ... }:
 let
+  addresses = import ./addresses.nix { inherit lib; };
+  nfsExport = name:
+    let m = getAttr name mapping; in ''
+      ${m.path} ${addresses.network.prefix}${toString addresses.group.servers}.0/24(rw,crossmnt,no_root_squash)
+    '';
   backupPath = name: (lib.lists.flatten (map (i: if ((isLocal i) && (mapping.${i} ? backup) && (elem name mapping.${i}.backup)) then [ (target i) ] else [ ]) (attrNames mapping)));
   backupPaths = {
     garage = backupPath "garage";

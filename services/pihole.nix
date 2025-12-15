@@ -1,10 +1,8 @@
 with builtins;
+{ config, lib, pkgs, ... }:
 let
-  addresses = import ./../addresses.nix;
+  addresses = import ./../addresses.nix { inherit lib; };
   pw = import ./../.secrets/passwords.nix;
-in
-{ config, pkgs, ... }:
-let
   tftpFiles = {
     "netboot.xyz.kpxe" = fetchurl {
       url = "https://github.com/netbootxyz/netboot.xyz/releases/download/2.0.87/netboot.xyz.kpxe";

@@ -1,7 +1,5 @@
 with builtins;
 let
-  addresses = import ./../addresses.nix;
-  pw = import ./../.secrets/passwords.nix;
   name = "home-assistant";
   user = "home-assistant";
   group = "home-assistant";
@@ -113,6 +111,8 @@ let
 in
 { config, pkgs, lib, ... }:
 let
+  addresses = import ./../addresses.nix { inherit lib; };
+  pw = import ./../.secrets/passwords.nix;
   windows =
     map
       (line:

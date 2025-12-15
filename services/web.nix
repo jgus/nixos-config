@@ -1,7 +1,7 @@
 with builtins;
-{ pkgs, ... }:
+{ lib, pkgs, ... }:
 let
-  addresses = import ./../addresses.nix;
+  addresses = import ./../addresses.nix { inherit lib; };
   pw = import ./../.secrets/passwords.nix;
   encodeCaddyPassword = password: readFile (derivation {
     name = "encodeCaddyPassword";
@@ -98,4 +98,3 @@ in
     ];
   };
 }
-

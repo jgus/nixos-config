@@ -1,8 +1,8 @@
+{ config, pkgs, lib, ... }:
 let
-  addresses = import ./addresses.nix;
+  addresses = import ./addresses.nix { inherit lib; };
   machine = import ./machine.nix;
 in
-{ config, pkgs, lib, ... }:
 {
   virtualisation = {
     docker = {

@@ -1,7 +1,6 @@
 with builtins;
 let
   machine = import ./machine.nix;
-  addresses = import ./addresses.nix;
   ### Settings
   name = "vm1";
   uuid = "99fefcc4-d5aa-4717-8dde-4fe5f0552d87";
@@ -45,6 +44,7 @@ let
 in
 { pkgs, lib, ... }:
 let
+  addresses = import ./addresses.nix { inherit lib; };
   vcpupins = concatStringsSep "\n" (lib.lists.flatten (genList
     (core: genList
       (thread: ''

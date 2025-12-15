@@ -13,7 +13,6 @@ in
     ./storage.nix
     ./backup.nix
     ./services.nix
-    ./backup.nix
     ./status2mqtt.nix
     ./systemctl-mqtt.nix
   ]
