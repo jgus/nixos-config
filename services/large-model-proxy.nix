@@ -100,6 +100,7 @@ let
             "--network=${dockerNetworkName}"
             "--ip=${ip}"
             "--device=nvidia.com/gpu=GPU-8bb9f199-be89-462d-8e68-6ba4fe870ce4"
+            "--cap-add IPC_LOCK"
             # NUMA Binding - GPU on PCIe connected to CPU 2 (NUMA node 1)
             "--cpuset-cpus=${numaCpusNearGpu1}"
             "-v /storage/llama.cpp:/root/.cache/llama.cpp"
@@ -138,16 +139,18 @@ let
             "-ot .ffn_.*_exps.=CPU"
             # Prompt Caching
             "--slot-save-path /root/.cache/llama.cpp/prompt-cache"
+            "--mlock"
 
             ### End Llama.cpp Args ###
           ];
           HealthcheckCommand = "docker exec ${containerName} curl --fail http://localhost:${toString localPort}/health";
           HealthcheckIntervalMilliseconds = 10000;
+          StartupTimeoutMilliseconds = 30 * 60 * 1000;
           KillCommand = "docker stop ${containerName}";
           RestartOnConnectionFailure = true;
           ResourceRequirements = {
             VRAM-1 = 21;
-            RAM = 271;
+            RAM = 231;
           };
         }
       )
@@ -180,6 +183,7 @@ let
             "--network=${dockerNetworkName}"
             "--ip=${ip}"
             "--device=nvidia.com/gpu=GPU-8bb9f199-be89-462d-8e68-6ba4fe870ce4"
+            "--cap-add IPC_LOCK"
             # NUMA Binding - GPU on PCIe connected to CPU 2 (NUMA node 1)
             "--cpuset-cpus=${numaCpusNearGpu1}"
             "-v /storage/llama.cpp:/root/.cache/llama.cpp"
@@ -217,16 +221,18 @@ let
             "-ot .ffn_.*_exps.=CPU"
             # Prompt Caching
             "--slot-save-path /root/.cache/llama.cpp/prompt-cache"
+            "--mlock"
 
             ### End Llama.cpp Args ###
           ];
           HealthcheckCommand = "docker exec ${containerName} curl --fail http://localhost:${toString localPort}/health";
           HealthcheckIntervalMilliseconds = 10000;
+          StartupTimeoutMilliseconds = 30 * 60 * 1000;
           KillCommand = "docker stop ${containerName}";
           RestartOnConnectionFailure = true;
           ResourceRequirements = {
-            VRAM-1 = 21;
-            RAM = 271;
+            VRAM-1 = 20;
+            RAM = 362;
           };
         }
       )
@@ -259,6 +265,7 @@ let
             "--network=${dockerNetworkName}"
             "--ip=${ip}"
             "--device=nvidia.com/gpu=GPU-8bb9f199-be89-462d-8e68-6ba4fe870ce4"
+            "--cap-add IPC_LOCK"
             # NUMA Binding - GPU on PCIe connected to CPU 2 (NUMA node 1)
             "--cpuset-cpus=${numaCpusNearGpu1}"
             "-v /storage/llama.cpp:/root/.cache/llama.cpp"
@@ -298,16 +305,68 @@ let
             "--slot-save-path /root/.cache/llama.cpp/prompt-cache"
             # Special flag to show thinking tags
             "--special"
+            "--mlock"
 
             ### End Llama.cpp Args ###
           ];
           HealthcheckCommand = "docker exec ${containerName} curl --fail http://localhost:${toString localPort}/health";
           HealthcheckIntervalMilliseconds = 10000;
+          StartupTimeoutMilliseconds = 30 * 60 * 1000;
           KillCommand = "docker stop ${containerName}";
           RestartOnConnectionFailure = true;
           ResourceRequirements = {
-            VRAM-1 = 21;
-            RAM = 271;
+            VRAM-1 = 20;
+            RAM = 366;
+          };
+        }
+      )
+
+      # ComfyUI - Stable Diffusion GUI
+      (
+        let
+          name = "comfyui";
+          localPort = 8188;
+          exposePort = 8188;
+          ip = "${dockerNetworkPrefix}5";
+          containerName = "lmp-${name}";
+
+          # Wrapper script that builds image (cached) then runs container
+          launchScript = pkgs.writeShellScript "comfyui-launch" ''
+            set -e
+            
+            # Build image (will use cache if Dockerfile unchanged)
+            echo "Building ComfyUI image (using cache if available)..."
+            docker build -t comfyui:local /etc/nixos/containers/comfyui
+            
+            # Run container
+            exec docker run \
+              --rm \
+              --name=${containerName} \
+              --network=${dockerNetworkName} \
+              --ip=${ip} \
+              --device=nvidia.com/gpu=GPU-8bb9f199-be89-462d-8e68-6ba4fe870ce4 \
+              -v /storage/comfyui/models:/app/comfyui/models \
+              -v /storage/comfyui/output:/app/comfyui/output \
+              -v /storage/comfyui/custom_nodes:/app/comfyui/custom_nodes \
+              comfyui:local
+          '';
+        in
+        {
+          Name = "ComfyUI";
+          ListenPort = toString exposePort;
+          ProxyTargetHost = ip;
+          ProxyTargetPort = toString localPort;
+          Command = toString launchScript;
+          Args = "";
+          HealthcheckCommand = "docker exec ${containerName} curl --fail http://localhost:${toString localPort}";
+          HealthcheckIntervalMilliseconds = 10000;
+          StartupTimeoutMilliseconds = 30 * 60 * 1000; # 5 minutes for first build
+          KillCommand = "docker stop -t 5 ${containerName}"; # Graceful shutdown
+          RestartOnConnectionFailure = true;
+          ShutDownAfterInactivitySeconds = 600;
+          ResourceRequirements = {
+            VRAM-1 = 20;
+            RAM = 16;
           };
         }
       )
@@ -338,8 +397,9 @@ in
 {
   configStorage = true;
   systemd = {
+    extraStorage = [ "comfyui " ];
     macvlan = true;
-    tcpPorts = [ 7070 7071 8080 8081 8082 ];
+    tcpPorts = [ 7070 7071 8080 8081 8082 8188 ];
     path = [ largeModelProxyPackage pkgs.curl pkgs.docker pkgs.bash ];
     script = { interface, ip, ip6, storagePath, name, ... }: ''
       # Create dedicated Docker network for LMP if it doesn't exist
