@@ -92,6 +92,7 @@ let
           "--ubatch-size ${toString (service.ubatchSize or 2048)}"
           "--ctx-size ${toString (service.contextSize or 0)}"
           "--parallel 1"
+          "-kvu"
           "--cache-type-k q8_0"
           "--cache-type-v q8_0"
           "--flash-attn on"
@@ -215,8 +216,8 @@ let
       model = "unsloth/Qwen3-Next-80B-A3B-Instruct-GGUF:Q4_K_XL";
       gpu = true;
       resourceRequirements = {
-        VRAM-1 = 24;
-        RAM = 366;
+        VRAM-1 = 9;
+        RAM = 45;
       };
       extraLlamaCppArgs = [
         # Sampling Parameters
@@ -238,8 +239,8 @@ let
       model = "unsloth/Qwen3-Next-80B-A3B-Thinking-GGUF:Q4_K_XL";
       gpu = true;
       resourceRequirements = {
-        VRAM-1 = 24;
-        RAM = 366;
+        VRAM-1 = 9;
+        RAM = 45;
       };
       extraLlamaCppArgs = [
         # Sampling Parameters
