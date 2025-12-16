@@ -55,6 +55,8 @@ let
       ip = "${dockerNetworkPrefix}${toString (llamaCppBaseIpSuffix + i)}";
       containerName = "lmp-${service.name}";
       gpu = service.gpu;
+      loadTimeSeconds = builtins.ceil (((service.resourceRequirements.VRAM-1 or 0) + (service.resourceRequirements.RAM or 0)) / 0.400);
+      initTimeSeconds = 10 * 60;
     in
     {
       Name = service.displayName;
@@ -102,159 +104,11 @@ let
       );
       HealthcheckCommand = "docker exec ${containerName} curl --fail http://localhost:${toString localPort}/health";
       HealthcheckIntervalMilliseconds = 10000;
-      StartupTimeoutMilliseconds = 30 * 60 * 1000;
+      StartupTimeoutMilliseconds = (loadTimeSeconds + initTimeSeconds) * 1000;
       KillCommand = "docker stop ${containerName}";
       RestartOnConnectionFailure = true;
       ResourceRequirements = service.resourceRequirements;
     };
-
-  llamaCppServices = [
-    # https://docs.unsloth.ai/models/deepseek-v3.1-how-to-run-locally
-    {
-      name = "deepseek-v3-terminus";
-      displayName = "DeepSeek V3.1 Terminus";
-      model = "unsloth/DeepSeek-V3.1-Terminus-GGUF:UD-Q2_K_XL";
-      gpu = true;
-      resourceRequirements = {
-        VRAM-1 = 24;
-        RAM = 231;
-      };
-      extraLlamaCppArgs = [
-        # Sampling Parameters
-        "--temp 0.6"
-        "--top-p 0.95"
-        "--min-p 0.01"
-        # GPU Settings
-        "--n-gpu-layers 999"
-        "-ot .ffn_.*_exps.=CPU"
-      ];
-    }
-
-    # https://docs.unsloth.ai/models/gpt-oss-how-to-run-and-fine-tune
-    {
-      name = "gpt-oss-20b";
-      displayName = "gpt-oss 20B";
-      model = "unsloth/gpt-oss-20b-GGUF:Q8_K_XL";
-      gpu = true;
-      resourceRequirements = {
-        VRAM-1 = 15;
-      };
-      extraLlamaCppArgs = [
-        # Sampling Parameters
-        "--temp 1.0"
-        "--top-p 1.0"
-        "--top-k 0.0"
-        # GPU Settings
-        "--n-gpu-layers 999"
-      ];
-    }
-
-    # https://docs.unsloth.ai/models/gpt-oss-how-to-run-and-fine-tune
-    {
-      name = "gpt-oss-120b";
-      displayName = "gpt-oss 120B";
-      model = "unsloth/gpt-oss-120b-GGUF:Q4_K_XL";
-      gpu = false;
-      resourceRequirements = {
-        RAM = 62;
-      };
-      extraLlamaCppArgs = [
-        # Sampling Parameters
-        "--temp 1.0"
-        "--min-p 0.0"
-        "--top-p 1.0"
-        "--top-k 0.0"
-      ];
-    }
-
-    # https://docs.unsloth.ai/models/kimi-k2-thinking-how-to-run-locally
-    {
-      name = "kimi-k2-instruct";
-      displayName = "Kimi K2 Instruct";
-      model = "unsloth/Kimi-K2-Instruct-GGUF:UD-Q2_K_XL";
-      gpu = true;
-      resourceRequirements = {
-        VRAM-1 = 24;
-        RAM = 362;
-      };
-      extraLlamaCppArgs = [
-        # Sampling Parameters
-        "--temp 0.6"
-        "--min-p 0.01"
-        # GPU Settings
-        "--n-gpu-layers 999"
-        "-ot .ffn_.*_exps.=CPU"
-      ];
-    }
-
-    # https://docs.unsloth.ai/models/kimi-k2-thinking-how-to-run-locally
-    {
-      name = "kimi-k2-thinking";
-      displayName = "Kimi K2 Thinking";
-      model = "unsloth/Kimi-K2-Thinking-GGUF:UD-Q2_K_XL";
-      gpu = true;
-      resourceRequirements = {
-        VRAM-1 = 24;
-        RAM = 366;
-      };
-      extraLlamaCppArgs = [
-        # Sampling Parameters
-        "--temp 1.0"
-        "--min-p 0.01"
-        # GPU Settings
-        "--n-gpu-layers 999"
-        "-ot .ffn_.*_exps.=CPU"
-        # Special flag to show thinking tags
-        "--special"
-      ];
-    }
-
-    # https://docs.unsloth.ai/models/qwen3-next
-    {
-      name = "qwen3-next-instruct";
-      displayName = "Qwen3 Next 80B Instruct";
-      model = "unsloth/Qwen3-Next-80B-A3B-Instruct-GGUF:Q4_K_XL";
-      gpu = true;
-      resourceRequirements = {
-        VRAM-1 = 9;
-        RAM = 45;
-      };
-      extraLlamaCppArgs = [
-        # Sampling Parameters
-        "--temp 0.7"
-        "--min-p 0.00"
-        "--top-p 0.80"
-        "--top-k 20"
-        "--presence-penalty 1.0"
-        # GPU Settings
-        "--n-gpu-layers 999"
-        "-ot .ffn_.*_exps.=CPU"
-      ];
-    }
-
-    # https://docs.unsloth.ai/models/qwen3-next
-    {
-      name = "qwen3-next-thinking";
-      displayName = "Qwen3 Next 80B Thinking";
-      model = "unsloth/Qwen3-Next-80B-A3B-Thinking-GGUF:Q4_K_XL";
-      gpu = true;
-      resourceRequirements = {
-        VRAM-1 = 9;
-        RAM = 45;
-      };
-      extraLlamaCppArgs = [
-        # Sampling Parameters
-        "--temp 0.6"
-        "--min-p 0.00"
-        "--top-p 0.95"
-        "--top-k 20"
-        "--presence-penalty 1.0"
-        # GPU Settings
-        "--n-gpu-layers 999"
-        "-ot .ffn_.*_exps.=CPU"
-      ];
-    }
-  ];
 
   # Configuration defined as Nix expression, will be converted to JSON
   configuration = {
@@ -272,71 +126,296 @@ let
     };
 
     # Global settings
-    MaxTimeToWaitForServiceToCloseConnectionBeforeGivingUpSeconds = 15;
+    MaxTimeToWaitForServiceToCloseConnectionBeforeGivingUpSeconds = 30;
     ShutDownAfterInactivitySeconds = 24 * 60 * 60;
 
     # Available resources to allocate
     # Adjust these values based on your GPU(s) and system RAM
     ResourcesAvailable = {
       VRAM-1 = 24;
-      RAM = 384;
+      RAM = 448;
     };
 
-    # Services to proxy (example configuration - customize as needed)
-    Services =
-      [
-        # ComfyUI - Stable Diffusion GUI
-        (
-          let
-            localPort = 8188;
-            exposePort = 8188;
-            ip = "${dockerNetworkPrefix}2";
-            containerName = "lmp-comfyui";
+    OutputServiceLogs = false;
 
-            launchScript = pkgs.writeShellScript "comfyui-launch" ''
-              set -e
+    # Services to proxy (example configuration - customize as needed)
+    Services = [
+      # ComfyUI - Stable Diffusion GUI
+      (
+        let
+          localPort = 8188;
+          exposePort = 8188;
+          ip = "${dockerNetworkPrefix}2";
+          containerName = "lmp-comfyui";
+
+          launchScript = pkgs.writeShellScript "comfyui-launch" ''
+            set -e
             
-              # Build image (will use cache if Dockerfile unchanged)
-              echo "Building ComfyUI image (using cache if available)..."
-              docker build -t comfyui:local ${./large-model-proxy/comfyui}
+            # Build image (will use cache if Dockerfile unchanged)
+            echo "Building ComfyUI image (using cache if available)..."
+            docker build -t comfyui:local ${./large-model-proxy/comfyui}
             
-              # Run container
-              exec docker run \
-                --rm \
-                --name=${containerName} \
-                --network=${dockerNetworkName} \
-                --ip=${ip} \
-                --device=nvidia.com/gpu=GPU-8bb9f199-be89-462d-8e68-6ba4fe870ce4 \
-                -v /storage/comfyui/models:/app/comfyui/models \
-                -v /storage/comfyui/output:/app/comfyui/output \
-                -v /storage/comfyui/custom_nodes:/app/comfyui/custom_nodes \
-                comfyui:local
-            '';
-          in
-          {
-            Name = "ComfyUI";
-            ListenPort = toString exposePort;
-            ProxyTargetHost = ip;
-            ProxyTargetPort = toString localPort;
-            Command = toString launchScript;
-            Args = "";
-            HealthcheckCommand = "docker exec ${containerName} curl --fail http://localhost:${toString localPort}";
-            HealthcheckIntervalMilliseconds = 10000;
-            StartupTimeoutMilliseconds = 30 * 60 * 1000; # 5 minutes for first build
-            KillCommand = "docker stop -t 5 ${containerName}"; # Graceful shutdown
-            RestartOnConnectionFailure = true;
-            ShutDownAfterInactivitySeconds = 600;
-            ResourceRequirements = {
-              VRAM-1 = 20;
-              RAM = 16;
-            };
-          }
-        )
-      ]
-      ++
-      # Llama.cpp Services
-      (lib.imap0 llamaCppService llamaCppServices)
-    ;
+            # Run container
+            exec docker run \
+              --rm \
+              --name=${containerName} \
+              --network=${dockerNetworkName} \
+              --ip=${ip} \
+              --device=nvidia.com/gpu=GPU-8bb9f199-be89-462d-8e68-6ba4fe870ce4 \
+              -v /storage/comfyui/models:/app/comfyui/models \
+              -v /storage/comfyui/output:/app/comfyui/output \
+              -v /storage/comfyui/custom_nodes:/app/comfyui/custom_nodes \
+              comfyui:local
+          '';
+        in
+        {
+          Name = "ComfyUI";
+          ListenPort = toString exposePort;
+          ProxyTargetHost = ip;
+          ProxyTargetPort = toString localPort;
+          Command = toString launchScript;
+          Args = "";
+          HealthcheckCommand = "docker exec ${containerName} curl --fail http://localhost:${toString localPort}";
+          HealthcheckIntervalMilliseconds = 10000;
+          StartupTimeoutMilliseconds = 30 * 60 * 1000; # 5 minutes for first build
+          KillCommand = "docker stop -t 5 ${containerName}"; # Graceful shutdown
+          RestartOnConnectionFailure = true;
+          ShutDownAfterInactivitySeconds = 600;
+          ResourceRequirements = {
+            VRAM-1 = 20;
+            RAM = 16;
+          };
+        }
+      )
+    ]
+    ++
+    # Llama.cpp Services
+    (lib.imap0 llamaCppService [
+      # https://docs.unsloth.ai/models/deepseek-v3.1-how-to-run-locally
+      {
+        name = "deepseek-v3-terminus";
+        displayName = "DeepSeek V3.1 Terminus";
+        model = "unsloth/DeepSeek-V3.1-Terminus-GGUF:UD-Q2_K_XL";
+        gpu = true;
+        resourceRequirements = {
+          VRAM-1 = 24;
+          RAM = 231;
+        };
+        extraLlamaCppArgs = [
+          # Sampling Parameters
+          "--temp 0.6"
+          "--top-p 0.95"
+          "--min-p 0.01"
+          # GPU Settings
+          "--n-gpu-layers 999"
+          "-ot .ffn_.*_exps.=CPU"
+        ];
+      }
+
+      # https://docs.unsloth.ai/models/gpt-oss-how-to-run-and-fine-tune
+      {
+        name = "gpt-oss-20b";
+        displayName = "gpt-oss 20B";
+        model = "unsloth/gpt-oss-20b-GGUF:Q8_K_XL";
+        gpu = true;
+        resourceRequirements = {
+          VRAM-1 = 15;
+        };
+        extraLlamaCppArgs = [
+          # Sampling Parameters
+          "--temp 1.0"
+          "--top-p 1.0"
+          "--top-k 0.0"
+          # GPU Settings
+          "--n-gpu-layers 999"
+        ];
+      }
+
+      # https://docs.unsloth.ai/models/gpt-oss-how-to-run-and-fine-tune
+      {
+        name = "gpt-oss-120b";
+        displayName = "gpt-oss 120B";
+        model = "unsloth/gpt-oss-120b-GGUF:Q4_K_XL";
+        gpu = false;
+        resourceRequirements = {
+          RAM = 62;
+        };
+        extraLlamaCppArgs = [
+          # Sampling Parameters
+          "--temp 1.0"
+          "--min-p 0.0"
+          "--top-p 1.0"
+          "--top-k 0.0"
+        ];
+      }
+
+      # https://docs.unsloth.ai/models/kimi-k2-thinking-how-to-run-locally
+      {
+        name = "kimi-k2-instruct";
+        displayName = "Kimi K2 Instruct";
+        model = "unsloth/Kimi-K2-Instruct-GGUF:UD-Q2_K_XL";
+        gpu = true;
+        resourceRequirements = {
+          VRAM-1 = 22;
+          RAM = 362;
+        };
+        contextSize = 128 * 1024;
+        extraLlamaCppArgs = [
+          # Sampling Parameters
+          "--temp 0.6"
+          "--min-p 0.01"
+          # GPU Settings
+          "--n-gpu-layers 999"
+          "-ot .ffn_.*_exps.=CPU"
+        ];
+      }
+
+      # https://docs.unsloth.ai/models/kimi-k2-thinking-how-to-run-locally
+      {
+        name = "kimi-k2-thinking";
+        displayName = "Kimi K2 Thinking";
+        model = "unsloth/Kimi-K2-Thinking-GGUF:UD-Q2_K_XL";
+        gpu = true;
+        resourceRequirements = {
+          VRAM-1 = 22;
+          RAM = 366;
+        };
+        contextSize = 128 * 1024;
+        extraLlamaCppArgs = [
+          # Sampling Parameters
+          "--temp 1.0"
+          "--min-p 0.01"
+          # GPU Settings
+          "--n-gpu-layers 999"
+          "-ot .ffn_.*_exps.=CPU"
+          # Special flag to show thinking tags
+          "--special"
+        ];
+      }
+
+      # https://docs.unsloth.ai/models/kimi-k2-thinking-how-to-run-locally
+      {
+        name = "kimi-k2-thinking-cpu";
+        displayName = "Kimi K2 Thinking (CPU)";
+        model = "unsloth/Kimi-K2-Thinking-GGUF:UD-Q2_K_XL";
+        gpu = false;
+        resourceRequirements = {
+          RAM = 382;
+        };
+        extraLlamaCppArgs = [
+          # Sampling Parameters
+          "--temp 1.0"
+          "--min-p 0.01"
+          # Special flag to show thinking tags
+          "--special"
+        ];
+      }
+
+      # https://docs.unsloth.ai/models/qwen3-next
+      {
+        name = "qwen3-next-instruct";
+        displayName = "Qwen3 Next 80B Instruct";
+        model = "unsloth/Qwen3-Next-80B-A3B-Instruct-GGUF:Q4_K_XL";
+        gpu = true;
+        resourceRequirements = {
+          VRAM-1 = 9;
+          RAM = 45;
+        };
+        extraLlamaCppArgs = [
+          # Sampling Parameters
+          "--temp 0.7"
+          "--min-p 0.00"
+          "--top-p 0.80"
+          "--top-k 20"
+          "--presence-penalty 1.0"
+          # GPU Settings
+          "--n-gpu-layers 999"
+          "-ot .ffn_.*_exps.=CPU"
+        ];
+      }
+
+      # https://docs.unsloth.ai/models/qwen3-next
+      {
+        name = "qwen3-next-thinking";
+        displayName = "Qwen3 Next 80B Thinking";
+        model = "unsloth/Qwen3-Next-80B-A3B-Thinking-GGUF:Q4_K_XL";
+        gpu = true;
+        resourceRequirements = {
+          VRAM-1 = 9;
+          RAM = 45;
+        };
+        extraLlamaCppArgs = [
+          # Sampling Parameters
+          "--temp 0.6"
+          "--min-p 0.00"
+          "--top-p 0.95"
+          "--top-k 20"
+          "--presence-penalty 1.0"
+          # GPU Settings
+          "--n-gpu-layers 999"
+          "-ot .ffn_.*_exps.=CPU"
+        ];
+      }
+
+      # https://docs.unsloth.ai/models/glm-4.6-how-to-run-locally
+      {
+        name = "glm-4.6";
+        displayName = "GLM 4.6";
+        model = "unsloth/GLM-4.6-GGUF:Q2_K_XL";
+        gpu = true;
+        resourceRequirements = {
+          VRAM-1 = 24;
+          RAM = 124;
+        };
+        contextSize = 64 * 1024;
+        extraLlamaCppArgs = [
+          # Sampling Parameters
+          "--temp 1.0"
+          "--top-p 0.95"
+          "--top-k 40"
+          # GPU Settings
+          "--n-gpu-layers 999"
+          "-ot .ffn_.*_exps.=CPU"
+        ];
+      }
+
+      # https://docs.unsloth.ai/models/glm-4.6-how-to-run-locally
+      {
+        name = "glm-4.6-cpu";
+        displayName = "GLM 4.6 (CPU)";
+        model = "unsloth/GLM-4.6-GGUF:Q2_K_XL";
+        gpu = false;
+        resourceRequirements = {
+          RAM = 174;
+        };
+        extraLlamaCppArgs = [
+          # Sampling Parameters
+          "--temp 1.0"
+          "--top-p 0.95"
+          "--top-k 40"
+        ];
+      }
+
+      # https://docs.unsloth.ai/models/glm-4.6-how-to-run-locally
+      {
+        name = "glm-4.6v-flash";
+        displayName = "GLM 4.6V Flash";
+        model = "unsloth/GLM-4.6V-Flash-GGUF:Q4_K_XL";
+        gpu = true;
+        resourceRequirements = {
+          VRAM-1 = 11;
+        };
+        extraLlamaCppArgs = [
+          # Sampling Parameters
+          "--temp 0.8"
+          "--top-p 0.6"
+          "--top-k 2"
+          "--repeat_penalty 1.1"
+          # GPU Settings
+          "--n-gpu-layers 999"
+        ];
+      }
+    ]);
   };
 
   # Generate JSON config file
