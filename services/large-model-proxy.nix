@@ -5,6 +5,7 @@ let
   machine = import ../machine.nix;
   numaCpusStrs = map (cpuSet: lib.concatMapStringsSep "," toString cpuSet) machine.numaCpus;
   numaCpusNearGpu1 = (builtins.elemAt numaCpusStrs 1);
+  numaCpusNotNearGpu1 = (builtins.elemAt numaCpusStrs 0);
   numaCpuCountPerNode = builtins.length (builtins.elemAt machine.numaCpus 0);
 
   # Docker network configuration
@@ -48,14 +49,15 @@ let
 
   # Helper function to create llamacpp service configurations
   # Takes index i and service config, auto-computes ipSuffix and exposePort
-  llamaCppService = i: svc:
+  llamaCppService = i: service:
     let
-      localPort = svc.localPort or 8080;
+      localPort = service.localPort or 8080;
       ip = "${dockerNetworkPrefix}${toString (llamaCppBaseIpSuffix + i)}";
-      containerName = "lmp-${svc.name}";
+      containerName = "lmp-${service.name}";
+      gpu = service.gpu;
     in
     {
-      Name = svc.displayName;
+      Name = service.displayName;
       OpenAiApi = true;
       ListenPort = toString (llamaCppBaseExposePort + i);
       ProxyTargetHost = ip;
@@ -70,25 +72,25 @@ let
           "--name=${containerName}"
           "--network=${dockerNetworkName}"
           "--ip=${ip}"
-          "--device=nvidia.com/gpu=GPU-8bb9f199-be89-462d-8e68-6ba4fe870ce4"
+          (lib.optionalString gpu "--device=nvidia.com/gpu=GPU-8bb9f199-be89-462d-8e68-6ba4fe870ce4")
           "--cap-add IPC_LOCK"
-          "--cpuset-cpus=${numaCpusNearGpu1}"
+          "--cpuset-cpus=${if gpu then numaCpusNearGpu1 else numaCpusNotNearGpu1}"
           "-v /storage/llama.cpp:/root/.cache/llama.cpp"
-          "ghcr.io/ggml-org/llama.cpp:server-cuda"
+          "ghcr.io/ggml-org/llama.cpp:${if gpu then "server-cuda" else "server"}"
         ]
         # Llama.cpp arguments
         ++ [
           "--port ${toString localPort}"
           "--threads ${toString numaCpuCountPerNode}"
           "--threads-batch ${toString numaCpuCountPerNode}"
-          "-hf ${svc.model}"
+          "-hf ${service.model}"
           "--jinja"
         ]
-        ++ (svc.extraLlamaCppArgs or [ ])
+        ++ (service.extraLlamaCppArgs or [ ])
         ++ [
-          "--batch-size ${toString (svc.batchSize or 8192)}"
-          "--ubatch-size ${toString (svc.ubatchSize or 2048)}"
-          "--ctx-size ${toString (svc.contextSize or 0)}"
+          "--batch-size ${toString (service.batchSize or 8192)}"
+          "--ubatch-size ${toString (service.ubatchSize or 2048)}"
+          "--ctx-size ${toString (service.contextSize or 0)}"
           "--parallel 1"
           "--cache-type-k q8_0"
           "--cache-type-v q8_0"
@@ -102,7 +104,7 @@ let
       StartupTimeoutMilliseconds = 30 * 60 * 1000;
       KillCommand = "docker stop ${containerName}";
       RestartOnConnectionFailure = true;
-      ResourceRequirements = svc.resourceRequirements;
+      ResourceRequirements = service.resourceRequirements;
     };
 
   llamaCppServices = [
@@ -111,6 +113,7 @@ let
       name = "deepseek-v3-terminus";
       displayName = "DeepSeek V3.1 Terminus";
       model = "unsloth/DeepSeek-V3.1-Terminus-GGUF:UD-Q2_K_XL";
+      gpu = true;
       resourceRequirements = {
         VRAM-1 = 24;
         RAM = 231;
@@ -131,6 +134,7 @@ let
       name = "gpt-oss-20b";
       displayName = "gpt-oss 20B";
       model = "unsloth/gpt-oss-20b-GGUF:Q8_K_XL";
+      gpu = true;
       resourceRequirements = {
         VRAM-1 = 15;
       };
@@ -149,9 +153,9 @@ let
       name = "gpt-oss-120b";
       displayName = "gpt-oss 120B";
       model = "unsloth/gpt-oss-120b-GGUF:Q4_K_XL";
+      gpu = false;
       resourceRequirements = {
-        VRAM-1 = 6;
-        RAM = 60;
+        RAM = 62;
       };
       extraLlamaCppArgs = [
         # Sampling Parameters
@@ -159,9 +163,6 @@ let
         "--min-p 0.0"
         "--top-p 1.0"
         "--top-k 0.0"
-        # GPU Settings
-        "--n-gpu-layers 0"
-        "-ot .ffn_(up)_exps.=CPU"
       ];
     }
 
@@ -170,6 +171,7 @@ let
       name = "kimi-k2-instruct";
       displayName = "Kimi K2 Instruct";
       model = "unsloth/Kimi-K2-Instruct-GGUF:UD-Q2_K_XL";
+      gpu = true;
       resourceRequirements = {
         VRAM-1 = 24;
         RAM = 362;
@@ -189,6 +191,7 @@ let
       name = "kimi-k2-thinking";
       displayName = "Kimi K2 Thinking";
       model = "unsloth/Kimi-K2-Thinking-GGUF:UD-Q2_K_XL";
+      gpu = true;
       resourceRequirements = {
         VRAM-1 = 24;
         RAM = 366;
@@ -210,6 +213,7 @@ let
       name = "qwen3-next-instruct";
       displayName = "Qwen3 Next 80B Instruct";
       model = "unsloth/Qwen3-Next-80B-A3B-Instruct-GGUF:Q4_K_XL";
+      gpu = true;
       resourceRequirements = {
         VRAM-1 = 24;
         RAM = 366;
@@ -232,6 +236,7 @@ let
       name = "qwen3-next-thinking";
       displayName = "Qwen3 Next 80B Thinking";
       model = "unsloth/Qwen3-Next-80B-A3B-Thinking-GGUF:Q4_K_XL";
+      gpu = true;
       resourceRequirements = {
         VRAM-1 = 24;
         RAM = 366;
