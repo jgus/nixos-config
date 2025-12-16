@@ -415,6 +415,133 @@ let
           "--n-gpu-layers 999"
         ];
       }
+
+      # https://docs.unsloth.ai/models/ministral-3
+      {
+        name = "ministral-3b-instruct";
+        displayName = "Ministral 3B Instruct";
+        model = "unsloth/Ministral-3-3B-Instruct-2512-GGUF:Q4_K_XL";
+        gpu = true;
+        resourceRequirements = {
+          VRAM-1 = 6;
+        };
+        contextSize = 16 * 1024;
+        extraLlamaCppArgs = [
+          # Sampling Parameters
+          "--temp 0.15"
+          # GPU Settings
+          "--n-gpu-layers 999"
+        ];
+      }
+
+      # https://docs.unsloth.ai/models/ministral-3
+      {
+        name = "ministral-3b-reasoning";
+        displayName = "Ministral 3B Reasoning";
+        model = "unsloth/Ministral-3-3B-Reasoning-2512-GGUF:Q4_K_XL";
+        gpu = true;
+        resourceRequirements = {
+          VRAM-1 = 6;
+        };
+        contextSize = 16 * 1024;
+        extraLlamaCppArgs = [
+          # Sampling Parameters
+          "--temp 0.6"
+          "--top-p 0.95"
+          # GPU Settings
+          "--n-gpu-layers 999"
+        ];
+      }
+
+      # https://docs.unsloth.ai/models/ministral-3
+      {
+        name = "ministral-14b-instruct";
+        displayName = "Ministral 14B Instruct";
+        model = "unsloth/Ministral-3-14B-Instruct-2512-GGUF:Q4_K_XL";
+        gpu = true;
+        resourceRequirements = {
+          VRAM-1 = 22;
+        };
+        contextSize = 128 * 1024;
+        extraLlamaCppArgs = [
+          # Sampling Parameters
+          "--temp 0.15"
+          # GPU Settings
+          "--n-gpu-layers 999"
+        ];
+      }
+
+      # https://docs.unsloth.ai/models/ministral-3
+      {
+        name = "ministral-14b-reasoning";
+        displayName = "Ministral 14B Reasoning";
+        model = "unsloth/Ministral-3-14B-Reasoning-2512-GGUF:Q4_K_XL";
+        gpu = true;
+        resourceRequirements = {
+          VRAM-1 = 22;
+        };
+        contextSize = 128 * 1024;
+        extraLlamaCppArgs = [
+          # Sampling Parameters
+          "--temp 0.6"
+          "--top-p 0.95"
+          # GPU Settings
+          "--n-gpu-layers 999"
+        ];
+      }
+
+      # https://docs.unsloth.ai/models/devstral-2
+      {
+        name = "devstral-small-2";
+        displayName = "Devstral Small 2";
+        model = "unsloth/Devstral-Small-2-24B-Instruct-2512-GGUF:UD-Q4_K_XL";
+        gpu = true;
+        resourceRequirements = {
+          VRAM-1 = 22;
+        };
+        contextSize = 64 * 1024;
+        extraLlamaCppArgs = [
+          "--mmproj unsloth/Devstral-Small-2-24B-Instruct-2512-GGUF/mmproj-F16.gguf"
+          # Sampling Parameters
+          "--temp 0.15"
+          # GPU Settings
+          "--n-gpu-layers 999"
+        ];
+      }
+
+      # https://docs.unsloth.ai/models/devstral-2
+      {
+        name = "devstral-2";
+        displayName = "Devstral 2";
+        model = "unsloth/Devstral-2-123B-Instruct-2512-GGUF:UD-Q2_K_XL";
+        gpu = true;
+        resourceRequirements = {
+          VRAM-1 = 24;
+          RAM = 38;
+        };
+        contextSize = 64 * 1024;
+        extraLlamaCppArgs = [
+          # Sampling Parameters
+          "--temp 0.15"
+          # GPU Settings
+          "--n-gpu-layers 32"
+        ];
+      }
+
+      # https://docs.unsloth.ai/models/devstral-2
+      {
+        name = "devstral-2-cpu";
+        displayName = "Devstral 2 (CPU)";
+        model = "unsloth/Devstral-2-123B-Instruct-2512-GGUF:UD-Q2_K_XL";
+        gpu = false;
+        resourceRequirements = {
+          RAM = 92;
+        };
+        extraLlamaCppArgs = [
+          # Sampling Parameters
+          "--temp 0.15"
+        ];
+      }
     ]);
   };
 
