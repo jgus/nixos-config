@@ -156,9 +156,17 @@ let
                   IPv6AcceptRA = "yes";
                   LinkLocalAddressing = "ipv6";
                 };
-                address = [
-                  "${serviceRecord.ip}/${toString addresses.network.prefixLength}"
-                  "${serviceRecord.ip6}/${toString addresses.network.prefix6Length}"
+                # Use AddPrefixRoute=false to prevent auto-generated kernel routes
+                # This ensures lan0 (host) routes are preferred over service macvlan routes
+                addresses = [
+                  {
+                    Address = "${serviceRecord.ip}/${toString addresses.network.prefixLength}";
+                    AddPrefixRoute = false;
+                  }
+                  {
+                    Address = "${serviceRecord.ip6}/${toString addresses.network.prefix6Length}";
+                    AddPrefixRoute = false;
+                  }
                 ];
                 routes = [
                   # Routes in main table (for direct connectivity)
