@@ -12,20 +12,20 @@ let
   dockerNetworkName = "lmp-network";
   dockerNetworkPrefix = "192.168.88.";
 
-  version = "0.7.1";
+  version = "jgus";
   # To update hashes when version changes:
   # 1. Update the version above
   # 2. Set gitHash = "" and vendorHash = ""
   # 3. Run nixos-rebuild (it will fail and display the correct hashes)
   # 4. Copy the correct hashes from the error message and update below
-  gitHash = "sha256-FAu8YGJRH0V5kDCI5UezxE/A8N0XQI6c/jsqUvGBkzM=";
-  vendorHash = "sha256-zMAapi6RDlXM7ewk8+vzUQftxGUy6PfBB27RQEeM+3A=";
+  gitHash = "sha256-1fe4goxvIFesXYY7y0Tezn00HJ1dM/8WsD08LNi9Ga0=";
+  vendorHash = "sha256-tu1nSSZbsPPIrYaiwnQEXeLZoUTnWfCJmIxr08fNPVs=";
   largeModelProxyPackage = pkgs.buildGoModule {
     pname = "large-model-proxy";
     inherit version;
 
     src = pkgs.fetchFromGitHub {
-      owner = "perk11";
+      owner = "jgus";
       repo = "large-model-proxy";
       rev = version;
       sha256 = gitHash;
@@ -45,7 +45,6 @@ let
 
   # Auto-increment settings for llama.cpp services
   llamaCppBaseIpSuffix = 11; # First service gets 192.168.88.11
-  llamaCppBaseExposePort = 8081; # First service gets port 8081
 
   # Helper function to create llamacpp service configurations
   # Takes index i and service config, auto-computes ipSuffix and exposePort
@@ -61,7 +60,6 @@ let
     {
       Name = service.displayName;
       OpenAiApi = true;
-      ListenPort = toString (llamaCppBaseExposePort + i);
       ProxyTargetHost = ip;
       ProxyTargetPort = toString localPort;
       Command = "docker";
@@ -111,18 +109,20 @@ let
     };
 
   # Configuration defined as Nix expression, will be converted to JSON
-  configuration = {
+  configuration = { hostIp, hostIp6 }: {
     # Default URL template for services
     DefaultServiceUrl = "http://large-model-proxy:{{.PORT}}/";
 
     # OpenAI-compatible API endpoint
     OpenAiApi = {
-      ListenPort = "7070";
+      ListenAddresses = [ hostIp hostIp6 ];
+      ListenPort = "8080";
     };
 
     # Management/dashboard API
     ManagementApi = {
-      ListenPort = "7071";
+      ListenAddresses = [ hostIp hostIp6 ];
+      ListenPort = "80";
     };
 
     # Global settings
@@ -170,6 +170,7 @@ let
         in
         {
           Name = "ComfyUI";
+          ListenAddresses = [ hostIp hostIp6 ];
           ListenPort = toString exposePort;
           ProxyTargetHost = ip;
           ProxyTargetPort = toString localPort;
@@ -540,7 +541,7 @@ let
           # Sampling Parameters
           "--temp 0.15"
           # GPU Settings
-          "--n-gpu-layers 32"
+          "--n-gpu-layers 28"
         ];
       }
 
@@ -560,16 +561,13 @@ let
       }
     ]);
   };
-
-  # Generate JSON config file
-  configFile = (pkgs.formats.json { }).generate "config.json" configuration;
 in
 {
   configStorage = true;
   systemd = {
     extraStorage = [ "comfyui " ];
     macvlan = true;
-    tcpPorts = [ 7070 7071 8080 8081 8082 8188 ];
+    tcpPorts = [ 80 8080 8188 ];
     path = [ largeModelProxyPackage pkgs.curl pkgs.docker pkgs.bash ];
     script = { interface, ip, ip6, storagePath, name, ... }: ''
       # Create dedicated Docker network for LMP if it doesn't exist
@@ -579,7 +577,7 @@ in
       fi
 
       cd ${storagePath name}
-      exec large-model-proxy -c ${configFile}
+      exec large-model-proxy -c ${(pkgs.formats.json { }).generate "config.json" (configuration { hostIp = ip; hostIp6 = ip6; })}
     '';
   };
 }
