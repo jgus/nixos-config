@@ -56,50 +56,49 @@ let
       gpu = service.gpu;
       loadTimeSeconds = builtins.ceil (((service.resourceRequirements.VRAM-1 or 0) + (service.resourceRequirements.RAM or 0)) / 0.400);
       initTimeSeconds = 10 * 60;
+      dockerImage = "ghcr.io/ggml-org/llama.cpp:${if gpu then "server-cuda" else "server"}";
+      launchScript = pkgs.writeShellScript "launch" ''
+        set -e
+            
+        docker pull ${dockerImage}
+            
+        # Run container
+        exec docker run \
+          --rm \
+          --read-only \
+          --name=${containerName} \
+          --network=${dockerNetworkName} \
+          --ip=${ip} \
+          ${(lib.optionalString gpu "--device=nvidia.com/gpu=GPU-8bb9f199-be89-462d-8e68-6ba4fe870ce4")} \
+          --cap-add IPC_LOCK \
+          --cpuset-cpus="${if gpu then numaCpusNearGpu1 else numaCpusNotNearGpu1}" \
+          -v /storage/llama.cpp:/root/.cache/llama.cpp \
+          ${dockerImage} \
+          --port ${toString localPort} \
+          --threads ${toString numaCpuCountPerNode} \
+          --threads-batch ${toString numaCpuCountPerNode} \
+          -hf ${service.model} \
+          --jinja \
+          --batch-size ${toString (service.batchSize or 8192)} \
+          --ubatch-size ${toString (service.ubatchSize or 2048)} \
+          --ctx-size ${toString (service.contextSize or 0)} \
+          --parallel 1 \
+          -kvu \
+          --cache-type-k q8_0 \
+          --cache-type-v q8_0 \
+          --flash-attn on \
+          --slot-save-path /root/.cache/llama.cpp/prompt-cache \
+          --mlock \
+          ${lib.concatStringsSep " " (service.extraLlamaCppArgs or [ ])}
+      '';
     in
     {
       Name = service.displayName;
       OpenAiApi = true;
       ProxyTargetHost = ip;
       ProxyTargetPort = toString localPort;
-      Command = "docker";
-      Args = lib.concatStringsSep " " (
-        # Docker arguments
-        [
-          "run"
-          "--rm"
-          "--read-only"
-          "--name=${containerName}"
-          "--network=${dockerNetworkName}"
-          "--ip=${ip}"
-          (lib.optionalString gpu "--device=nvidia.com/gpu=GPU-8bb9f199-be89-462d-8e68-6ba4fe870ce4")
-          "--cap-add IPC_LOCK"
-          "--cpuset-cpus=${if gpu then numaCpusNearGpu1 else numaCpusNotNearGpu1}"
-          "-v /storage/llama.cpp:/root/.cache/llama.cpp"
-          "ghcr.io/ggml-org/llama.cpp:${if gpu then "server-cuda" else "server"}"
-        ]
-        # Llama.cpp arguments
-        ++ [
-          "--port ${toString localPort}"
-          "--threads ${toString numaCpuCountPerNode}"
-          "--threads-batch ${toString numaCpuCountPerNode}"
-          "-hf ${service.model}"
-          "--jinja"
-        ]
-        ++ (service.extraLlamaCppArgs or [ ])
-        ++ [
-          "--batch-size ${toString (service.batchSize or 8192)}"
-          "--ubatch-size ${toString (service.ubatchSize or 2048)}"
-          "--ctx-size ${toString (service.contextSize or 0)}"
-          "--parallel 1"
-          "-kvu"
-          "--cache-type-k q8_0"
-          "--cache-type-v q8_0"
-          "--flash-attn on"
-          "--slot-save-path /root/.cache/llama.cpp/prompt-cache"
-          "--mlock"
-        ]
-      );
+      Command = toString launchScript;
+      Args = "";
       HealthcheckCommand = "docker exec ${containerName} curl --fail http://localhost:${toString localPort}/health";
       HealthcheckIntervalMilliseconds = 10000;
       StartupTimeoutMilliseconds = (loadTimeSeconds + initTimeSeconds) * 1000;
@@ -147,7 +146,6 @@ let
           exposePort = 8188;
           ip = "${dockerNetworkPrefix}2";
           containerName = "lmp-comfyui";
-
           launchScript = pkgs.writeShellScript "comfyui-launch" ''
             set -e
             
