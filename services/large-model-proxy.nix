@@ -416,6 +416,22 @@ let
         ];
       }
 
+      {
+        name = "glm-4.5-air";
+        displayName = "GLM 4.5 Air";
+        model = "unsloth/GLM-4.5-Air-GGUF:Q4_K_XL";
+        gpu = true;
+        resourceRequirements = {
+          VRAM-1 = 20;
+          RAM = 67;
+        };
+        extraLlamaCppArgs = [
+          # GPU Settings
+          "--n-gpu-layers 999"
+          "-ot .ffn_.*_exps.=CPU"
+        ];
+      }
+
       # https://docs.unsloth.ai/models/ministral-3
       {
         name = "ministral-3b-instruct";
