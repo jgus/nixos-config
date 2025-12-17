@@ -84,8 +84,8 @@ let
           --ctx-size ${toString (service.contextSize or 0)} \
           --parallel 1 \
           -kvu \
-          --cache-type-k q8_0 \
-          --cache-type-v q8_0 \
+          --cache-type-k q4_0 \
+          --cache-type-v q4_0 \
           --flash-attn on \
           --slot-save-path /root/.cache/llama.cpp/prompt-cache \
           --mlock \
@@ -276,7 +276,7 @@ let
         model = "unsloth/Kimi-K2-Thinking-GGUF:UD-Q2_K_XL";
         gpu = true;
         resourceRequirements = {
-          VRAM-1 = 22;
+          VRAM-1 = 18;
           RAM = 366;
         };
         contextSize = 128 * 1024;
@@ -440,7 +440,7 @@ let
         resourceRequirements = {
           VRAM-1 = 6;
         };
-        contextSize = 16 * 1024;
+        contextSize = 32 * 1024;
         extraLlamaCppArgs = [
           # Sampling Parameters
           "--temp 0.15"
@@ -458,7 +458,7 @@ let
         resourceRequirements = {
           VRAM-1 = 6;
         };
-        contextSize = 16 * 1024;
+        contextSize = 32 * 1024;
         extraLlamaCppArgs = [
           # Sampling Parameters
           "--temp 0.6"
@@ -477,7 +477,7 @@ let
         resourceRequirements = {
           VRAM-1 = 22;
         };
-        contextSize = 128 * 1024;
+        # contextSize = 128 * 1024;
         extraLlamaCppArgs = [
           # Sampling Parameters
           "--temp 0.15"
@@ -495,7 +495,7 @@ let
         resourceRequirements = {
           VRAM-1 = 22;
         };
-        contextSize = 128 * 1024;
+        # contextSize = 128 * 1024;
         extraLlamaCppArgs = [
           # Sampling Parameters
           "--temp 0.6"
@@ -514,7 +514,7 @@ let
         resourceRequirements = {
           VRAM-1 = 22;
         };
-        contextSize = 64 * 1024;
+        contextSize = 128 * 1024;
         extraLlamaCppArgs = [
           "--mmproj unsloth/Devstral-Small-2-24B-Instruct-2512-GGUF/mmproj-F16.gguf"
           # Sampling Parameters
@@ -534,7 +534,7 @@ let
           VRAM-1 = 24;
           RAM = 38;
         };
-        contextSize = 64 * 1024;
+        contextSize = 128 * 1024;
         extraLlamaCppArgs = [
           # Sampling Parameters
           "--temp 0.15"
@@ -555,6 +555,25 @@ let
         extraLlamaCppArgs = [
           # Sampling Parameters
           "--temp 0.15"
+        ];
+      }
+
+      # https://docs.unsloth.ai/models/nemotron-3
+      {
+        name = "menotron-3-nano";
+        displayName = "Nemotron 3 Nano";
+        model = "unsloth/Nemotron-3-Nano-30B-A3B-GGUF:UD-Q4_K_XL";
+        gpu = true;
+        resourceRequirements = {
+          VRAM-1 = 24;
+        };
+        contextSize = 256 * 1024;
+        extraLlamaCppArgs = [
+          # Sampling Parameters
+          "--temp 0.6"
+          "--top-p 0.95"
+          # GPU Settings
+          "--n-gpu-layers 999"
         ];
       }
     ]);
