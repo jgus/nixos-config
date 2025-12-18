@@ -273,13 +273,12 @@ let
       {
         name = "kimi-k2-thinking";
         displayName = "Kimi K2 Thinking";
-        model = "unsloth/Kimi-K2-Thinking-GGUF:UD-Q2_K_XL";
+        model = "unsloth/Kimi-K2-Thinking-GGUF:UD-Q3_K_XL";
         gpu = true;
         resourceRequirements = {
-          VRAM-1 = 18;
-          RAM = 366;
+          VRAM-1 = 23;
+          RAM = 424;
         };
-        contextSize = 128 * 1024;
         extraLlamaCppArgs = [
           # Sampling Parameters
           "--temp 1.0"
@@ -296,10 +295,10 @@ let
       {
         name = "kimi-k2-thinking-cpu";
         displayName = "Kimi K2 Thinking (CPU)";
-        model = "unsloth/Kimi-K2-Thinking-GGUF:UD-Q2_K_XL";
+        model = "unsloth/Kimi-K2-Thinking-GGUF:UD-Q3_K_XL";
         gpu = false;
         resourceRequirements = {
-          RAM = 382;
+          RAM = 448;
         };
         extraLlamaCppArgs = [
           # Sampling Parameters
@@ -403,6 +402,27 @@ let
         gpu = true;
         resourceRequirements = {
           VRAM-1 = 11;
+        };
+        extraLlamaCppArgs = [
+          # Sampling Parameters
+          "--temp 0.8"
+          "--top-p 0.6"
+          "--top-k 2"
+          "--repeat_penalty 1.1"
+          # GPU Settings
+          "--n-gpu-layers 999"
+        ];
+      }
+
+      # https://docs.unsloth.ai/models/glm-4.6-how-to-run-locally
+      {
+        name = "glm-4.6v";
+        displayName = "GLM 4.6V";
+        model = "unsloth/GLM-4.6V-GGUF:Q4_K_XL";
+        gpu = true;
+        resourceRequirements = {
+          VRAM-1 = 20;
+          RAM = 67;
         };
         extraLlamaCppArgs = [
           # Sampling Parameters
