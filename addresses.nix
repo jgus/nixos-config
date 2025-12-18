@@ -95,6 +95,7 @@ let
       ollama = { id = 51; host = "d1"; };
       open-webui = { id = 52; host = "d1"; };
       searxng = { id = 53; host = "c1-2"; };
+      sillytavern = { id = 54; host = "d1"; };
       large-model-proxy = { id = 55; host = "d1"; };
       plex = { id = 60; host = "d1"; };
       jellyfin = { id = 61; host = "d1"; };
