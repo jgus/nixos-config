@@ -53,30 +53,46 @@
     {
       device = "/dev/disk/by-uuid/12CE-A600";
       fsType = "vfat";
+      options = [ "fmask=0022" "dmask=0022" ];
     };
 
   fileSystems."/boot/1" =
     {
       device = "/dev/disk/by-uuid/ED86-22BC";
       fsType = "vfat";
+      options = [ "fmask=0022" "dmask=0022" ];
+    };
+
+  fileSystems."/etc/nixos/.secrets" =
+    {
+      device = "/boot/.secrets";
+      fsType = "none";
+      options = [ "bind" ];
+    };
+
+  fileSystems."/s" =
+    {
+      device = "/dev/md/s";
+      fsType = "xfs";
+    };
+
+  fileSystems."/storage/llama.cpp" =
+    {
+      device = "/s/llama.cpp";
+      fsType = "none";
+      options = [ "bind" ];
+    };
+
+  fileSystems."/storage/ollama" =
+    {
+      device = "/s/ollama";
+      fsType = "none";
+      options = [ "bind" ];
     };
 
   swapDevices = [ ];
 
-  # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
-  # (the default) this is the recommended approach. When using systemd-networkd it's
-  # still possible to use this option, but it's recommended to use it in conjunction
-  # with explicit per-interface declarations with `networking.interfaces.<interface>.useDHCP`.
-  networking.useDHCP = lib.mkDefault true;
-  # networking.interfaces.eno1.useDHCP = lib.mkDefault true;
-  # networking.interfaces.eno2.useDHCP = lib.mkDefault true;
-  # networking.interfaces.eno3.useDHCP = lib.mkDefault true;
-  # networking.interfaces.eno4.useDHCP = lib.mkDefault true;
-  # networking.interfaces.enp5s0f0.useDHCP = lib.mkDefault true;
-  # networking.interfaces.enp5s0f1.useDHCP = lib.mkDefault true;
-  # networking.interfaces.enp5s0f2.useDHCP = lib.mkDefault true;
-  # networking.interfaces.enp5s0f3.useDHCP = lib.mkDefault true;
-
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+  boot.swraid.enable = true;
 }

@@ -25,7 +25,7 @@ let
       # lan-interfaces = [ "eno1" "eno2" "eno3" "eno4" "enp5s0" ];
       lan-interface = "enp131s0d1";
       nvidia = true;
-      zfs-pools = [ "d" "f" "s" ];
+      zfs-pools = [ "d" "f" ];
       imports = [
         #./vm-vm1.nix
       ];
