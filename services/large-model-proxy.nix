@@ -135,7 +135,7 @@ let
       RAM = 448;
     };
 
-    OutputServiceLogs = false;
+    # OutputServiceLogs = false;
 
     # Services to proxy (example configuration - customize as needed)
     Services = [
@@ -200,6 +200,7 @@ let
           VRAM-1 = 24;
           RAM = 231;
         };
+        contextSize = 128 * 1024;
         extraLlamaCppArgs = [
           # Sampling Parameters
           "--temp 0.6"
@@ -255,7 +256,7 @@ let
         model = "unsloth/Kimi-K2-Instruct-GGUF:UD-Q2_K_XL";
         gpu = true;
         resourceRequirements = {
-          VRAM-1 = 22;
+          VRAM-1 = 20;
           RAM = 362;
         };
         contextSize = 128 * 1024;
@@ -273,11 +274,11 @@ let
       {
         name = "kimi-k2-thinking";
         displayName = "Kimi K2 Thinking";
-        model = "unsloth/Kimi-K2-Thinking-GGUF:UD-Q3_K_XL";
+        model = "unsloth/Kimi-K2-Thinking-GGUF:UD-Q2_K_XL";
         gpu = true;
         resourceRequirements = {
           VRAM-1 = 23;
-          RAM = 424;
+          RAM = 360;
         };
         extraLlamaCppArgs = [
           # Sampling Parameters
@@ -295,7 +296,7 @@ let
       {
         name = "kimi-k2-thinking-cpu";
         displayName = "Kimi K2 Thinking (CPU)";
-        model = "unsloth/Kimi-K2-Thinking-GGUF:UD-Q3_K_XL";
+        model = "unsloth/Kimi-K2-Thinking-GGUF:UD-Q2_K_XL";
         gpu = false;
         resourceRequirements = {
           RAM = 448;
@@ -435,13 +436,14 @@ let
         ];
       }
 
+      # https://huggingface.co/unsloth/GLM-4.5-Air-GGUF
       {
         name = "glm-4.5-air";
         displayName = "GLM 4.5 Air";
         model = "unsloth/GLM-4.5-Air-GGUF:Q4_K_XL";
         gpu = true;
         resourceRequirements = {
-          VRAM-1 = 20;
+          VRAM-1 = 14;
           RAM = 67;
         };
         extraLlamaCppArgs = [
@@ -596,6 +598,59 @@ let
           "--n-gpu-layers 999"
         ];
       }
+
+      # https://huggingface.co/unsloth/Seed-OSS-36B-Instruct-GGUF
+      {
+        name = "seed-oss";
+        displayName = "Seed OSS";
+        model = "unsloth/Seed-OSS-36B-Instruct-GGUF:Q2_K_XL";
+        gpu = true;
+        resourceRequirements = {
+          VRAM-1 = 24;
+        };
+        extraLlamaCppArgs = [
+          # GPU Settings
+          "--n-gpu-layers 999"
+        ];
+      }
+
+      # https://huggingface.co/LatitudeGames/Hearthfire-24B-GGUF
+      {
+        name = "heathfire";
+        displayName = "Hearthfire";
+        model = "LatitudeGames/Hearthfire-24B-GGUF:Q4_K_M";
+        gpu = true;
+        resourceRequirements = {
+          VRAM-1 = 24;
+        };
+        extraLlamaCppArgs = [
+          # Sampling Parameters
+          "--temp 0.8"
+          "--min-p 0.025"
+          "--repeat_penalty 1.05"
+          # GPU Settings
+          "--n-gpu-layers 999"
+        ];
+      }
+
+      # https://huggingface.co/LatitudeGames/Nova-70B-Llama-3.3-GGUF
+      {
+        name = "nova";
+        displayName = "Nova";
+        model = "LatitudeGames/Nova-70B-Llama-3.3-GGUF:Q4_K_M";
+        gpu = true;
+        resourceRequirements = {
+          VRAM-1 = 24;
+        };
+        extraLlamaCppArgs = [
+          # Sampling Parameters
+          "--temp 0.8"
+          "--min-p 0.05"
+          "--repeat_penalty 1.05"
+          # GPU Settings
+          "--n-gpu-layers 999"
+        ];
+      }
     ]);
   };
 in
@@ -616,5 +671,20 @@ in
       cd ${storagePath name}
       exec large-model-proxy -c ${(pkgs.formats.json { }).generate "config.json" (configuration { hostIp = ip; hostIp6 = ip6; })}
     '';
+  };
+  extraConfig = {
+    fileSystems = {
+      "/service/large-model-proxy/logs".fsType = "tmpfs";
+      "/storage/comfyui" = {
+        device = "/s/comfyui";
+        fsType = "none";
+        options = [ "bind" ];
+      };
+      "/storage/llama.cpp" = {
+        device = "/s/llama.cpp";
+        fsType = "none";
+        options = [ "bind" ];
+      };
+    };
   };
 }

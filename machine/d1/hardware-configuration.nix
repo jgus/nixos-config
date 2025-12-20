@@ -76,20 +76,6 @@
       fsType = "xfs";
     };
 
-  fileSystems."/storage/llama.cpp" =
-    {
-      device = "/s/llama.cpp";
-      fsType = "none";
-      options = [ "bind" ];
-    };
-
-  fileSystems."/storage/ollama" =
-    {
-      device = "/s/ollama";
-      fsType = "none";
-      options = [ "bind" ];
-    };
-
   swapDevices = [ ];
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
