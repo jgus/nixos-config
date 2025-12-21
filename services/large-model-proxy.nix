@@ -82,7 +82,7 @@ let
           --batch-size ${toString (service.batchSize or 8192)} \
           --ubatch-size ${toString (service.ubatchSize or 2048)} \
           --ctx-size ${toString (service.contextSize or 0)} \
-          --parallel 1 \
+          --parallel 2 \
           -kvu \
           --cache-type-k q4_0 \
           --cache-type-v q4_0 \
