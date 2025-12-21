@@ -425,6 +425,7 @@ let
           VRAM-1 = 20;
           RAM = 67;
         };
+        contextSize = 128 * 1024;
         extraLlamaCppArgs = [
           # Sampling Parameters
           "--temp 0.8"
@@ -446,6 +447,7 @@ let
           VRAM-1 = 14;
           RAM = 67;
         };
+        contextSize = 128 * 1024;
         extraLlamaCppArgs = [
           # GPU Settings
           "--n-gpu-layers 999"
@@ -522,6 +524,29 @@ let
           # Sampling Parameters
           "--temp 0.6"
           "--top-p 0.95"
+          # GPU Settings
+          "--n-gpu-layers 999"
+        ];
+      }
+
+      # https://huggingface.co/mradermacher/MistralSmall-Creative-24B-Realist-i1-GGUF
+      {
+        name = "mistral-small-creative";
+        displayName = "Mistral Small Creative";
+        model = "mradermacher/MistralSmall-Creative-24B-Realist-GGUF:Q6_K";
+        gpu = true;
+        resourceRequirements = {
+          VRAM-1 = 22;
+        };
+        # contextSize = 128 * 1024;
+        extraLlamaCppArgs = [
+          # Sampling Parameters
+          "--temp 0.8"
+          "--min-p 0.08"
+          "--dry-multiplier 0.8"
+          "--dry-base 1.75"
+          "--dry-allowed-length 2"
+          "--repeat-penalty 1.05"
           # GPU Settings
           "--n-gpu-layers 999"
         ];
