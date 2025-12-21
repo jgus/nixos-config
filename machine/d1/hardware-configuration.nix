@@ -9,10 +9,24 @@
       (modulesPath + "/installer/scan/not-detected.nix")
     ];
 
-  boot.initrd.availableKernelModules = [ "ahci" "xhci_pci" "ehci_pci" "megaraid_sas" "usbhid" "usb_storage" "sd_mod" "sr_mod" ];
+  boot.initrd.availableKernelModules = [
+    "ahci"
+    "ehci_pci"
+    "md_mod"
+    "megaraid_sas"
+    "sd_mod"
+    "sr_mod"
+    "usb_storage"
+    "usbhid"
+    "xhci_pci"
+  ];
   boot.initrd.kernelModules = [ ];
   boot.kernelModules = [ "kvm-intel" ];
   boot.extraModulePackages = [ ];
+  boot.swraid.enable = true;
+  boot.swraid.mdadmConf = ''
+    ARRAY /dev/md/s  metadata=1.2 UUID=a2edf378:c1efcb74:731a6323:d961e11d
+  '';
 
   fileSystems."/" =
     {
@@ -80,5 +94,4 @@
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
-  boot.swraid.enable = true;
 }

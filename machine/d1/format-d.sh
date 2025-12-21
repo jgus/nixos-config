@@ -62,6 +62,9 @@ F_DISKS=(
 )
 
 
+mdadm --create /dev/md/s --level=0 --raid-devices=${#S_DISKS[@]} "${S_DISKS[@]}" --chunk=1024 --uuid=a2edf378:c1efcb74:731a6323:d961e11d
+mkfs.xfs -d su=1024k,sw=${#S_DISKS[@]} /dev/md/s
+
 zpool create "${SSD_ZPOOL_OPTS[@]}" -O recordsize=1M -O mountpoint=/s s "${S_DISKS[@]}"
 
 zpool create "${HDD_ZPOOL_OPTS[@]}" -O recordsize=128K -O mountpoint=/d d raidz3 "${D_DISKS[@]}"
