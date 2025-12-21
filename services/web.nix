@@ -1,3 +1,4 @@
+# Manage DNS records for the below at: https://dash.cloudflare.com/4863ad256b1367a5598b6b30306133d8/home/domains
 with builtins;
 { lib, pkgs, ... }:
 let
@@ -42,6 +43,9 @@ let
     }
     search.${publicDomain} {
       reverse_proxy searxng.${addresses.network.domain}:8080
+    }
+    search-mcp.${publicDomain} {
+      reverse_proxy searxng-mcp.${addresses.network.domain}:80
     }
     open-webui.${publicDomain} {
       reverse_proxy open-webui.${addresses.network.domain}:8080

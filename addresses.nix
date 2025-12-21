@@ -88,6 +88,7 @@ let
       joyfulsong = { id = 23; host = "c1-2"; };
       joyfulsong-db = { id = 24; host = "c1-2"; };
       searxng = { id = 28; host = "c1-2"; };
+      searxng-mcp = { id = 29; host = "c1-2"; };
 
       # Home Automation
       home-assistant = { id = 30; host = "b1"; aliases = [ "homeassistant" "ha" ]; };
