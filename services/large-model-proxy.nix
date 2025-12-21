@@ -563,7 +563,6 @@ let
         };
         contextSize = 128 * 1024;
         extraLlamaCppArgs = [
-          "--mmproj unsloth/Devstral-Small-2-24B-Instruct-2512-GGUF/mmproj-F16.gguf"
           # Sampling Parameters
           "--temp 0.15"
           # GPU Settings
