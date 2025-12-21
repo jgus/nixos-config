@@ -310,52 +310,6 @@ let
         ];
       }
 
-      # https://docs.unsloth.ai/models/qwen3-next
-      {
-        name = "qwen3-next-instruct";
-        displayName = "Qwen3 Next 80B Instruct";
-        model = "unsloth/Qwen3-Next-80B-A3B-Instruct-GGUF:Q4_K_XL";
-        gpu = true;
-        resourceRequirements = {
-          VRAM-1 = 9;
-          RAM = 45;
-        };
-        extraLlamaCppArgs = [
-          # Sampling Parameters
-          "--temp 0.7"
-          "--min-p 0.00"
-          "--top-p 0.80"
-          "--top-k 20"
-          "--presence-penalty 1.0"
-          # GPU Settings
-          "--n-gpu-layers 999"
-          "-ot .ffn_.*_exps.=CPU"
-        ];
-      }
-
-      # https://docs.unsloth.ai/models/qwen3-next
-      {
-        name = "qwen3-next-thinking";
-        displayName = "Qwen3 Next 80B Thinking";
-        model = "unsloth/Qwen3-Next-80B-A3B-Thinking-GGUF:Q4_K_XL";
-        gpu = true;
-        resourceRequirements = {
-          VRAM-1 = 9;
-          RAM = 45;
-        };
-        extraLlamaCppArgs = [
-          # Sampling Parameters
-          "--temp 0.6"
-          "--min-p 0.00"
-          "--top-p 0.95"
-          "--top-k 20"
-          "--presence-penalty 1.0"
-          # GPU Settings
-          "--n-gpu-layers 999"
-          "-ot .ffn_.*_exps.=CPU"
-        ];
-      }
-
       # https://docs.unsloth.ai/models/glm-4.6-how-to-run-locally
       {
         name = "glm-4.6";
@@ -455,103 +409,6 @@ let
         ];
       }
 
-      # https://docs.unsloth.ai/models/ministral-3
-      {
-        name = "ministral-3b-instruct";
-        displayName = "Ministral 3B Instruct";
-        model = "unsloth/Ministral-3-3B-Instruct-2512-GGUF:Q4_K_XL";
-        gpu = true;
-        resourceRequirements = {
-          VRAM-1 = 6;
-        };
-        contextSize = 32 * 1024;
-        extraLlamaCppArgs = [
-          # Sampling Parameters
-          "--temp 0.15"
-          # GPU Settings
-          "--n-gpu-layers 999"
-        ];
-      }
-
-      # https://docs.unsloth.ai/models/ministral-3
-      {
-        name = "ministral-3b-reasoning";
-        displayName = "Ministral 3B Reasoning";
-        model = "unsloth/Ministral-3-3B-Reasoning-2512-GGUF:Q4_K_XL";
-        gpu = true;
-        resourceRequirements = {
-          VRAM-1 = 6;
-        };
-        contextSize = 32 * 1024;
-        extraLlamaCppArgs = [
-          # Sampling Parameters
-          "--temp 0.6"
-          "--top-p 0.95"
-          # GPU Settings
-          "--n-gpu-layers 999"
-        ];
-      }
-
-      # https://docs.unsloth.ai/models/ministral-3
-      {
-        name = "ministral-14b-instruct";
-        displayName = "Ministral 14B Instruct";
-        model = "unsloth/Ministral-3-14B-Instruct-2512-GGUF:Q4_K_XL";
-        gpu = true;
-        resourceRequirements = {
-          VRAM-1 = 22;
-        };
-        # contextSize = 128 * 1024;
-        extraLlamaCppArgs = [
-          # Sampling Parameters
-          "--temp 0.15"
-          # GPU Settings
-          "--n-gpu-layers 999"
-        ];
-      }
-
-      # https://docs.unsloth.ai/models/ministral-3
-      {
-        name = "ministral-14b-reasoning";
-        displayName = "Ministral 14B Reasoning";
-        model = "unsloth/Ministral-3-14B-Reasoning-2512-GGUF:Q4_K_XL";
-        gpu = true;
-        resourceRequirements = {
-          VRAM-1 = 22;
-        };
-        # contextSize = 128 * 1024;
-        extraLlamaCppArgs = [
-          # Sampling Parameters
-          "--temp 0.6"
-          "--top-p 0.95"
-          # GPU Settings
-          "--n-gpu-layers 999"
-        ];
-      }
-
-      # https://huggingface.co/mradermacher/MistralSmall-Creative-24B-Realist-i1-GGUF
-      {
-        name = "mistral-small-creative";
-        displayName = "Mistral Small Creative";
-        model = "mradermacher/MistralSmall-Creative-24B-Realist-GGUF:Q6_K";
-        gpu = true;
-        resourceRequirements = {
-          VRAM-1 = 22;
-        };
-        # contextSize = 128 * 1024;
-        extraLlamaCppArgs = [
-          # Sampling Parameters
-          "--temp 0.8"
-          "--min-p 0.08"
-          "--dry-multiplier 0.8"
-          "--dry-base 1.75"
-          "--dry-allowed-length 2"
-          "--repeat-penalty 1.05"
-          # GPU Settings
-          "--n-gpu-layers 999"
-        ];
-      }
-
       # https://docs.unsloth.ai/models/devstral-2
       {
         name = "devstral-small-2";
@@ -633,44 +490,6 @@ let
           VRAM-1 = 24;
         };
         extraLlamaCppArgs = [
-          # GPU Settings
-          "--n-gpu-layers 999"
-        ];
-      }
-
-      # https://huggingface.co/LatitudeGames/Hearthfire-24B-GGUF
-      {
-        name = "heathfire";
-        displayName = "Hearthfire";
-        model = "LatitudeGames/Hearthfire-24B-GGUF:Q4_K_M";
-        gpu = true;
-        resourceRequirements = {
-          VRAM-1 = 24;
-        };
-        extraLlamaCppArgs = [
-          # Sampling Parameters
-          "--temp 0.8"
-          "--min-p 0.025"
-          "--repeat_penalty 1.05"
-          # GPU Settings
-          "--n-gpu-layers 999"
-        ];
-      }
-
-      # https://huggingface.co/LatitudeGames/Nova-70B-Llama-3.3-GGUF
-      {
-        name = "nova";
-        displayName = "Nova";
-        model = "LatitudeGames/Nova-70B-Llama-3.3-GGUF:Q4_K_M";
-        gpu = true;
-        resourceRequirements = {
-          VRAM-1 = 24;
-        };
-        extraLlamaCppArgs = [
-          # Sampling Parameters
-          "--temp 0.8"
-          "--min-p 0.05"
-          "--repeat_penalty 1.05"
           # GPU Settings
           "--n-gpu-layers 999"
         ];
