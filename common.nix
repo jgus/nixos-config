@@ -161,7 +161,7 @@ in
       comma
       nixd
       nixpkgs-fmt
-      claude-code
+      (callPackage ./pkgs/cline.nix { })
     ];
     variables = {
       SERVER_NAMES = builtins.concatStringsSep " " addresses.serverNames;
