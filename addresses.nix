@@ -63,24 +63,33 @@ let
       somfy = { id = 17; mac = "00:0e:c6:aa:0a:86"; };
     } //
     mapAttrs (k: v: { g = group.services; } // v) {
+      # Network
       pihole-1 = { id = 1; host = "b1"; aliases = [ "dhcp-1" "dns-1" "pihole" "dhcp" "dns" ]; };
       ntp = { id = 2; host = "b1"; };
       landing = { id = 3; host = "b1"; };
       pihole-2 = { id = 4; host = "c1-1"; aliases = [ "dhcp-2" "dns-2" ]; };
       pihole-3 = { id = 5; host = "d1"; aliases = [ "dhcp-3" "dns-3" ]; };
       cloudflared = { id = 6; host = "c1-2"; };
+      echo = { id = 7; host = "d1"; };
+
+      # Storage
       samba = { id = 10; host = "c1-1"; aliases = [ "smb" "nas" ]; };
+      samba-c1-2 = { id = 11; host = "c1-2"; };
       garage = { id = 12; host = "d1"; };
-      samba-c1-2 = { id = 13; host = "c1-2"; };
+      owncloud = { id = 13; host = "c1-1"; aliases = [ "drive" ]; };
+      owncloud-db = { id = 14; host = "c1-1"; };
+      owncloud-redis = { id = 15; host = "c1-1"; };
+      onlyoffice = { id = 16; host = "c1-2"; aliases = [ "office" ]; };
+
+      # Web
       web = { id = 20; host = "c1-2"; };
       journal = { id = 21; host = "c1-2"; };
       journal-db = { id = 22; host = "c1-2"; };
-      owncloud = { id = 23; host = "c1-1"; aliases = [ "drive" ]; };
-      owncloud-db = { id = 24; host = "c1-1"; };
-      owncloud-redis = { id = 25; host = "c1-1"; };
-      onlyoffice = { id = 26; host = "c1-2"; aliases = [ "office" ]; };
-      joyfulsong = { id = 27; host = "c1-2"; };
-      joyfulsong-db = { id = 28; host = "c1-2"; };
+      joyfulsong = { id = 23; host = "c1-2"; };
+      joyfulsong-db = { id = 24; host = "c1-2"; };
+      searxng = { id = 28; host = "c1-2"; };
+
+      # Home Automation
       home-assistant = { id = 30; host = "b1"; aliases = [ "homeassistant" "ha" ]; };
       esphome = { id = 31; host = "c1-2"; };
       mosquitto = { id = 32; host = "b1"; aliases = [ "mqtt" ]; };
@@ -92,27 +101,33 @@ let
       zwave-basement = { id = 42; host = "b1"; };
       zwave-north = { id = 43; host = "b1"; };
       frigate = { id = 50; host = "d1"; };
-      ollama = { id = 51; host = "d1"; };
-      open-webui = { id = 52; host = "d1"; };
-      searxng = { id = 53; host = "c1-2"; };
-      sillytavern = { id = 54; host = "d1"; };
-      large-model-proxy = { id = 55; host = "d1"; aliases = [ "comfyui" ]; };
+
+      # Media
       plex = { id = 60; host = "d1"; };
       jellyfin = { id = 61; host = "d1"; };
+      komga = { id = 62; host = "c1-2"; };
+      lazylibrarian = { id = 63; host = "c1-2"; };
+      calibre = { id = 64; host = "c1-2"; };
+      audiobookshelf = { id = 65; host = "c1-2"; };
+
+      # Download
       sabnzbd = { id = 70; host = "c1-2"; };
+      qbittorrent = { id = 71; host = "c1-2"; };
       prowlarr = { id = 72; host = "c1-2"; };
       sonarr = { id = 73; host = "c1-2"; };
       radarr = { id = 74; host = "c1-2"; };
       lidarr = { id = 75; host = "c1-2"; };
       kapowarr = { id = 76; host = "c1-2"; };
-      komga = { id = 77; host = "c1-2"; };
-      flaresolverr = { id = 78; host = "c1-2"; };
-      lazylibrarian = { id = 79; host = "c1-2"; };
-      calibre = { id = 80; host = "c1-2"; };
-      audiobookshelf = { id = 81; host = "c1-2"; };
-      qbittorrent = { id = 82; host = "c1-2"; };
+      flaresolverr = { id = 77; host = "c1-2"; };
+
+      # AI
+      large-model-proxy = { id = 80; host = "d1"; aliases = [ "comfyui" ]; };
+      ollama = { id = 81; host = "d1"; };
+      open-webui = { id = 82; host = "d1"; };
+      sillytavern = { id = 83; host = "d1"; };
+
+      # Other
       minecraft = { id = 100; host = "c1-2"; };
-      echo = { id = 101; host = "d1"; };
     } //
     mapAttrs (k: v: { g = group.vms; } // v) {
       vm1 = { id = 1; host = "d1"; dns = "host"; };
