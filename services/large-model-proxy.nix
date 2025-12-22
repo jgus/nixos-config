@@ -149,11 +149,10 @@ let
           launchScript = pkgs.writeShellScript "comfyui-launch" ''
             set -e
             
-            # Build image (will use cache if Dockerfile unchanged)
-            echo "Building ComfyUI image (using cache if available)..."
+            # Build Image
             docker build -t comfyui:local ${./large-model-proxy/comfyui}
             
-            # Run container
+            # Run
             exec docker run \
               --rm \
               --name=${containerName} \
@@ -409,6 +408,26 @@ let
         ];
       }
 
+      # https://huggingface.co/unsloth/Mistral-Small-3.2-24B-Instruct-2506-GGUF
+      {
+        name = "mistral-small-3.2";
+        displayName = "Mistral Small 3.2";
+        model = "unsloth/Mistral-Small-3.2-24B-Instruct-2506-GGUF:Q4_K_XL";
+        gpu = true;
+        resourceRequirements = {
+          VRAM-1 = 22;
+        };
+        contextSize = 128 * 1024;
+        extraLlamaCppArgs = [
+          # Sampling Parameters
+          "--temp 0.15"
+          "--top-k -1"
+          "--top-p 1.00"
+          # GPU Settings
+          "--n-gpu-layers 999"
+        ];
+      }
+
       # https://docs.unsloth.ai/models/devstral-2
       {
         name = "devstral-small-2";
@@ -458,6 +477,24 @@ let
         extraLlamaCppArgs = [
           # Sampling Parameters
           "--temp 0.15"
+        ];
+      }
+
+      # https://huggingface.co/mradermacher/Goetia-24B-v1.1-GGUF
+      {
+        name = "goetia";
+        displayName = "Goetia";
+        model = "mradermacher/Goetia-24B-v1.1-GGUF:Q5_K_M";
+        gpu = true;
+        resourceRequirements = {
+          VRAM-1 = 22;
+        };
+        # contextSize = 128 * 1024;
+        extraLlamaCppArgs = [
+          # Sampling Parameters
+          "--top-nsigma 1.26"
+          # GPU Settings
+          "--n-gpu-layers 999"
         ];
       }
 
