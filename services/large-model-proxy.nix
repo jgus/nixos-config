@@ -309,6 +309,27 @@ let
         ];
       }
 
+      # https://docs.unsloth.ai/models/glm-4.7
+      {
+        name = "glm-4.7";
+        displayName = "GLM 4.7";
+        model = "unsloth/GLM-4.7-GGUF:Q2_K_XL";
+        gpu = true;
+        resourceRequirements = {
+          VRAM-1 = 22;
+          RAM = 124;
+        };
+        contextSize = 96 * 1024;
+        extraLlamaCppArgs = [
+          # Sampling Parameters
+          "--temp 1.0"
+          "--top-p 0.95"
+          # GPU Settings
+          "--n-gpu-layers 999"
+          "-ot .ffn_.*_exps.=CPU"
+        ];
+      }
+
       # https://docs.unsloth.ai/models/glm-4.6-how-to-run-locally
       {
         name = "glm-4.6";
