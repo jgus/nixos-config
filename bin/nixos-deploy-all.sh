@@ -57,6 +57,8 @@ echo "Switch phase: ${DO_SWITCH}"
 echo "========================================"
 echo ""
 
+nix-channel --update
+
 #
 # Phase 1: Build all configurations locally
 #
