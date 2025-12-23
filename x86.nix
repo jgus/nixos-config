@@ -26,10 +26,10 @@
   };
 
   system = {
-    autoUpgrade = {
-      enable = true;
-      allowReboot = true;
-    };
+    # autoUpgrade = {
+    #   enable = true;
+    #   allowReboot = true;
+    # };
     includeBuildDependencies = true;
     activationScripts = {
       syncBoot.text = ''
