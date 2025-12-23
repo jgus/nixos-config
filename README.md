@@ -111,10 +111,10 @@ Each service definition record has the following possible attributes:
 - **`user`**: Service user (default: "root")
 - **`group`**: Service group (default: "root")
 - **`configStorage`**: Enable configuration storage (default: true)
-- **`extraStorage`**: Additional storage paths
-- **`requires`**: Service dependencies
+- **`extraStorage`**: Additional storage paths or configurations (e.g., filesystem mounts for systemd services)
+- **`requires`**: Service dependencies (systemd units or mount points)
 - **`autoStart`**: Whether to start automatically (default: true)
-- **`extraConfig`**: Additional Nix configuration
+- **`extraConfig`**: Additional Nix configuration (merged into the main config)
 - **`docker`**: If present, this is a docker-based service; see below for details
 - **`systemd`**: If present, this is _not_ a docker-based service, but a more generic systemd service; see below for details
 
@@ -123,21 +123,35 @@ Note that any given service maybe be _either_ a docker service (contains the `do
 #### Docker Service Options
 - **`docker.image`**: Docker image URI
 - **`docker.configVolume`**: Container path for config storage
-- **`docker.volumes`**: Additional volume mounts (format: "host:container[:options]") Can be a function that receives a function for fetching storage paths
+- **`docker.volumes`**: Additional volume mounts. Can be either:
+  - A list of volume specifications (format: `"host:container[:options]"`)
+  - A function that receives the `storagePath` function and returns a list of volume specifications
 - **`docker.environment`**: Environment variables
 - **`docker.extraOptions`**: Additional Docker CLI options
 - **`docker.entrypoint`**: Custom container entrypoint
 - **`docker.entrypointOptions`**: Container command arguments
-- **`docker.ports`**: Exposed ports
+- **`docker.ports`**: Exposed ports. Format is docker's format, `"port[:container_port][/protocol]"`
+- **`docker.dependsOn`**: Container dependencies (other containers this one depends on)
+- **`docker.environmentFiles`**: Environment files to load
 
 #### Systemd Service Options
 - **`systemd.macvlan`**: Use macvlan networking (default: false)
 - **`systemd.tcpPorts`**: Open TCP ports
 - **`systemd.udpPorts`**: Open UDP ports
 - **`systemd.path`**: List of Nix packages to add to PATH (e.g., `[ pkgs.socat pkgs.curl ]`)
-- **`systemd.script`**: Service startup script (function, receives context with name, uid, gid, ip, ip6, interface, etc.)
+- **`systemd.script`**: Service startup script. This is a function that receives a context object containing:
+  - `name`: Service name
+  - `uid`: User ID
+  - `gid`: Group ID
+  - `ip`: IPv4 address
+  - `ip6`: IPv6 address
+  - `interface`: Network interface name (if macvlan enabled)
+  - `storagePath`: Function to get storage path for a service
+  - `dockerOptions`: Additional Docker options
 
-### Docker Service Example
+### Docker Service Examples
+
+#### Simple Docker Service
 
 For services running in Docker containers:
 
@@ -157,6 +171,30 @@ For services running in Docker containers:
       TZ = config.time.timeZone;
     };
     ports = [ "8989" ];
+  };
+}
+```
+
+#### Docker Service with Dynamic Volumes
+
+When you need to use the `storagePath` function to mount extra storage paths, use the function form:
+
+```nix
+{ config, ... }:
+{
+  requires = [ "storage-media.mount" ];
+  docker = {
+    image = "ghcr.io/advplyr/audiobookshelf";
+    environment = {
+      TZ = config.time.timeZone;
+    };
+    ports = [ "80" ];
+    configVolume = "/config";
+    extraStorage = [ "audiobookshelf_metadata" ];  # Define extra storage
+    volumes = storagePath: [
+      "/storage/media:/media"
+      "${storagePath "audiobookshelf_metadata"}:/metadata"  # Use storagePath for extra storage
+    ];
   };
 }
 ```
