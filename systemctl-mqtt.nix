@@ -17,8 +17,8 @@ let
       src = fetchFromGitHub {
         owner = "jgus";
         repo = "systemctl-mqtt";
-        rev = "d26c45ded9a7a6f3d05ca026a75501038d9ca294";
-        sha256 = "sha256-rsYT1wmh3WEPaAeIgR3pAU6A4k0I2vwDaYuupMmpm9E=";
+        rev = "1cd79ebc097133bd5c77828df5a750e64dea6aeb";
+        sha256 = "sha256-qjgzT95vLbnGL2wn2sMqHODOfXfhXVyIwONp2zhxGiA=";
       };
       dependencies = [
         aiomqtt
