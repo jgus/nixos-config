@@ -32,7 +32,7 @@ in
         Type = "oneshot";
       };
       wantedBy = [ "multi-user.target" ];
-      requires = [ "nfs-mountd.service" ];
+      requires = [ "nfs-mountd.service" "storage-backup.mount" ];
     };
   };
 }
