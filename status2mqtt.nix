@@ -11,57 +11,61 @@ in
         mosquitto
       ] ++ (if machine.zfs then [ zfs ] else [ ]);
       script = ''
-        advertize() {
-          local UNIQUE_ID="server_${machine.hostName}_$(echo $TOPIC_PATH | ${pkgs.gnused}/bin/sed 's|/|_|g')"
-          local DEVICE_JSON="{\"name\":\"Server ${machine.hostName}\",\"identifiers\":[\"server_${machine.hostName}\"]}"
-          local PAYLOAD_JSON="{\"state_topic\":\"server/${machine.hostName}/$TOPIC_PATH\""
-          PAYLOAD_JSON="$PAYLOAD_JSON,\"name\":\"$NAME\""
-          PAYLOAD_JSON="$PAYLOAD_JSON,\"unique_id\":\"$UNIQUE_ID\""
-          PAYLOAD_JSON="$PAYLOAD_JSON,\"availability_topic\":\"server/${machine.hostName}/availability\""
-          PAYLOAD_JSON="$PAYLOAD_JSON,\"device\":$DEVICE_JSON"
-          if [[ "x$UNIT" != "x" ]]
-          then
-            PAYLOAD_JSON="$PAYLOAD_JSON,\"unit_of_measurement\":\"$UNIT\""
+        add_sensor() {
+          local TOPIC="$1"
+          local NAME="$2"
+          local UNIQUE_ID="$3"
+          local UNIT="$4"
+          
+          local SENSOR_JSON="\"$UNIQUE_ID\":{"
+          SENSOR_JSON="$SENSOR_JSON\"p\":\"sensor\","
+          SENSOR_JSON="$SENSOR_JSON\"name\":\"$NAME\","
+          SENSOR_JSON="$SENSOR_JSON\"state_topic\":\"server/${machine.hostName}/$TOPIC\","
+          SENSOR_JSON="$SENSOR_JSON\"unique_id\":\"server_${machine.hostName}_$UNIQUE_ID\","
+          SENSOR_JSON="$SENSOR_JSON\"availability_topic\":\"server/${machine.hostName}/availability\""
+          if [[ "x$UNIT" != "x" ]]; then
+            SENSOR_JSON="$SENSOR_JSON,\"unit_of_measurement\":\"$UNIT\""
           fi
-          PAYLOAD_JSON="$PAYLOAD_JSON}"
-
-          ${pkgs.mosquitto}/bin/mosquitto_pub -V 5 -h mqtt.home.gustafson.me -u server -P ${pw.mqtt.server} -t homeassistant/sensor/server_${machine.hostName}/$UNIQUE_ID/config -r -m "$PAYLOAD_JSON"
+          SENSOR_JSON="$SENSOR_JSON}"
+          
+          if [[ -z "$SENSORS_JSON" ]]; then
+            SENSORS_JSON="$SENSOR_JSON"
+          else
+            SENSORS_JSON="$SENSORS_JSON,$SENSOR_JSON"
+          fi
         }
 
-        NAME="Failed Services" TOPIC_PATH=systemd/failed advertize
+        SENSORS_JSON=""
+        
+        add_sensor "systemd/failed" "Failed Services" "systemd_failed" ""
 
-        NAME="Memory Used" TOPIC_PATH=memory/used UNIT="bytes" advertize
-        NAME="Memory Free" TOPIC_PATH=memory/free UNIT="bytes" advertize
+        add_sensor "memory/used" "Memory Used" "memory_used" "bytes"
+        add_sensor "memory/free" "Memory Free" "memory_free" "bytes"
 
-        df -x zfs -x tmpfs -x devtmpfs -x efivarfs -x nfs4 -x overlay -x fuse | tail -n +2 | while read line
-        do
+        while IFS= read -r line; do
           DNAME="$(echo ''${line} | awk '{print $1}' | sed 's|^/dev/||' | sed 's|/|_|g')"
-          NAME="Drive ''${DNAME} Device" TOPIC_PATH=drive/''${DNAME}/device advertize
-          NAME="Drive ''${DNAME} Size" TOPIC_PATH=drive/''${DNAME}/size UNIT="bytes" advertize
-          NAME="Drive ''${DNAME} Used" TOPIC_PATH=drive/''${DNAME}/used UNIT="bytes" advertize
-          NAME="Drive ''${DNAME} Available" TOPIC_PATH=drive/''${DNAME}/available UNIT="bytes" advertize
-          NAME="Drive ''${DNAME} Used %" TOPIC_PATH=drive/''${DNAME}/capacity UNIT="%" advertize
-          NAME="Drive ''${DNAME} Mount" TOPIC_PATH=drive/''${DNAME}/mount advertize
-        done
+          add_sensor "drive/''${DNAME}/device" "Drive ''${DNAME} Device" "drive_''${DNAME}_device" ""
+          add_sensor "drive/''${DNAME}/size" "Drive ''${DNAME} Size" "drive_''${DNAME}_size" "bytes"
+          add_sensor "drive/''${DNAME}/used" "Drive ''${DNAME} Used" "drive_''${DNAME}_used" "bytes"
+          add_sensor "drive/''${DNAME}/available" "Drive ''${DNAME} Available" "drive_''${DNAME}_available" "bytes"
+          add_sensor "drive/''${DNAME}/capacity" "Drive ''${DNAME} Capacity" "drive_''${DNAME}_capacity" "%"
+          add_sensor "drive/''${DNAME}/mount" "Drive ''${DNAME} Mount" "drive_''${DNAME}_mount" ""
+        done < <(df -x zfs -x tmpfs -x devtmpfs -x efivarfs -x nfs4 -x overlay -x fuse | tail -n +2)
       ''
       + (if machine.zfs then ''
         for i in $(zpool list -H -o name)
         do
-          for p in health
-          do
-            NAME="ZPool $i $p" TOPIC_PATH=zpool/$i/$p advertize
-          done
-          for p in capacity
-          do
-            NAME="ZPool $i $p" TOPIC_PATH=zpool/$i/$p UNIT="%" advertize
-          done
-          for p in size free allocated
-          do
-            NAME="ZPool $i $p" TOPIC_PATH=zpool/$i/$p UNIT="bytes" advertize
-          done
+          add_sensor "zpool/$i/health" "ZPool $i Health" "zpool_''${i}_health" ""
+          add_sensor "zpool/$i/capacity" "ZPool $i Capacity" "zpool_''${i}_capacity" "%"
+          add_sensor "zpool/$i/size" "ZPool $i Size" "zpool_''${i}_size" "bytes"
+          add_sensor "zpool/$i/free" "ZPool $i Free" "zpool_''${i}_free" "bytes"
+          add_sensor "zpool/$i/allocated" "ZPool $i Allocated" "zpool_''${i}_allocated" "bytes"
         done
       '' else "")
       + ''
+
+        PAYLOAD_JSON="{\"dev\":{\"ids\":\"server_${machine.hostName}\",\"name\":\"Server ${machine.hostName}\"},\"o\":{\"name\":\"status2mqtt\",\"sw\":\"1.0\"},\"cmps\":{$SENSORS_JSON}}"
+        ${pkgs.mosquitto}/bin/mosquitto_pub -V 5 -h mqtt.home.gustafson.me -u server -P ${pw.mqtt.server} -t homeassistant/device/server_${machine.hostName}/config -r -m "$PAYLOAD_JSON"
 
         systemctl start status2mqtt.service
 
