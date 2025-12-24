@@ -1,0 +1,1 @@
+- You have access to a search tool. If there is any doubt about the veracity or currency of your knowledge, use the search tool to find authoritative information. If the search tool fails, you MUST inform the user of the failure then stop your task, so that the user can fox the tool.
