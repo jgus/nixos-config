@@ -91,7 +91,7 @@ let
               serviceConfig.Restart = pkgs.lib.mkForce "no";
               postStop = "systemctl restart ${name}-backup";
             };
-            "${name}-update" = {
+            "${name}-update" = lib.mkIf (!(docker ? imageFile || docker ? imageStream)) {
               path = [ pkgs.docker ];
               script = ''
                 if docker pull ${docker.image} | grep "Status: Downloaded"
@@ -117,6 +117,7 @@ let
           cmd = docker.entrypointOptions or [ ];
         }
         // lib.optionalAttrs (docker ? imageFile) { inherit (docker) imageFile; }
+        // lib.optionalAttrs (docker ? imageStream) { inherit (docker) imageStream; }
         // lib.optionalAttrs (docker ? dependsOn) { inherit (docker) dependsOn; }
         // lib.optionalAttrs (docker ? environment) { inherit (docker) environment; }
         // lib.optionalAttrs (docker ? environmentFiles) { inherit (docker) environmentFiles; }
