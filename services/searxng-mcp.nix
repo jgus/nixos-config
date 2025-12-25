@@ -1,13 +1,14 @@
 # SearXNG MCP Server - Model Context Protocol server for web search integration
-# https://github.com/ihor-sokoliuk/mcp-searxng
+# https://github.com/tcpipuk/mcp-server
 { ... }:
 {
   configStorage = false;
   docker = {
-    image = "isokoliuk/mcp-searxng:latest";
+    image = "ghcr.io/tcpipuk/mcp-server/server:latest";
     environment = {
-      SEARXNG_URL = "http://searxng:8080";
-      MCP_HTTP_PORT = "80";
+      SEARXNG_QUERY_URL = "http://searxng:8080";
+      SSE_HOST = "::";
+      SSE_PORT = "80";
     };
   };
 }
