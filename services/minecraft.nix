@@ -1,43 +1,27 @@
 let
-  name = "minecraft";
   user = "minecraft";
   group = "minecraft";
 in
 { config, pkgs, ... }:
 {
-  systemd = {
-    path = [ pkgs.docker pkgs.zfs ];
-    script = { storagePath, dockerOptions, ... }: ''
-      docker container stop ${name} >/dev/null 2>&1 || true ; \
-      docker container rm -f ${name} >/dev/null 2>&1 || true ; \
-
-      docker build \
-        --build-arg uid=${toString config.users.users.${user}.uid} \
-        --build-arg gid=${toString config.users.groups.${group}.gid} \
-        --build-arg java_ver=21 \
-        -t ${name} \
-        ${./minecraft/docker}
-
-      docker run --rm --name ${name} \
-        ${builtins.concatStringsSep " " dockerOptions} \
-        -p 22/tcp \
-        -p 19132/udp \
-        -p 19133/udp \
-        -p 25565/udp \
-        -p 25565/tcp \
-        -p 8123/tcp \
-        -v ${storagePath name}:/home/${name}/config \
-        ${name}
-    '';
-    unitConfig = {
-      StartLimitIntervalSec = 0;
+  docker = {
+    image = "ghcr.io/jgus/minecraft-runner:1.0.0-java21";
+    imageFile = pkgs.dockerTools.pullImage
+      # nix-shell -p nix-prefetch-docker --run 'nix-prefetch-docker --quiet --image-name ghcr.io/jgus/minecraft-runner --image-tag 1.0.0-java21'
+      {
+        imageName = "ghcr.io/jgus/minecraft-runner";
+        imageDigest = "sha256:376991786225659f2e471c00b39c5fafa291f5d8c5ca81968ae03949fa95d8f0";
+        hash = "sha256-i5puli98x56I6T/+CmRVMELFz7f31xHuwF4gHOWaf7U=";
+        finalImageName = "ghcr.io/jgus/minecraft-runner";
+        finalImageTag = "1.0.0-java21";
+      };
+    configVolume = "/home/minecraft/config";
+    volumes = [
+      "${../.secrets/minecraft}:/ssh-keys-inject"
+    ];
+    environment = {
+      MINECRAFT_UID = toString config.users.users.${user}.uid;
+      MINECRAFT_GID = toString config.users.groups.${group}.gid;
     };
-    serviceConfig = {
-      Restart = "no";
-      RestartSec = 10;
-    };
-  };
-  extraConfig = {
-    imports = [ ./../docker.nix ];
   };
 }
