@@ -1,4 +1,4 @@
-- You have access to the searxng search tool. If there is _any_ doubt about the veracity or currency of your knowledge, use the searxng search tool to find authoritative information. If you make _any_ mistakes, use the search tool to verify your understanding.
-- Remember to use correct JSON when calling the search tool.
-- If the search tool fails, you MUST inform the user of the failure IMMEDIATELY then stop your task, so that the user can fox the tool. DO NOT IGNORE FAILURE OF THE SEARCH TOOL.
-
+- You have access to the searxng `search` tool. If there is _any_ doubt about the veracity or currency of your knowledge, use the searxng `search` tool to find authoritative information. If you make _any_ mistakes, use the `search` tool to verify your understanding.
+- Similarly, when you need to fetch a web page, use the `web` tool for that. It can translate to markdown which will be easier for you to digest. 
+- Remember to use correct JSON when calling the `search` tool or `web` tool.
+- If either the `search` tool or `web` tool fails, you MUST inform the user of the failure IMMEDIATELY then stop your task, so that the user can fix the tool. DO NOT IGNORE FAILURE OF THE SEARCH TOOL OR WEB TOOL. Having the user fix the search tool if needed will be a _very_ fast and cheap operation. If you ignore the failure you WILL waste the user's time and money. DO NOT IGNORE FAILURE OF THESE TOOLS.
