@@ -10,8 +10,8 @@ in
       # nix-shell -p nix-prefetch-docker --run 'nix-prefetch-docker --quiet --image-name lscr.io/linuxserver/qbittorrent --image-tag latest'
       {
         imageName = "lscr.io/linuxserver/qbittorrent";
-        imageDigest = "sha256:a68c4cfb7b07c39cf3f13e7f1d23d333c1e4a60304d37bc1eec7af3eacfe12d5";
-        hash = "sha256-Mwmpc5drI0GV3DYqog5/COd4f6zizEc4KaqRevLmSxk=";
+        imageDigest = "sha256:1497b6e047ad47b738f94739219f0e5c5b2ad7a5953b7cf0050f2fedddd8c601";
+        hash = "sha256-PUapqpJ6rZjWmmvKzJS2vYNC0Ew0UdM+Y1Z8Epk3V3o=";
         finalImageName = "lscr.io/linuxserver/qbittorrent";
         finalImageTag = "latest";
       };

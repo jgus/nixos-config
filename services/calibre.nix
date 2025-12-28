@@ -10,8 +10,8 @@ in
       # nix-shell -p nix-prefetch-docker --run 'nix-prefetch-docker --quiet --image-name lscr.io/linuxserver/calibre-web --image-tag latest'
       {
         imageName = "lscr.io/linuxserver/calibre-web";
-        imageDigest = "sha256:f76306b65a5f8c884683652a3586d084c1f16e34ba983c58492aaade52df9b08";
-        hash = "sha256-rmMmccf8ehuZ8/X9oABX0vNNmJmoitC6WJNIxxTK+pA=";
+        imageDigest = "sha256:6ad57f800588623fe598b7c8d4c39b20f9234798987757b67a8e50e7aabf95ff";
+        hash = "sha256-9oCWRUGRlSvcnLKmJEkKXHjRrgtGkv2NgZLzNIZuGow=";
         finalImageName = "lscr.io/linuxserver/calibre-web";
         finalImageTag = "latest";
       };

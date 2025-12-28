@@ -10,8 +10,8 @@ in
       # nix-shell -p nix-prefetch-docker --run 'nix-prefetch-docker --quiet --image-name lscr.io/linuxserver/lazylibrarian --image-tag latest'
       {
         imageName = "lscr.io/linuxserver/lazylibrarian";
-        imageDigest = "sha256:218ef302d43de82c219d096c651ca7461d224537674a08d0489ea087cdcd8ad2";
-        hash = "sha256-w5hTxhwDZqpNWSOR06IJLjUJS7M2kU7F/yWMO1B/XTo=";
+        imageDigest = "sha256:a17cdc2d8042ab1546c158f9f8d1d1fccf1ccab9df19a91d4c1e8b529ae8f3f7";
+        hash = "sha256-Cw5TvAXqGGoD5Z6UtnmfSG0zC9m5/x7K3jmHS5scHnE=";
         finalImageName = "lscr.io/linuxserver/lazylibrarian";
         finalImageTag = "latest";
       };
