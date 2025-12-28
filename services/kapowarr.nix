@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ ... }:
 {
   requires = [ "storage-media.mount" "storage-scratch.mount" ];
   docker = {

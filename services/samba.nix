@@ -2,7 +2,7 @@ with builtins;
 let
   pw = import ./../.secrets/passwords.nix;
 in
-{ config, pkgs, ... }:
+{ config, ... }:
 {
   configStorage = false;
   docker = {

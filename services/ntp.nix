@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ ... }:
 {
   configStorage = false;
   docker = {

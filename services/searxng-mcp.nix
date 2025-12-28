@@ -1,6 +1,6 @@
 # SearXNG MCP Server - Model Context Protocol server for web search integration
 # https://github.com/tcpipuk/mcp-server
-{ pkgs, ... }:
+{ ... }:
 {
   configStorage = false;
   docker = {

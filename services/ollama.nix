@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ ... }:
 {
   autoStart = false;
   docker = {

@@ -2,7 +2,7 @@ let
   user = "plex";
   group = "plex";
 in
-{ config, pkgs, ... }:
+{ config, ... }:
 {
   requires = [ "storage-media.mount" "storage-photos.mount" ];
   docker = {

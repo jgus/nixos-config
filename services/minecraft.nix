@@ -2,7 +2,7 @@ let
   user = "minecraft";
   group = "minecraft";
 in
-{ config, pkgs, ... }:
+{ config, ... }:
 {
   docker = {
     pullImage =

@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ ... }:
 {
   # SillyTavern - Feature-rich RP/chat frontend
   # Web UI at http://sillytavern:8000

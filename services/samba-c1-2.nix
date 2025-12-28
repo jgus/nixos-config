@@ -1,5 +1,5 @@
 with builtins;
-{ pkgs, ... }:
+{ ... }:
 {
   configStorage = false;
   docker = {

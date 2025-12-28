@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ ... }:
 let
   pw = import ./../.secrets/passwords.nix;
 in

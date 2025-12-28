@@ -2,7 +2,7 @@ let
   user = "josh";
   group = "users";
 in
-{ config, pkgs, ... }:
+{ config, ... }:
 {
   inherit user group;
   docker = {

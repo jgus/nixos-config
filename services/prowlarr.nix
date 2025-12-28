@@ -2,7 +2,7 @@ let
   user = "josh";
   group = "plex";
 in
-{ config, pkgs, ... }:
+{ config, ... }:
 {
   docker = {
     pullImage =

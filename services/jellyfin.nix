@@ -2,7 +2,7 @@ let
   user = "plex";
   group = "plex";
 in
-{ config, pkgs, ... }:
+{ config, ... }:
 let
   uid = toString config.users.users.${user}.uid;
   gid = toString config.users.groups.${group}.gid;

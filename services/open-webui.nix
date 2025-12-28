@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ ... }:
 {
   docker = {
     pullImage =
