@@ -4,8 +4,7 @@ let
     {
       name = "zwave-${area}";
       docker = {
-        image = "zwavejs/zwave-js-ui";
-        imageFile = pkgs.dockerTools.pullImage
+        pullImage =
           # nix-shell -p nix-prefetch-docker --run 'nix-prefetch-docker --quiet --image-name zwavejs/zwave-js-ui --image-tag latest'
           {
             imageName = "zwavejs/zwave-js-ui";

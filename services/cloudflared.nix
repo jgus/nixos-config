@@ -2,8 +2,7 @@
 {
   configStorage = false;
   docker = {
-    image = "cloudflare/cloudflared:latest";
-    imageFile = pkgs.dockerTools.pullImage
+    pullImage =
       # nix-shell -p nix-prefetch-docker --run 'nix-prefetch-docker --quiet --image-name cloudflare/cloudflared --image-tag latest'
       {
         imageName = "cloudflare/cloudflared";

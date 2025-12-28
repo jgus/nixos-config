@@ -6,8 +6,7 @@ in
   {
     name = "joyfulsong-db";
     docker = {
-      image = "mariadb";
-      imageFile = pkgs.dockerTools.pullImage
+      pullImage =
         # nix-shell -p nix-prefetch-docker --run 'nix-prefetch-docker --quiet --image-name mariadb --image-tag latest'
         {
           imageName = "mariadb";
@@ -28,8 +27,7 @@ in
   {
     name = "joyfulsong";
     docker = {
-      image = "wordpress:php8.3-apache";
-      imageFile = pkgs.dockerTools.pullImage
+      pullImage =
         # nix-shell -p nix-prefetch-docker --run 'nix-prefetch-docker --quiet --image-name wordpress --image-tag php8.3-apache'
         {
           imageName = "wordpress";

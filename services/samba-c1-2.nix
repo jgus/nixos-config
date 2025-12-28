@@ -3,8 +3,7 @@ with builtins;
 {
   configStorage = false;
   docker = {
-    image = "ghcr.io/servercontainers/samba";
-    imageFile = pkgs.dockerTools.pullImage
+    pullImage =
       # nix-shell -p nix-prefetch-docker --run 'nix-prefetch-docker --quiet --image-name ghcr.io/servercontainers/samba --image-tag latest'
       {
         imageName = "ghcr.io/servercontainers/samba";

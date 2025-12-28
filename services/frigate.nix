@@ -275,8 +275,7 @@ in
 {
   requires = [ "storage-frigate.mount" "zfs-import-f.service" ];
   docker = {
-    image = "ghcr.io/blakeblackshear/frigate:stable-tensorrt";
-    imageFile = pkgs.dockerTools.pullImage
+    pullImage =
       # nix-shell -p nix-prefetch-docker --run 'nix-prefetch-docker --quiet --image-name ghcr.io/blakeblackshear/frigate --image-tag stable-tensorrt'
       {
         imageName = "ghcr.io/blakeblackshear/frigate";

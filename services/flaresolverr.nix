@@ -2,8 +2,7 @@
 {
   configStorage = false;
   docker = {
-    image = "ghcr.io/flaresolverr/flaresolverr:latest";
-    imageFile = pkgs.dockerTools.pullImage
+    pullImage =
       # nix-shell -p nix-prefetch-docker --run 'nix-prefetch-docker --quiet --image-name ghcr.io/flaresolverr/flaresolverr --image-tag latest'
       {
         imageName = "ghcr.io/flaresolverr/flaresolverr";

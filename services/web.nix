@@ -89,8 +89,7 @@ in
   name = "web";
   extraStorage = [ "web_data" ];
   docker = {
-    image = "caddy";
-    imageFile = pkgs.dockerTools.pullImage
+    pullImage =
       # nix-shell -p nix-prefetch-docker --run 'nix-prefetch-docker --quiet --image-name caddy --image-tag latest'
       {
         imageName = "caddy";

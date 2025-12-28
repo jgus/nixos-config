@@ -1,8 +1,7 @@
 { config, pkgs, ... }:
 {
   docker = {
-    image = "nodered/node-red";
-    imageFile = pkgs.dockerTools.pullImage
+    pullImage =
       # nix-shell -p nix-prefetch-docker --run 'nix-prefetch-docker --quiet --image-name nodered/node-red --image-tag latest'
       {
         imageName = "nodered/node-red";

@@ -61,7 +61,7 @@ let
       serviceRecord = addresses.records.${name};
       storageNames = extraStorage ++ lib.optional configStorage name;
       dockerOptions = addresses.dockerOptions name;
-      isDocker = docker ? image;
+      isDocker = docker ? image || docker ? pullImage;
 
       # Shared service components used by both docker and systemd configs
       requiresTarget = rec {
@@ -80,49 +80,61 @@ let
         startAt = "hourly";
       };
 
-      dockerConfig = {
-        imports = [ ./docker.nix extraConfig ] ++ map homelabServiceStorage storageNames;
+      dockerConfig =
+        let
+          dockerImage =
+            if docker ? pullImage
+            then "${docker.pullImage.finalImageName}:${docker.pullImage.finalImageTag}"
+            else docker.image;
 
-        systemd = {
-          targets."${name}-requires" = requiresTarget;
-          services = {
-            "docker-${name}" = {
-              aliases = [ "${name}.service" ];
-              serviceConfig.Restart = pkgs.lib.mkForce "no";
-              postStop = "systemctl restart ${name}-backup";
+          dockerImageFile =
+            if docker ? pullImage
+            then pkgs.dockerTools.pullImage docker.pullImage
+            else docker.imageFile or null;
+        in
+        {
+          imports = [ ./docker.nix extraConfig ] ++ map homelabServiceStorage storageNames;
+
+          systemd = {
+            targets."${name}-requires" = requiresTarget;
+            services = {
+              "docker-${name}" = {
+                aliases = [ "${name}.service" ];
+                serviceConfig.Restart = pkgs.lib.mkForce "no";
+                postStop = "systemctl restart ${name}-backup";
+              };
+              "${name}-update" = lib.mkIf (!(docker ? imageFile || docker ? imageStream || docker ? pullImage)) {
+                path = [ pkgs.docker ];
+                script = ''
+                  if docker pull ${dockerImage} | grep "Status: Downloaded"
+                  then
+                    systemctl restart ${name}
+                  fi
+                '';
+                serviceConfig = { Type = "exec"; };
+                startAt = "hourly";
+              };
+              "${name}-backup" = backupService;
             };
-            "${name}-update" = lib.mkIf (!(docker ? imageFile || docker ? imageStream)) {
-              path = [ pkgs.docker ];
-              script = ''
-                if docker pull ${docker.image} | grep "Status: Downloaded"
-                then
-                  systemctl restart ${name}
-                fi
-              '';
-              serviceConfig = { Type = "exec"; };
-              startAt = "hourly";
-            };
-            "${name}-backup" = backupService;
           };
+          virtualisation.oci-containers.containers.${name} = {
+            image = dockerImage;
+            autoStart = autoStart;
+            user = "${uid}:${gid}";
+            volumes =
+              (let v = docker.volumes or [ ]; in if isFunction v then v storagePath else v) ++
+                lib.optional configStorage "${storagePath name}:${docker.configVolume}";
+            extraOptions = docker.extraOptions or [ ] ++ dockerOptions;
+            entrypoint = docker.entrypoint or null;
+            cmd = docker.entrypointOptions or [ ];
+          }
+          // lib.optionalAttrs (dockerImageFile != null) { imageFile = dockerImageFile; }
+          // lib.optionalAttrs (docker ? imageStream) { inherit (docker) imageStream; }
+          // lib.optionalAttrs (docker ? dependsOn) { inherit (docker) dependsOn; }
+          // lib.optionalAttrs (docker ? environment) { inherit (docker) environment; }
+          // lib.optionalAttrs (docker ? environmentFiles) { inherit (docker) environmentFiles; }
+          // lib.optionalAttrs (docker ? ports) { inherit (docker) ports; };
         };
-        virtualisation.oci-containers.containers.${name} = {
-          image = docker.image;
-          autoStart = autoStart;
-          user = "${uid}:${gid}";
-          volumes =
-            (let v = docker.volumes or [ ]; in if isFunction v then v storagePath else v) ++
-              lib.optional configStorage "${storagePath name}:${docker.configVolume}";
-          extraOptions = docker.extraOptions or [ ] ++ dockerOptions;
-          entrypoint = docker.entrypoint or null;
-          cmd = docker.entrypointOptions or [ ];
-        }
-        // lib.optionalAttrs (docker ? imageFile) { inherit (docker) imageFile; }
-        // lib.optionalAttrs (docker ? imageStream) { inherit (docker) imageStream; }
-        // lib.optionalAttrs (docker ? dependsOn) { inherit (docker) dependsOn; }
-        // lib.optionalAttrs (docker ? environment) { inherit (docker) environment; }
-        // lib.optionalAttrs (docker ? environmentFiles) { inherit (docker) environmentFiles; }
-        // lib.optionalAttrs (docker ? ports) { inherit (docker) ports; };
-      };
       systemdConfig =
         let
           useMacvlan = systemd.macvlan or false;

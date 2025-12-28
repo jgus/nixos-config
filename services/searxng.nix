@@ -16,8 +16,7 @@ in
 { pkgs, ... }:
 {
   docker = {
-    image = "docker.io/searxng/searxng";
-    imageFile = pkgs.dockerTools.pullImage
+    pullImage =
       # nix-shell -p nix-prefetch-docker --run 'nix-prefetch-docker --quiet --image-name docker.io/searxng/searxng --image-tag latest'
       {
         imageName = "docker.io/searxng/searxng";

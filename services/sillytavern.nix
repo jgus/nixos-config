@@ -28,8 +28,7 @@
 
   configStorage = true;
   docker = {
-    image = "ghcr.io/sillytavern/sillytavern:latest";
-    imageFile = pkgs.dockerTools.pullImage
+    pullImage =
       # nix-shell -p nix-prefetch-docker --run 'nix-prefetch-docker --quiet --image-name ghcr.io/sillytavern/sillytavern --image-tag latest'
       {
         imageName = "ghcr.io/sillytavern/sillytavern";

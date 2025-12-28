@@ -38,8 +38,7 @@ in
 {
   configStorage = false;
   docker = {
-    image = "dxflrs/garage:v1.0.0";
-    imageFile = pkgs.dockerTools.pullImage
+    pullImage =
       # nix-shell -p nix-prefetch-docker --run 'nix-prefetch-docker --quiet --image-name dxflrs/garage --image-tag v1.0.0'
       {
         imageName = "dxflrs/garage";

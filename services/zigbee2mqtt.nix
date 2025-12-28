@@ -1,8 +1,7 @@
 { config, pkgs, ... }:
 {
   docker = {
-    image = "koenkk/zigbee2mqtt";
-    imageFile = pkgs.dockerTools.pullImage
+    pullImage =
       # nix-shell -p nix-prefetch-docker --run 'nix-prefetch-docker --quiet --image-name koenkk/zigbee2mqtt --image-tag latest'
       {
         imageName = "koenkk/zigbee2mqtt";

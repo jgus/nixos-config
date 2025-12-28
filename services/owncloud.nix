@@ -14,8 +14,7 @@ in
     configStorage = false;
     requires = [ "storage-owncloud.mount" ];
     docker = {
-      image = "owncloud/server";
-      imageFile = pkgs.dockerTools.pullImage
+      pullImage =
         # nix-shell -p nix-prefetch-docker --run 'nix-prefetch-docker --quiet --image-name owncloud/server --image-tag latest'
         {
           imageName = "owncloud/server";
@@ -50,8 +49,7 @@ in
   {
     name = "owncloud-db";
     docker = {
-      image = "mariadb:10";
-      imageFile = pkgs.dockerTools.pullImage
+      pullImage =
         # nix-shell -p nix-prefetch-docker --run 'nix-prefetch-docker --quiet --image-name mariadb --image-tag 10'
         {
           imageName = "mariadb";
@@ -73,8 +71,7 @@ in
   {
     name = "owncloud-redis";
     docker = {
-      image = "redis:6";
-      imageFile = pkgs.dockerTools.pullImage
+      pullImage =
         # nix-shell -p nix-prefetch-docker --run 'nix-prefetch-docker --quiet --image-name redis --image-tag 6'
         {
           imageName = "redis";

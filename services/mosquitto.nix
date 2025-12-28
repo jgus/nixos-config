@@ -47,8 +47,7 @@ let
 in
 {
   docker = {
-    image = "eclipse-mosquitto";
-    imageFile = pkgs.dockerTools.pullImage
+    pullImage =
       # nix-shell -p nix-prefetch-docker --run 'nix-prefetch-docker --quiet --image-name eclipse-mosquitto --image-tag latest'
       {
         imageName = "eclipse-mosquitto";

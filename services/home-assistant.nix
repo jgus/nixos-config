@@ -142,8 +142,7 @@ let
 in
 {
   docker = {
-    image = "ghcr.io/home-assistant/home-assistant:stable";
-    imageFile = pkgs.dockerTools.pullImage
+    pullImage =
       # nix-shell -p nix-prefetch-docker --run 'nix-prefetch-docker --quiet --image-name ghcr.io/home-assistant/home-assistant --image-tag stable'
       {
         imageName = "ghcr.io/home-assistant/home-assistant";

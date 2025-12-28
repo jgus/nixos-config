@@ -2,8 +2,7 @@
 {
   requires = [ "storage-media.mount" ];
   docker = {
-    image = "ghcr.io/advplyr/audiobookshelf";
-    imageFile = pkgs.dockerTools.pullImage
+    pullImage =
       # nix-shell -p nix-prefetch-docker --run 'nix-prefetch-docker --quiet --image-name ghcr.io/advplyr/audiobookshelf --image-tag latest'
       {
         imageName = "ghcr.io/advplyr/audiobookshelf";

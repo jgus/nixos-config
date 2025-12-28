@@ -6,8 +6,7 @@ in
 {
   requires = [ "storage-media.mount" "storage-scratch.mount" ];
   docker = {
-    image = "lscr.io/linuxserver/sonarr";
-    imageFile = pkgs.dockerTools.pullImage
+    pullImage =
       # nix-shell -p nix-prefetch-docker --run 'nix-prefetch-docker --quiet --image-name lscr.io/linuxserver/sonarr --image-tag latest'
       {
         imageName = "lscr.io/linuxserver/sonarr";

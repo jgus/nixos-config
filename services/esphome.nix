@@ -6,8 +6,7 @@ in
 {
   inherit user group;
   docker = {
-    image = "ghcr.io/esphome/esphome";
-    imageFile = pkgs.dockerTools.pullImage
+    pullImage =
       # nix-shell -p nix-prefetch-docker --run 'nix-prefetch-docker --quiet --image-name ghcr.io/esphome/esphome --image-tag latest'
       {
         imageName = "ghcr.io/esphome/esphome";

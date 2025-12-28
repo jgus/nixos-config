@@ -6,8 +6,7 @@ in
 {
   requires = [ "storage-media.mount" "storage-photos.mount" ];
   docker = {
-    image = "lscr.io/linuxserver/plex";
-    imageFile = pkgs.dockerTools.pullImage
+    pullImage =
       # nix-shell -p nix-prefetch-docker --run 'nix-prefetch-docker --quiet --image-name lscr.io/linuxserver/plex --image-tag latest'
       {
         imageName = "lscr.io/linuxserver/plex";

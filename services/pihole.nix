@@ -53,8 +53,7 @@ map
     inherit name;
     configStorage = false;
     docker = {
-      image = "pihole/pihole";
-      imageFile = pkgs.dockerTools.pullImage
+      pullImage =
         # nix-shell -p nix-prefetch-docker --run 'nix-prefetch-docker --quiet --image-name pihole/pihole --image-tag latest'
         {
           imageName = "pihole/pihole";

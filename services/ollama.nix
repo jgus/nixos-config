@@ -2,8 +2,7 @@
 {
   autoStart = false;
   docker = {
-    image = "ollama/ollama";
-    imageFile = pkgs.dockerTools.pullImage
+    pullImage =
       # nix-shell -p nix-prefetch-docker --run 'nix-prefetch-docker --quiet --image-name ollama/ollama --image-tag latest'
       {
         imageName = "ollama/ollama";

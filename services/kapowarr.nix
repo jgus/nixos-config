@@ -2,8 +2,7 @@
 {
   requires = [ "storage-media.mount" "storage-scratch.mount" ];
   docker = {
-    image = "mrcas/kapowarr";
-    imageFile = pkgs.dockerTools.pullImage
+    pullImage =
       # nix-shell -p nix-prefetch-docker --run 'nix-prefetch-docker --quiet --image-name mrcas/kapowarr --image-tag latest'
       {
         imageName = "mrcas/kapowarr";

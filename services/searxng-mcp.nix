@@ -4,8 +4,7 @@
 {
   configStorage = false;
   docker = {
-    image = "ghcr.io/tcpipuk/mcp-server/server:latest";
-    imageFile = pkgs.dockerTools.pullImage
+    pullImage =
       # nix-shell -p nix-prefetch-docker --run 'nix-prefetch-docker --quiet --image-name ghcr.io/tcpipuk/mcp-server/server --image-tag latest'
       {
         imageName = "ghcr.io/tcpipuk/mcp-server/server";

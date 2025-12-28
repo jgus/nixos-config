@@ -5,8 +5,7 @@ in
 { config, pkgs, ... }:
 {
   docker = {
-    image = "lscr.io/linuxserver/prowlarr";
-    imageFile = pkgs.dockerTools.pullImage
+    pullImage =
       # nix-shell -p nix-prefetch-docker --run 'nix-prefetch-docker --quiet --image-name lscr.io/linuxserver/prowlarr --image-tag latest'
       {
         imageName = "lscr.io/linuxserver/prowlarr";

@@ -6,8 +6,7 @@ in
   {
     name = "onlyoffice";
     docker = {
-      image = "onlyoffice/documentserver";
-      imageFile = pkgs.dockerTools.pullImage
+      pullImage =
         # nix-shell -p nix-prefetch-docker --run 'nix-prefetch-docker --quiet --image-name onlyoffice/documentserver --image-tag latest'
         {
           imageName = "onlyoffice/documentserver";

@@ -2,8 +2,7 @@
 {
   configStorage = false;
   docker = {
-    image = "mneveroff/ipmi-server";
-    imageFile = pkgs.dockerTools.pullImage
+    pullImage =
       # nix-shell -p nix-prefetch-docker --run 'nix-prefetch-docker --quiet --image-name mneveroff/ipmi-server --image-tag latest'
       {
         imageName = "mneveroff/ipmi-server";

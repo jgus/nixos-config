@@ -2,8 +2,7 @@
 {
   configStorage = false;
   docker = {
-    image = "cturra/ntp";
-    imageFile = pkgs.dockerTools.pullImage
+    pullImage =
       # nix-shell -p nix-prefetch-docker --run 'nix-prefetch-docker --quiet --image-name cturra/ntp --image-tag latest'
       {
         imageName = "cturra/ntp";

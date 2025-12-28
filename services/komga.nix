@@ -7,8 +7,7 @@ in
   inherit user group;
   requires = [ "storage-media.mount" ];
   docker = {
-    image = "gotson/komga";
-    imageFile = pkgs.dockerTools.pullImage
+    pullImage =
       # nix-shell -p nix-prefetch-docker --run 'nix-prefetch-docker --quiet --image-name gotson/komga --image-tag latest'
       {
         imageName = "gotson/komga";
