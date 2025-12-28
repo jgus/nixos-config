@@ -521,7 +521,7 @@ let
 
       # https://docs.unsloth.ai/models/nemotron-3
       {
-        name = "menotron-3-nano";
+        name = "nemotron-3-nano";
         displayName = "Nemotron 3 Nano";
         model = "unsloth/Nemotron-3-Nano-30B-A3B-GGUF:UD-Q4_K_XL";
         gpu = true;
