@@ -303,7 +303,7 @@ let
       {
         name = "glm-4.7";
         displayName = "GLM 4.7";
-        model = "unsloth/GLM-4.7-GGUF:Q4_K_XL";
+        model = "unsloth/GLM-4.7-GGUF:Q2_K_XL";
         gpu = true;
         resourceRequirements = {
           VRAM-1 = 22;
