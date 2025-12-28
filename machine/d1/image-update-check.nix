@@ -20,12 +20,13 @@ let
       CURRENT_SPEC_JSON_NORM=$(echo ${lib.escapeShellArg (builtins.toJSON pullImage)} | ${pkgs.jq}/bin/jq -S -c .)
       LATEST_SPEC_NIX=$(${pkgs.nix-prefetch-docker}/bin/nix-prefetch-docker --quiet --image-name ${pullImage.finalImageName} --image-tag ${pullImage.finalImageTag})
       LATEST_SPEC_JSON_NORM=$(${pkgs.nix}/bin/nix eval --json --expr "$LATEST_SPEC_NIX" | ${pkgs.jq}/bin/jq -S -c .)
-      if [ "CURRENT_SPEC_JSON_NORM" != "LATEST_SPEC_JSON_NORM" ]
+      if [ "$CURRENT_SPEC_JSON_NORM" != "$LATEST_SPEC_JSON_NORM" ]
       then
-        echo "Update available for ${pullImage.finalImageName}:${pullImage.finalImageTag}"
+        echo "Update available for ${pullImage.finalImageName}:${pullImage.finalImageTag} in ${file}:"
+        echo "$LATEST_SPEC_NIX"
         echo "" >&3
-        echo "${file}:" >&3
-        echo "''${LATEST_SPEC_NIX}" >&3
+        echo "Update available for ${pullImage.finalImageName}:${pullImage.finalImageTag} in ${file}:" >&3
+        echo "$LATEST_SPEC_NIX" >&3
       fi
     '')
     allPullImages))
