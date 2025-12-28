@@ -89,6 +89,7 @@ let
           --flash-attn on \
           --slot-save-path /root/.cache/llama.cpp/prompt-cache \
           --mlock \
+          ${(lib.optionalString gpu "--fit on")} \
           ${lib.concatStringsSep " " (service.extraLlamaCppArgs or [ ])}
       '';
     in
@@ -205,9 +206,6 @@ let
           "--temp 0.6"
           "--top-p 0.95"
           "--min-p 0.01"
-          # GPU Settings
-          "--n-gpu-layers 999"
-          "-ot .ffn_.*_exps.=CPU"
         ];
       }
 
@@ -225,8 +223,6 @@ let
           "--temp 1.0"
           "--top-p 1.0"
           "--top-k 0.0"
-          # GPU Settings
-          "--n-gpu-layers 999"
         ];
       }
 
@@ -263,9 +259,6 @@ let
           # Sampling Parameters
           "--temp 0.6"
           "--min-p 0.01"
-          # GPU Settings
-          "--n-gpu-layers 999"
-          "-ot .ffn_.*_exps.=CPU"
         ];
       }
 
@@ -283,9 +276,6 @@ let
           # Sampling Parameters
           "--temp 1.0"
           "--min-p 0.01"
-          # GPU Settings
-          "--n-gpu-layers 999"
-          "-ot .ffn_.*_exps.=CPU"
           # Special flag to show thinking tags
           "--special"
         ];
@@ -324,9 +314,6 @@ let
           # Sampling Parameters
           "--temp 1.0"
           "--top-p 0.95"
-          # GPU Settings
-          "--n-gpu-layers 999"
-          "-ot .ffn_.*_exps.=CPU"
         ];
       }
 
@@ -346,9 +333,6 @@ let
           "--temp 1.0"
           "--top-p 0.95"
           "--top-k 40"
-          # GPU Settings
-          "--n-gpu-layers 999"
-          "-ot .ffn_.*_exps.=CPU"
         ];
       }
 
@@ -384,8 +368,6 @@ let
           "--top-p 0.6"
           "--top-k 2"
           "--repeat_penalty 1.1"
-          # GPU Settings
-          "--n-gpu-layers 999"
         ];
       }
 
@@ -406,8 +388,6 @@ let
           "--top-p 0.6"
           "--top-k 2"
           "--repeat_penalty 1.1"
-          # GPU Settings
-          "--n-gpu-layers 999"
         ];
       }
 
@@ -422,11 +402,6 @@ let
           RAM = 67;
         };
         contextSize = 128 * 1024;
-        extraLlamaCppArgs = [
-          # GPU Settings
-          "--n-gpu-layers 999"
-          "-ot .ffn_.*_exps.=CPU"
-        ];
       }
 
       # https://huggingface.co/unsloth/Mistral-Small-3.2-24B-Instruct-2506-GGUF
@@ -444,8 +419,6 @@ let
           "--temp 0.15"
           "--top-k -1"
           "--top-p 1.00"
-          # GPU Settings
-          "--n-gpu-layers 999"
         ];
       }
 
@@ -462,8 +435,6 @@ let
         extraLlamaCppArgs = [
           # Sampling Parameters
           "--temp 0.15"
-          # GPU Settings
-          "--n-gpu-layers 999"
         ];
       }
 
@@ -481,8 +452,6 @@ let
         extraLlamaCppArgs = [
           # Sampling Parameters
           "--temp 0.15"
-          # GPU Settings
-          "--n-gpu-layers 28"
         ];
       }
 
@@ -514,8 +483,6 @@ let
         extraLlamaCppArgs = [
           # Sampling Parameters
           "--top-nsigma 1.26"
-          # GPU Settings
-          "--n-gpu-layers 999"
         ];
       }
 
@@ -533,8 +500,6 @@ let
           # Sampling Parameters
           "--temp 0.6"
           "--top-p 0.95"
-          # GPU Settings
-          "--n-gpu-layers 999"
         ];
       }
 
@@ -547,10 +512,6 @@ let
         resourceRequirements = {
           VRAM-1 = 24;
         };
-        extraLlamaCppArgs = [
-          # GPU Settings
-          "--n-gpu-layers 999"
-        ];
       }
     ]);
   };
