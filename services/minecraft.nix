@@ -2,11 +2,10 @@ let
   user = "minecraft";
   group = "minecraft";
 in
-{ config, pkgs, ... }:
+{ config, ... }:
 {
   docker = {
-    image = "ghcr.io/jgus/minecraft-runner:1.0.0-java21";
-    imageFile = pkgs.dockerTools.pullImage
+    pullImage =
       # nix-shell -p nix-prefetch-docker --run 'nix-prefetch-docker --quiet --image-name ghcr.io/jgus/minecraft-runner --image-tag 1.0.0-java21'
       {
         imageName = "ghcr.io/jgus/minecraft-runner";

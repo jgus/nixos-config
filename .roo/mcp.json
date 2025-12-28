@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "search": {
+      "url": "https://search-mcp.gustafson.me/sse",
+      "alwaysAllow": [
+        "search",
+        "web"
+      ]
+    }
+  }
+}

@@ -28,7 +28,15 @@
 
   configStorage = true;
   docker = {
-    image = "ghcr.io/sillytavern/sillytavern:latest";
+    pullImage =
+      # nix-shell -p nix-prefetch-docker --run 'nix-prefetch-docker --quiet --image-name ghcr.io/sillytavern/sillytavern --image-tag latest'
+      {
+        imageName = "ghcr.io/sillytavern/sillytavern";
+        imageDigest = "sha256:8dc43050b9e0036e0eb106a0c0f943763ef4c071139613c49c3237599d8c4f7d";
+        hash = "sha256-/XR/GOhh1jmYeOGfIj6DYvzZvkLPWNbWKzEPVHIWRdI=";
+        finalImageName = "ghcr.io/sillytavern/sillytavern";
+        finalImageTag = "latest";
+      };
     configVolume = "/home/node/app/config";
     ports = [
       "80"

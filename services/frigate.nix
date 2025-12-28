@@ -275,7 +275,15 @@ in
 {
   requires = [ "storage-frigate.mount" "zfs-import-f.service" ];
   docker = {
-    image = "ghcr.io/blakeblackshear/frigate:stable-tensorrt";
+    pullImage =
+      # nix-shell -p nix-prefetch-docker --run 'nix-prefetch-docker --quiet --image-name ghcr.io/blakeblackshear/frigate --image-tag stable-tensorrt'
+      {
+        imageName = "ghcr.io/blakeblackshear/frigate";
+        imageDigest = "sha256:7940134770b1f050e7b4ad6cf716fda011e15fe53ea6cc7e5066b8f1df6335bd";
+        hash = "sha256-CRqjBIcymzJXNRgfHSgMXDHj4UTgdn/whUyOWbCRaEg=";
+        finalImageName = "ghcr.io/blakeblackshear/frigate";
+        finalImageTag = "stable-tensorrt";
+      };
     environment = {
       PLUS_API_KEY = pw.frigate_plus;
       FRIGATE_RTSP_PASSWORD = "password";
