@@ -1,4 +1,4 @@
-{ ... }:
+{ pkgs, ... }:
 let
   pw = import ./../.secrets/passwords.nix;
 in
@@ -7,6 +7,15 @@ in
     name = "joyfulsong-db";
     docker = {
       image = "mariadb";
+      imageFile = pkgs.dockerTools.pullImage
+        # nix-shell -p nix-prefetch-docker --run 'nix-prefetch-docker --quiet --image-name mariadb --image-tag latest'
+        {
+          imageName = "mariadb";
+          imageDigest = "sha256:e1bcd6f8578111dfdafc78fd2adf2d15a54d4f185611d5f7b6b75cf967f1c1b1";
+          hash = "sha256-tPm0XwIe/rM3+gJkQbzpj+/emE8j1HNqIg1yjb37+TI=";
+          finalImageName = "mariadb";
+          finalImageTag = "latest";
+        };
       configVolume = "/var/lib/mysql";
       environment = {
         MARIADB_DATABASE = "joyfulsong";
@@ -20,6 +29,15 @@ in
     name = "joyfulsong";
     docker = {
       image = "wordpress:php8.3-apache";
+      imageFile = pkgs.dockerTools.pullImage
+        # nix-shell -p nix-prefetch-docker --run 'nix-prefetch-docker --quiet --image-name wordpress --image-tag php8.3-apache'
+        {
+          imageName = "wordpress";
+          imageDigest = "sha256:3655391d4ecab1fcdbf80a83fe2b9f473ccb90797dc3ea9739ef6ad63b146bad";
+          hash = "sha256-ZzTB+yUJ9SdI4VLTbXHZEdYGAPuRfplWeDIs6qp6eVk=";
+          finalImageName = "wordpress";
+          finalImageTag = "php8.3-apache";
+        };
       dependsOn = [ "joyfulsong-db" ];
       configVolume = "/var/www/html";
       ports = [

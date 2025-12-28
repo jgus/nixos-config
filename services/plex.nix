@@ -2,11 +2,20 @@ let
   user = "plex";
   group = "plex";
 in
-{ config, ... }:
+{ config, pkgs, ... }:
 {
   requires = [ "storage-media.mount" "storage-photos.mount" ];
   docker = {
     image = "lscr.io/linuxserver/plex";
+    imageFile = pkgs.dockerTools.pullImage
+      # nix-shell -p nix-prefetch-docker --run 'nix-prefetch-docker --quiet --image-name lscr.io/linuxserver/plex --image-tag latest'
+      {
+        imageName = "lscr.io/linuxserver/plex";
+        imageDigest = "sha256:1720efa8e919a724ff3003cce7c1c0ae91a54e097ca3c8f6713a780c6fd73432";
+        hash = "sha256-rwEr4bCiOkmjjV6AdZzofxBceWOOrL5yg+bleAsQGHo=";
+        finalImageName = "lscr.io/linuxserver/plex";
+        finalImageTag = "latest";
+      };
     environment = {
       PUID = toString config.users.users.${user}.uid;
       PGID = toString config.users.groups.${group}.gid;

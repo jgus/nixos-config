@@ -54,6 +54,15 @@ map
     configStorage = false;
     docker = {
       image = "pihole/pihole";
+      imageFile = pkgs.dockerTools.pullImage
+        # nix-shell -p nix-prefetch-docker --run 'nix-prefetch-docker --quiet --image-name pihole/pihole --image-tag latest'
+        {
+          imageName = "pihole/pihole";
+          imageDigest = "sha256:91dc91ddd413bf461c283204558f8f21839851e9824799075a7ceff7c77eea40";
+          hash = "sha256-/+YRujV4n/ISyAD4LHBS1EnHwx4i6rahakbRaBIfSN0=";
+          finalImageName = "pihole/pihole";
+          finalImageTag = "latest";
+        };
       environment = {
         TZ = config.time.timeZone;
         FTLCONF_dns_upstreams = concatStringsSep ";" upstream;
