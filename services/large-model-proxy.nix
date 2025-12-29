@@ -508,6 +508,24 @@ let
         ];
       }
 
+      # https://unsloth.ai/docs/models/qwen3-coder-how-to-run-locally
+      {
+        name = "qwen-coder-30b";
+        displayName = "Qwen3-Coder 30B";
+        model = "unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF:UD-Q4_K_XL";
+        gpu = true;
+        resourceRequirements = {
+          VRAM-1 = 24;
+        };
+        extraLlamaCppArgs = [
+          # Sampling Parameters (recommended by Qwen)
+          "--temp 0.7"
+          "--top-p 0.8"
+          "--top-k 20"
+          "--repeat_penalty 1.05"
+        ];
+      }
+
       # https://huggingface.co/unsloth/Seed-OSS-36B-Instruct-GGUF
       {
         name = "seed-oss";
