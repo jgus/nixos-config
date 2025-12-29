@@ -89,6 +89,7 @@ let
           --flash-attn on \
           --slot-save-path /root/.cache/llama.cpp/prompt-cache \
           --mlock \
+          ${(lib.optionalString gpu "--fit on")} \
           ${lib.concatStringsSep " " (service.extraLlamaCppArgs or [ ])}
       '';
     in
@@ -188,7 +189,7 @@ let
     ]
     ++
     # Llama.cpp Services
-    (lib.imap0 llamaCppService [
+    (lib.imap0 llamaCppService ([
       # https://docs.unsloth.ai/models/deepseek-v3.1-how-to-run-locally
       {
         name = "deepseek-v3-terminus";
@@ -205,9 +206,6 @@ let
           "--temp 0.6"
           "--top-p 0.95"
           "--min-p 0.01"
-          # GPU Settings
-          "--n-gpu-layers 999"
-          "-ot .ffn_.*_exps.=CPU"
         ];
       }
 
@@ -225,8 +223,6 @@ let
           "--temp 1.0"
           "--top-p 1.0"
           "--top-k 0.0"
-          # GPU Settings
-          "--n-gpu-layers 999"
         ];
       }
 
@@ -263,9 +259,6 @@ let
           # Sampling Parameters
           "--temp 0.6"
           "--min-p 0.01"
-          # GPU Settings
-          "--n-gpu-layers 999"
-          "-ot .ffn_.*_exps.=CPU"
         ];
       }
 
@@ -283,9 +276,6 @@ let
           # Sampling Parameters
           "--temp 1.0"
           "--min-p 0.01"
-          # GPU Settings
-          "--n-gpu-layers 999"
-          "-ot .ffn_.*_exps.=CPU"
           # Special flag to show thinking tags
           "--special"
         ];
@@ -308,28 +298,30 @@ let
           "--special"
         ];
       }
-
-      # https://docs.unsloth.ai/models/glm-4.7
-      {
-        name = "glm-4.7";
-        displayName = "GLM 4.7";
-        model = "unsloth/GLM-4.7-GGUF:Q4_K_XL";
-        gpu = true;
-        resourceRequirements = {
-          VRAM-1 = 22;
-          RAM = 188;
-        };
-        contextSize = 96 * 1024;
-        extraLlamaCppArgs = [
-          # Sampling Parameters
-          "--temp 1.0"
-          "--top-p 0.95"
-          # GPU Settings
-          "--n-gpu-layers 999"
-          "-ot .ffn_.*_exps.=CPU"
-        ];
-      }
-
+    ]
+    ++
+    (map
+      (q:
+        # https://docs.unsloth.ai/models/glm-4.7
+        {
+          name = "glm-4.7-q${toString q}";
+          displayName = "GLM 4.7 Q${toString q}";
+          model = "unsloth/GLM-4.7-GGUF:Q${toString q}_K_XL";
+          gpu = true;
+          resourceRequirements = {
+            VRAM-1 = 22;
+            RAM = 188;
+          };
+          contextSize = 96 * 1024;
+          extraLlamaCppArgs = [
+            # Sampling Parameters
+            "--temp 1.0"
+            "--top-p 0.95"
+          ];
+        }
+      ) [ 2 3 4 ])
+    ++
+    [
       # https://docs.unsloth.ai/models/glm-4.6-how-to-run-locally
       {
         name = "glm-4.6";
@@ -346,9 +338,6 @@ let
           "--temp 1.0"
           "--top-p 0.95"
           "--top-k 40"
-          # GPU Settings
-          "--n-gpu-layers 999"
-          "-ot .ffn_.*_exps.=CPU"
         ];
       }
 
@@ -384,8 +373,6 @@ let
           "--top-p 0.6"
           "--top-k 2"
           "--repeat_penalty 1.1"
-          # GPU Settings
-          "--n-gpu-layers 999"
         ];
       }
 
@@ -406,8 +393,6 @@ let
           "--top-p 0.6"
           "--top-k 2"
           "--repeat_penalty 1.1"
-          # GPU Settings
-          "--n-gpu-layers 999"
         ];
       }
 
@@ -422,11 +407,6 @@ let
           RAM = 67;
         };
         contextSize = 128 * 1024;
-        extraLlamaCppArgs = [
-          # GPU Settings
-          "--n-gpu-layers 999"
-          "-ot .ffn_.*_exps.=CPU"
-        ];
       }
 
       # https://huggingface.co/unsloth/Mistral-Small-3.2-24B-Instruct-2506-GGUF
@@ -444,8 +424,6 @@ let
           "--temp 0.15"
           "--top-k -1"
           "--top-p 1.00"
-          # GPU Settings
-          "--n-gpu-layers 999"
         ];
       }
 
@@ -462,8 +440,6 @@ let
         extraLlamaCppArgs = [
           # Sampling Parameters
           "--temp 0.15"
-          # GPU Settings
-          "--n-gpu-layers 999"
         ];
       }
 
@@ -481,8 +457,6 @@ let
         extraLlamaCppArgs = [
           # Sampling Parameters
           "--temp 0.15"
-          # GPU Settings
-          "--n-gpu-layers 28"
         ];
       }
 
@@ -514,8 +488,6 @@ let
         extraLlamaCppArgs = [
           # Sampling Parameters
           "--top-nsigma 1.26"
-          # GPU Settings
-          "--n-gpu-layers 999"
         ];
       }
 
@@ -533,8 +505,24 @@ let
           # Sampling Parameters
           "--temp 0.6"
           "--top-p 0.95"
-          # GPU Settings
-          "--n-gpu-layers 999"
+        ];
+      }
+
+      # https://unsloth.ai/docs/models/qwen3-coder-how-to-run-locally
+      {
+        name = "qwen-coder-30b";
+        displayName = "Qwen3-Coder 30B";
+        model = "unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF:UD-Q4_K_XL";
+        gpu = true;
+        resourceRequirements = {
+          VRAM-1 = 24;
+        };
+        extraLlamaCppArgs = [
+          # Sampling Parameters (recommended by Qwen)
+          "--temp 0.7"
+          "--top-p 0.8"
+          "--top-k 20"
+          "--repeat_penalty 1.05"
         ];
       }
 
@@ -547,12 +535,8 @@ let
         resourceRequirements = {
           VRAM-1 = 24;
         };
-        extraLlamaCppArgs = [
-          # GPU Settings
-          "--n-gpu-layers 999"
-        ];
       }
-    ]);
+    ]));
   };
 in
 {

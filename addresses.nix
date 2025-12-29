@@ -315,7 +315,7 @@ let
       (attrNames records)
     )
   ];
-  dockerOptions = service: [
+  containerOptions = service: [
     "--network=macvlan"
     "--mac-address=${records."${service}".mac}"
     "--hostname=${service}"
@@ -326,7 +326,7 @@ let
     "--dns=${records.pihole-3.ip}"
     "--dns-search=${network.domain}"
   ];
-  dockerAddAllHosts =
+  containerAddAllHosts =
     (map (n: "--add-host=${n}:${getAttr n nameToIp}") names)
     ++
     (map (n: "--add-host=${n}.${network.domain}:${getAttr n nameToIp}") names)
@@ -336,4 +336,4 @@ let
     (map (n: "--add-host=${n}.${network.domain}:${getAttr n nameToIp6}") names6)
   ;
 in
-{ inherit network group records nameToIp nameToIp6 ipToIp6 serverNames hosts hosts6 dhcpReservations dockerOptions dockerAddAllHosts; }
+{ inherit network group records nameToIp nameToIp6 ipToIp6 serverNames hosts hosts6 dhcpReservations containerOptions containerAddAllHosts; }

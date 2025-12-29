@@ -49,21 +49,25 @@ let
     , extraStorage ? [ ]
     , requires ? [ ]
     , autoStart ? true
-    , docker ? { }
+    , container ? { }
     , systemd ? { }
     , extraConfig ? { }
     ,
-    }: { config, ... }:
+    }@args: { config, ... }:
     let
       serviceRequires = requires;
       uid = toString config.users.users.${user}.uid;
       gid = toString config.users.groups.${group}.gid;
       serviceRecord = addresses.records.${name};
       storageNames = extraStorage ++ lib.optional configStorage name;
-      dockerOptions = addresses.dockerOptions name;
-      isDocker = docker ? image || docker ? pullImage;
+      container = args.container // (if args.container ? pullImage then {
+        image = "${args.container.pullImage.finalImageName}:${args.container.pullImage.finalImageTag}";
+        imageFile = pkgs.dockerTools.pullImage args.container.pullImage;
+      } else { });
+      containerOptions = addresses.containerOptions name;
+      isContainer = container ? image;
 
-      # Shared service components used by both docker and systemd configs
+      # Shared service components used by both container and systemd configs
       requiresTarget = rec {
         requires = map (s: "service-storage-${s}-setup.service") storageNames;
         after = requires;
@@ -80,61 +84,50 @@ let
         startAt = "hourly";
       };
 
-      dockerConfig =
-        let
-          dockerImage =
-            if docker ? pullImage
-            then "${docker.pullImage.finalImageName}:${docker.pullImage.finalImageTag}"
-            else docker.image;
+      containerConfig = {
+        imports = [ ./container.nix extraConfig ] ++ map homelabServiceStorage storageNames;
 
-          dockerImageFile =
-            if docker ? pullImage
-            then pkgs.dockerTools.pullImage docker.pullImage
-            else docker.imageFile or null;
-        in
-        {
-          imports = [ ./docker.nix extraConfig ] ++ map homelabServiceStorage storageNames;
-
-          systemd = {
-            targets."${name}-requires" = requiresTarget;
-            services = {
-              "docker-${name}" = {
-                aliases = [ "${name}.service" ];
-                serviceConfig.Restart = pkgs.lib.mkForce "no";
-                postStop = "systemctl restart ${name}-backup";
-              };
-              "${name}-update" = lib.mkIf (!(docker ? imageFile || docker ? imageStream || docker ? pullImage)) {
-                path = [ pkgs.docker ];
-                script = ''
-                  if docker pull ${dockerImage} | grep "Status: Downloaded"
-                  then
-                    systemctl restart ${name}
-                  fi
-                '';
-                serviceConfig = { Type = "exec"; };
-                startAt = "hourly";
-              };
-              "${name}-backup" = backupService;
+        systemd = {
+          targets."${name}-requires" = requiresTarget;
+          services = {
+            "${name}" = {
+              aliases = [ "homelab-${name}.service" ];
+              serviceConfig.Restart = pkgs.lib.mkForce "no";
+              postStop = "systemctl restart ${name}-backup";
             };
+            "${name}-update" = lib.mkIf (!(container ? imageFile || container ? imageStream || container ? pullImage)) {
+              path = [ pkgs.docker ];
+              script = ''
+                if docker pull ${container.image} | grep "Status: Downloaded"
+                then
+                  systemctl restart ${name}
+                fi
+              '';
+              serviceConfig = { Type = "exec"; };
+              startAt = "hourly";
+            };
+            "${name}-backup" = backupService;
           };
-          virtualisation.oci-containers.containers.${name} = {
-            image = dockerImage;
-            autoStart = autoStart;
-            user = "${uid}:${gid}";
-            volumes =
-              (let v = docker.volumes or [ ]; in if isFunction v then v storagePath else v) ++
-                lib.optional configStorage "${storagePath name}:${docker.configVolume}";
-            extraOptions = docker.extraOptions or [ ] ++ dockerOptions;
-            entrypoint = docker.entrypoint or null;
-            cmd = docker.entrypointOptions or [ ];
-          }
-          // lib.optionalAttrs (dockerImageFile != null) { imageFile = dockerImageFile; }
-          // lib.optionalAttrs (docker ? imageStream) { inherit (docker) imageStream; }
-          // lib.optionalAttrs (docker ? dependsOn) { inherit (docker) dependsOn; }
-          // lib.optionalAttrs (docker ? environment) { inherit (docker) environment; }
-          // lib.optionalAttrs (docker ? environmentFiles) { inherit (docker) environmentFiles; }
-          // lib.optionalAttrs (docker ? ports) { inherit (docker) ports; };
         };
+        virtualisation.oci-containers.containers.${name} = {
+          serviceName = name;
+          image = container.image;
+          autoStart = autoStart;
+          user = "${uid}:${gid}";
+          volumes =
+            (let v = container.volumes or [ ]; in if isFunction v then v storagePath else v) ++
+              lib.optional configStorage "${storagePath name}:${container.configVolume}";
+          extraOptions = container.extraOptions or [ ] ++ containerOptions;
+          entrypoint = container.entrypoint or null;
+          cmd = container.entrypointOptions or [ ];
+        }
+        // lib.optionalAttrs (container ? imageFile) { inherit (container) imageFile; }
+        // lib.optionalAttrs (container ? imageStream) { inherit (container) imageStream; }
+        // lib.optionalAttrs (container ? dependsOn) { inherit (container) dependsOn; }
+        // lib.optionalAttrs (container ? environment) { inherit (container) environment; }
+        // lib.optionalAttrs (container ? environmentFiles) { inherit (container) environmentFiles; }
+        // lib.optionalAttrs (container ? ports) { inherit (container) ports; };
+      };
       systemdConfig =
         let
           useMacvlan = systemd.macvlan or false;
@@ -229,6 +222,7 @@ let
             targets."${name}-requires" = requiresTarget;
             services = {
               "${name}" = rec {
+                aliases = [ "homelab-${name}.service" ];
                 enable = true;
                 description = name;
                 wantedBy = lib.optional autoStart "multi-user.target";
@@ -239,7 +233,7 @@ let
                 after = requires;
                 path = systemd.path or [ ];
                 script = lib.optionalString (systemd ? script) (systemd.script {
-                  inherit name uid gid storagePath dockerOptions;
+                  inherit name uid gid storagePath containerOptions;
                   interface = if useMacvlan then macvlanInterfaceName else null;
                   ip = serviceRecord.ip;
                   ip6 = serviceRecord.ip6;
@@ -255,7 +249,7 @@ let
             allowedUDPPorts = systemd.udpPorts or [ ];
           };
         };
-      serviceConfig = if isDocker then dockerConfig else systemdConfig;
+      serviceConfig = if isContainer then containerConfig else systemdConfig;
     in
     if (machine.hostName == addresses.records.${name}.host) then serviceConfig else { };
   importService = n:

@@ -38,10 +38,11 @@ in
     systemctl-mqtt = {
       path = [
         pkgs.gawk
+        pkgs.gnused
         (pkgs.python3.pkgs.callPackage systemctlMqttPackage { })
       ];
       script = ''
-        systemctl-mqtt --mqtt-host mqtt.home.gustafson.me --mqtt-disable-tls --mqtt-username server --mqtt-password ${pw.mqtt.server} $(systemctl list-units --full --plain --no-legend --output=short docker-*.service | awk '{print "--monitor-system-unit " $1 " --control-system-unit " $1}')
+        systemctl-mqtt --mqtt-host mqtt.home.gustafson.me --mqtt-disable-tls --mqtt-username server --mqtt-password ${pw.mqtt.server} $(systemctl list-unit-files --all --full --plain --no-legend --output=short homelab-*.service | sed 's/^homelab-//' | awk '{print "--monitor-system-unit " $1 " --control-system-unit " $1}')
       '';
       serviceConfig = {
         Type = "simple";

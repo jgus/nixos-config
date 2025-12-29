@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... }:
+{ pkgs, lib, ... }:
 let
   addresses = import ./addresses.nix { inherit lib; };
   machine = import ./machine.nix;

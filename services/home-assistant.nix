@@ -459,16 +459,14 @@ let
 
 in
 {
-  docker = {
-    pullImage =
-      # nix-shell -p nix-prefetch-docker --run 'nix-prefetch-docker --quiet --image-name ghcr.io/home-assistant/home-assistant --image-tag stable'
-      {
-        imageName = "ghcr.io/home-assistant/home-assistant";
-        imageDigest = "sha256:75ef6851d2e48d366764cdb6b569b7ad8be77dcc8e0d1b9aa508ac90e42d4c58";
-        hash = "sha256-GvthMEINUllk65Xa83ZLa0u2NMJBVKeWENolJrvWmWM=";
-        finalImageName = "ghcr.io/home-assistant/home-assistant";
-        finalImageTag = "stable";
-      };
+  container = {
+    pullImage = {
+      imageName = "ghcr.io/home-assistant/home-assistant";
+      imageDigest = "sha256:75ef6851d2e48d366764cdb6b569b7ad8be77dcc8e0d1b9aa508ac90e42d4c58";
+      hash = "sha256-GvthMEINUllk65Xa83ZLa0u2NMJBVKeWENolJrvWmWM=";
+      finalImageName = "ghcr.io/home-assistant/home-assistant";
+      finalImageTag = "stable";
+    };
     configVolume = "/config";
     environment = {
       PUID = toString config.users.users.${user}.uid;

@@ -14,11 +14,9 @@ let
     )
     (builtins.attrNames serviceFiles);
 
-  # Helper to extract docker.pullImage from a service definition
   getPullImage = service:
-    if (service ? docker && service.docker ? pullImage) then [ service.docker.pullImage ] else [ ];
+    if (service ? container && service.container ? pullImage) then [ service.container.pullImage ] else [ ];
 
-  # Process a single service file
   pullImagesInFile = name:
     let
       contents = import (servicesDir + "/${name}") args;
