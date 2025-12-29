@@ -139,6 +139,324 @@ let
   secretsYaml = pkgs.writeText "secrets.yaml" ''
     doorbell_password: ${pw.doorbell}
   '';
+
+  # HTTP Configuration
+  httpYaml = (pkgs.formats.yaml { }).generate "http.yaml" {
+    use_x_forwarded_for = true;
+    trusted_proxies = [
+      addresses.nameToIp.web
+      addresses.nameToIp6.web
+      addresses.nameToIp.cloudflared
+      addresses.nameToIp6.cloudflared
+    ];
+  };
+
+  # Device ID Verification Automation
+  verifyDeviceIdsYaml = (pkgs.formats.yaml { }).generate "verify_device_ids.yaml" {
+    id = "verify_device_ids";
+    alias = "Verify Nix Device ID Map";
+    mode = "single";
+    triggers = [
+      {
+        trigger = "homeassistant";
+        event = "start";
+        id = "setup";
+      }
+    ];
+    actions = lib.lists.flatten (map
+      (entity_id:
+        let
+          device_id = (getAttr entity_id device_ids);
+        in
+        if (device_id == null) then [ ] else [
+          (
+            let
+              notification_id = "nix_device_id_incorrect_${replaceStrings ["."] ["_"] entity_id}";
+            in
+            {
+              "if" = "{{ device_id('${entity_id}') == '${device_id}' }}";
+              "then" = [{
+                action = "persistent_notification.dismiss";
+                data = {
+                  inherit notification_id;
+                };
+              }];
+              "else" = [{
+                action = "persistent_notification.create";
+                data = {
+                  message = "Entry should be: \"${entity_id}\" = \"{{ device_id('${entity_id}') }}\";";
+                  title = "Nix Device ID Map is incorrect for ${entity_id}";
+                  inherit notification_id;
+                };
+              }];
+            }
+          )
+        ]
+      )
+      (attrNames device_ids));
+  };
+
+  # Window Shade Automation Files
+  windowShadeFiles = lib.lists.flatten (map
+    (
+      w:
+      (if w.has_shade then [
+        {
+          name = "input_number/${w.target_name}.yaml";
+          path = pkgs.writeText "${w.target_name}.yaml" ''
+            min: 0
+            max: 100
+          '';
+        }
+        {
+          name = "input_boolean/${w.override_name}.yaml";
+          path = pkgs.writeText "${w.override_name}.yaml" ''
+            initial: false
+          '';
+        }
+        {
+          name = "automation/${w.shade_name}_auto_set.yaml";
+          path = (pkgs.formats.yaml { }).generate "${w.shade_name}_auto_set.yaml" {
+            alias = "${w.shade_name} auto set";
+            id = "${w.shade_name}_auto_set";
+            mode = "restart";
+            trigger = [
+              {
+                platform = "state";
+                entity_id = [ "input_number.${w.target_name}" ];
+              }
+              {
+                platform = "state";
+                entity_id = [ "input_boolean.${w.override_name}" ];
+                to = "off";
+              }
+            ] ++ (if w.opens then [
+              {
+                platform = "state";
+                entity_id = [ "binary_sensor.${w.window_name}" ];
+              }
+            ] else [ ]);
+            condition = [
+              {
+                condition = "state";
+                entity_id = "input_boolean.${w.override_name}";
+                state = "off";
+              }
+            ];
+            action = [
+              {
+                variables = {
+                  p = if w.opens then "{{ [states('input_number.${w.target_name}') | int, ${toString w.open_limit} if is_state('binary_sensor.${w.window_name}', 'on') else 0] | max }}" else "{{ states('input_number.${w.target_name}') | int }}";
+                };
+              }
+              {
+                service = "cover.set_cover_position";
+                target = { entity_id = "cover.${w.shade_name}"; };
+                data = { position = "{{ p }}"; };
+              }
+            ];
+          };
+        }
+        {
+          name = "automation/${w.shade_name}_user_set.yaml";
+          path = pkgs.writeText "${w.shade_name}_user_set.yaml" ''
+            alias: ${w.shade_name} user set
+            id: ${w.shade_name}_user_set
+            mode: restart
+            trigger:
+              - platform: state
+                entity_id:
+                  - cover.${w.shade_name}
+                attribute: current_position
+                for:
+                  seconds: 10
+            condition: >-
+              {% if ("current_position" not in trigger.from_state.attributes) or ("current_position" not in trigger.to_state.attributes) %}
+                false
+              {% else %}
+                {{ ([trigger.from_state.attributes.current_position | int, trigger.to_state.attributes.current_position | int, states('input_number.${w.target_name}') | int] | sort)[1] != (trigger.to_state.attributes.current_position | int) }}
+              {% endif %}
+            action:
+              - service: input_boolean.turn_on
+                target:
+                  entity_id: input_boolean.${w.override_name}
+          '';
+        }
+        {
+          name = "automation/${w.shade_name}_user_reset.yaml";
+          path = pkgs.writeText "${w.shade_name}_user_reset.yaml" ''
+            alias: ${w.shade_name} user reset
+            id: ${w.shade_name}_user_reset
+            mode: restart
+            trigger:
+              - platform: state
+                entity_id:
+                  - input_boolean.${w.override_name}
+                to: "on"
+                for:
+                  hours: 2
+            action:
+              - service: input_boolean.turn_off
+                target:
+                  entity_id: input_boolean.${w.override_name}
+          '';
+        }
+      ] else [ ])
+    )
+    windows);
+
+  # CEC Theater Device Command Files
+  cecCommandFiles = lib.lists.flatten (map
+    (
+      i:
+      lib.lists.flatten (map
+        (
+          j:
+          [
+            {
+              name = "shell_command/cec_${i.device}_${j.command}.yaml";
+              path = pkgs.writeText "cec_${i.device}_${j.command}.yaml" ''
+                (echo 'tx 1${i.index}:44:${j.code}'; sleep 0.050s; echo 'tx 1${i.index}:45') | nc -uw1 theater-cec 9526
+              '';
+            }
+          ]
+        )
+        cec_map)
+    )
+    theater_devices);
+
+  # Light Group Files
+  lightGroupFiles = lib.lists.flatten (map
+    (
+      k:
+      let
+        group_id = "${replaceStrings [" "] ["_"] (lib.strings.toLower k)}_light_group";
+        entities = (getAttr k light_groups);
+        devices = lib.lists.flatten (map (e: if ((getAttr e device_ids) != null) then [ (getAttr e device_ids) ] else [ ]) entities);
+      in
+      [
+        {
+          name = "light/${group_id}.yaml";
+          path = (pkgs.formats.yaml { }).generate "${group_id}.yaml" {
+            platform = "group";
+            unique_id = "${group_id}";
+            name = "${k} Light Group";
+            all = true;
+            entities = filter (e: (match ".*_virtual.*" e) == null) entities;
+          };
+        }
+        {
+          name = "automation/${group_id}.yaml";
+          path = (pkgs.formats.yaml { }).generate "${group_id}.yaml" {
+            id = "${group_id}";
+            alias = "${k} Light Group";
+            mode = "restart";
+            triggers = [
+              {
+                trigger = "homeassistant";
+                event = "start";
+                id = "setup";
+              }
+            ] ++
+            (map
+              (i: {
+                device_id = i;
+                domain = "zwave_js";
+                type = "event.value_notification.central_scene";
+                property = "scene";
+                property_key = "001";
+                endpoint = 0;
+                command_class = 91;
+                subtype = "Endpoint 0 Scene 001";
+                trigger = "device";
+                value = 3;
+                id = "on";
+              })
+              devices) ++
+            (map
+              (i: {
+                device_id = i;
+                domain = "zwave_js";
+                type = "event.value_notification.central_scene";
+                property = "scene";
+                property_key = "002";
+                endpoint = 0;
+                command_class = 91;
+                subtype = "Endpoint 0 Scene 002";
+                trigger = "device";
+                value = 3;
+                id = "off";
+              })
+              devices);
+            actions = [{
+              choose = [
+                {
+                  conditions = [{ condition = "trigger"; id = [ "setup" ]; }];
+                  sequence = (map
+                    (i: {
+                      action = "zwave_js.set_config_parameter";
+                      data = {
+                        device_id = devices;
+                      } // i;
+                    })
+                    [
+                      {
+                        parameter = 32; # LED Indicator: Confirm Configuration Change
+                        value = 1; # Disable
+                      }
+                      {
+                        parameter = 12; # Double-Tap Upper Paddle Behavior
+                        value = 3; # Disable
+                      }
+                      {
+                        parameter = 13; # Scene Control
+                        value = 1; # Enable
+                      }
+                      {
+                        parameter = 26; # Local Programming
+                        value = 1; # Disable
+                      }
+                    ]);
+                }
+                {
+                  conditions = [{ condition = "trigger"; id = [ "on" ]; }];
+                  sequence = [{
+                    action = "light.turn_on";
+                    data = { brightness_pct = "100"; };
+                    target = { entity_id = "light.${group_id}"; };
+                  }];
+                }
+                {
+                  conditions = [{ condition = "trigger"; id = [ "off" ]; }];
+                  sequence = [{
+                    action = "light.turn_off";
+                    target = { entity_id = "light.${group_id}"; };
+                  }];
+                }
+              ];
+            }];
+          };
+        }
+      ]
+    )
+    (attrNames light_groups));
+
+  # Create linkFarm with symlinks (single source of truth for file structure)
+  haConfigSymlinks = pkgs.linkFarm "home-assistant-config-links" (
+    [
+      { name = "http.yaml"; path = httpYaml; }
+      { name = "automation/verify_device_ids.yaml"; path = verifyDeviceIdsYaml; }
+    ]
+    ++ windowShadeFiles
+    ++ cecCommandFiles
+    ++ lightGroupFiles
+  );
+
+  # Copy with dereferencing to resolve symlinks into actual files for Docker
+  haConfigFiles = pkgs.runCommandLocal "home-assistant-config" { } ''
+    cp -rL ${haConfigSymlinks} $out
+  '';
+
 in
 {
   docker = {
@@ -159,7 +477,7 @@ in
       VERSION = "latest";
     };
     volumes = [
-      "/etc/${name}:/config/etc:ro"
+      "${haConfigFiles}:/config/etc:ro"
       "${secretsYaml}:/config/secrets.yaml:ro"
       "/etc/static:/etc/static:ro"
       "/nix/store:/nix/store:ro"
@@ -168,314 +486,5 @@ in
     extraOptions = [
       "--privileged"
     ];
-  };
-  extraConfig = {
-    environment.etc = {
-      "${name}/http.yaml" = {
-        source = (pkgs.formats.yaml { }).generate "http.yaml" {
-          use_x_forwarded_for = true;
-          trusted_proxies = [
-            addresses.nameToIp.web
-            addresses.nameToIp6.web
-            addresses.nameToIp.cloudflared
-            addresses.nameToIp6.cloudflared
-          ];
-        };
-      };
-      "${name}/automation/verify_device_ids.yaml" = {
-        source = (pkgs.formats.yaml { }).generate "verify_device_ids.yaml" {
-          id = "verify_device_ids";
-          alias = "Verify Nix Device ID Map";
-          mode = "single";
-          triggers =
-            [{
-              trigger = "homeassistant";
-              event = "start";
-              id = "setup";
-            }];
-          actions = lib.lists.flatten (map
-            (entity_id:
-              let
-                device_id = (getAttr entity_id device_ids);
-              in
-              if (device_id == null) then [ ] else [
-                (
-                  let
-                    notification_id = "nix_device_id_incorrect_${replaceStrings ["."] ["_"] entity_id}";
-                  in
-                  {
-                    "if" = "{{ device_id('${entity_id}') == '${device_id}' }}";
-                    "then" = [{
-                      action = "persistent_notification.dismiss";
-                      data = {
-                        inherit notification_id;
-                      };
-                    }];
-                    "else" = [{
-                      action = "persistent_notification.create";
-                      data = {
-                        message = "Entry should be: \"${entity_id}\" = \"{{ device_id('${entity_id}') }}\";";
-                        title = "Nix Device ID Map is incorrect for ${entity_id}";
-                        inherit notification_id;
-                      };
-                    }];
-                  }
-                )
-              ]
-            )
-            (attrNames device_ids));
-        };
-      };
-    }
-    //
-    listToAttrs (lib.lists.flatten (map
-      (
-        w:
-        (if w.has_shade then [
-          {
-            name = "${name}/input_number/${w.target_name}.yaml";
-            value = {
-              text = ''
-                min: 0
-                max: 100
-              '';
-            };
-          }
-          {
-            name = "${name}/input_boolean/${w.override_name}.yaml";
-            value = { text = "initial: false"; };
-          }
-          {
-            name = "${name}/automation/${w.shade_name}_auto_set.yaml";
-            value = {
-              source = (pkgs.formats.yaml { }).generate "${w.shade_name}_auto_set.yaml" {
-                alias = "${w.shade_name} auto set";
-                id = "${w.shade_name}_auto_set";
-                mode = "restart";
-                trigger = [
-                  {
-                    platform = "state";
-                    entity_id = [ "input_number.${w.target_name}" ];
-                  }
-                  {
-                    platform = "state";
-                    entity_id = [ "input_boolean.${w.override_name}" ];
-                    to = "off";
-                  }
-                ] ++ (if w.opens then [
-                  {
-                    platform = "state";
-                    entity_id = [ "binary_sensor.${w.window_name}" ];
-                  }
-                ] else [ ]);
-                condition = [
-                  {
-                    condition = "state";
-                    entity_id = "input_boolean.${w.override_name}";
-                    state = "off";
-                  }
-                ];
-                action = [
-                  {
-                    variables = {
-                      p = if w.opens then "{{ [states('input_number.${w.target_name}') | int, ${toString w.open_limit} if is_state('binary_sensor.${w.window_name}', 'on') else 0] | max }}" else "{{ states('input_number.${w.target_name}') | int }}";
-                    };
-                  }
-                  {
-                    service = "cover.set_cover_position";
-                    target = { entity_id = "cover.${w.shade_name}"; };
-                    data = { position = "{{ p }}"; };
-                  }
-                ];
-              };
-            };
-          }
-          {
-            name = "${name}/automation/${w.shade_name}_user_set.yaml";
-            value = {
-              text = ''
-                alias: ${w.shade_name} user set
-                id: ${w.shade_name}_user_set
-                mode: restart
-                trigger:
-                  - platform: state
-                    entity_id:
-                      - cover.${w.shade_name}
-                    attribute: current_position
-                    for:
-                      seconds: 10
-                condition: >-
-                  {% if ("current_position" not in trigger.from_state.attributes) or ("current_position" not in trigger.to_state.attributes) %}
-                    false
-                  {% else %}
-                    {{ ([trigger.from_state.attributes.current_position | int, trigger.to_state.attributes.current_position | int, states('input_number.${w.target_name}') | int] | sort)[1] != (trigger.to_state.attributes.current_position | int) }}
-                  {% endif %}
-                action:
-                  - service: input_boolean.turn_on
-                    target:
-                      entity_id: input_boolean.${w.override_name}
-              '';
-            };
-          }
-          {
-            name = "${name}/automation/${w.shade_name}_user_reset.yaml";
-            value = {
-              text = ''
-                alias: ${w.shade_name} user reset
-                id: ${w.shade_name}_user_reset
-                mode: restart
-                trigger:
-                  - platform: state
-                    entity_id:
-                      - input_boolean.${w.override_name}
-                    to: "on"
-                    for:
-                      hours: 2
-                action:
-                  - service: input_boolean.turn_off
-                    target:
-                      entity_id: input_boolean.${w.override_name}
-              '';
-            };
-          }
-        ] else [ ])
-      )
-      windows))
-    //
-    listToAttrs (lib.lists.flatten (map
-      (
-        i: lib.lists.flatten (map
-          (
-            j: [
-              {
-                name = "${name}/shell_command/cec_${i.device}_${j.command}.yaml";
-                value = {
-                  text = "(echo 'tx 1${i.index}:44:${j.code}'; sleep 0.050s; echo 'tx 1${i.index}:45') | nc -uw1 theater-cec 9526";
-                };
-              }
-            ]
-          )
-          cec_map)
-      )
-      theater_devices))
-    //
-    listToAttrs (lib.lists.flatten (map
-      (
-        k:
-        let
-          group_id = "${replaceStrings [" "] ["_"] (lib.strings.toLower k)}_light_group";
-          entities = (getAttr k light_groups);
-          devices = lib.lists.flatten (map (e: if ((getAttr e device_ids) != null) then [ (getAttr e device_ids) ] else [ ]) entities);
-        in
-        [
-          {
-            name = "${name}/light/${group_id}.yaml";
-            value = {
-              source = (pkgs.formats.yaml { }).generate "${group_id}.yaml" {
-                platform = "group";
-                unique_id = "${group_id}";
-                name = "${k} Light Group";
-                all = true;
-                entities = filter (e: (match ".*_virtual.*" e) == null) entities;
-              };
-            };
-          }
-          {
-            name = "${name}/automation/${group_id}.yaml";
-            value = {
-              source = (pkgs.formats.yaml { }).generate "${group_id}.yaml" {
-                id = "${group_id}";
-                alias = "${k} Light Group";
-                mode = "restart";
-                triggers =
-                  [{
-                    trigger = "homeassistant";
-                    event = "start";
-                    id = "setup";
-                  }]
-                  ++
-                  (map
-                    (i: {
-                      device_id = i;
-                      domain = "zwave_js";
-                      type = "event.value_notification.central_scene";
-                      property = "scene";
-                      property_key = "001";
-                      endpoint = 0;
-                      command_class = 91;
-                      subtype = "Endpoint 0 Scene 001";
-                      trigger = "device";
-                      value = 3;
-                      id = "on";
-                    })
-                    devices)
-                  ++
-                  (map
-                    (i: {
-                      device_id = i;
-                      domain = "zwave_js";
-                      type = "event.value_notification.central_scene";
-                      property = "scene";
-                      property_key = "002";
-                      endpoint = 0;
-                      command_class = 91;
-                      subtype = "Endpoint 0 Scene 002";
-                      trigger = "device";
-                      value = 3;
-                      id = "off";
-                    })
-                    devices);
-                actions = [{
-                  choose = [
-                    {
-                      conditions = [{ condition = "trigger"; id = [ "setup" ]; }];
-                      sequence = (map
-                        (i: {
-                          action = "zwave_js.set_config_parameter";
-                          data = {
-                            device_id = devices;
-                          } // i;
-                        }) [
-                        {
-                          parameter = 32; # LED Indicator: Confirm Configuration Change
-                          value = 1; # Disable
-                        }
-                        {
-                          parameter = 12; # Double-Tap Upper Paddle Behavior
-                          value = 3; # Disable
-                        }
-                        {
-                          parameter = 13; # Scene Control
-                          value = 1; # Enable
-                        }
-                        {
-                          parameter = 26; # Local Programming
-                          value = 1; # Disable
-                        }
-                      ]);
-                    }
-                    {
-                      conditions = [{ condition = "trigger"; id = [ "on" ]; }];
-                      sequence = [{
-                        action = "light.turn_on";
-                        data = { brightness_pct = "100"; };
-                        target = { entity_id = "light.${group_id}"; };
-                      }];
-                    }
-                    {
-                      conditions = [{ condition = "trigger"; id = [ "off" ]; }];
-                      sequence = [{
-                        action = "light.turn_off";
-                        target = { entity_id = "light.${group_id}"; };
-                      }];
-                    }
-                  ];
-                }];
-              };
-            };
-          }
-        ]
-      )
-      (attrNames light_groups)));
   };
 }
