@@ -147,7 +147,7 @@ Note that any given service maybe be _either_ a docker service (contains the `do
   - `ip6`: IPv6 address
   - `interface`: Network interface name (if macvlan enabled)
   - `storagePath`: Function to get storage path for a service
-  - `dockerOptions`: Additional Docker options
+  - `containerOptions`: Additional Docker options
 
 ### Docker Service Examples
 

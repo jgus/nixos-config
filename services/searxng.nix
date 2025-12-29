@@ -15,16 +15,14 @@ let
 in
 { pkgs, ... }:
 {
-  docker = {
-    pullImage =
-      # nix-shell -p nix-prefetch-docker --run 'nix-prefetch-docker --quiet --image-name docker.io/searxng/searxng --image-tag latest'
-      {
-        imageName = "docker.io/searxng/searxng";
-        imageDigest = "sha256:8d98d5c1b678714c3b20dacfab5ea5e3b67f79e50df6d5dbc92ed4f0a964ccbd";
-        hash = "sha256-FYn1E9WUVdrjboXP4rTdCzAcskMW+NcnAbJn6dYvhH0=";
-        finalImageName = "docker.io/searxng/searxng";
-        finalImageTag = "latest";
-      };
+  container = {
+    pullImage = {
+      imageName = "docker.io/searxng/searxng";
+      imageDigest = "sha256:8d98d5c1b678714c3b20dacfab5ea5e3b67f79e50df6d5dbc92ed4f0a964ccbd";
+      hash = "sha256-FYn1E9WUVdrjboXP4rTdCzAcskMW+NcnAbJn6dYvhH0=";
+      finalImageName = "docker.io/searxng/searxng";
+      finalImageTag = "latest";
+    };
     ports = [
       "8080"
     ];

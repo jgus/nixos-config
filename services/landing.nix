@@ -82,7 +82,7 @@ let
 in
 {
   configStorage = false;
-  docker = {
+  container = {
     image = "landing:latest";
     imageFile = landingImage;
   };

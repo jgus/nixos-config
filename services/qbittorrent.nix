@@ -5,16 +5,14 @@ in
 { config, ... }:
 {
   requires = [ "storage-scratch.mount" ];
-  docker = {
-    pullImage =
-      # nix-shell -p nix-prefetch-docker --run 'nix-prefetch-docker --quiet --image-name lscr.io/linuxserver/qbittorrent --image-tag latest'
-      {
-        imageName = "lscr.io/linuxserver/qbittorrent";
-        imageDigest = "sha256:1497b6e047ad47b738f94739219f0e5c5b2ad7a5953b7cf0050f2fedddd8c601";
-        hash = "sha256-PUapqpJ6rZjWmmvKzJS2vYNC0Ew0UdM+Y1Z8Epk3V3o=";
-        finalImageName = "lscr.io/linuxserver/qbittorrent";
-        finalImageTag = "latest";
-      };
+  container = {
+    pullImage = {
+      imageName = "lscr.io/linuxserver/qbittorrent";
+      imageDigest = "sha256:1497b6e047ad47b738f94739219f0e5c5b2ad7a5953b7cf0050f2fedddd8c601";
+      hash = "sha256-PUapqpJ6rZjWmmvKzJS2vYNC0Ew0UdM+Y1Z8Epk3V3o=";
+      finalImageName = "lscr.io/linuxserver/qbittorrent";
+      finalImageTag = "latest";
+    };
     environment = {
       PUID = toString config.users.users.${user}.uid;
       PGID = toString config.users.groups.${group}.gid;

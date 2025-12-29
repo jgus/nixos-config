@@ -6,7 +6,7 @@ let
   script = pkgs.writeShellScript "image-update-check" (''
     set -e
     
-    echo "Checking Docker images for updates..."
+    echo "Checking Container images for updates..."
 
     tmpfile=$(${pkgs.coreutils}/bin/mktemp)
     exec 3<>"$tmpfile"
@@ -42,7 +42,7 @@ let
         cat /dev/fd/3
       } | ${pkgs.msmtp}/bin/msmtp "j@gustafson.me"
     else
-      echo "All Docker images are up to date."
+      echo "All Container images are up to date."
     fi
   '');
 in

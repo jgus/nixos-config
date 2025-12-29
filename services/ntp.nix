@@ -1,16 +1,14 @@
 { ... }:
 {
   configStorage = false;
-  docker = {
-    pullImage =
-      # nix-shell -p nix-prefetch-docker --run 'nix-prefetch-docker --quiet --image-name cturra/ntp --image-tag latest'
-      {
-        imageName = "cturra/ntp";
-        imageDigest = "sha256:7224d4e7c7833aabbcb7dd70c46c8a8dcccda365314c6db047b9b10403ace3bc";
-        hash = "sha256-gJ4Ylre/p2B21fZVF5J2m++KS2J70oQ1YJ3FCk8BU34=";
-        finalImageName = "cturra/ntp";
-        finalImageTag = "latest";
-      };
+  container = {
+    pullImage = {
+      imageName = "cturra/ntp";
+      imageDigest = "sha256:7224d4e7c7833aabbcb7dd70c46c8a8dcccda365314c6db047b9b10403ace3bc";
+      hash = "sha256-gJ4Ylre/p2B21fZVF5J2m++KS2J70oQ1YJ3FCk8BU34=";
+      finalImageName = "cturra/ntp";
+      finalImageTag = "latest";
+    };
     ports = [
       "123/udp"
     ];
