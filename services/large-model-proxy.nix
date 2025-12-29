@@ -189,7 +189,7 @@ let
     ]
     ++
     # Llama.cpp Services
-    (lib.imap0 llamaCppService [
+    (lib.imap0 llamaCppService ([
       # https://docs.unsloth.ai/models/deepseek-v3.1-how-to-run-locally
       {
         name = "deepseek-v3-terminus";
@@ -298,25 +298,30 @@ let
           "--special"
         ];
       }
-
-      # https://docs.unsloth.ai/models/glm-4.7
-      {
-        name = "glm-4.7";
-        displayName = "GLM 4.7";
-        model = "unsloth/GLM-4.7-GGUF:Q2_K_XL";
-        gpu = true;
-        resourceRequirements = {
-          VRAM-1 = 22;
-          RAM = 188;
-        };
-        contextSize = 96 * 1024;
-        extraLlamaCppArgs = [
-          # Sampling Parameters
-          "--temp 1.0"
-          "--top-p 0.95"
-        ];
-      }
-
+    ]
+    ++
+    (map
+      (q:
+        # https://docs.unsloth.ai/models/glm-4.7
+        {
+          name = "glm-4.7-q${toString q}";
+          displayName = "GLM 4.7 Q${toString q}";
+          model = "unsloth/GLM-4.7-GGUF:Q${toString q}_K_XL";
+          gpu = true;
+          resourceRequirements = {
+            VRAM-1 = 22;
+            RAM = 188;
+          };
+          contextSize = 96 * 1024;
+          extraLlamaCppArgs = [
+            # Sampling Parameters
+            "--temp 1.0"
+            "--top-p 0.95"
+          ];
+        }
+      ) [ 2 3 4 ])
+    ++
+    [
       # https://docs.unsloth.ai/models/glm-4.6-how-to-run-locally
       {
         name = "glm-4.6";
@@ -513,7 +518,7 @@ let
           VRAM-1 = 24;
         };
       }
-    ]);
+    ]));
   };
 in
 {
