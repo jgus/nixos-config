@@ -97,6 +97,7 @@ map
       extraOptions = [
         "--shm-size=1g"
         "--cap-add=NET_ADMIN"
+        "--cap-add=NET_RAW"
         "--tmpfs=/etc/pihole"
       ]
       ++
