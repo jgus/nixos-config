@@ -60,9 +60,10 @@ let
       gid = toString config.users.groups.${group}.gid;
       serviceRecord = addresses.records.${name};
       storageNames = extraStorage ++ lib.optional configStorage name;
-      container = args.container // (if args.container ? pullImage then {
-        image = "${args.container.pullImage.finalImageName}:${args.container.pullImage.finalImageTag}";
-        imageFile = pkgs.dockerTools.pullImage args.container.pullImage;
+      argsContainer = args.container or { };
+      container = argsContainer // (if argsContainer ? pullImage then {
+        image = "${argsContainer.pullImage.finalImageName}:${argsContainer.pullImage.finalImageTag}";
+        imageFile = pkgs.dockerTools.pullImage argsContainer.pullImage;
       } else { });
       containerOptions = addresses.containerOptions name;
       isContainer = container ? image;
