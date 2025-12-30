@@ -3,17 +3,16 @@ with builtins;
 let
   pw = import ./../../.secrets/passwords.nix;
   addresses = import ./../../addresses.nix { inherit lib; };
+  container = import ./container.nix { inherit pkgs lib; };
   image = "ghcr.io/lovelaze/nebula-sync:latest";
 in
 {
   systemd.services = {
     nebula-sync = {
-      path = with pkgs; [
-        docker
-      ];
+      path = [ container.package ];
       script = ''
-        docker pull ${image}
-        docker run --rm \
+        ${container.executable} pull ${image}
+        ${container.executable} run --rm \
         --name nebula-sync \
         -e PRIMARY="http://pihole-1|${pw.pihole}" \
         -e REPLICAS="http://pihole-2|${pw.pihole},http://pihole-3|${pw.pihole}" \

@@ -452,7 +452,7 @@ let
     ++ lightGroupFiles
   );
 
-  # Copy with dereferencing to resolve symlinks into actual files for Docker
+  # Copy with dereferencing to resolve symlinks into actual files for container mount
   haConfigFiles = pkgs.runCommandLocal "home-assistant-config" { } ''
     cp -rL ${haConfigSymlinks} $out
   '';

@@ -3,6 +3,7 @@
 { pkgs, lib, ... }:
 let
   machine = import ../machine.nix;
+  container = import ./container.nix { inherit pkgs lib; };
   numaCpusStrs = map (cpuSet: lib.concatMapStringsSep "," toString cpuSet) machine.numaCpus;
   numaCpusNearGpu1 = (builtins.elemAt numaCpusStrs 1);
   numaCpusNotNearGpu1 = (builtins.elemAt numaCpusStrs 0);
@@ -60,10 +61,10 @@ let
       launchScript = pkgs.writeShellScript "launch" ''
         set -e
             
-        docker pull ${containerImage}
+        ${container.executable} pull ${containerImage}
             
         # Run container
-        exec docker run \
+        exec ${container.executable} run \
           --rm \
           --read-only \
           --name=${containerName} \
@@ -100,10 +101,10 @@ let
       ProxyTargetPort = toString localPort;
       Command = toString launchScript;
       Args = "";
-      HealthcheckCommand = "docker exec ${containerName} curl --fail http://localhost:${toString localPort}/health";
+      HealthcheckCommand = "${container.executable} exec ${containerName} curl --fail http://localhost:${toString localPort}/health";
       HealthcheckIntervalMilliseconds = 10000;
       StartupTimeoutMilliseconds = (loadTimeSeconds + initTimeSeconds) * 1000;
-      KillCommand = "docker stop ${containerName}";
+      KillCommand = "${container.executable} stop ${containerName}";
       RestartOnConnectionFailure = true;
       ResourceRequirements = service.resourceRequirements;
     };
@@ -151,10 +152,10 @@ let
             set -e
             
             # Build Image
-            docker build -t comfyui:local ${./large-model-proxy/comfyui}
+            ${container.executable} build -t comfyui:local ${./large-model-proxy/comfyui}
             
             # Run
-            exec docker run \
+            exec ${container.executable} run \
               --rm \
               --name=${containerName} \
               --network=${containerNetworkName} \
@@ -174,10 +175,10 @@ let
           ProxyTargetPort = toString localPort;
           Command = toString launchScript;
           Args = "";
-          HealthcheckCommand = "docker exec ${containerName} curl --fail http://localhost:${toString localPort}";
+          HealthcheckCommand = "${container.executable} exec ${containerName} curl --fail http://localhost:${toString localPort}";
           HealthcheckIntervalMilliseconds = 10000;
           StartupTimeoutMilliseconds = 30 * 60 * 1000; # 5 minutes for first build
-          KillCommand = "docker stop -t 5 ${containerName}"; # Graceful shutdown
+          KillCommand = "${container.executable} stop -t 5 ${containerName}"; # Graceful shutdown
           RestartOnConnectionFailure = true;
           ShutDownAfterInactivitySeconds = 600;
           ResourceRequirements = {
@@ -545,12 +546,12 @@ in
     extraStorage = [ "comfyui " ];
     macvlan = true;
     tcpPorts = [ 80 8080 8188 ];
-    path = [ largeModelProxyPackage pkgs.curl pkgs.docker pkgs.bash ];
+    path = [ largeModelProxyPackage pkgs.curl container.package pkgs.bash ];
     script = { interface, ip, ip6, storagePath, name, ... }: ''
       # Create dedicated Container network for LMP if it doesn't exist
-      if ! docker network inspect ${containerNetworkName} >/dev/null 2>&1; then
+      if ! ${container.executable} network inspect ${containerNetworkName} >/dev/null 2>&1; then
         echo "Creating Container network: ${containerNetworkName}"
-        docker network create --driver=bridge --subnet=${containerNetworkPrefix}0/24 --gateway=${containerNetworkPrefix}1 ${containerNetworkName}
+        ${container.executable} network create --driver=bridge --subnet=${containerNetworkPrefix}0/24 --gateway=${containerNetworkPrefix}1 ${containerNetworkName}
       fi
 
       cd ${storagePath name}

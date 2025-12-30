@@ -8,6 +8,7 @@ in
 args@{ pkgs, lib, ... }:
 let
   addresses = import ./addresses.nix { inherit lib; };
+  containerImport = import ./container.nix { inherit pkgs lib; };
   serviceNames = map (n: lib.strings.removeSuffix ".nix" n) (filter (n: serviceDir.${n} == "regular" && (lib.strings.hasSuffix ".nix" n) && !(lib.strings.hasPrefix "." n)) (attrNames serviceDir));
   homelabServiceStorage = name:
     let
@@ -86,7 +87,10 @@ let
       };
 
       containerConfig = {
-        imports = [ ./container.nix extraConfig ] ++ map homelabServiceStorage storageNames;
+        imports = [
+          containerImport.config
+          extraConfig
+        ] ++ map homelabServiceStorage storageNames;
 
         systemd = {
           targets."${name}-requires" = requiresTarget;
@@ -97,9 +101,9 @@ let
               postStop = "systemctl restart ${name}-backup";
             };
             "${name}-update" = lib.mkIf (!(container ? imageFile || container ? imageStream || container ? pullImage)) {
-              path = [ pkgs.docker ];
+              path = [ containerConfig.package ];
               script = ''
-                if docker pull ${container.image} | grep "Status: Downloaded"
+                if ${containerConfig.executable} pull ${container.image} | grep "Status: Downloaded"
                 then
                   systemctl restart ${name}
                 fi
