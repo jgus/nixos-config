@@ -18,7 +18,7 @@ This file provides guidance to agents when working with code in this repository.
   MACHINE_ID="c1-2" nix-build '<nixpkgs/nixos>' -A config.system.build.toplevel
   ```
 - **Cross-machine deployment**: Use `./bin/nixos-deploy-all.sh` to build/test/switch all machines
-- **Service types**: Each service is EITHER docker-based OR systemd-based, never both
+- **Service types**: Each service is EITHER container-based OR systemd-based, never both
 
 ### Networking
 
@@ -61,7 +61,7 @@ For your information, but NOT FOR AGENT USE
 ## Non-Obvious Code Patterns
 
 1. **Dynamic MAC address generation**: MAC addresses auto-generated from group/ID in `addresses.nix`
-2. **Docker options**: All docker services use macvlan with specific IP/MAC assignment
+2. **Container options**: All container services use macvlan with specific IP/MAC assignment
 3. **Service discovery**: `addresses.nix` is the source of truth for service-to-host mapping
 4. **ZFS snapshot management**: Custom scripts in `bin/functions.sh` for snapshot operations
 5. **Cross-machine deployments**: Cross-machine builds are cached via GC roots in `/etc/nixos/gcroots/`

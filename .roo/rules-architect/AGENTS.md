@@ -6,4 +6,4 @@
 - Custom routing tables (1000+) are used for macvlan services to prevent route conflicts
 - Service storage is automatically created as ZFS datasets when ZFS is available
 - All service storage is backed up hourly via rsync to backup paths
-- Docker and systemd services cannot be mixed in the same service definition
+- Container and systemd services cannot be mixed in the same service definition

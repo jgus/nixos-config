@@ -8,9 +8,9 @@ let
   numaCpusNotNearGpu1 = (builtins.elemAt numaCpusStrs 0);
   numaCpuCountPerNode = builtins.length (builtins.elemAt machine.numaCpus 0);
 
-  # Docker network configuration
-  dockerNetworkName = "lmp-network";
-  dockerNetworkPrefix = "192.168.88.";
+  # Container network configuration
+  containerNetworkName = "lmp-network";
+  containerNetworkPrefix = "192.168.88.";
 
   version = "jgus";
   # To update hashes when version changes:
@@ -51,29 +51,29 @@ let
   llamaCppService = i: service:
     let
       localPort = service.localPort or 8080;
-      ip = "${dockerNetworkPrefix}${toString (llamaCppBaseIpSuffix + i)}";
+      ip = "${containerNetworkPrefix}${toString (llamaCppBaseIpSuffix + i)}";
       containerName = "lmp-${service.name}";
       gpu = service.gpu;
       loadTimeSeconds = builtins.ceil (((service.resourceRequirements.VRAM-1 or 0) + (service.resourceRequirements.RAM or 0)) / 0.400);
       initTimeSeconds = 10 * 60;
-      dockerImage = "ghcr.io/ggml-org/llama.cpp:${if gpu then "server-cuda" else "server"}";
+      containerImage = "ghcr.io/ggml-org/llama.cpp:${if gpu then "server-cuda" else "server"}";
       launchScript = pkgs.writeShellScript "launch" ''
         set -e
             
-        docker pull ${dockerImage}
+        docker pull ${containerImage}
             
         # Run container
         exec docker run \
           --rm \
           --read-only \
           --name=${containerName} \
-          --network=${dockerNetworkName} \
+          --network=${containerNetworkName} \
           --ip=${ip} \
           ${(lib.optionalString gpu "--device=nvidia.com/gpu=GPU-8bb9f199-be89-462d-8e68-6ba4fe870ce4")} \
           --cap-add IPC_LOCK \
           --cpuset-cpus="${if gpu then numaCpusNearGpu1 else numaCpusNotNearGpu1}" \
           -v /storage/llama.cpp:/root/.cache/llama.cpp \
-          ${dockerImage} \
+          ${containerImage} \
           --port ${toString localPort} \
           --threads ${toString numaCpuCountPerNode} \
           --threads-batch ${toString numaCpuCountPerNode} \
@@ -145,7 +145,7 @@ let
         let
           localPort = 8188;
           exposePort = 8188;
-          ip = "${dockerNetworkPrefix}2";
+          ip = "${containerNetworkPrefix}2";
           containerName = "lmp-comfyui";
           launchScript = pkgs.writeShellScript "comfyui-launch" ''
             set -e
@@ -157,7 +157,7 @@ let
             exec docker run \
               --rm \
               --name=${containerName} \
-              --network=${dockerNetworkName} \
+              --network=${containerNetworkName} \
               --ip=${ip} \
               --device=nvidia.com/gpu=GPU-8bb9f199-be89-462d-8e68-6ba4fe870ce4 \
               -v /storage/comfyui/models:/app/comfyui/models \
@@ -547,10 +547,10 @@ in
     tcpPorts = [ 80 8080 8188 ];
     path = [ largeModelProxyPackage pkgs.curl pkgs.docker pkgs.bash ];
     script = { interface, ip, ip6, storagePath, name, ... }: ''
-      # Create dedicated Docker network for LMP if it doesn't exist
-      if ! docker network inspect ${dockerNetworkName} >/dev/null 2>&1; then
-        echo "Creating Docker network: ${dockerNetworkName}"
-        docker network create --driver=bridge --subnet=${dockerNetworkPrefix}0/24 --gateway=${dockerNetworkPrefix}1 ${dockerNetworkName}
+      # Create dedicated Container network for LMP if it doesn't exist
+      if ! docker network inspect ${containerNetworkName} >/dev/null 2>&1; then
+        echo "Creating Container network: ${containerNetworkName}"
+        docker network create --driver=bridge --subnet=${containerNetworkPrefix}0/24 --gateway=${containerNetworkPrefix}1 ${containerNetworkName}
       fi
 
       cd ${storagePath name}

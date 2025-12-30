@@ -7,7 +7,7 @@ A declarative, reproducible NixOS configuration for managing a home lab environm
 This repository contains NixOS configurations for managing a home lab infrastructure with:
 - Multiple physical servers (x86_64 and ARM/RPi)
 - ZFS storage pools
-- Docker-based service deployment
+- Container-based service deployment
 - Home automation integration
 - Media server capabilities
 - Network services and monitoring
@@ -41,7 +41,7 @@ See `addresses.nix` for source of truth
 - Service configurations in `services/` directory
 
 ### Service Management
-- **Docker-based deployment**: Most services run in containers
+- **Container-based deployment**: Most services run in containers
 - **macvlan networking**: Each service gets its own MAC address and IP
 - **Automatic backups**: Service data is backed up automatically
 - **Storage management**: ZFS integration for snapshots and backups
@@ -115,24 +115,24 @@ Each service definition record has the following possible attributes:
 - **`requires`**: Service dependencies (systemd units or mount points)
 - **`autoStart`**: Whether to start automatically (default: true)
 - **`extraConfig`**: Additional Nix configuration (merged into the main config)
-- **`docker`**: If present, this is a docker-based service; see below for details
-- **`systemd`**: If present, this is _not_ a docker-based service, but a more generic systemd service; see below for details
+- **`container`**: If present, this is a container-based service; see below for details
+- **`systemd`**: If present, this is _not_ a container-based service, but a more generic systemd service; see below for details
 
-Note that any given service maybe be _either_ a docker service (contains the `docker` attribute) _or_ a generic systemd service (contains the `systemd` attribute) but _not_ both. A service _must_ have one or the other.
+Note that any given service maybe be _either_ a container service (contains the `container` attribute) _or_ a generic systemd service (contains the `systemd` attribute) but _not_ both. A service _must_ have one or the other.
 
-#### Docker Service Options
-- **`docker.image`**: Docker image URI
-- **`docker.configVolume`**: Container path for config storage
-- **`docker.volumes`**: Additional volume mounts. Can be either:
+#### Container Service Options
+- **`container.image`**: Container image URI
+- **`container.configVolume`**: Container path for config storage
+- **`container.volumes`**: Additional volume mounts. Can be either:
   - A list of volume specifications (format: `"host:container[:options]"`)
   - A function that receives the `storagePath` function and returns a list of volume specifications
-- **`docker.environment`**: Environment variables
-- **`docker.extraOptions`**: Additional Docker CLI options
-- **`docker.entrypoint`**: Custom container entrypoint
-- **`docker.entrypointOptions`**: Container command arguments
-- **`docker.ports`**: Exposed ports. Format is docker's format, `"port[:container_port][/protocol]"`
-- **`docker.dependsOn`**: Container dependencies (other containers this one depends on)
-- **`docker.environmentFiles`**: Environment files to load
+- **`container.environment`**: Environment variables
+- **`container.extraOptions`**: Additional Container CLI options
+- **`container.entrypoint`**: Custom container entrypoint
+- **`container.entrypointOptions`**: Container command arguments
+- **`container.ports`**: Exposed ports. Format is container's format, `"port[:container_port][/protocol]"`
+- **`container.dependsOn`**: Container dependencies (other containers this one depends on)
+- **`container.environmentFiles`**: Environment files to load
 
 #### Systemd Service Options
 - **`systemd.macvlan`**: Use macvlan networking (default: false)
@@ -147,17 +147,17 @@ Note that any given service maybe be _either_ a docker service (contains the `do
   - `ip6`: IPv6 address
   - `interface`: Network interface name (if macvlan enabled)
   - `storagePath`: Function to get storage path for a service
-  - `containerOptions`: Additional Docker options
+  - `containerOptions`: Additional Container options
 
-### Docker Service Examples
+### Container Service Examples
 
-#### Simple Docker Service
+#### Simple Container Service
 
-For services running in Docker containers:
+For services running in Container containers:
 
 ```nix
 { name, ... }: {
-  docker = {
+  container = {
     image = "lscr.io/linuxserver/sonarr";
     configVolume = "/config";
     volumes = [
@@ -175,7 +175,7 @@ For services running in Docker containers:
 }
 ```
 
-#### Docker Service with Dynamic Volumes
+#### Container Service with Dynamic Volumes
 
 When you need to use the `storagePath` function to mount extra storage paths, use the function form:
 
@@ -183,7 +183,7 @@ When you need to use the `storagePath` function to mount extra storage paths, us
 { config, ... }:
 {
   requires = [ "storage-media.mount" ];
-  docker = {
+  container = {
     image = "ghcr.io/advplyr/audiobookshelf";
     environment = {
       TZ = config.time.timeZone;
