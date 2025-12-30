@@ -3,7 +3,7 @@ with builtins;
 let
   pw = import ./../../.secrets/passwords.nix;
   addresses = import ./../../addresses.nix { inherit lib; };
-  container = import ./container.nix { inherit pkgs lib; };
+  container = import ./../../container.nix { inherit pkgs lib; };
   image = "ghcr.io/lovelaze/nebula-sync:latest";
 in
 {

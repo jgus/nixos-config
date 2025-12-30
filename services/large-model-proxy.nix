@@ -3,7 +3,7 @@
 { pkgs, lib, ... }:
 let
   machine = import ../machine.nix;
-  container = import ./container.nix { inherit pkgs lib; };
+  container = import ../container.nix { inherit pkgs lib; };
   numaCpusStrs = map (cpuSet: lib.concatMapStringsSep "," toString cpuSet) machine.numaCpus;
   numaCpusNearGpu1 = (builtins.elemAt numaCpusStrs 1);
   numaCpusNotNearGpu1 = (builtins.elemAt numaCpusStrs 0);
@@ -11,7 +11,7 @@ let
 
   # Container network configuration
   containerNetworkName = "lmp-network";
-  containerNetworkPrefix = "192.168.88.";
+  containerNetworkPrefix = "192.168.80.";
 
   version = "jgus";
   # To update hashes when version changes:
@@ -66,7 +66,6 @@ let
         # Run container
         exec ${container.executable} run \
           --rm \
-          --read-only \
           --name=${containerName} \
           --network=${containerNetworkName} \
           --ip=${ip} \
