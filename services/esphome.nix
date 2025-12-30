@@ -2,7 +2,7 @@ let
   user = "josh";
   group = "users";
 in
-{ config, ... }:
+{ ... }:
 {
   inherit user group;
   container = {
@@ -21,17 +21,12 @@ in
       "6052"
     ];
     configVolume = "/config";
-    extraOptions =
-      let
-        uid = toString config.users.users.${user}.uid;
-        gid = toString config.users.groups.${group}.gid;
-      in
-      [
-        "--tmpfs=/.cache:exec,uid=${uid},gid=${gid}"
-        "--tmpfs=/.local:exec,uid=${uid},gid=${gid}"
-        "--tmpfs=/cache:exec,uid=${uid},gid=${gid}"
-        "--tmpfs=/config/.esphome/build:exec,uid=${uid},gid=${gid}"
-        "--tmpfs=/config/.esphome/external_components:exec,uid=${uid},gid=${gid}"
-      ];
+    extraOptions = [
+      "--tmpfs=/.cache:exec,mode=1777"
+      "--tmpfs=/.local:exec,mode=1777"
+      "--tmpfs=/cache:exec,mode=1777"
+      "--tmpfs=/config/.esphome/build:exec,mode=1777"
+      "--tmpfs=/config/.esphome/external_components:exec,mode=1777"
+    ];
   };
 }
