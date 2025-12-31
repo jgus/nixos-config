@@ -27,8 +27,8 @@ in
     container = {
       pullImage = {
         imageName = "wordpress";
-        imageDigest = "sha256:3655391d4ecab1fcdbf80a83fe2b9f473ccb90797dc3ea9739ef6ad63b146bad";
-        hash = "sha256-ZzTB+yUJ9SdI4VLTbXHZEdYGAPuRfplWeDIs6qp6eVk=";
+        imageDigest = "sha256:39ec4f8802d6c5e15b655766fe86f7f83ded0fc92e58d0aa4e9706bf215a4ad3";
+        hash = "sha256-eeEc9jq3PkKvumau29nO9ZbA3A8KiR3tkpWzgRbl2t0=";
         finalImageName = "wordpress";
         finalImageTag = "php8.3-apache";
       };

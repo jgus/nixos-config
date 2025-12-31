@@ -1,6 +1,5 @@
 with builtins;
 let
-  name = "home-assistant";
   user = "home-assistant";
   group = "home-assistant";
   theater_devices = [
@@ -462,8 +461,8 @@ in
   container = {
     pullImage = {
       imageName = "ghcr.io/home-assistant/home-assistant";
-      imageDigest = "sha256:75ef6851d2e48d366764cdb6b569b7ad8be77dcc8e0d1b9aa508ac90e42d4c58";
-      hash = "sha256-GvthMEINUllk65Xa83ZLa0u2NMJBVKeWENolJrvWmWM=";
+      imageDigest = "sha256:9a5a3eb4a213dfb25932dee9dc6815c9305f78cecb5afa716fa2483163d8fb5b";
+      hash = "sha256-ikVzH4qDouKB809BWmrpeY05RRS6QUklHN5Z/zhbe6E=";
       finalImageName = "ghcr.io/home-assistant/home-assistant";
       finalImageTag = "stable";
     };

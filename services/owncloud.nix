@@ -69,8 +69,8 @@ in
     container = {
       pullImage = {
         imageName = "redis";
-        imageDigest = "sha256:d338acf5e1c111dfdafc78fd2adf2d15a54d4f185611d5f7b6b75cf967f1c1b1";
-        hash = "sha256-7L9CwOT1GUuLsMexNsoMJClQueuHflSE11IVSFFN3Ek=";
+        imageDigest = "sha256:b0637889625b89ff449612d5729da2b99adafeda9b2c16faa5428f2dbd310685";
+        hash = "sha256-MJGq50IuW4Q5mzooCaSmyseVnPhlsAv2RdFZnYb+yss=";
         finalImageName = "redis";
         finalImageTag = "6";
       };
