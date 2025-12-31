@@ -18,8 +18,8 @@ in
   container = {
     pullImage = {
       imageName = "docker.io/searxng/searxng";
-      imageDigest = "sha256:8d98d5c1b678714c3b20dacfab5ea5e3b67f79e50df6d5dbc92ed4f0a964ccbd";
-      hash = "sha256-FYn1E9WUVdrjboXP4rTdCzAcskMW+NcnAbJn6dYvhH0=";
+      imageDigest = "sha256:1ad4159e74903f8870e3464df701b800a75bd2854f5d11b44ce09ee297f3c158";
+      hash = "sha256-4NThBCZQyVU29/DPmhXbhsEWqdLw9BdhMuPxL4Ksse4=";
       finalImageName = "docker.io/searxng/searxng";
       finalImageTag = "latest";
     };
