@@ -475,14 +475,8 @@ in
       VERSION = "latest";
     };
     volumes = [
-      "${haConfigFiles}:/config/etc:ro"
+      "${haConfigFiles}:/config/generated:ro"
       "${secretsYaml}:/config/secrets.yaml:ro"
-      "/etc/static:/etc/static:ro"
-      "/nix/store:/nix/store:ro"
-      "/run/dbus:/run/dbus:ro"
-    ];
-    extraOptions = [
-      "--privileged"
     ];
   };
 }
