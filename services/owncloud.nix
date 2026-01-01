@@ -14,13 +14,7 @@ in
     configStorage = false;
     requires = [ "storage-owncloud.mount" ];
     container = {
-      pullImage = {
-        imageName = "owncloud/server";
-        imageDigest = "sha256:62c93574d2bd0f98d17ac1a541f703653822e4572a628dcf993a8e65b2400e97";
-        hash = "sha256-ftE9szjmZzqcMZtk46qWfWwAPEI3Ef88BbT9glrcV4U=";
-        finalImageName = "owncloud/server";
-        finalImageTag = "latest";
-      };
+      pullImage = import ../images/owncloud.nix;
       dependsOn = [ "owncloud-db" "owncloud-redis" ];
       environment = {
         OWNCLOUD_VERSION = "10.15";
@@ -47,13 +41,7 @@ in
   {
     name = "owncloud-db";
     container = {
-      pullImage = {
-        imageName = "mariadb";
-        imageDigest = "sha256:8763a63f00ec980d913c04bf84f7fd5f60aa11ac9033f36d1a77921c065a5988";
-        hash = "sha256-Mo6hqQxl4/pLVJjnDZLqX67MdRah0MFiDvOHabl85oo=";
-        finalImageName = "mariadb";
-        finalImageTag = "10";
-      };
+      pullImage = import ../images/mariadb.nix;
       environment = {
         MYSQL_ROOT_PASSWORD = dbPass;
         MYSQL_USER = dbUser;
@@ -67,13 +55,7 @@ in
   {
     name = "owncloud-redis";
     container = {
-      pullImage = {
-        imageName = "redis";
-        imageDigest = "sha256:b0637889625b89ff449612d5729da2b99adafeda9b2c16faa5428f2dbd310685";
-        hash = "sha256-MJGq50IuW4Q5mzooCaSmyseVnPhlsAv2RdFZnYb+yss=";
-        finalImageName = "redis";
-        finalImageTag = "6";
-      };
+      pullImage = import ../images/redis.nix;
       configVolume = "/data";
     };
   }

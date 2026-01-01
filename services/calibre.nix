@@ -6,13 +6,7 @@ in
 {
   requires = [ "storage-media.mount" ];
   container = {
-    pullImage = {
-      imageName = "lscr.io/linuxserver/calibre-web";
-      imageDigest = "sha256:6ad57f800588623fe598b7c8d4c39b20f9234798987757b67a8e50e7aabf95ff";
-      hash = "sha256-9oCWRUGRlSvcnLKmJEkKXHjRrgtGkv2NgZLzNIZuGow=";
-      finalImageName = "lscr.io/linuxserver/calibre-web";
-      finalImageTag = "latest";
-    };
+    pullImage = import ../images/calibre-web.nix;
     environment = {
       PUID = toString config.users.users.${user}.uid;
       PGID = toString config.users.groups.${group}.gid;

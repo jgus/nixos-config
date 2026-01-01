@@ -6,26 +6,14 @@ in
   {
     name = "journal-db";
     container = {
-      pullImage = {
-        imageName = "mysql";
-        imageDigest = "sha256:4bc6bc963e6d8443453676cae56536f4b8156d78bae03c0145cbe47c2aad73bb";
-        hash = "sha256-GeeN1dtcTE9Bi08IjGG6RuEPLOieewK3SPzvlhK+6sQ=";
-        finalImageName = "mysql";
-        finalImageTag = "5.7";
-      };
+      pullImage = import ../images/mysql.nix;
       configVolume = "/var/lib/mysql";
     };
   }
   {
     name = "journal";
     container = {
-      pullImage = {
-        imageName = "wordpress";
-        imageDigest = "sha256:39ec4f8802d6c5e15b655766fe86f7f83ded0fc92e58d0aa4e9706bf215a4ad3";
-        hash = "sha256-eeEc9jq3PkKvumau29nO9ZbA3A8KiR3tkpWzgRbl2t0=";
-        finalImageName = "wordpress";
-        finalImageTag = "php8.3-apache";
-      };
+      pullImage = import ../images/wordpress.nix;
       dependsOn = [ "journal-db" ];
       configVolume = "/var/www/html";
       ports = [

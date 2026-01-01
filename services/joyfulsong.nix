@@ -6,13 +6,7 @@ in
   {
     name = "joyfulsong-db";
     container = {
-      pullImage = {
-        imageName = "mariadb";
-        imageDigest = "sha256:e1bcd6f85781f4a875abefb11c4166c1d79e4237c23de597bf0df81fec225b40";
-        hash = "sha256-tPm0XwIe/rM3+gJkQbzpj+/emE8j1HNqIg1yjb37+TI=";
-        finalImageName = "mariadb";
-        finalImageTag = "latest";
-      };
+      pullImage = import ../images/mariadb.nix;
       configVolume = "/var/lib/mysql";
       environment = {
         MARIADB_DATABASE = "joyfulsong";
@@ -25,13 +19,7 @@ in
   {
     name = "joyfulsong";
     container = {
-      pullImage = {
-        imageName = "wordpress";
-        imageDigest = "sha256:39ec4f8802d6c5e15b655766fe86f7f83ded0fc92e58d0aa4e9706bf215a4ad3";
-        hash = "sha256-eeEc9jq3PkKvumau29nO9ZbA3A8KiR3tkpWzgRbl2t0=";
-        finalImageName = "wordpress";
-        finalImageTag = "php8.3-apache";
-      };
+      pullImage = import ../images/wordpress.nix;
       dependsOn = [ "joyfulsong-db" ];
       configVolume = "/var/www/html";
       ports = [

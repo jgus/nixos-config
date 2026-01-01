@@ -2,13 +2,7 @@
 {
   requires = [ "storage-media.mount" ];
   container = {
-    pullImage = {
-      imageName = "ghcr.io/advplyr/audiobookshelf";
-      imageDigest = "sha256:a52dc5db694a5bf041ce38f285dd6c6a660a4b1b21e37ad6b6746433263b2ae5";
-      hash = "sha256-LMHpQiv8ygEv728Frn1NMVVGHuP2Os4vKt3CnMXL6pk=";
-      finalImageName = "ghcr.io/advplyr/audiobookshelf";
-      finalImageTag = "latest";
-    };
+    pullImage = import ../images/audiobookshelf.nix;
     environment = {
       TZ = config.time.timeZone;
     };
