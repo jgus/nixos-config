@@ -3,8 +3,15 @@ let
   addresses = import ./addresses.nix { inherit lib; };
   machine = import ./machine.nix;
   hostRecord = addresses.records."${machine.hostName}";
+  nixIndexDatabase = builtins.fetchTarball {
+    url = "https://github.com/nix-community/nix-index-database/archive/main.tar.gz";
+  };
 in
 {
+  imports = [
+    "${nixIndexDatabase}/nixos-module.nix"
+  ];
+
   boot = {
     initrd.secrets."/etc/nixos/.secrets/vkey" = ./.secrets/vkey;
     tmp.useTmpfs = true;
@@ -158,7 +165,6 @@ in
   environment = {
     systemPackages = with pkgs; [
       clang-tools # TODO
-      comma
       nixd
       nixpkgs-fmt
       (callPackage ./pkgs/cline.nix { })
@@ -192,6 +198,7 @@ in
     htop.enable = true;
     mosh.enable = true;
     nix-index.enable = true;
+    nix-index-database.comma.enable = true;
     nix-ld = {
       enable = true;
       libraries = options.programs.nix-ld.libraries.default ++ (
