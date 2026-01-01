@@ -22,9 +22,9 @@
         description = "CEC-Client";
         wantedBy = [ "multi-user.target" ];
         requires = [ "network-online.target" ];
-        path = [ pkgs.netcat pkgs.libcec ];
+        path = [ pkgs.socat pkgs.libcec ];
         script = ''
-          nc -ulk 9526 | cec-client
+          socat -u UDP6-LISTEN:9526,reuseaddr,fork,ipv6only=0 STDOUT | cec-client
         '';
         serviceConfig = {
           Restart = "no";
