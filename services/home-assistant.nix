@@ -2,57 +2,6 @@ with builtins;
 let
   user = "home-assistant";
   group = "home-assistant";
-  theater_devices = [
-    {
-      device = "bluray";
-      index = "4";
-    }
-    {
-      device = "shield";
-      index = "B";
-    }
-  ];
-  cec_map = [
-    { command = "select"; code = "00"; }
-    { command = "d_up"; code = "01"; }
-    { command = "d_down"; code = "02"; }
-    { command = "d_left"; code = "03"; }
-    { command = "d_right"; code = "04"; }
-    { command = "root_menu"; code = "09"; }
-    { command = "setup_menu"; code = "0A"; }
-    { command = "contents_menu"; code = "0B"; }
-    { command = "favorite_menu"; code = "0C"; }
-    { command = "exit"; code = "0D"; }
-    { command = "enter"; code = "2B"; }
-    { command = "clear"; code = "2C"; }
-    { command = "channel_up"; code = "30"; }
-    { command = "channel_down"; code = "31"; }
-    { command = "prev_channel"; code = "32"; }
-    { command = "display_info"; code = "35"; }
-    { command = "power"; code = "40"; }
-    { command = "volume_up"; code = "41"; }
-    { command = "volume_down"; code = "42"; }
-    { command = "mute"; code = "43"; }
-    { command = "play"; code = "44"; }
-    { command = "stop"; code = "45"; }
-    { command = "pause"; code = "46"; }
-    { command = "record"; code = "47"; }
-    { command = "rewind"; code = "48"; }
-    { command = "fast_forward"; code = "49"; }
-    { command = "eject"; code = "4A"; }
-    { command = "forward"; code = "4B"; }
-    { command = "backward"; code = "4C"; }
-    { command = "play_f"; code = "60"; }
-    { command = "pause_play_f"; code = "61"; }
-    { command = "power_toggle_f"; code = "6B"; }
-    { command = "power_off_f"; code = "6C"; }
-    { command = "power_on_f"; code = "6D"; }
-    { command = "f1"; code = "71"; }
-    { command = "f2"; code = "72"; }
-    { command = "f3"; code = "73"; }
-    { command = "f4"; code = "74"; }
-    { command = "f5"; code = "75"; }
-  ];
   light_groups = {
     "Great Room" = [
       "light.dining_room_light"
@@ -304,26 +253,6 @@ let
     )
     windows);
 
-  # CEC Theater Device Command Files
-  cecCommandFiles = lib.lists.flatten (map
-    (
-      i:
-      lib.lists.flatten (map
-        (
-          j:
-          [
-            {
-              name = "shell_command/cec_${i.device}_${j.command}.yaml";
-              path = pkgs.writeText "cec_${i.device}_${j.command}.yaml" ''
-                (echo 'tx 1${i.index}:44:${j.code}'; sleep 0.050s; echo 'tx 1${i.index}:45') | nc -uw1 theater-cec 9526
-              '';
-            }
-          ]
-        )
-        cec_map)
-    )
-    theater_devices);
-
   # Light Group Files
   lightGroupFiles = lib.lists.flatten (map
     (
@@ -447,7 +376,6 @@ let
       { name = "automation/verify_device_ids.yaml"; path = verifyDeviceIdsYaml; }
     ]
     ++ windowShadeFiles
-    ++ cecCommandFiles
     ++ lightGroupFiles
   );
 
