@@ -123,6 +123,7 @@ let
 
       # AI
       large-model-proxy = { id = 80; host = "d1"; aliases = [ "comfyui" ]; };
+      ollama = { id = 81; host = "d1"; };
       open-webui = { id = 82; host = "d1"; };
       sillytavern = { id = 83; host = "d1"; };
 
