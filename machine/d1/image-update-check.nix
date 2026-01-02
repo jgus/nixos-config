@@ -1,8 +1,29 @@
 with builtins;
-args@{ config, pkgs, lib, ... }:
+{ pkgs, lib, ... }:
 let
-  # Import the image extractor
-  allPullImages = import ./all-pull-images.nix args;
+  # Inline image extractor logic
+  imagesDir = ./../../images;
+  imageFiles = builtins.readDir imagesDir;
+
+  nixFiles = builtins.filter
+    (
+      name:
+      imageFiles.${name} == "regular"
+      && lib.strings.hasSuffix ".nix" name
+      && !(lib.strings.hasPrefix "." name)
+    )
+    (builtins.attrNames imageFiles);
+
+  pullImagesInFile = name:
+    [{
+      pullImage = import (imagesDir + "/${name}");
+      file = name;
+    }];
+
+  allPullImages = lib.concatMap pullImagesInFile nixFiles;
+
+  latestDir = "/etc/nixos/images/latest";
+
   script = pkgs.writeShellScript "image-update-check" (''
     set -e
     
@@ -17,16 +38,11 @@ let
   (builtins.concatStringsSep "\n" (map
     ({ pullImage, file }: ''
       echo "Checking ${pullImage.finalImageName}:${pullImage.finalImageTag} from ${file}..."
-      CURRENT_SPEC_JSON_NORM=$(echo ${lib.escapeShellArg (builtins.toJSON pullImage)} | ${pkgs.jq}/bin/jq -S -c .)
-      LATEST_SPEC_NIX=$(${pkgs.nix-prefetch-docker}/bin/nix-prefetch-docker --quiet --image-name ${pullImage.finalImageName} --image-tag ${pullImage.finalImageTag})
-      LATEST_SPEC_JSON_NORM=$(${pkgs.nix}/bin/nix eval --json --expr "$LATEST_SPEC_NIX" | ${pkgs.jq}/bin/jq -S -c .)
-      if [ "$CURRENT_SPEC_JSON_NORM" != "$LATEST_SPEC_JSON_NORM" ]
+      if [ "$(skopeo inspect docker://${pullImage.finalImageName}:${pullImage.finalImageTag} --format '{{.Digest}}')" != "${pullImage.imageDigest}" ]
       then
-        echo "Update available for ${pullImage.finalImageName}:${pullImage.finalImageTag} in ${file}:"
-        echo "$LATEST_SPEC_NIX"
-        echo "" >&3
-        echo "Update available for ${pullImage.finalImageName}:${pullImage.finalImageTag} in ${file}:" >&3
-        echo "$LATEST_SPEC_NIX" >&3
+        echo "Update available for ${pullImage.finalImageName}:${pullImage.finalImageTag} in ${file}; pulling..."
+        echo "${pullImage.finalImageName}:${pullImage.finalImageTag} in ${file}" >&3
+        ${pkgs.nix-prefetch-docker}/bin/nix-prefetch-docker --quiet --image-name ${pullImage.finalImageName} --image-tag ${pullImage.finalImageTag} > ${latestDir}/${file}
       fi
     '')
     allPullImages))
@@ -39,6 +55,7 @@ let
         echo "subject: Container Image Updates Available"
         echo ""
         echo "The following container images have updates available:"
+        echo ""
         cat /dev/fd/3
       } | ${pkgs.msmtp}/bin/msmtp "j@gustafson.me"
     else
@@ -50,12 +67,11 @@ in
   systemd.services = {
     image-update-check = {
       path = with pkgs; [
-        nix
-        msmtp
         bash
         coreutils
-        jq
+        msmtp
         nix-prefetch-docker
+        skopeo
       ];
       script = ''
         ${script}
