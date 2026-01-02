@@ -1,7 +1,7 @@
 {
   imageName = "koenkk/zigbee2mqtt";
-  imageDigest = "sha256:163e7351430a95d550d5b1bb958527edc1eff115eb013ca627f3545a192e853f";
-  hash = "sha256-qUfO7EQf7ghQgxx/X6k2Y+mThKiZijj5JAb8WnNAKa4=";
+  imageDigest = "sha256:60a295b40f4e7fb7ab4d995932369e50f2529837272fa4979e986ec1ffdb7fce";
+  hash = "sha256-3VJ8MDH3ocdz6NMqM2EX5JFdkUt8oM5UFvhS2JUikms=";
   finalImageName = "koenkk/zigbee2mqtt";
   finalImageTag = "latest";
 }
