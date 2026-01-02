@@ -19,7 +19,7 @@ let
   # 2. Set gitHash = "" and vendorHash = ""
   # 3. Run nixos-rebuild (it will fail and display the correct hashes)
   # 4. Copy the correct hashes from the error message and update below
-  gitHash = "sha256-1fe4goxvIFesXYY7y0Tezn00HJ1dM/8WsD08LNi9Ga0=";
+  gitHash = "sha256-dKMQUSxxKW26AqxkTOj2Tj2R8JDbUnhoHif/pSqr5ok=";
   vendorHash = "sha256-tu1nSSZbsPPIrYaiwnQEXeLZoUTnWfCJmIxr08fNPVs=";
   largeModelProxyPackage = pkgs.buildGoModule {
     pname = "large-model-proxy";
