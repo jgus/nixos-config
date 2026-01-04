@@ -126,6 +126,7 @@ let
       ollama = { id = 81; host = "d1"; };
       qdrant = { id = 82; host = "d1"; };
       plandex = { id = 83; host = "d1"; };
+      plandex-db = { id = 84; host = "d1"; };
       open-webui = { id = 88; host = "d1"; };
       sillytavern = { id = 89; host = "d1"; };
 
