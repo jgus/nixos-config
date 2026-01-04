@@ -1,3 +1,2 @@
-- ALWAYS mark `nixos-rebuild test`, `nixos-rebuild boot`, and `nixos-rebuild switch` commands as requiring approval (set `requires_approval: true`)
-- `nixos-rebuild build` commands do _not_ require approval
-- prefer `nixos-rebuild test` over `nixos-rebuild switch`
+- NEVER run `nixos-rebuild test`, `nixos-rebuild boot`, or `nixos-rebuild switch`
+- You MAY run`nixos-rebuild build`
