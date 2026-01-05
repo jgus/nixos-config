@@ -7,8 +7,8 @@
       "6333"
     ];
     readOnly = true;
-    extraOptions = [
-      "--tmpfs=/qdrant/snapshots:exec,mode=1777"
+    tmpFs = [
+      "/qdrant/snapshots"
     ];
   };
 }

@@ -14,8 +14,8 @@
       # "/storage/scratch/torrent:/torrent"
       # "/storage/scratch/usenet:/usenet"
     ];
-    extraOptions = [
-      "--tmpfs=/app/temp_downloads"
+    tmpFs = [
+      "/app/temp_downloads"
     ];
   };
 }

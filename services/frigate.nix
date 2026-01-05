@@ -298,11 +298,13 @@ in
     ];
     extraOptions = [
       "--shm-size=4g"
-      "--tmpfs=/tmp"
       "--pids-limit=-1"
       "--device=nvidia.com/gpu=GPU-35f1dd5f-a7af-1980-58e4-61bec60811dd"
       "--device=/dev/apex_0:/dev/apex_0"
       "--device=/dev/apex_1:/dev/apex_1"
+    ];
+    tmpFs = [
+      "/tmp"
     ];
   };
   extraConfig = {

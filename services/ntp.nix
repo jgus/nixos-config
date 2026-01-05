@@ -11,10 +11,10 @@
       ENABLE_NTS = "true";
     };
     readOnly = true;
-    extraOptions = [
-      "--tmpfs=/etc/chrony:rw,mode=1750"
-      "--tmpfs=/run/chrony:rw,mode=1750"
-      "--tmpfs=/var/lib/chrony:rw,mode=1750"
+    tmpFs = [
+      "/etc/chrony"
+      "/run/chrony"
+      "/var/lib/chrony"
     ];
   };
 }
