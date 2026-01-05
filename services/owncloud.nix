@@ -14,6 +14,7 @@ in
     configStorage = false;
     requires = [ "storage-owncloud.mount" ];
     container = {
+      readOnly = false;
       pullImage = import ../images/owncloud.nix;
       dependsOn = [ "owncloud-db" "owncloud-redis" ];
       environment = {
@@ -41,6 +42,7 @@ in
   {
     name = "owncloud-db";
     container = {
+      readOnly = false;
       pullImage = import ../images/mariadb.nix;
       environment = {
         MYSQL_ROOT_PASSWORD = dbPass;
@@ -55,6 +57,7 @@ in
   {
     name = "owncloud-redis";
     container = {
+      readOnly = false;
       pullImage = import ../images/redis.nix;
       configVolume = "/data";
     };

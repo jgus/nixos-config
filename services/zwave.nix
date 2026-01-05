@@ -3,6 +3,7 @@ let
   zwave-area = area: {
     name = "zwave-${area}";
     container = {
+      readOnly = false;
       pullImage = import ../images/zwave-js-ui.nix;
       environment = {
         TZ = config.time.timeZone;

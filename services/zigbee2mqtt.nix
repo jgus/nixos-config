@@ -1,6 +1,7 @@
 { config, ... }:
 {
   container = {
+    readOnly = false;
     pullImage = import ../images/zigbee2mqtt.nix;
     configVolume = "/app/data";
     environment = {

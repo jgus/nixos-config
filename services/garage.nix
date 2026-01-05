@@ -39,13 +39,11 @@ in
   configStorage = false;
   container = {
     pullImage = import ../images/garage.nix;
+    readOnly = true;
     volumes = [
       "${(pkgs.formats.toml { }).generate "garage.toml" configuration}:/etc/garage.toml:ro"
       "/storage/garage/meta:/var/lib/garage/meta"
       "/storage/garage/data:/var/lib/garage/data"
-    ];
-    extraOptions = [
-      "--read-only"
     ];
   };
 }

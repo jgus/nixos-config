@@ -3,9 +3,7 @@
   configStorage = false;
   container = {
     pullImage = import ../images/cloudflared.nix;
-    extraOptions = [
-      "--read-only"
-    ];
+    readOnly = true;
     entrypointOptions = [
       "tunnel"
       "--no-autoupdate"

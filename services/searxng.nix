@@ -16,6 +16,7 @@ in
 { pkgs, ... }:
 {
   container = {
+    readOnly = false;
     pullImage = import ../images/searxng.nix;
     ports = [
       "8080"

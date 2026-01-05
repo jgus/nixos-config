@@ -387,6 +387,7 @@ let
 in
 {
   container = {
+    readOnly = false;
     pullImage = import ../images/home-assistant.nix;
     configVolume = "/config";
     environment = {

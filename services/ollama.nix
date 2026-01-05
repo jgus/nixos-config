@@ -1,6 +1,7 @@
 { ... }:
 {
   container = {
+    readOnly = false;
     pullImage = import ../images/ollama.nix;
     ports = [
       "11434"

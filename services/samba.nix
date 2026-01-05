@@ -6,6 +6,7 @@ in
 {
   configStorage = false;
   container = {
+    readOnly = false;
     pullImage = import ../images/samba.nix;
     environment =
       {

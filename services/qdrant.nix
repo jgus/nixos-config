@@ -6,8 +6,8 @@
     ports = [
       "6333"
     ];
+    readOnly = true;
     extraOptions = [
-      "--read-only"
       "--tmpfs=/qdrant/snapshots:exec,mode=1777"
     ];
   };

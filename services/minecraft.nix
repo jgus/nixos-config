@@ -5,6 +5,7 @@ in
 { config, ... }:
 {
   container = {
+    readOnly = false;
     pullImage = import ../images/minecraft-runner.nix;
     configVolume = "/home/minecraft/config";
     volumes = [

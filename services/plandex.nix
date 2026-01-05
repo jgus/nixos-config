@@ -10,6 +10,7 @@ in
   {
     name = "plandex-db";
     container = {
+      readOnly = false;
       pullImage = import ../images/postgres.nix;
       configVolume = "/var/lib/postgresql/data";
       ports = [
@@ -25,6 +26,7 @@ in
   {
     name = "plandex";
     container = {
+      readOnly = false;
       pullImage = import ../images/plandex.nix;
       dependsOn = [ "plandex-db" ];
       configVolume = "/plandex-server";

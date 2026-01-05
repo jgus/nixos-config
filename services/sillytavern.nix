@@ -2,6 +2,7 @@
 {
   configStorage = true;
   container = {
+    readOnly = false;
     pullImage = import ../images/sillytavern.nix;
     configVolume = "/home/node/app/config";
     ports = [

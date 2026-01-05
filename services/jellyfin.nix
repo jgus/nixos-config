@@ -10,6 +10,7 @@ in
 {
   requires = [ "storage-media.mount" "storage-photos.mount" ];
   container = {
+    readOnly = false;
     pullImage = import ../images/jellyfin.nix;
     environment = {
       PUID = uid;

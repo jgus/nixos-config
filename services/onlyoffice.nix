@@ -6,6 +6,7 @@ in
   {
     name = "onlyoffice";
     container = {
+      readOnly = false;
       pullImage = import ../images/documentserver.nix;
       configVolume = "/var/www/onlyoffice/Data";
       ports = [ "80" ];

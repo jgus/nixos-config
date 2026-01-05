@@ -275,6 +275,7 @@ in
 {
   requires = [ "storage-frigate.mount" "zfs-import-f.service" ];
   container = {
+    readOnly = false;
     pullImage = import ../images/frigate.nix;
     environment = {
       PLUS_API_KEY = pw.frigate_plus;

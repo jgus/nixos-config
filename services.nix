@@ -122,7 +122,10 @@ let
           volumes =
             (let v = container.volumes or [ ]; in if isFunction v then v storagePath else v) ++
               lib.optional configStorage "${storagePath name}:${container.configVolume}";
-          extraOptions = container.extraOptions or [ ] ++ containerOptions;
+          extraOptions =
+            (container.extraOptions or [ ]) ++
+              containerOptions ++
+              lib.optional (container.readOnly or false) "--read-only";
           entrypoint = container.entrypoint or null;
           cmd = container.entrypointOptions or [ ];
         }

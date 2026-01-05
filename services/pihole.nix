@@ -53,6 +53,7 @@ map
     inherit name;
     configStorage = false;
     container = {
+      readOnly = false;
       pullImage = import ../images/pihole.nix;
       environment = {
         TZ = config.time.timeZone;

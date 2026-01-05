@@ -5,6 +5,7 @@ in
 { config, ... }:
 {
   container = {
+    readOnly = false;
     pullImage = import ../images/prowlarr.nix;
     environment = {
       PUID = toString config.users.users.${user}.uid;
