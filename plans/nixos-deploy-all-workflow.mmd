@@ -1,0 +1,48 @@
+graph TD
+    A[Start Script] --> B[Parse Arguments]
+    B --> C[Setup Environment]
+    C --> D[Update Nix Channels]
+    
+    D --> E[Phase 1: Build Configurations]
+    E --> E1[Sequential Execution<br/>Machine 1 → Machine 2 → ... → Machine N]
+    E1 --> E2[Total Time: Σ(build_time_i)]
+    
+    E --> F[Phase 1: Build Configurations<br/>(Parallel Version)]
+    F --> F1[Parallel Execution<br/>Machine 1 || Machine 2 || ... || Machine N]
+    F1 --> F2[Total Time: max(build_time_i)]
+    
+    F2 --> G[Phase 2: Test Configurations]
+    G --> G1[Sequential Execution<br/>Machine 1 → Machine 2 → ... → Machine N]
+    G1 --> G2[Total Time: Σ(test_time_i)]
+    
+    G --> H[Phase 2: Test Configurations<br/>(Parallel Version)]
+    H --> H1[Parallel Execution<br/>Machine 1 || Machine 2 || ... || Machine N]
+    H1 --> H2[Total Time: max(test_time_i)]
+    
+    H2 --> I{Switch Flag Set?}
+    I -->|Yes| J[Phase 3: Switch Configurations]
+    I -->|No| K[Skip Switch Phase]
+    
+    J --> J1[Sequential Execution<br/>Machine 1 → Machine 2 → ... → Machine N]
+    J1 --> J2[Total Time: Σ(switch_time_i)]
+    
+    J --> L[Phase 3: Switch Configurations<br/>(Parallel Version)]
+    L --> L1[Parallel Execution<br/>Machine 1 || Machine 2 || ... || Machine N]
+    L1 --> L2[Total Time: max(switch_time_i)]
+    
+    L2 --> M[End Script]
+    K --> M
+    M --> N[Completion]
+    
+    style E1 fill:#ffcccc,stroke:#333
+    style F1 fill:#ccffcc,stroke:#333
+    style G1 fill:#ffcccc,stroke:#333
+    style H1 fill:#ccffcc,stroke:#333
+    style J1 fill:#ffcccc,stroke:#333
+    style L1 fill:#ccffcc,stroke:#333
+    
+    classDef oldApproach fill:#ffcccc,stroke:#333;
+    classDef newApproach fill:#ccffcc,stroke:#333;
+    classDef improvement fill:#ffffcc,stroke:#333;
+    
+    class E1,G1,J1 oldApproach;

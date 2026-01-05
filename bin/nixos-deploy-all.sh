@@ -106,10 +106,10 @@ if [[ "${DO_SWITCH}" == "true" ]]; then
         echo "--- Switching configuration for ${machine} ---"
         if [[ "${machine}" == "${CURRENT_HOST}" ]]; then
             # Local machine - no --target-host needed
-            MACHINE_ID="${machine}" nixos-rebuild switch
+            MACHINE_ID="${machine}" nixos-rebuild boot
         else
             # Remote machine - use --target-host
-            MACHINE_ID="${machine}" nixos-rebuild switch --target-host "${machine}"
+            MACHINE_ID="${machine}" nixos-rebuild boot --target-host "${machine}"
         fi
         echo "✓ Switch successful for ${machine}"
     done
