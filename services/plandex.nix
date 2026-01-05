@@ -10,7 +10,7 @@ in
   {
     name = "plandex-db";
     container = {
-      readOnly = false;
+      readOnly = true;
       pullImage = import ../images/postgres.nix;
       configVolume = "/var/lib/postgresql/data";
       ports = [
