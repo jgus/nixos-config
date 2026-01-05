@@ -1,7 +1,7 @@
 {
   imageName = "ghcr.io/servercontainers/samba";
-  imageDigest = "sha256:14666eb79560feaf3f15b0bec335d1653403b047eeb8093f1a0fef30f8039ab7";
-  hash = "sha256-eqT+ayCV9q1QKSara1EICsXh0mzc90yhrEeZjdG+brs=";
+  imageDigest = "sha256:4f688e9943e912cbd3b40f41e56abd3a4d81b9902e25b8d74b6297fa8258618b";
+  hash = "sha256-oyn8helsGWk0ehMgAlM3QsiNw9RAYwc12GiY1VFGiHo=";
   finalImageName = "ghcr.io/servercontainers/samba";
   finalImageTag = "latest";
 }
