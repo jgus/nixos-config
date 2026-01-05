@@ -26,7 +26,7 @@ in
   {
     name = "plandex";
     container = {
-      readOnly = false;
+      readOnly = true;
       pullImage = import ../images/plandex.nix;
       dependsOn = [ "plandex-db" ];
       configVolume = "/plandex-server";
