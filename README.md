@@ -167,7 +167,7 @@ For services running in Container containers:
     ];
     environment = {
       PUID = toString config.users.users.josh.uid;
-      PGID = toString config.users.groups.plex.gid;
+      PGID = toString config.users.groups.media.gid;
       TZ = config.time.timeZone;
     };
     ports = [ "8989" ];

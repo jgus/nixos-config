@@ -8,7 +8,7 @@ in
 
     groups = {
       users.gid = 100;
-      plex.gid = 193;
+      media.gid = 193;
       home-assistant.gid = 200;
       www.gid = 911;
       mosquitto.gid = 1883;
@@ -21,10 +21,10 @@ in
         openssh.authorizedKeys.keyFiles = [ ./pubkeys/josh-ed25519 ./pubkeys/josh-rsa ];
       };
 
-      plex = {
+      media = {
         uid = 193;
         isSystemUser = true;
-        group = "plex";
+        group = "media";
       };
 
       home-assistant = {

@@ -1,6 +1,6 @@
 let
-  user = "plex";
-  group = "plex";
+  user = "media";
+  group = "media";
 in
 { config, ... }:
 let
