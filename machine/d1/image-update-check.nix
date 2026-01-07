@@ -33,6 +33,8 @@ let
     exec 3<>"$tmpfile"
     rm "$tmpfile"
 
+    mkdir -p ${latestDir}
+
   ''
   +
   (builtins.concatStringsSep "\n" (map
