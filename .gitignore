@@ -5,6 +5,3 @@ machine-id.nix
 /images/latest
 /plans
 /.direnv
-.aider*
-!.aider.model.metadata.json
-!.aider.conf.yaml

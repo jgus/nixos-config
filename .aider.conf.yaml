@@ -1,3 +1,0 @@
-model: openai/deepseek-ai/deepseek-v3.2-exp-thinking
-editor-model: openai/deepseek-ai/deepseek-v3.2-exp
-weak-model: openai/openai/gpt-oss-20b
