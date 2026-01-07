@@ -4,3 +4,4 @@ result
 machine-id.nix
 /images/latest
 /plans
+/.direnv

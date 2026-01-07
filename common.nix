@@ -191,7 +191,10 @@ in
 
   programs = {
     command-not-found.enable = false;
-    direnv.enable = true;
+    direnv = {
+      enable = true;
+      silent = true;
+    };
     git.enable = true;
     git.lfs.enable = true;
     gnupg.agent.enable = true;
