@@ -1,0 +1,50 @@
+{
+  "openai/zai-org/glm-4.7-original:thinking": {
+    "cache_creation_input_token_cost": 0,
+    "cache_read_input_token_cost": 0,
+    "input_cost_per_token": 0,
+    "output_cost_per_token": 0,
+    "max_input_tokens": 200000,
+    "max_output_tokens": 128000,
+    "mode": "chat",
+    "supports_function_calling": true,
+    "supports_reasoning": true,
+    "supports_tool_choice": true,
+    "source": "https://docs.z.ai/guides/overview/pricing"
+  },
+  "openai/deepseek-ai/deepseek-v3.2-exp-thinking": {
+    "input_cost_per_token": 0,
+    "max_input_tokens": 163840,
+    "max_output_tokens": 163840,
+    "max_tokens": 8192,
+    "mode": "chat",
+    "output_cost_per_token": 0,
+    "supports_assistant_prefill": true,
+    "supports_function_calling": true,
+    "supports_prompt_caching": true,
+    "supports_reasoning": true,
+    "supports_tool_choice": true
+  },
+  "openai/deepseek-ai/deepseek-v3.2-exp": {
+    "input_cost_per_token": 0,
+    "max_input_tokens": 163840,
+    "max_output_tokens": 163840,
+    "max_tokens": 8192,
+    "mode": "chat",
+    "output_cost_per_token": 0,
+    "supports_assistant_prefill": true,
+    "supports_function_calling": true,
+    "supports_prompt_caching": true,
+    "supports_reasoning": true,
+    "supports_tool_choice": true
+  },
+  "openai/openai/gpt-oss-20b": {
+    "max_tokens": 131072,
+    "max_input_tokens": 131072,
+    "max_output_tokens": 131072,
+    "input_cost_per_token": 0,
+    "output_cost_per_token": 0,
+    "mode": "chat",
+    "supports_tool_choice": true
+  }
+}
