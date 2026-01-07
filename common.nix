@@ -2,7 +2,6 @@
 let
   addresses = import ./addresses.nix { inherit lib; };
   machine = import ./machine.nix;
-  pw = import ./.secrets/passwords.nix;
   hostRecord = addresses.records."${machine.hostName}";
   nixIndexDatabase = builtins.fetchTarball {
     url = "https://github.com/nix-community/nix-index-database/archive/main.tar.gz";
