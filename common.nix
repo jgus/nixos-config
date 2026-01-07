@@ -168,16 +168,10 @@ in
       clang-tools # TODO
       nixd
       nixpkgs-fmt
-      plandex
     ];
     variables = {
       SERVER_NAMES = builtins.concatStringsSep " " addresses.serverNames;
       OTHER_SERVER_NAMES = builtins.concatStringsSep " " (lib.lists.remove machine.hostName addresses.serverNames);
-      NANOGPT_API_KEY = pw.plandex.nanoGptApiKey;
-    };
-    shellAliases = {
-      plandex = "plandex-cli";
-      pdx = "plandex-cli";
     };
   };
 
