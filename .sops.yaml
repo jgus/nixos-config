@@ -1,0 +1,17 @@
+keys:
+  - &admin_josh age1jxuf7pg7vpcye928qgx3uxzvgcrrpac5pn4844yphctpvuef530qqs59wh
+  - &server_b1 age1rd3pdegptd0jz3pktjjv3c4z9e6l6jpywlrgp8kftnrp8arjvp0qujyk2q
+  - &server_c1-1 age1t2mg5qfgnh9jt0h824yprvux7hl837sxhqn8lgacxa4msm53hspqpx8q9t
+  - &server_c1-2 age1txypm409yzc6hwyepjgnj288ph4c43mdme9c354a45msc69hjpts0p3903
+  - &server_d1 age14mtzynemax29ls25wk7s72lfnsmqwsxd3suj7a24zxprkkxufqtqfmkq4y
+  - &server_pi-67cba1 age1u8f5qmensfddyqcrhzy59uyc5qas400lkvmystkvasxgm3clw9kqs2aya0
+creation_rules:
+  - path_regex: secrets/[^/]+\.(yaml|json|env|ini)$
+    key_groups:
+      - age:
+          - *admin_josh
+          - *server_b1
+          - *server_c1-1
+          - *server_c1-2
+          - *server_d1
+          - *server_pi-67cba1

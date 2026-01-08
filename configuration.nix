@@ -9,6 +9,7 @@ in
     ./${machine.arch}.nix
     ./host.nix
     ./users.nix
+    ./sops.nix
     ./vscode.nix
     ./storage.nix
     ./backup.nix

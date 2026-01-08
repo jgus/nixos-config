@@ -6,6 +6,5 @@ pkgs.mkShellNoCC {
   ];
 
   shellHook = ''
-    echo "🎉 Welcome to the nixos-config project."
   '';
 }

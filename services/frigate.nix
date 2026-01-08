@@ -1,4 +1,5 @@
 with builtins;
+{ config, lib, ... }:
 let
   pw = import ./../.secrets/passwords.nix;
   detector = "coral";
@@ -13,7 +14,7 @@ let
   };
   amcrestIP8M = {
     user = "admin";
-    password = pw.camera;
+    password = config.sops.placeholder.camera;
     width = 3840;
     height = 2160;
     detectStream = 2;
@@ -21,7 +22,7 @@ let
   };
   empireTechT180 = {
     user = "admin";
-    password = pw.camera;
+    password = config.sops.placeholder.camera;
     width = 4096;
     height = 1800;
     detectStream = 2;
@@ -271,7 +272,6 @@ let
       cameras;
   };
 in
-{ config, pkgs, ... }:
 {
   requires = [ "storage-frigate.mount" "zfs-import-f.service" ];
   container = {
@@ -292,7 +292,7 @@ in
     ];
     configVolume = "/config";
     volumes = [
-      "${(pkgs.formats.yaml { }).generate "config.yml" configuration}:/config/config.yml:ro"
+      "${config.sops.templates."frigate/config.yml".path}:/config/config.yml:ro"
       "/storage/frigate/media:/media/frigate"
       "/etc/localtime:/etc/localtime:ro"
     ];
@@ -309,5 +309,7 @@ in
   };
   extraConfig = {
     boot.extraModulePackages = with config.boot.kernelPackages; [ gasket ];
+    sops.secrets.camera = { };
+    sops.templates."frigate/config.yml".content = lib.generators.toYAML { } configuration;
   };
 }
