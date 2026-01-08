@@ -12,14 +12,14 @@ in
           {
             name = "ssh/ssh_host_${i}_key";
             value = {
-              source = ./.secrets/etc/ssh/${machine.hostName}/ssh_host_${i}_key;
+              source = ./.secrets/ssh/${machine.hostName}/ssh_host_${i}_key;
               mode = "0600";
             };
           }
           {
             name = "ssh/ssh_host_${i}_key.pub";
             value = {
-              source = ./.secrets/etc/ssh/${machine.hostName}/ssh_host_${i}_key.pub;
+              source = ./pubkeys/${machine.hostName}/ssh_host_${i}_key.pub;
               mode = "0644";
             };
           }

@@ -44,7 +44,8 @@ let
     # SSH config
     mkdir -p $out/etc/ssh
     cp ${files.sshd_config} $out/etc/ssh/sshd_config
-    cp ${./../.secrets/landing/etc/ssh}/ssh_host_* $out/etc/ssh/
+    cp ${./../.secrets/ssh/landing}/ssh_host_* $out/etc/ssh/
+    cp ${./../pubkeys/landing}/ssh_host_* $out/etc/ssh/
 
     # User's authorized_keys
     mkdir -p $out/home/${user}/.ssh
