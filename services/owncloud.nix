@@ -1,12 +1,9 @@
-{ lib, ... }:
+{ config, lib, ... }:
 let
   addresses = import ./../addresses.nix { inherit lib; };
-  pw = import ./../.secrets/passwords.nix;
   adminUser = "admin";
-  adminPass = pw.owncloud.admin;
   dbName = "owncloud";
   dbUser = "owncloud";
-  dbPass = pw.owncloud.db;
 in
 [
   {
@@ -24,19 +21,30 @@ in
         OWNCLOUD_DB_TYPE = "mysql";
         OWNCLOUD_DB_NAME = dbName;
         OWNCLOUD_DB_USERNAME = dbUser;
-        OWNCLOUD_DB_PASSWORD = dbPass;
         OWNCLOUD_DB_HOST = "owncloud-db.${addresses.network.domain}";
         OWNCLOUD_ADMIN_USERNAME = adminUser;
-        OWNCLOUD_ADMIN_PASSWORD = adminPass;
         OWNCLOUD_MYSQL_UTF8MB4 = "true";
         OWNCLOUD_REDIS_ENABLED = "true";
         OWNCLOUD_REDIS_HOST = "owncloud-redis.${addresses.network.domain}";
         ADMIN_USERNAME = adminUser;
-        ADMIN_PASSWORD = adminPass;
         HTTP_PORT = "8080";
       };
+      environmentFiles = [
+        config.sops.templates."owncloud/env".path
+      ];
       ports = [ "8080" ];
       volumes = [ "/storage/owncloud:/mnt/data" ];
+    };
+    extraConfig = {
+      sops = {
+        secrets."owncloud/admin" = { };
+        secrets."owncloud/db" = { };
+        templates."owncloud/env".content = ''
+          OWNCLOUD_DB_PASSWORD=${config.sops.placeholder."owncloud/db"}
+          OWNCLOUD_ADMIN_PASSWORD=${config.sops.placeholder."owncloud/admin"}
+          ADMIN_PASSWORD=${config.sops.placeholder."owncloud/admin"}
+        '';
+      };
     };
   }
   {
@@ -45,13 +53,23 @@ in
       readOnly = false;
       pullImage = import ../images/mariadb.nix;
       environment = {
-        MYSQL_ROOT_PASSWORD = dbPass;
         MYSQL_USER = dbUser;
-        MYSQL_PASSWORD = dbPass;
         MYSQL_DATABASE = dbName;
         MARIADB_AUTO_UPGRADE = "1";
       };
+      environmentFiles = [
+        config.sops.templates."owncloud-db/env".path
+      ];
       configVolume = "/var/lib/mysql";
+    };
+    extraConfig = {
+      sops = {
+        secrets."owncloud/db" = { };
+        templates."owncloud-db/env".content = ''
+          MYSQL_ROOT_PASSWORD=${config.sops.placeholder."owncloud/db"}
+          MYSQL_PASSWORD=${config.sops.placeholder."owncloud/db"}
+        '';
+      };
     };
   }
   {

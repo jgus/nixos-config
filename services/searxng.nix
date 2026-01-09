@@ -1,19 +1,18 @@
+{ config, myLib, ... }:
 let
-  pw = import ./../.secrets/passwords.nix;
   settings = {
     use_default_settings = true;
     server = {
       base_url = "https://search.gustafson.me";
       port = "8080";
       bind_address = "0.0.0.0";
-      secret_key = pw.searxng.secret;
+      secret_key = config.sops.placeholder.searxng;
     };
     search = {
       formats = [ "html" "json" ];
     };
   };
 in
-{ pkgs, ... }:
 {
   container = {
     readOnly = false;
@@ -23,7 +22,13 @@ in
     ];
     configVolume = "/var/cache/searxng";
     volumes = [
-      "${(pkgs.formats.yaml { }).generate "settings.yml" settings}:/etc/searxng/settings.yml:ro"
+      "${config.sops.templates."searxng/config.yml".path}:/etc/searxng/settings.yml:ro"
     ];
+  };
+  extraConfig = {
+    sops = {
+      secrets.searxng = { };
+      templates."searxng/config.yml".content = myLib.prettyYaml settings;
+    };
   };
 }
