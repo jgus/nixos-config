@@ -2,5 +2,6 @@
     "files.associations": {
         "*.yaml": "yaml"
     },
-    "nixEnvSelector.suggestion": false
+    "nixEnvSelector.suggestion": false,
+    "continue.enableConsole": true
 }

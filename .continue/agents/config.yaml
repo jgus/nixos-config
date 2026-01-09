@@ -1,0 +1,50 @@
+name: NixOS Config
+version: 1.0.0
+schema: v1
+models:
+  - name: Deepseek V3.2
+    provider: openai
+    model: deepseek/deepseek-v3.2
+    apiBase: https://nano-gpt.com/api/v1
+    apiKey: sk-nano-8d70c3e7-61c8-404d-97b4-9e194e75eea4
+  - name: Deepseek V3.2 Thinking
+    provider: openai
+    model: deepseek/deepseek-v3.2:thinking
+    apiBase: https://nano-gpt.com/api/v1
+    apiKey: sk-nano-8d70c3e7-61c8-404d-97b4-9e194e75eea4
+  - name: Deepseek V3.2 Speciale
+    provider: openai
+    model: deepseek/deepseek-v3.2-speciale
+    apiBase: https://nano-gpt.com/api/v1
+    apiKey: sk-nano-8d70c3e7-61c8-404d-97b4-9e194e75eea4
+  - name: Deepseek R1 0528 Qwen3 8B
+    provider: openai
+    model: deepseek-ai/DeepSeek-R1-0528-Qwen3-8B
+    apiBase: https://nano-gpt.com/api/v1
+    apiKey: sk-nano-8d70c3e7-61c8-404d-97b4-9e194e75eea4
+  - name: KAT Coder Pro V1
+    provider: openai
+    model: KAT-Coder-Pro-V1
+    apiBase: https://nano-gpt.com/api/v1
+    apiKey: sk-nano-8d70c3e7-61c8-404d-97b4-9e194e75eea4
+  - name: KAT Coder Air V1
+    provider: openai
+    model: KAT-Coder-Air-V1
+    apiBase: https://nano-gpt.com/api/v1
+    apiKey: sk-nano-8d70c3e7-61c8-404d-97b4-9e194e75eea4
+    roles:
+      - autocomplete
+  - name: GLM 4.5 Air
+    provider: openai
+    model: zai-org/GLM-4.5-Air
+    apiBase: https://nano-gpt.com/api/v1
+    apiKey: sk-nano-8d70c3e7-61c8-404d-97b4-9e194e75eea4
+  - name: GLM 4.7
+    provider: openai
+    model: zai-org/glm-4.7
+    apiBase: https://nano-gpt.com/api/v1
+    apiKey: sk-nano-8d70c3e7-61c8-404d-97b4-9e194e75eea4
+    roles:
+      - chat
+      - edit
+      - apply

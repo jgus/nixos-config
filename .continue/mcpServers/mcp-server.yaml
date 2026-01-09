@@ -1,0 +1,9 @@
+name: NixOS Config
+version: 0.0.1
+schema: v1
+mcpServers:
+  - name: SearXNG
+    type: sse
+    url: "https://search-mcp.gustafson.me/sse"
+  - name: Ripgrep
+    command: "/etc/nixos/.continue/mcpServers/ripgrep.sh"
