@@ -1,4 +1,4 @@
-{ ... }:
+{ config, ... }:
 {
   programs.msmtp = {
     enable = true;
@@ -12,8 +12,9 @@
         port = 587;
         from = "alert@gustafson.me";
         user = "gustafsonme";
-        password = (import .secrets/passwords.nix).smtp2go;
+        passwordeval = "cat ${config.sops.secrets.smtp2go.path}";
       };
     };
   };
+  sops.secrets.smtp2go = { };
 }

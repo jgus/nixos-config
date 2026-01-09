@@ -52,7 +52,7 @@ with builtins;
       (listToAttrs (map (g: { name = "GROUP_${g}"; value = toString config.users.groups.${g}.gid; }) (attrNames config.users.groups))) //
       (listToAttrs (map (u: { name = "UID_${u}"; value = toString config.users.users.${u}.uid; }) (attrNames config.users.users)));
     environmentFiles = [
-      config.sops.templates."samba/env".path
+      config.sops.secrets."samba".path
     ];
     volumes = [
       "/home:/home"
@@ -63,13 +63,6 @@ with builtins;
     ];
   };
   extraConfig = {
-    sops =
-      let
-        users = [ "gustafson" "josh" ];
-      in
-      {
-        secrets = listToAttrs (map (u: { name = "samba/${u}"; value = { }; }) users);
-        templates."samba/env".content = concatStringsSep "\n" (map (u: "ACCOUNT_${u}=${config.sops.placeholder."samba/${u}"}") users);
-      };
+    sops.secrets."samba" = { };
   };
 }

@@ -1,7 +1,6 @@
-{ pkgs, lib, ... }:
+{ config, pkgs, lib, ... }:
 
 let
-  pw = import ./../../.secrets/passwords.nix;
   machine = import ./../../machine.nix;
   addresses = import ./../../addresses.nix { inherit lib; };
 in
@@ -37,7 +36,8 @@ in
     users.admin = {
       actions = [ "SET" "FSD" ];
       instcmds = [ "ALL" ];
-      passwordFile = toString (pkgs.writeText "password.txt" pw.ups);
+      passwordFile = config.sops.secrets.ups.path;
     };
   };
+  sops.secrets.ups = { };
 }

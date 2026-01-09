@@ -60,7 +60,6 @@ in
 { config, pkgs, lib, ... }:
 let
   addresses = import ./../addresses.nix { inherit lib; };
-  pw = import ./../.secrets/passwords.nix;
   windows =
     map
       (line:
@@ -84,9 +83,6 @@ let
         }
       )
       (lib.lists.drop 1 (lib.lists.remove "" (lib.strings.splitString "\n" (readFile ./home-assistant/windows.csv))));
-  secretsYaml = pkgs.writeText "secrets.yaml" ''
-    doorbell_password: ${pw.doorbell}
-  '';
 
   # HTTP Configuration
   httpYaml = (pkgs.formats.yaml { }).generate "http.yaml" {
@@ -398,7 +394,15 @@ in
     };
     volumes = [
       "${haConfigFiles}:/config/generated:ro"
-      "${secretsYaml}:/config/secrets.yaml:ro"
+      "${config.sops.templates."home-assistant/secrets.yaml".path}:/config/secrets.yaml:ro"
     ];
+  };
+  extraConfig = {
+    sops = {
+      secrets.doorbell = { };
+      templates."home-assistant/secrets.yaml".content = ''
+        doorbell_password: ${config.sops.placeholder.doorbell}
+      '';
+    };
   };
 }

@@ -1,7 +1,4 @@
-{ pkgs, ... }:
-let
-  pw = import ./../.secrets/passwords.nix;
-in
+{ config, pkgs, ... }:
 [
   {
     name = "onlyoffice";
@@ -10,15 +7,14 @@ in
       pullImage = import ../images/documentserver.nix;
       configVolume = "/var/www/onlyoffice/Data";
       ports = [ "80" ];
-      environment = {
-        JWT_SECRET = pw.onlyoffice;
-      };
+      environmentFiles = [ config.sops.secrets."onlyoffice".path ];
       volumes = [
         "${pkgs.vista-fonts}:/usr/share/fonts/truetype/vista-fonts:ro"
       ];
     };
     extraConfig = {
       nixpkgs.config.allowUnfree = true;
+      sops.secrets.onlyoffice = { };
     };
   }
 ]

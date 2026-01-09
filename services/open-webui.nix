@@ -1,7 +1,4 @@
-{ ... }:
-let
-  pw = import ./../.secrets/passwords.nix;
-in
+{ config, ... }:
 {
   container = {
     readOnly = false;
@@ -10,8 +7,11 @@ in
       "8080"
     ];
     configVolume = "/app/backend/data";
-    environment = {
-      WEBUI_SECRET_KEY = pw.openWebui.secretKey;
-    };
+    environmentFiles = [
+      config.sops.secrets."openWebui".path
+    ];
+  };
+  extraConfig = {
+    sops.secrets."openWebui" = { };
   };
 }
