@@ -18,7 +18,6 @@ git clone -b ${BRANCH} https://github.com/jgus/nixos-config.git /etc/nixos
 echo -n "${MACHINE_ID}" >/etc/nixos/machine-id.nix
 
 mkdir -p /etc/nixos/.secrets
-[ -f /etc/nixos/.secrets/passwords.nix ] || echo "{}" >/etc/nixos/.secrets/passwords.nix
 [ -f /etc/nixos/.secrets/vkey ] || dd if=/dev/random of=/etc/nixos/.secrets/vkey bs=32 count=1
 mkdir -p /etc/nixos/.secrets/etc/ssh
 ssh-keygen -A -f /etc/nixos/.secrets

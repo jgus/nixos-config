@@ -1,19 +1,5 @@
-with builtins;
+{ config, pkgs, ... }:
 let
-  pw = import ./../.secrets/passwords.nix;
-in
-{ pkgs, ... }:
-let
-  passwordFileDer = pkgs.runCommandLocal "passwordFile" { } (concatStringsSep "\n" (
-    [
-      "mkdir \${out}"
-      "touch \${out}/password.conf"
-      "chmod 600 \${out}/password.conf"
-      # "chown 1883:1883 \${out}/password.conf"
-    ] ++
-    (map (n: "${pkgs.mosquitto}/bin/mosquitto_passwd -b \${out}/password.conf ${n} ${getAttr n pw.mqtt}\n") (attrNames pw.mqtt)) ++
-    [ "" ]
-  ));
   aclFile = pkgs.writeText "acl.conf" ''
     user ha
     topic readwrite #
@@ -54,10 +40,15 @@ in
       "9001"
     ];
     volumes = [
-      "${passwordFileDer}/password.conf:/mosquitto/config/password_file.conf:ro"
+      "${config.sops.secrets."mqtt/file".path}:/mosquitto/config/password_file.conf:ro"
       "${aclFile}:/mosquitto/config/acl_file.conf:ro"
       "${configFile}:/mosquitto/config/mosquitto.conf:ro"
     ];
     readOnly = true;
+  };
+  extraConfig = {
+    sops.secrets."mqtt/file" = {
+      mode = "0444";
+    };
   };
 }
