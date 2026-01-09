@@ -5,7 +5,7 @@ let
   storageBackupPath = name: "/storage/service/${name}";
   serviceDir = readDir ./services;
 in
-args@{ pkgs, lib, ... }:
+args@{ pkgs, lib, myLib, ... }:
 let
   addresses = import ./addresses.nix { inherit lib; };
   containerImport = import ./container.nix { inherit pkgs lib; };

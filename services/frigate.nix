@@ -1,5 +1,5 @@
 with builtins;
-{ config, lib, ... }:
+{ config, myLib, ... }:
 let
   detector = "coral";
   # detector = "onnx";
@@ -315,7 +315,7 @@ in
         "mqtt/frigate" = { };
         frigate_plus = { };
       };
-      templates."frigate/config.yml".content = lib.generators.toYAML { } configuration;
+      templates."frigate/config.yml".content = myLib.prettyYaml configuration;
     };
   };
 }

@@ -1,7 +1,8 @@
+{ pkgs, ... }:
 let
+  myLib = import ./my-lib.nix { inherit pkgs; };
   machine = import ./machine.nix;
 in
-{ config, pkgs, ... }:
 {
   imports = [
     ./machine/${machine.hostName}/hardware-configuration.nix
@@ -22,4 +23,6 @@ in
   ++ (if machine.clamav then [ ./clamav.nix ] else [ ])
   ++ (if machine.python then [ ./python.nix ] else [ ])
   ++ machine.imports;
+
+  _module.args = { inherit myLib; };
 }

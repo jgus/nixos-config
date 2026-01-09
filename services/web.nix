@@ -1,15 +1,7 @@
 # Manage DNS records for the below at: https://dash.cloudflare.com/4863ad256b1367a5598b6b30306133d8/home/domains
-with builtins;
-{ lib, pkgs, ... }:
+{ config, lib, ... }:
 let
   addresses = import ./../addresses.nix { inherit lib; };
-  pw = import ./../.secrets/passwords.nix;
-  encodeCaddyPassword = password: readFile (derivation {
-    name = "encodeCaddyPassword";
-    builder = "/bin/sh";
-    args = [ "-c" "${pkgs.caddy}/bin/caddy hash-password -p '${password}' >$out" ];
-    system = builtins.currentSystem;
-  });
   publicDomain = "gustafson.me";
   caddyFile = ''
     ${publicDomain}, www.${publicDomain} {
@@ -56,31 +48,31 @@ let
     esphome.${publicDomain} {
       reverse_proxy esphome.${addresses.network.domain}:6052
       basic_auth {
-        josh ${encodeCaddyPassword pw.esphome}
+        josh ${config.sops.placeholder.esphome_hashed}
       }
     }
     zwave-main.${publicDomain} {
       reverse_proxy zwave-main.${addresses.network.domain}:8091
       basic_auth {
-        josh ${encodeCaddyPassword pw.zwave}
+        josh ${config.sops.placeholder.zwave_hashed}
       }
     }
     zwave-upstairs.${publicDomain} {
       reverse_proxy zwave-upstairs.${addresses.network.domain}:8091
       basic_auth {
-        josh ${encodeCaddyPassword pw.zwave}
+        josh ${config.sops.placeholder.zwave_hashed}
       }
     }
     zwave-basement.${publicDomain} {
       reverse_proxy zwave-basement.${addresses.network.domain}:8091
       basic_auth {
-        josh ${encodeCaddyPassword pw.zwave}
+        josh ${config.sops.placeholder.zwave_hashed}
       }
     }
     zwave-north.${publicDomain} {
       reverse_proxy zwave-north.${addresses.network.domain}:8091
       basic_auth {
-        josh ${encodeCaddyPassword pw.zwave}
+        josh ${config.sops.placeholder.zwave_hashed}
       }
     }
   '';
@@ -97,8 +89,17 @@ in
     configVolume = "/config";
     volumes = storagePath: [
       "${storagePath "web_data"}:/data"
-      "${pkgs.writeText "Caddyfile" caddyFile}:/etc/caddy/Caddyfile"
+      "${config.sops.templates."caddy/Caddyfile".path}:/etc/caddy/Caddyfile:ro"
       "/storage/service/www:/usr/share/caddy"
     ];
+  };
+  extraConfig = {
+    sops = {
+      secrets = {
+        esphome_hashed = { };
+        zwave_hashed = { };
+      };
+      templates."caddy/Caddyfile".content = caddyFile;
+    };
   };
 }
