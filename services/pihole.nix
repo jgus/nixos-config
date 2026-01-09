@@ -2,7 +2,6 @@ with builtins;
 { config, lib, pkgs, ... }:
 let
   addresses = import ./../addresses.nix { inherit lib; };
-  pw = import ./../.secrets/passwords.nix;
   tftpFiles = {
     "netboot.xyz.kpxe" = fetchurl {
       url = "https://github.com/netbootxyz/netboot.xyz/releases/download/2.0.87/netboot.xyz.kpxe";
@@ -60,7 +59,7 @@ map
         FTLCONF_dns_upstreams = concatStringsSep ";" upstream;
         FTLCONF_dns_domainNeeded = "true";
         FTLCONF_dns_expandHosts = "true";
-        FTLCONF_dns_domain = addresses.network.domain;
+        FTLCONF_dns_domain_name = addresses.network.domain;
         FTLCONF_dns_dnssec = "true";
         FTLCONF_dns_interface = "eth0";
         FTLCONF_dns_listeningMode = "SINGLE";
@@ -75,7 +74,7 @@ map
         FTLCONF_ntp_ipv6_active = "false";
         FTLCONF_ntp_sync_active = "false";
         FTLCONF_ntp_sync_server = "172.22.3.2";
-        FTLCONF_webserver_api_password = pw.pihole;
+        WEBPASSWORD_FILE = "WEBPASSWORD_FILE";
         FTLCONF_misc_etc_dnsmasq_d = "true";
       };
       ports = [
@@ -84,8 +83,8 @@ map
         "80/tcp"
         "443/tcp"
       ];
-      # configVolume = "/etc/pihole";
-      volumes = storagePath: [
+      volumes = [
+        "${config.sops.secrets.pihole.path}:/run/secrets/WEBPASSWORD_FILE:ro"
       ]
       ++ (map (n: "${pkgs.writeText "50-nixos-${n}.conf" dnsmasqConf.${n}}:/etc/dnsmasq.d/50-nixos-${n}.conf") (attrNames dnsmasqConf))
       ++ (map (n: "${tftpFiles.${n}}:/tftp/${n}") (attrNames tftpFiles));
@@ -93,6 +92,7 @@ map
         "--shm-size=1g"
         "--cap-add=NET_ADMIN"
         "--cap-add=NET_RAW"
+        "--cap-add=SYS_NICE"
       ]
       ++
       (map (x: "--dns=${x}") upstream)
@@ -102,5 +102,8 @@ map
       tmpFs = [
         "/etc/pihole"
       ];
+    };
+    extraConfig = {
+      sops.secrets.pihole = { };
     };
   }) [ 1 2 3 ]

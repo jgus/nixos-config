@@ -3,11 +3,11 @@ with builtins;
 let
   machineIdEnv = builtins.getEnv "MACHINE_ID";
   machineId = if (machineIdEnv != "") then machineIdEnv else (builtins.readFile ./machine-id.nix);
-  pw = import ./.secrets/passwords.nix;
   rpi = {
     arch = "rpi";
     lan-interface = "end0";
     zfs = false;
+    clamav = false;
   };
   machine = {
     # Defaults
@@ -16,7 +16,7 @@ let
     nvidia = false;
     zfs = true;
     zfs-pools = [ ];
-    clamav = pw ? smtp2go;
+    clamav = true;
     imports = [ ];
   } // (getAttr machineId {
     d1 = {

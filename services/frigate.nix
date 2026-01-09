@@ -1,12 +1,11 @@
 with builtins;
 { config, lib, ... }:
 let
-  pw = import ./../.secrets/passwords.nix;
   detector = "coral";
   # detector = "onnx";
   doorbell = {
     user = "admin";
-    password = pw.doorbell;
+    password = config.sops.placeholder.doorbell;
     width = 2560;
     height = 1920;
     detectStream = 0;
@@ -164,7 +163,7 @@ let
     mqtt = {
       host = "mqtt.home.gustafson.me";
       user = "frigate";
-      password = pw.mqtt.frigate;
+      password = config.sops.placeholder."mqtt/frigate";
     };
     objects = {
       track = [ "person" "face" "car" "license_plate" "amazon" "usps" "ups" "fedex" "package" ];
@@ -278,7 +277,6 @@ in
     readOnly = false;
     pullImage = import ../images/frigate.nix;
     environment = {
-      PLUS_API_KEY = pw.frigate_plus;
       FRIGATE_RTSP_PASSWORD = "password";
       # NVIDIA_VISIBLE_DEVICES = "GPU-35f1dd5f-a7af-1980-58e4-61bec60811dd";
     };
@@ -293,6 +291,7 @@ in
     configVolume = "/config";
     volumes = [
       "${config.sops.templates."frigate/config.yml".path}:/config/config.yml:ro"
+      "${config.sops.secrets.frigate_plus.path}:/run/secrets/PLUS_API_KEY:ro"
       "/storage/frigate/media:/media/frigate"
       "/etc/localtime:/etc/localtime:ro"
     ];
@@ -309,7 +308,14 @@ in
   };
   extraConfig = {
     boot.extraModulePackages = with config.boot.kernelPackages; [ gasket ];
-    sops.secrets.camera = { };
-    sops.templates."frigate/config.yml".content = lib.generators.toYAML { } configuration;
+    sops = {
+      secrets = {
+        camera = { };
+        doorbell = { };
+        "mqtt/frigate" = { };
+        frigate_plus = { };
+      };
+      templates."frigate/config.yml".content = lib.generators.toYAML { } configuration;
+    };
   };
 }

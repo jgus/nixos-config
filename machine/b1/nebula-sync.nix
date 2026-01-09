@@ -1,7 +1,6 @@
 with builtins;
 { config, pkgs, lib, ... }:
 let
-  pw = import ./../../.secrets/passwords.nix;
   addresses = import ./../../addresses.nix { inherit lib; };
   container = import ./../../container.nix { inherit pkgs lib; };
   image = "ghcr.io/lovelaze/nebula-sync:latest";
@@ -11,11 +10,12 @@ in
     nebula-sync = {
       path = [ container.package ];
       script = ''
+        export PW="$(cat ${config.sops.secrets.pihole.path})"
         ${container.executable} pull ${image}
         ${container.executable} run --rm \
         --name nebula-sync \
-        -e PRIMARY="http://pihole-1|${pw.pihole}" \
-        -e REPLICAS="http://pihole-2|${pw.pihole},http://pihole-3|${pw.pihole}" \
+        -e PRIMARY="http://pihole-1|''${PW}" \
+        -e REPLICAS="http://pihole-2|''${PW},http://pihole-3|''${PW}" \
         -e FULL_SYNC=false \
         -e SYNC_GRAVITY_GROUP=true \
         -e SYNC_GRAVITY_DOMAIN_LIST=true \
@@ -34,4 +34,5 @@ in
       startAt = "hourly";
     };
   };
+  sops.secrets.pihole = { };
 }
