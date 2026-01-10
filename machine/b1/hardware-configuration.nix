@@ -5,7 +5,8 @@
 
 {
   imports =
-    [ (modulesPath + "/installer/scan/not-detected.nix")
+    [
+      (modulesPath + "/installer/scan/not-detected.nix")
     ];
 
   boot.initrd.availableKernelModules = [ "xhci_pci" "ahci" "usb_storage" "sd_mod" ];
@@ -13,8 +14,8 @@
   boot.kernelModules = [ "kvm-intel" ];
   boot.extraModulePackages = [ ];
 
-  # cryptsetup luksFormat /dev/sdb --key-file /etc/nixos/.secrets/vkey
-  # cryptsetup open /dev/sdb d --key-file /etc/nixos/.secrets/vkey
+  # cryptsetup luksFormat /dev/sdb --key-file /boot/.secrets/vkey
+  # cryptsetup open /dev/sdb d --key-file /boot/.secrets/vkey
   # mkfs.xfs /dev/mapper/d
   # mount /dev/mapper/d /d
   # nixos-generate-config
@@ -22,37 +23,47 @@
 
   boot.initrd.luks.devices."d" = {
     device = "/dev/disk/by-uuid/b82f9947-51b4-4a41-af96-32baee7e5e35";
-    keyFile = "/etc/nixos/.secrets/vkey";
+    keyFile = "/boot/.secrets/vkey";
   };
 
   fileSystems."/" =
-    { device = "r";
-      fsType = "zfs"; options = [ "zfsutil" ];
+    {
+      device = "r";
+      fsType = "zfs";
+      options = [ "zfsutil" ];
     };
 
   fileSystems."/etc/nixos" =
-    { device = "r/nixos";
-      fsType = "zfs"; options = [ "zfsutil" ];
+    {
+      device = "r/nixos";
+      fsType = "zfs";
+      options = [ "zfsutil" ];
     };
 
   fileSystems."/root" =
-    { device = "r/root";
-      fsType = "zfs"; options = [ "zfsutil" ];
+    {
+      device = "r/root";
+      fsType = "zfs";
+      options = [ "zfsutil" ];
     };
 
   fileSystems."/var/lib" =
-    { device = "r/varlib";
-      fsType = "zfs"; options = [ "zfsutil" ];
+    {
+      device = "r/varlib";
+      fsType = "zfs";
+      options = [ "zfsutil" ];
     };
 
   fileSystems."/boot" =
-    { device = "/dev/disk/by-uuid/E141-62B8";
+    {
+      device = "/dev/disk/by-uuid/E141-62B8";
       fsType = "vfat";
       options = [ "fmask=0022" "dmask=0022" ];
     };
 
   fileSystems."/d" =
-    { device = "/dev/disk/by-uuid/eeda77c9-1a75-4c16-9a3c-a1fc6fbe067b";
+    {
+      device = "/dev/disk/by-uuid/eeda77c9-1a75-4c16-9a3c-a1fc6fbe067b";
       fsType = "xfs";
     };
 

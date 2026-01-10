@@ -27,7 +27,7 @@ echo -n "${MACHINE_ID}" >/mnt/etc/nixos/machine-id.nix
 mkdir -p /mnt/boot/.secrets
 mkdir -p /mnt/etc/nixos/.secrets
 mount --bind /mnt/boot/.secrets /mnt/etc/nixos/.secrets
-[ -f /mnt/etc/nixos/.secrets/vkey ] || dd if=/dev/random of=/mnt/etc/nixos/.secrets/vkey bs=32 count=1
+[ -f /mnt/boot/.secrets/vkey ] || dd if=/dev/random of=/mnt/boot/.secrets/vkey bs=32 count=1
 mkdir -p /mnt/etc/nixos/.secrets/etc/ssh
 ssh-keygen -A -f /mnt/etc/nixos/.secrets
 

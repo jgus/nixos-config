@@ -78,13 +78,6 @@
       options = [ "fmask=0022" "dmask=0022" ];
     };
 
-  fileSystems."/etc/nixos/.secrets" =
-    {
-      device = "/boot/.secrets";
-      fsType = "none";
-      options = [ "bind" ];
-    };
-
   fileSystems."/s" =
     {
       device = "/dev/md/s";

@@ -5,7 +5,8 @@
 
 {
   imports =
-    [ (modulesPath + "/installer/scan/not-detected.nix")
+    [
+      (modulesPath + "/installer/scan/not-detected.nix")
     ];
 
   boot.initrd.availableKernelModules = [ "xhci_pci" "usbhid" "usb_storage" ];
@@ -15,11 +16,12 @@
 
   # boot.initrd.luks.devices."d" = {
   #   device = "/dev/disk/by-uuid/a82e8c4f-14f0-4fbc-94de-0974dce7c131";
-  #   keyFile = "/etc/nixos/.secrets/vkey";
+  #   keyFile = "/boot/.secrets/vkey";
   # };
 
   fileSystems."/" =
-    { device = "/dev/disk/by-uuid/44444444-4444-4444-8888-888888888888";
+    {
+      device = "/dev/disk/by-uuid/44444444-4444-4444-8888-888888888888";
       fsType = "ext4";
     };
 

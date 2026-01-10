@@ -13,7 +13,6 @@ in
   ];
 
   boot = {
-    initrd.secrets."/etc/nixos/.secrets/vkey" = ./.secrets/vkey;
     tmp.useTmpfs = true;
     supportedFilesystems = [ "ntfs" ];
     # Fix ARP flux: only respond to ARP when target IP is on the receiving interface
