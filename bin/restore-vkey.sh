@@ -5,7 +5,7 @@ set -euo pipefail
 
 # Default values
 SOURCE_FILE="${SOURCE_FILE:-/etc/nixos/secrets/$(hostname)/vkey}"
-TARGET_FILE="${TARGET_FILE:-/boot/.secrets/vkey}"
+TARGET_FILE="${TARGET_FILE:-/boot/vkey}"
 
 # Parse arguments
 while [[ $# -gt 0 ]]; do
@@ -25,7 +25,7 @@ while [[ $# -gt 0 ]]; do
             echo ""
             echo "Options:"
             echo "  --source FILE   Source encrypted vkey file (default: /etc/nixos/secrets/\$(hostname)/vkey)"
-            echo "  --target FILE   Target file for restored vkey (default: /boot/.secrets/vkey)"
+            echo "  --target FILE   Target file for restored vkey (default: /boot/vkey)"
             echo "  -h, --help      Show this help message"
             echo ""
             echo "Environment variables:"

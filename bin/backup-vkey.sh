@@ -4,7 +4,7 @@
 set -euo pipefail
 
 # Default values
-SOURCE_FILE="${SOURCE_FILE:-/boot/.secrets/vkey}"
+SOURCE_FILE="${SOURCE_FILE:-/boot/vkey}"
 TARGET_FILE="${TARGET_FILE:-/etc/nixos/secrets/$(hostname)/vkey}"
 
 # Parse arguments
@@ -24,7 +24,7 @@ while [[ $# -gt 0 ]]; do
             echo "Back up vkey as a sops-encrypted binary file."
             echo ""
             echo "Options:"
-            echo "  --source FILE   Source vkey file (default: /boot/.secrets/vkey)"
+            echo "  --source FILE   Source vkey file (default: /boot/vkey)"
             echo "  --target FILE   Target file for encrypted backup (default: /etc/nixos/secrets/\$(hostname)/vkey)"
             echo "  -h, --help      Show this help message"
             echo ""

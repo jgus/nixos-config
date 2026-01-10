@@ -143,9 +143,9 @@ for machine in "${MACHINES[@]}"; do
     
     if [[ -f "${SECRET_VKEY_FILE}" ]]; then
         # Local backup exists - verify remote key exists and matches
-        if ${SSH_CMD} test -f /boot/.secrets/vkey 2>/dev/null; then
+        if ${SSH_CMD} test -f /boot/vkey 2>/dev/null; then
             DECRYPTED_VKEY=$(sops -d "${SECRET_VKEY_FILE}" 2>/dev/null || echo "")
-            ACTUAL_VKEY=$(${SSH_CMD} cat /boot/.secrets/vkey 2>/dev/null || echo "")
+            ACTUAL_VKEY=$(${SSH_CMD} cat /boot/vkey 2>/dev/null || echo "")
             if [[ "${DECRYPTED_VKEY}" != "${ACTUAL_VKEY}" ]]; then
                 echo "  ✗ vkey content mismatch on ${machine}"
                 RET=1
@@ -156,7 +156,7 @@ for machine in "${MACHINES[@]}"; do
         fi
     else
         # Local backup does not exist - verify remote key also does not exist
-        if ${SSH_CMD} test -f /boot/.secrets/vkey 2>/dev/null; then
+        if ${SSH_CMD} test -f /boot/vkey 2>/dev/null; then
             echo "  ✗ vkey exists on ${machine} but backup missing"
             RET=1
         fi

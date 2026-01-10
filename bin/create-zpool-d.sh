@@ -4,7 +4,7 @@ SWAP_SIZE_="${SWAP_SIZE:-0%}"
 
 Z_DEVS=()
 
-[ -f /boot/.secrets/vkey ] || dd bs=1 count=32 if=/dev/urandom of=/boot/.secrets/vkey
+[ -f /boot/vkey ] || dd bs=1 count=32 if=/dev/urandom of=/boot/vkey
 
 if [[ "${SWAP_SIZE}" == "0%" ]]
 then
@@ -36,7 +36,7 @@ ZPOOL_OPTS=(
     -O com.sun:auto-snapshot=true
     -O encryption=aes-256-gcm
     -O keyformat=raw
-    -O keylocation=file:///boot/.secrets/vkey
+    -O keylocation=file:///boot/vkey
 )
 
 zpool create -f "${ZPOOL_OPTS[@]}" d raidz3 "${Z_DEVS[@]}"

@@ -11,7 +11,7 @@ ZPOOL_OPTS=(
     -O xattr=sa
     -O encryption=on
     -O keyformat=raw
-    -O keylocation=file:///boot/.secrets/vkey
+    -O keylocation=file:///boot/vkey
     -O recordsize=1M
     -O autobackup:snap-$(hostname)=true
 )

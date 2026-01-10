@@ -17,11 +17,6 @@ git clone -b ${BRANCH} https://github.com/jgus/nixos-config.git /etc/nixos
 
 echo -n "${MACHINE_ID}" >/etc/nixos/machine-id.nix
 
-mkdir -p /etc/nixos/.secrets
-[ -f /boot/.secrets/vkey ] || dd if=/dev/random of=/boot/.secrets/vkey bs=32 count=1
-mkdir -p /etc/nixos/.secrets/etc/ssh
-ssh-keygen -A -f /etc/nixos/.secrets
-
 echo "### Installing"
 nix-channel --add https://github.com/NixOS/nixos-hardware/archive/master.tar.gz nixos-hardware
 nix-channel --update
