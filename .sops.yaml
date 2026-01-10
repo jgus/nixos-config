@@ -6,7 +6,7 @@ keys:
   - &server_d1 age14mtzynemax29ls25wk7s72lfnsmqwsxd3suj7a24zxprkkxufqtqfmkq4y
   - &server_pi-67cba1 age1u8f5qmensfddyqcrhzy59uyc5qas400lkvmystkvasxgm3clw9kqs2aya0
 creation_rules:
-  - path_regex: secrets/[^/]+\.(yaml|json|env|ini)$
+  - path_regex: secrets/.*$
     key_groups:
       - age:
           - *admin_josh

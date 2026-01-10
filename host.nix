@@ -1,30 +1,26 @@
 let
   machine = import ./machine.nix;
 in
-{ lib, ... }:
+{ ... }:
 {
   time.timeZone = "America/Denver";
 
-  environment.etc = builtins.listToAttrs
-    (lib.lists.flatten (map
-      (
-        i: [
-          {
-            name = "ssh/ssh_host_${i}_key";
-            value = {
-              source = ./.secrets/ssh/${machine.hostName}/ssh_host_${i}_key;
-              mode = "0600";
-            };
-          }
-          {
-            name = "ssh/ssh_host_${i}_key.pub";
-            value = {
-              source = ./pubkeys/${machine.hostName}/ssh_host_${i}_key.pub;
-              mode = "0644";
-            };
-          }
-        ]
-      ) [ "ecdsa" "ed25519" "rsa" ])) // { };
+  # Use backup-ssh.sh and restore-ssh.sh to backup/restore keys
+  services.openssh.hostKeys = [
+    {
+      path = "/etc/ssh/ssh_host_ed25519_key";
+      type = "ed25519";
+    }
+    {
+      path = "/etc/ssh/ssh_host_ecdsa_key";
+      type = "ecdsa";
+    }
+    {
+      path = "/etc/ssh/ssh_host_rsa_key";
+      type = "rsa";
+      bits = 4096;
+    }
+  ];
 
   networking = {
     hostName = machine.hostName;

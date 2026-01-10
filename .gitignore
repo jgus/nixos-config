@@ -5,4 +5,4 @@ machine-id.nix
 /images/latest
 /plans
 /.direnv
-/secrets/.decrypted~*
+/secrets/**/.decrypted~*
