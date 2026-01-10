@@ -66,7 +66,6 @@ let
       # Network
       pihole-1 = { id = 1; host = "b1"; aliases = [ "dhcp-1" "dns-1" "pihole" "dhcp" "dns" ]; };
       ntp = { id = 2; host = "b1"; };
-      landing = { id = 3; host = "b1"; };
       pihole-2 = { id = 4; host = "c1-1"; aliases = [ "dhcp-2" "dns-2" ]; };
       pihole-3 = { id = 5; host = "d1"; aliases = [ "dhcp-3" "dns-3" ]; };
       cloudflared = { id = 6; host = "c1-2"; };
