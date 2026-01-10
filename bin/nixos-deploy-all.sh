@@ -57,12 +57,28 @@ echo "Switch phase: ${DO_SWITCH}"
 echo "========================================"
 echo ""
 
-nix-channel --update
+#
+# Phase 0: Verify SSH and vkey backups for all machines
+#
+echo "=== Phase 0: Verifying SSH and vkey backups ==="
+echo ""
+
+# Call verification script (try PATH first for packaged case, then fall back to relative path)
+if command -v verify-sops-backups &>/dev/null; then
+    verify-sops-backups
+else
+    "${SCRIPT_DIR}/verify-sops-backups.sh"
+fi
+
+echo ""
 
 #
 # Phase 1: Build all configurations locally
 #
 echo "=== Phase 1: Building all configurations ==="
+
+nix-channel --update
+
 for machine in "${MACHINES[@]}"; do
     echo ""
     echo "--- Building configuration for ${machine} ---"
