@@ -13,7 +13,6 @@ in
     ./sops.nix
     ./vscode.nix
     ./storage.nix
-    ./backup.nix
     ./services.nix
     ./status2mqtt.nix
     ./systemctl-mqtt.nix

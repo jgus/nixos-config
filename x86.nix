@@ -11,11 +11,6 @@
     };
   };
 
-  fileSystems."/etc/nixos/.secrets" = {
-    device = "/boot/.secrets";
-    options = [ "bind" ];
-  };
-
   # Allow building for aarch64 (Raspberry Pi) via binfmt emulation
   # - sandbox = "relaxed": Fall back to unsandboxed when namespaces unavailable (QEMU can't emulate them)
   # - filter-syscalls = false: Disable seccomp filtering (QEMU can't emulate seccomp BPF)
