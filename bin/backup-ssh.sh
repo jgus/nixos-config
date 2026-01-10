@@ -5,7 +5,7 @@ set -euo pipefail
 
 # Default values
 SOURCE_DIR="${SOURCE_DIR:-/etc/ssh}"
-TARGET_DIR="${TARGET_DIR:-/etc/nixos/secrets/ssh/$(hostname)}"
+TARGET_DIR="${TARGET_DIR:-/etc/nixos/secrets/$(hostname)/ssh}"
 
 # Parse arguments
 while [[ $# -gt 0 ]]; do
@@ -25,7 +25,7 @@ while [[ $# -gt 0 ]]; do
             echo ""
             echo "Options:"
             echo "  --source DIR    Source directory containing SSH keys (default: /etc/ssh)"
-            echo "  --target DIR    Target directory for encrypted backups (default: /etc/nixos/secrets/ssh/\$(hostname))"
+            echo "  --target DIR    Target directory for encrypted backups (default: /etc/nixos/secrets/\$(hostname)/ssh)"
             echo "  -h, --help      Show this help message"
             echo ""
             echo "Environment variables:"

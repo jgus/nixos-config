@@ -21,15 +21,6 @@ in
       sops
       age
     ];
-    etc."ssh/age-host-key.txt" = {
-      mode = "0400";
-      source = pkgs.runCommand "age-host-key.txt"
-        {
-          buildInputs = [ pkgs.ssh-to-age ];
-        } ''
-        ssh-to-age -private-key -i ${./.secrets/ssh/${machine.hostName}/ssh_host_ed25519_key} > $out
-      '';
-    };
     sessionVariables = {
       SOPS_AGE_KEY_FILE = "/etc/ssh/age-host-key.txt";
     };

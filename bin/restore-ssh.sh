@@ -1,10 +1,10 @@
 #! /usr/bin/env nix-shell
-#! nix-shell -i bash -p sops openssh
+#! nix-shell -i bash -p sops openssh ssh-to-age
 
 set -euo pipefail
 
 # Default values
-SOURCE_DIR="${SOURCE_DIR:-/etc/nixos/secrets/ssh/$(hostname)}"
+SOURCE_DIR="${SOURCE_DIR:-/etc/nixos/secrets/$(hostname)/ssh}"
 TARGET_DIR="${TARGET_DIR:-/etc/ssh}"
 
 # Parse arguments
@@ -25,7 +25,7 @@ while [[ $# -gt 0 ]]; do
             echo "Extracts public keys from private keys automatically."
             echo ""
             echo "Options:"
-            echo "  --source DIR    Source directory containing encrypted backups (default: /etc/nixos/secrets/ssh/\$(hostname))"
+            echo "  --source DIR    Source directory containing encrypted backups (default: /etc/nixos/secrets/\$(hostname)/ssh)"
             echo "  --target DIR    Target directory for restored keys (default: /etc/ssh)"
             echo "  -h, --help      Show this help message"
             echo ""
@@ -89,6 +89,9 @@ for key_file in "${SOURCE_DIR}"/ssh_host_*_key; do
 
     RESTORE_COUNT=$((RESTORE_COUNT + 1))
 done
+
+ssh-to-age -private-key -i "${TARGET_DIR}/ssh_host_ed25519_key" > "${TARGET_DIR}/age-host-key.txt"
+chmod 0400 "${TARGET_DIR}/age-host-key.txt"
 
 echo ""
 echo "========================================"
