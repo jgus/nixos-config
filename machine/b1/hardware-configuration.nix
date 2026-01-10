@@ -14,18 +14,6 @@
   boot.kernelModules = [ "kvm-intel" ];
   boot.extraModulePackages = [ ];
 
-  # cryptsetup luksFormat /dev/sdb --key-file /boot/.secrets/vkey
-  # cryptsetup open /dev/sdb d --key-file /boot/.secrets/vkey
-  # mkfs.xfs /dev/mapper/d
-  # mount /dev/mapper/d /d
-  # nixos-generate-config
-  # copy/paste
-
-  boot.initrd.luks.devices."d" = {
-    device = "/dev/disk/by-uuid/b82f9947-51b4-4a41-af96-32baee7e5e35";
-    keyFile = "/boot/.secrets/vkey";
-  };
-
   fileSystems."/" =
     {
       device = "r";
@@ -59,12 +47,6 @@
       device = "/dev/disk/by-uuid/E141-62B8";
       fsType = "vfat";
       options = [ "fmask=0022" "dmask=0022" ];
-    };
-
-  fileSystems."/d" =
-    {
-      device = "/dev/disk/by-uuid/eeda77c9-1a75-4c16-9a3c-a1fc6fbe067b";
-      fsType = "xfs";
     };
 
   swapDevices = [ ];
