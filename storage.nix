@@ -1,6 +1,10 @@
 with builtins;
 let
   machine = import ./machine.nix;
+  s3Urls = {
+    cloud = "s3:https://s3.us-west-004.backblazeb2.com/jgus-backup";
+    garage = "s3:http://garage.home.gustafson.me:3900/backup";
+  };
   mapping =
     (listToAttrs (map
       (x: {
@@ -108,7 +112,7 @@ let
       "--keep-yearly=${toString yearly}"
     ];
 in
-{ lib, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 let
   addresses = import ./addresses.nix { inherit lib; };
   nfsExport = name:
@@ -135,6 +139,22 @@ in
 
   environment.systemPackages = with pkgs; [
     nfs-utils
+    (pkgs.writeShellScriptBin "restic-cloud" ''
+      set -a
+      source ${config.sops.secrets."restic/cloud/env".path}
+      set +a
+      export RESTIC_PASSWORD_FILE=${config.sops.secrets."restic/cloud/password".path}
+      export RESTIC_REPOSITORY="${s3Urls.cloud}"
+      exec ${pkgs.restic}/bin/restic "$@"
+    '')
+    (pkgs.writeShellScriptBin "restic-garage" ''
+      set -a
+      source ${config.sops.secrets."restic/garage/env".path}
+      set +a
+      export RESTIC_PASSWORD_FILE=${config.sops.secrets."restic/garage/password".path}
+      export RESTIC_REPOSITORY="${s3Urls.garage}"
+      exec ${pkgs.restic}/bin/restic "$@"
+    '')
   ];
 
   fileSystems =
@@ -149,9 +169,9 @@ in
       garage = {
         initialize = true;
         paths = backupPaths.garage;
-        repository = (readFile "/etc/nixos/.secrets/restic/garage/repository");
-        environmentFile = "/etc/nixos/.secrets/restic/garage/env";
-        passwordFile = "/etc/nixos/.secrets/restic/garage/password";
+        repository = s3Urls.garage;
+        environmentFile = config.sops.secrets."restic/garage/env".path;
+        passwordFile = config.sops.secrets."restic/garage/password".path;
         extraBackupArgs = [ "-v" "--compression=max" ];
         pruneOpts = [ "-v" ] ++ (scaledKeepFlags 20 6);
       };
@@ -161,11 +181,19 @@ in
       cloud = {
         initialize = true;
         paths = backupPaths.cloud;
-        repository = (readFile "/etc/nixos/.secrets/restic/cloud/repository");
-        environmentFile = "/etc/nixos/.secrets/restic/cloud/env";
-        passwordFile = "/etc/nixos/.secrets/restic/cloud/password";
+        repository = s3Urls.cloud;
+        environmentFile = config.sops.secrets."restic/cloud/env".path;
+        passwordFile = config.sops.secrets."restic/cloud/password".path;
         extraBackupArgs = [ "-v" "--compression=max" ];
         pruneOpts = [ "-v" ] ++ (scaledKeepFlags 3 6);
       };
     } else { });
+
+  sops.secrets = {
+    "restic/cloud/env" = { };
+    "restic/cloud/password" = { };
+    "restic/garage/env" = { };
+    "restic/garage/password" = { };
+  };
 }
+
