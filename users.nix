@@ -1,4 +1,4 @@
-{ pkgs, lib, ... }:
+{ config, pkgs, lib, ... }:
 let
   container = import ./container.nix { inherit pkgs lib; };
 in
@@ -17,7 +17,7 @@ in
 
     users = {
       root = {
-        hashedPassword = "$y$j9T$kPkXW3Xo/TsdmLvo5eQE9/$z1/r/jzXvqtH/0xXO.pwtFYqlkt4LN7mnBEU1gjKNR2";
+        hashedPasswordFile = config.sops.secrets."users/josh".path;
         openssh.authorizedKeys.keyFiles = [ ./pubkeys/josh-ed25519 ./pubkeys/josh-rsa ];
       };
 
@@ -54,7 +54,7 @@ in
         uid = 1001;
         isNormalUser = true;
         extraGroups = [ "wheel" "www" container.group "libvirtd" "davfs2" ];
-        hashedPassword = "$y$j9T$ejqS3R1wFPz6VoSCPm6l31$e60wSoEFUtCCklzlwnCxdzre4vuNnmbJE8E/b6/tJ72";
+        hashedPasswordFile = config.sops.secrets."users/josh".path;
         openssh.authorizedKeys.keyFiles = [ ./pubkeys/josh-ed25519 ./pubkeys/josh-rsa ];
       };
 
@@ -69,5 +69,10 @@ in
         group = "minecraft";
       };
     };
+  };
+
+  sops.secrets = {
+    "users/root" = { neededForUsers = true; };
+    "users/josh" = { neededForUsers = true; };
   };
 }
