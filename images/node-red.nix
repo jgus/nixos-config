@@ -1,7 +1,7 @@
 {
   imageName = "nodered/node-red";
-  imageDigest = "sha256:216e7403aab9888f7e68de9e468fed31bb9d7b2d38117c08e645095a63658a2f";
-  hash = "sha256-jY0C2XQYUToeuNZybGBSy78KpY+seJUVkDsEm2LFNnw=";
+  imageDigest = "sha256:41d0985765046e18be11ccc18e839d3d4c09ba122a85ebec96aaa8f77bae0384";
+  hash = "sha256-6NNv/lAJFwCB1VimTHh1vOofyukI0SqKLTW2HagQg9Y=";
   finalImageName = "nodered/node-red";
   finalImageTag = "latest";
 }
