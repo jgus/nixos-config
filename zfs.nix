@@ -1,7 +1,4 @@
-let
-  machine = import ./machine.nix;
-in
-{ pkgs, config, ... }:
+{ pkgs, machine, ... }:
 {
   boot = {
     # kernelPackages = config.boot.zfs.package.latestCompatibleLinuxPackages;

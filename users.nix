@@ -1,6 +1,6 @@
-{ config, pkgs, lib, ... }:
+{ config, pkgs, lib, machine, ... }:
 let
-  container = import ./container.nix { inherit pkgs lib; };
+  container = import ./container.nix { inherit pkgs lib machine; };
 in
 {
   users = {

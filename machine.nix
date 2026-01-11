@@ -1,8 +1,7 @@
 # hostId: head -c4 /dev/urandom | od -A none -t x4
+{ machineId, ... }:
 with builtins;
 let
-  machineIdEnv = builtins.getEnv "MACHINE_ID";
-  machineId = if (machineIdEnv != "") then machineIdEnv else (builtins.readFile ./machine-id.nix);
   rpi = {
     arch = "rpi";
     lan-interface = "end0";

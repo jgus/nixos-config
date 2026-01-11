@@ -1,6 +1,6 @@
-{ pkgs, lib, ... }:
+{ pkgs, lib, inputs, ... }:
 {
-  imports = [ <nixos-hardware/raspberry-pi/4> ];
+  imports = [ inputs.nixos-hardware.nixosModules.raspberry-pi-4 ];
 
   boot = {
     loader = {

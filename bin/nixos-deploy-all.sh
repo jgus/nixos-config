@@ -77,13 +77,11 @@ echo ""
 #
 echo "=== Phase 1: Building all configurations ==="
 
-nix-channel --update
-
 for machine in "${MACHINES[@]}"; do
     echo ""
     echo "--- Building configuration for ${machine} ---"
     # Build and create a GC root symlink
-    MACHINE_ID="${machine}" nix-build '<nixpkgs/nixos>' -A config.system.build.toplevel -o "${RESULT_DIR}/${machine}"
+    nix build .#nixosConfigurations.${machine}.config.system.build.toplevel --out-link "${RESULT_DIR}/${machine}"
     echo "✓ Build successful for ${machine}"
 done
 
@@ -100,10 +98,10 @@ for machine in "${MACHINES[@]}"; do
     echo "--- Testing configuration for ${machine} ---"
     if [[ "${machine}" == "${CURRENT_HOST}" ]]; then
         # Local machine - no --target-host needed
-        MACHINE_ID="${machine}" nixos-rebuild test
+        nixos-rebuild test --flake .#${machine}
     else
         # Remote machine - use --target-host
-        MACHINE_ID="${machine}" nixos-rebuild test --target-host "${machine}"
+        nixos-rebuild test --flake .#${machine} --target-host "${machine}"
     fi
     echo "✓ Test successful for ${machine}"
 done
@@ -122,10 +120,10 @@ if [[ "${DO_SWITCH}" == "true" ]]; then
         echo "--- Switching configuration for ${machine} ---"
         if [[ "${machine}" == "${CURRENT_HOST}" ]]; then
             # Local machine - no --target-host needed
-            MACHINE_ID="${machine}" nixos-rebuild boot
+            nixos-rebuild boot --flake .#${machine}
         else
             # Remote machine - use --target-host
-            MACHINE_ID="${machine}" nixos-rebuild boot --target-host "${machine}"
+            nixos-rebuild boot --flake .#${machine} --target-host "${machine}"
         fi
         echo "✓ Switch successful for ${machine}"
     done

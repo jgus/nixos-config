@@ -1,7 +1,6 @@
-{ pkgs, lib, ... }:
+{ pkgs, lib, machine, ... }:
 let
   addresses = import ./addresses.nix { inherit lib; };
-  machine = import ./machine.nix;
   executable = "podman";
   package = pkgs.podman;
   group = "podman";

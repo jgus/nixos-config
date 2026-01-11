@@ -1,7 +1,6 @@
-{ pkgs, ... }:
+{ pkgs, inputs, machine, ... }:
 let
   myLib = import ./my-lib.nix { inherit pkgs; };
-  machine = import ./machine.nix;
 in
 {
   imports = [
@@ -16,6 +15,8 @@ in
     ./services.nix
     ./status2mqtt.nix
     ./systemctl-mqtt.nix
+    inputs.sops-nix.nixosModules.sops
+    inputs.nix-index-database.nixosModules.nix-index
   ]
   ++ (if machine.nvidia then [ ./nvidia.nix ] else [ ])
   ++ (if machine.zfs then [ ./zfs.nix ] else [ ])

@@ -1,7 +1,4 @@
-let
-  machine = import ./machine.nix;
-in
-{ ... }:
+{ machine, ... }:
 {
   time.timeZone = "America/Denver";
 

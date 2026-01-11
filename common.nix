@@ -1,16 +1,10 @@
-{ pkgs, lib, options, ... }:
+{ pkgs, lib, options, machine, ... }:
 let
   addresses = import ./addresses.nix { inherit lib; };
-  machine = import ./machine.nix;
   hostRecord = addresses.records."${machine.hostName}";
-  nixIndexDatabase = builtins.fetchTarball {
-    url = "https://github.com/nix-community/nix-index-database/archive/main.tar.gz";
-  };
 in
 {
-  imports = [
-    "${nixIndexDatabase}/nixos-module.nix"
-  ];
+  # nix-index-database module is now imported via flake inputs in configuration.nix
 
   boot = {
     tmp.useTmpfs = true;
@@ -234,6 +228,12 @@ in
     '';
     settings = {
       auto-optimise-store = true;
+      substituters = [
+        "https://cache.nixos.org"
+      ];
+      trusted-public-keys = [
+        "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+      ];
     };
   };
 

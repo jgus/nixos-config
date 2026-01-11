@@ -1,6 +1,6 @@
 with builtins;
+{ machine, ... }:
 let
-  machine = import ./machine.nix;
   ### Settings
   name = "vm1";
   uuid = "99fefcc4-d5aa-4717-8dde-4fe5f0552d87";

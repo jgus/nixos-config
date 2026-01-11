@@ -1,9 +1,8 @@
 # Large Model Proxy - manages multiple resource-heavy LLMs on the same machine
 # https://github.com/perk11/large-model-proxy
-{ pkgs, lib, ... }:
+{ pkgs, lib, machine, ... }:
 let
-  machine = import ../machine.nix;
-  container = import ../container.nix { inherit pkgs lib; };
+  container = import ../container.nix { inherit pkgs lib machine; };
   numaCpusStrs = map (cpuSet: lib.concatMapStringsSep "," toString cpuSet) machine.numaCpus;
   numaCpusNearGpu1 = (builtins.elemAt numaCpusStrs 1);
   numaCpusNotNearGpu1 = (builtins.elemAt numaCpusStrs 0);
@@ -546,7 +545,7 @@ in
     macvlan = true;
     tcpPorts = [ 80 8080 8188 ];
     path = [ largeModelProxyPackage pkgs.curl container.package pkgs.bash ];
-    script = { interface, ip, ip6, storagePath, name, ... }: ''
+    script = { ip, ip6, storagePath, name, ... }: ''
       # Create dedicated Container network for LMP if it doesn't exist
       if ! ${container.executable} network inspect ${containerNetworkName} >/dev/null 2>&1; then
         echo "Creating Container network: ${containerNetworkName}"

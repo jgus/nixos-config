@@ -1,7 +1,6 @@
-{ config, pkgs, lib, ... }:
+{ config, lib, machine, ... }:
 
 let
-  machine = import ./../../machine.nix;
   addresses = import ./../../addresses.nix { inherit lib; };
 in
 {

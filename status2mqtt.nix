@@ -1,7 +1,4 @@
-{ config, pkgs, ... }:
-let
-  machine = import ./machine.nix;
-in
+{ config, pkgs, machine, ... }:
 {
   systemd.services = {
     status2mqtt-will = {
@@ -15,7 +12,7 @@ in
           local NAME="$2"
           local UNIQUE_ID="$3"
           local UNIT="$4"
-          
+
           local SENSOR_JSON="\"$UNIQUE_ID\":{"
           SENSOR_JSON="$SENSOR_JSON\"p\":\"sensor\","
           SENSOR_JSON="$SENSOR_JSON\"name\":\"$NAME\","
@@ -26,7 +23,7 @@ in
             SENSOR_JSON="$SENSOR_JSON,\"unit_of_measurement\":\"$UNIT\""
           fi
           SENSOR_JSON="$SENSOR_JSON}"
-          
+
           if [[ -z "$SENSORS_JSON" ]]; then
             SENSORS_JSON="$SENSOR_JSON"
           else
@@ -35,7 +32,7 @@ in
         }
 
         SENSORS_JSON=""
-        
+
         add_sensor "systemd/failed" "Failed Services" "systemd_failed" ""
 
         add_sensor "memory/used" "Memory Used" "memory_used" "bytes"
@@ -50,8 +47,7 @@ in
           add_sensor "drive/''${DNAME}/capacity" "Drive ''${DNAME} Capacity" "drive_''${DNAME}_capacity" "%"
           add_sensor "drive/''${DNAME}/mount" "Drive ''${DNAME} Mount" "drive_''${DNAME}_mount" ""
         done < <(df -x zfs -x tmpfs -x devtmpfs -x efivarfs -x nfs4 -x overlay -x fuse | tail -n +2)
-      ''
-      + (if machine.zfs then ''
+      '' + (if machine.zfs then ''
         for i in $(zpool list -H -o name)
         do
           add_sensor "zpool/$i/health" "ZPool $i Health" "zpool_''${i}_health" ""
@@ -60,8 +56,7 @@ in
           add_sensor "zpool/$i/free" "ZPool $i Free" "zpool_''${i}_free" "bytes"
           add_sensor "zpool/$i/allocated" "ZPool $i Allocated" "zpool_''${i}_allocated" "bytes"
         done
-      '' else "")
-      + ''
+      '' else "") + ''
 
         PAYLOAD_JSON="{\"dev\":{\"ids\":\"server_${machine.hostName}\",\"name\":\"Server ${machine.hostName}\"},\"o\":{\"name\":\"status2mqtt\",\"sw\":\"1.0\"},\"cmps\":{$SENSORS_JSON}}"
         ${pkgs.mosquitto}/bin/mosquitto_pub -V 5 -h mqtt.home.gustafson.me -u server -P $(cat ${config.sops.secrets."mqtt/server".path}) -t homeassistant/device/server_${machine.hostName}/config -r -m "$PAYLOAD_JSON"
@@ -97,7 +92,7 @@ in
         pub memory/used "$(free -L | awk '{ print $6 }')"
         pub memory/free "$(free -L | awk '{ print $8 }')"
 
-        df -x zfs -x tmpfs -x devtmpfs -x efivarfs -x nfs4 -x overlay | tail -n +2 | while read line
+        df -x zfs -x tmpfs -x devtmpfs -x efivarfs -x nfs4 -x overlay -x fuse | tail -n +2 | while read line
         do
           NAME="$(echo ''${line} | awk '{print $1}' | sed 's|^/dev/||' | sed 's|/|_|g')"
           DEVICE="$(echo ''${line} | awk '{print $1}')"
@@ -113,8 +108,7 @@ in
           pub drive/''${NAME}/capacity "''${CAPACITY}"
           pub drive/''${NAME}/mount "''${MOUNT}"
         done
-      ''
-      + (if machine.zfs then ''
+      '' + (if machine.zfs then ''
         for i in $(zpool list -H -o name)
         do
           for p in health capacity size free allocated

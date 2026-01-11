@@ -1,14 +1,13 @@
 with builtins;
 let
-  machine = import ./machine.nix;
   storagePath = name: "/service/${name}";
   storageBackupPath = name: "/storage/service/${name}";
   serviceDir = readDir ./services;
 in
-args@{ pkgs, lib, myLib, ... }:
+args@{ pkgs, lib, myLib, machine, ... }:
 let
   addresses = import ./addresses.nix { inherit lib; };
-  containerImport = import ./container.nix { inherit pkgs lib; };
+  containerImport = import ./container.nix { inherit pkgs lib machine; };
   serviceNames = map (n: lib.strings.removeSuffix ".nix" n) (filter (n: serviceDir.${n} == "regular" && (lib.strings.hasSuffix ".nix" n) && !(lib.strings.hasPrefix "." n)) (attrNames serviceDir));
   homelabServiceStorage = name:
     let

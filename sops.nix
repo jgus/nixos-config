@@ -1,20 +1,6 @@
 { pkgs, ... }:
-let
-  machine = import ./machine.nix;
-in
 {
-  imports =
-    let
-      # https://github.com/Mic92/sops-nix/commits/master/
-      commit = "ea3adcb6d2a000d9a69d0e23cad1f2cacb3a9fbe";
-      sha256 = "sha256:1gsjpxl5ffrxxq6gkrcj0smfkn8bhsz98a4whl4663rdz8s4882r";
-    in
-    [
-      "${builtins.fetchTarball {
-      url = "https://github.com/Mic92/sops-nix/archive/${commit}.tar.gz";
-      inherit sha256;
-    }}/modules/sops"
-    ];
+  # sops-nix module is now imported via flake inputs in configuration.nix
 
   environment = {
     systemPackages = with pkgs; [

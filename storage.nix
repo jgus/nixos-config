@@ -1,6 +1,6 @@
 with builtins;
+{ config, lib, pkgs, machine, ... }:
 let
-  machine = import ./machine.nix;
   s3Urls = {
     cloud = "s3:https://s3.us-west-004.backblazeb2.com/jgus-backup";
     garage = "s3:http://garage.home.gustafson.me:3900/backup";
@@ -91,7 +91,7 @@ let
       where = target name;
     };
   systemdAutomount = name:
-    let m = getAttr name mapping; in {
+    {
       wantedBy = [ "multi-user.target" ];
       automountConfig = {
         TimeoutIdleSec = "600";
@@ -111,9 +111,6 @@ let
       "--keep-monthly=${toString monthly}"
       "--keep-yearly=${toString yearly}"
     ];
-in
-{ config, lib, pkgs, ... }:
-let
   addresses = import ./addresses.nix { inherit lib; };
   nfsExport = name:
     let m = getAttr name mapping; in ''
@@ -196,4 +193,3 @@ in
     "restic/garage/password" = { };
   };
 }
-
