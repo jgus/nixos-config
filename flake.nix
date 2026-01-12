@@ -42,7 +42,7 @@
 
           mkMachine = machineId:
             let
-              machine = import ./machine.nix { lib = nixpkgs.lib; inherit machineId; };
+              machine = import ./machine.nix { inherit machineId; };
             in
             nixpkgs.lib.nixosSystem {
               inherit (machine) system;
