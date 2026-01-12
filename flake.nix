@@ -36,77 +36,33 @@
     , ...
     } @ inputs: {
       # NixOS configurations for each machine
-      nixosConfigurations = {
-        b1 = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          specialArgs = {
-            inherit inputs;
-            machine = import ./machine.nix { lib = nixpkgs.lib; machineId = "b1"; };
-          };
-          modules = [
-            ./configuration.nix
-            ./machine/b1/hardware-configuration.nix
-            sops-nix.nixosModules.sops
-            nix-index-database.nixosModules.nix-index
-          ];
-        };
+      nixosConfigurations =
+        let
+          machineIds = [ "b1" "c1-1" "c1-2" "d1" "pi-67cba1" ];
 
-        c1-1 = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          specialArgs = {
-            inherit inputs;
-            machine = import ./machine.nix { lib = nixpkgs.lib; machineId = "c1-1"; };
-          };
-          modules = [
-            ./configuration.nix
-            ./machine/c1-1/hardware-configuration.nix
-            sops-nix.nixosModules.sops
-            nix-index-database.nixosModules.nix-index
-          ];
-        };
-
-        c1-2 = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          specialArgs = {
-            inherit inputs;
-            machine = import ./machine.nix { lib = nixpkgs.lib; machineId = "c1-2"; };
-          };
-          modules = [
-            ./configuration.nix
-            ./machine/c1-2/hardware-configuration.nix
-            sops-nix.nixosModules.sops
-            nix-index-database.nixosModules.nix-index
-          ];
-        };
-
-        d1 = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          specialArgs = {
-            inherit inputs;
-            machine = import ./machine.nix { lib = nixpkgs.lib; machineId = "d1"; };
-          };
-          modules = [
-            ./configuration.nix
-            ./machine/d1/hardware-configuration.nix
-            sops-nix.nixosModules.sops
-            nix-index-database.nixosModules.nix-index
-          ];
-        };
-
-        pi-67cba1 = nixpkgs.lib.nixosSystem {
-          system = "aarch64-linux";
-          specialArgs = {
-            inherit inputs;
-            machine = import ./machine.nix { lib = nixpkgs.lib; machineId = "pi-67cba1"; };
-          };
-          modules = [
-            ./configuration.nix
-            ./machine/pi-67cba1/hardware-configuration.nix
-            sops-nix.nixosModules.sops
-            nix-index-database.nixosModules.nix-index
-          ];
-        };
-      };
+          mkMachine = machineId:
+            let
+              machine = import ./machine.nix { lib = nixpkgs.lib; inherit machineId; };
+            in
+            nixpkgs.lib.nixosSystem {
+              inherit (machine) system;
+              specialArgs = {
+                inherit inputs machine;
+              };
+              modules = [
+                ./configuration.nix
+                ./machine/${machineId}/hardware-configuration.nix
+                sops-nix.nixosModules.sops
+                nix-index-database.nixosModules.nix-index
+              ];
+            };
+        in
+        nixpkgs.lib.listToAttrs (map
+          (machineId: {
+            name = machineId;
+            value = mkMachine machineId;
+          })
+          machineIds);
 
       # Development shell
       devShells.x86_64-linux.default = nixpkgs.legacyPackages.x86_64-linux.mkShellNoCC {
