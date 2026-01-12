@@ -1,5 +1,5 @@
 # hostId: head -c4 /dev/urandom | od -A none -t x4
-{ machineId, ... }:
+{ lib, machineId, ... }:
 with builtins;
 let
   rpi = {
@@ -73,6 +73,6 @@ in
   python = (machine.arch == "x86");
 }
 //
-(if (machine ? lan-interfaces) then { lan-interface = "br0"; } else { })
+lib.optionalAttrs (machine ? lan-interfaces) { lan-interface = "br0"; }
   //
 machine

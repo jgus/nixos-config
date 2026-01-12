@@ -1,4 +1,4 @@
-{ pkgs, machine, addresses, ... }:
+{ lib, pkgs, machine, addresses, ... }:
 let
   executable = "podman";
   package = pkgs.podman;
@@ -15,19 +15,20 @@ let
     };
 
     systemd = {
-      services = (if machine.zfs then {
-        podman-setup = {
-          path = [ pkgs.zfs ];
-          script = ''
-            zfs list r/varlib/containers >/dev/null 2>&1 || zfs create r/varlib/containers
-          '';
-          serviceConfig = {
-            Type = "oneshot";
+      services = lib.optionalAttrs machine.zfs
+        {
+          podman-setup = {
+            path = [ pkgs.zfs ];
+            script = ''
+              zfs list r/varlib/containers >/dev/null 2>&1 || zfs create r/varlib/containers
+            '';
+            serviceConfig = {
+              Type = "oneshot";
+            };
+            requiredBy = [ "${executable}.service" ];
+            before = [ "${executable}.service" ];
           };
-          requiredBy = [ "${executable}.service" ];
-          before = [ "${executable}.service" ];
-        };
-      } else { }) // {
+        } // {
         podman-configure = {
           path = [ package ];
           script = ''

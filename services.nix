@@ -12,7 +12,7 @@ let
     let
       path = storagePath name;
       backupPath = storageBackupPath name;
-      zfsDeps = if machine.zfs then [ "zfs.target" ] else [ ];
+      zfsDeps = lib.optional machine.zfs "zfs.target";
     in
     {
       systemd.services = {

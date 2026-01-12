@@ -42,11 +42,12 @@
 
           mkMachine = machineId:
             let
-              machine = import ./machine.nix { inherit machineId; };
+              machine = import ./machine.nix { inherit machineId; lib = nixpkgs.lib; };
               addresses = import ./addresses.nix { lib = nixpkgs.lib; };
               container = import ./container.nix {
-                pkgs = nixpkgs.legacyPackages.${machine.system};
                 inherit machine addresses;
+                pkgs = nixpkgs.legacyPackages.${machine.system};
+                lib = nixpkgs.lib;
               };
               myLib = import ./my-lib.nix {
                 pkgs = nixpkgs.legacyPackages.${machine.system};
@@ -72,10 +73,10 @@
                 sops-nix.nixosModules.sops
                 nix-index-database.nixosModules.nix-index
               ]
-              ++ (if machine.nvidia then [ ./nvidia.nix ] else [ ])
-              ++ (if machine.zfs then [ ./zfs.nix ] else [ ])
-              ++ (if machine.clamav then [ ./clamav.nix ] else [ ])
-              ++ (if machine.python then [ ./python.nix ] else [ ])
+              ++ nixpkgs.lib.optional machine.nvidia ./nvidia.nix
+              ++ nixpkgs.lib.optional machine.zfs ./zfs.nix
+              ++ nixpkgs.lib.optional machine.clamav ./clamav.nix
+              ++ nixpkgs.lib.optional machine.python ./python.nix
               ++ machine.imports;
             };
         in

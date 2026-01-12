@@ -1,3 +1,5 @@
+## Searchin the Web ##
+
 - You have access to the searxng `search` tool. If there is _any_ doubt about the veracity or currency of your knowledge, use the searxng `search` tool to find authoritative information. If you make _any_ mistakes, use the `search` tool to verify your understanding.
 - Similarly, when you need to fetch a web page, use the `web` tool for that. It can translate to markdown which will be easier for you to digest. 
 - Remember to use correct JSON when calling the `search` tool or `web` tool.

@@ -1,11 +1,11 @@
-{ config, pkgs, machine, ... }:
+{ config, pkgs, lib, machine, ... }:
 {
   systemd.services = {
     status2mqtt-will = {
       path = with pkgs; [
         gawk
         mosquitto
-      ] ++ (if machine.zfs then [ zfs ] else [ ]);
+      ] ++ lib.optional machine.zfs zfs;
       script = ''
         add_sensor() {
           local TOPIC="$1"
@@ -47,7 +47,7 @@
           add_sensor "drive/''${DNAME}/capacity" "Drive ''${DNAME} Capacity" "drive_''${DNAME}_capacity" "%"
           add_sensor "drive/''${DNAME}/mount" "Drive ''${DNAME} Mount" "drive_''${DNAME}_mount" ""
         done < <(df -x zfs -x tmpfs -x devtmpfs -x efivarfs -x nfs4 -x overlay -x fuse | tail -n +2)
-      '' + (if machine.zfs then ''
+      '' + lib.optionalString machine.zfs ''
         for i in $(zpool list -H -o name)
         do
           add_sensor "zpool/$i/health" "ZPool $i Health" "zpool_''${i}_health" ""
@@ -56,7 +56,7 @@
           add_sensor "zpool/$i/free" "ZPool $i Free" "zpool_''${i}_free" "bytes"
           add_sensor "zpool/$i/allocated" "ZPool $i Allocated" "zpool_''${i}_allocated" "bytes"
         done
-      '' else "") + ''
+      '' + ''
 
         PAYLOAD_JSON="{\"dev\":{\"ids\":\"server_${machine.hostName}\",\"name\":\"Server ${machine.hostName}\"},\"o\":{\"name\":\"status2mqtt\",\"sw\":\"1.0\"},\"cmps\":{$SENSORS_JSON}}"
         ${pkgs.mosquitto}/bin/mosquitto_pub -V 5 -h mqtt.home.gustafson.me -u server -P $(cat ${config.sops.secrets."mqtt/server".path}) -t homeassistant/device/server_${machine.hostName}/config -r -m "$PAYLOAD_JSON"
@@ -77,7 +77,7 @@
         gawk
         mosquitto
         procps
-      ] ++ (if machine.zfs then [ zfs ] else [ ]);
+      ] ++ lib.optional machine.zfs zfs;
       script = ''
         pub() {
           local TOPIC="$1"
@@ -108,7 +108,7 @@
           pub drive/''${NAME}/capacity "''${CAPACITY}"
           pub drive/''${NAME}/mount "''${MOUNT}"
         done
-      '' + (if machine.zfs then ''
+      '' + lib.optionalString machine.zfs ''
         for i in $(zpool list -H -o name)
         do
           for p in health capacity size free allocated
@@ -116,7 +116,7 @@
             pub zpool/$i/$p "$(zpool get $p -Hp -o value $i)"
           done
         done
-      '' else "");
+      '';
       serviceConfig = {
         Type = "oneshot";
       };

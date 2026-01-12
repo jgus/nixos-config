@@ -155,25 +155,26 @@ in
 
   fileSystems =
     listToAttrs (lib.lists.flatten (map (name: if (isLocal name) then (bindMount name) else [ ]) (attrNames mapping)))
-    // (if (isLocal "tmp") then { "/storage/tmp" = { device = "tmpfs"; fsType = "tmpfs"; }; } else { });
+    // lib.optionalAttrs (isLocal "tmp") { "/storage/tmp" = { device = "tmpfs"; fsType = "tmpfs"; }; };
   services.nfs.server.exports = lib.concatStrings (map (name: if (isLocal name) then (nfsExport name) else "") (attrNames mapping));
   systemd.mounts = lib.lists.flatten (map (name: if (isLocal name) then [ ] else [ (systemdMount name) ]) (attrNames mapping));
   systemd.automounts = lib.lists.flatten (map (name: if (isLocal name) then [ ] else [ (systemdAutomount name) ]) (attrNames mapping));
 
   services.restic.backups =
-    (if ((length backupPaths.garage) > 0) then {
-      garage = {
-        initialize = true;
-        paths = backupPaths.garage;
-        repository = s3Urls.garage;
-        environmentFile = config.sops.secrets."restic/garage/env".path;
-        passwordFile = config.sops.secrets."restic/garage/password".path;
-        extraBackupArgs = [ "-v" "--compression=max" ];
-        pruneOpts = [ "-v" ] ++ (scaledKeepFlags 20 6);
-      };
-    } else { })
+    lib.optionalAttrs ((length backupPaths.garage) > 0)
+      {
+        garage = {
+          initialize = true;
+          paths = backupPaths.garage;
+          repository = s3Urls.garage;
+          environmentFile = config.sops.secrets."restic/garage/env".path;
+          passwordFile = config.sops.secrets."restic/garage/password".path;
+          extraBackupArgs = [ "-v" "--compression=max" ];
+          pruneOpts = [ "-v" ] ++ (scaledKeepFlags 20 6);
+        };
+      }
     //
-    (if ((length backupPaths.cloud) > 0) then {
+    lib.optionalAttrs ((length backupPaths.cloud) > 0) {
       cloud = {
         initialize = true;
         paths = backupPaths.cloud;
@@ -183,7 +184,7 @@ in
         extraBackupArgs = [ "-v" "--compression=max" ];
         pruneOpts = [ "-v" ] ++ (scaledKeepFlags 3 6);
       };
-    } else { });
+    };
 
   sops.secrets = {
     "restic/cloud/env" = { };

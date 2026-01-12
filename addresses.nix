@@ -1,5 +1,5 @@
-{ lib }:
 with builtins;
+{ lib }:
 let
   network = rec {
     prefix = "172.22.";
