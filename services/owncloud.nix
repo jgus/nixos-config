@@ -28,6 +28,8 @@ in
         OWNCLOUD_REDIS_HOST = "owncloud-redis.${addresses.network.domain}";
         ADMIN_USERNAME = adminUser;
         HTTP_PORT = "8080";
+        OWNCLOUD_SKIP_CHOWN = "true";
+        OWNCLOUD_SKIP_CHMOD = "true";
       };
       environmentFiles = [
         config.sops.templates."owncloud/env".path
