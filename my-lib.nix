@@ -22,4 +22,12 @@ with builtins;
     "${prefixBase}:${suffix}";
 
   prettyYaml = x: (readFile ((pkgs.formats.yaml { }).generate "yaml" x));
+
+  # Convert values to string for debugging in test assertions
+  toDebugStr = x:
+    if isString x then x
+    else if isInt x || isBool x then toString x
+    else if isList x then toJSON x
+    else if isAttrs x then toJSON x
+    else toString x;
 }

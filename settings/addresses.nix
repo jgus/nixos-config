@@ -187,12 +187,6 @@ let
       camera-s-side = { g = 119; id = 17; mac = "9c:8e:cd:3d:72:c0"; };
       camera-guest-patio = { g = 120; id = 16; mac = "9c:8e:cd:3d:88:7d"; };
     };
-  zeroPad = (s: n: if (stringLength s) >= n then s else (zeroPad ("0" + s) n));
-  toHex2 = (x: zeroPad (lib.strings.toLower (lib.trivial.toHexString x)) 2);
-  getIp = (name:
-    let r = (getAttr name records-conf); in
-    if (r ? dns) then (getIp (if (r.dns == "host") then r.host else r.dns)) else lib.concatStrings [ network.prefix (toString r.g) "." (toString r.id) ]
-  );
   iot = {
     server-climate = { ip = "172.21.1.20"; };
     sprinklers = { ip = "172.21.2.30"; };
@@ -219,12 +213,17 @@ let
     doorbell-basement = { ip = "172.21.120.2"; };
   };
 
+  getIp = (name:
+    let r = (getAttr name records-conf); in
+    if (r ? dns) then (getIp (if (r.dns == "host") then r.host else r.dns)) else lib.concatStrings [ network.prefix (toString r.g) "." (toString r.id) ]
+  );
   records = (mapAttrs
     (k: v:
       { ip = getIp k; }
         //
         (if (v ? dns) then { } else
         let
+          toHex2 = x: lib.strings.fixedWidthString 2 "0" (lib.strings.toLower (lib.trivial.toHexString x));
           mac = if (v ? mac) then v.mac else (lib.concatStrings [ "00:24:0b:16:" (toHex2 v.g) ":" (toHex2 v.id) ]);
           ip6 = myLib.macToIp6 network.prefix6 mac;
         in
