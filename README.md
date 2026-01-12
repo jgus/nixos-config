@@ -26,7 +26,7 @@ The configuration manages multiple machines:
 
 ### Network Structure
 
-See `addresses.nix` for source of truth
+See `settings/addresses.nix` for source of truth
 
 - **Network prefix**: `172.22.0.0/16`
 - **IPv6 prefix**: `2001:55d:b00b:1::/64`
@@ -37,7 +37,7 @@ See `addresses.nix` for source of truth
 
 ### Declarative Configuration
 - All configurations defined in Nix expressions
-- Machine-specific configurations in `machine.nix`
+- Machine-specific configurations in `settings/machine.nix`
 - Service configurations in `services/` directory
 
 ### Service Management
@@ -58,19 +58,21 @@ The project provides a script for managing cross-machine deployments:
 ```
 
 ### Address Management
-- Centralized address management in `addresses.nix`
+- Centralized address management in `settings/addresses.nix`
 - Automatic MAC address generation
 - IPv6 support with EUI-64 identifiers
 - DNS and DHCP reservations
-- Service definitions in `addresses.nix` determine which phyiscal machine instatiates the service
+- Service definitions in `settings/addresses.nix` determine which phyiscal machine instatiates the service
 
 ## Directory Structure
 
 ```
 .
 ├── configuration.nix          # Main configuration
-├── machine.nix               # Machine definitions
-├── addresses.nix             # Network addressing
+├── settings/                 # Configuration settings
+│   ├── machine.nix          # Machine definitions
+│   ├── addresses.nix        # Network addressing
+│   └── container.nix        # Container configuration
 ├── services.nix              # Service orchestration
 ├── services/                 # Individual service configurations
 │   ├── home-assistant.nix
@@ -97,8 +99,8 @@ The project provides a script for managing cross-machine deployments:
 ### Adding a New Service
 
 1. Create a new Nix file in `services/` (e.g., `services/my-service.nix`)
-2. Add a service entry in `addresses.nix`; be sure to assign an id unique within the services group
-3. The machine defined as the host of the service in `addresses.nix` will instantiate the service when its configuration is built and applied
+2. Add a service entry in `settings/addresses.nix`; be sure to assign an id unique within the services group
+3. The machine defined as the host of the service in `settings/addresses.nix` will instantiate the service when its configuration is built and applied
 
 ### Service Options
 

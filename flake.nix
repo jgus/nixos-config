@@ -42,9 +42,9 @@
 
           mkMachine = machineId:
             let
-              machine = import ./machine.nix { inherit machineId; lib = nixpkgs.lib; };
-              addresses = import ./addresses.nix { lib = nixpkgs.lib; };
-              container = import ./container.nix {
+              machine = import ./settings/machine.nix { inherit machineId; lib = nixpkgs.lib; };
+              addresses = import ./settings/addresses.nix { lib = nixpkgs.lib; };
+              container = import ./settings/container.nix {
                 inherit machine addresses;
                 pkgs = nixpkgs.legacyPackages.${machine.system};
                 lib = nixpkgs.lib;
