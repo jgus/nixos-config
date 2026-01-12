@@ -58,11 +58,25 @@
                 inherit inputs machine addresses container myLib;
               };
               modules = [
-                ./configuration.nix
-                ./machine/${machineId}/hardware-configuration.nix
+                ./machine/${machine.hostName}/hardware-configuration.nix
+                ./common.nix
+                ./${machine.arch}.nix
+                ./host.nix
+                ./users.nix
+                ./sops.nix
+                ./vscode.nix
+                ./storage.nix
+                ./services.nix
+                ./status2mqtt.nix
+                ./systemctl-mqtt.nix
                 sops-nix.nixosModules.sops
                 nix-index-database.nixosModules.nix-index
-              ];
+              ]
+              ++ (if machine.nvidia then [ ./nvidia.nix ] else [ ])
+              ++ (if machine.zfs then [ ./zfs.nix ] else [ ])
+              ++ (if machine.clamav then [ ./clamav.nix ] else [ ])
+              ++ (if machine.python then [ ./python.nix ] else [ ])
+              ++ machine.imports;
             };
         in
         nixpkgs.lib.listToAttrs (map
