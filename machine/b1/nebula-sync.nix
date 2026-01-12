@@ -1,8 +1,6 @@
 with builtins;
-{ config, pkgs, lib, machine, ... }:
+{ config, addresses, container, ... }:
 let
-  addresses = import ./../../addresses.nix { inherit lib; };
-  container = import ./../../container.nix { inherit pkgs lib machine; };
   image = "ghcr.io/lovelaze/nebula-sync:latest";
 in
 {

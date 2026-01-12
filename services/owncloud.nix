@@ -1,6 +1,5 @@
-{ config, lib, ... }:
+{ config, addresses, ... }:
 let
-  addresses = import ./../addresses.nix { inherit lib; };
   adminUser = "admin";
   dbName = "owncloud";
   dbUser = "owncloud";

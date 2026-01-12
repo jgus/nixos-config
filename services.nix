@@ -4,10 +4,9 @@ let
   storageBackupPath = name: "/storage/service/${name}";
   serviceDir = readDir ./services;
 in
-args@{ pkgs, lib, myLib, machine, ... }:
+args@{ pkgs, lib, myLib, machine, addresses, container, ... }:
 let
-  addresses = import ./addresses.nix { inherit lib; };
-  containerImport = import ./container.nix { inherit pkgs lib machine; };
+  containerImport = container;
   serviceNames = map (n: lib.strings.removeSuffix ".nix" n) (filter (n: serviceDir.${n} == "regular" && (lib.strings.hasSuffix ".nix" n) && !(lib.strings.hasPrefix "." n)) (attrNames serviceDir));
   homelabServiceStorage = name:
     let

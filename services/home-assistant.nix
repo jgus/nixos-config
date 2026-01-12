@@ -57,9 +57,8 @@ let
     "light.upstairs_hall_north_switch_virtual_s" = "1c74e3a6baf321724a557775e3c20cbc";
   };
 in
-{ config, pkgs, lib, ... }:
+{ config, pkgs, lib, addresses, ... }:
 let
-  addresses = import ./../addresses.nix { inherit lib; };
   windows =
     map
       (line:

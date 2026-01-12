@@ -1,6 +1,5 @@
-{ lib, pkgs, ... }:
+{ pkgs, addresses, ... }:
 let
-  addresses = import ./../addresses.nix { inherit lib; };
   configuration = {
     metadata_dir = "/var/lib/garage/meta";
     data_dir = "/var/lib/garage/data";

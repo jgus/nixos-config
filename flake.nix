@@ -43,11 +43,19 @@
           mkMachine = machineId:
             let
               machine = import ./machine.nix { inherit machineId; };
+              addresses = import ./addresses.nix { lib = nixpkgs.lib; };
+              container = import ./container.nix {
+                pkgs = nixpkgs.legacyPackages.${machine.system};
+                inherit machine addresses;
+              };
+              myLib = import ./my-lib.nix {
+                pkgs = nixpkgs.legacyPackages.${machine.system};
+              };
             in
             nixpkgs.lib.nixosSystem {
               inherit (machine) system;
               specialArgs = {
-                inherit inputs machine;
+                inherit inputs machine addresses container myLib;
               };
               modules = [
                 ./configuration.nix

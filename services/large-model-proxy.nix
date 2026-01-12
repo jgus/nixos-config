@@ -1,8 +1,7 @@
 # Large Model Proxy - manages multiple resource-heavy LLMs on the same machine
 # https://github.com/perk11/large-model-proxy
-{ pkgs, lib, machine, ... }:
+{ pkgs, lib, machine, container, ... }:
 let
-  container = import ../container.nix { inherit pkgs lib machine; };
   numaCpusStrs = map (cpuSet: lib.concatMapStringsSep "," toString cpuSet) machine.numaCpus;
   numaCpusNearGpu1 = (builtins.elemAt numaCpusStrs 1);
   numaCpusNotNearGpu1 = (builtins.elemAt numaCpusStrs 0);

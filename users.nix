@@ -1,7 +1,4 @@
-{ config, pkgs, lib, machine, ... }:
-let
-  container = import ./container.nix { inherit pkgs lib machine; };
-in
+{ config, container, ... }:
 {
   users = {
     mutableUsers = false;

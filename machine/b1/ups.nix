@@ -1,8 +1,4 @@
-{ config, lib, machine, ... }:
-
-let
-  addresses = import ./../../addresses.nix { inherit lib; };
-in
+{ config, machine, addresses, ... }:
 {
   power.ups = {
     enable = true;

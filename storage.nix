@@ -1,5 +1,5 @@
 with builtins;
-{ config, lib, pkgs, machine, ... }:
+{ config, lib, pkgs, machine, addresses, ... }:
 let
   s3Urls = {
     cloud = "s3:https://s3.us-west-004.backblazeb2.com/jgus-backup";
@@ -111,7 +111,6 @@ let
       "--keep-monthly=${toString monthly}"
       "--keep-yearly=${toString yearly}"
     ];
-  addresses = import ./addresses.nix { inherit lib; };
   nfsExport = name:
     let m = getAttr name mapping; in ''
       ${m.path} ${addresses.network.prefix}${toString addresses.group.servers}.0/24(rw,crossmnt,no_root_squash)

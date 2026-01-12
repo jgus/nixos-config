@@ -1,7 +1,6 @@
 with builtins;
-{ config, lib, pkgs, ... }:
+{ config, pkgs, addresses, ... }:
 let
-  addresses = import ./../addresses.nix { inherit lib; };
   tftpFiles = {
     "netboot.xyz.kpxe" = fetchurl {
       url = "https://github.com/netbootxyz/netboot.xyz/releases/download/2.0.87/netboot.xyz.kpxe";

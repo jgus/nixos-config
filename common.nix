@@ -1,6 +1,5 @@
-{ pkgs, lib, options, machine, ... }:
+{ pkgs, lib, options, machine, addresses, ... }:
 let
-  addresses = import ./addresses.nix { inherit lib; };
   hostRecord = addresses.records."${machine.hostName}";
 in
 {

@@ -1,2 +1,3 @@
 - NEVER run `nixos-rebuild test`, `nixos-rebuild boot`, or `nixos-rebuild switch`
 - You MAY run`nixos-rebuild build`
+- We use flakes, so don't forget e.g. `--flake .` to build the local machine
