@@ -27,7 +27,6 @@ done
 
 # Get the directory where this script lives
 SCRIPT_DIR="$(cd "$(dirname "$0")" ; pwd)"
-cd "${SCRIPT_DIR}/.."
 
 # Get current hostname
 CURRENT_HOST="$(hostname)"
