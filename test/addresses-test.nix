@@ -78,12 +78,13 @@ let
     assertHasKey "nameToIp6 has pihole-1" "pihole-1" addresses.nameToIp6 &&
     assertEq "nameToIp6 for pihole-1" "2001:55d:b00b:1:224:bff:fe16:301" addresses.nameToIp6."pihole-1";
 
-  # Test alias resolution for DNS
+  # Test alias resolution
   dnsAliasTests =
     assertHasKey "alias 'dns' resolves" "dns" addresses.nameToIp &&
     assertHasKey "alias 'dhcp' resolves" "dhcp" addresses.nameToIp &&
     assertEq "dns alias resolves to pihole-1" addresses.nameToIp."pihole-1" addresses.nameToIp.dns &&
-    assertEq "dhcp alias resolves to pihole-1" addresses.nameToIp."pihole-1" addresses.nameToIp.dhcp;
+    assertEq "dhcp alias resolves to pihole-1" addresses.nameToIp."pihole-1" addresses.nameToIp.dhcp &&
+    assertEq "pihole-1-host alias resolves to b11" addresses.nameToIp."pihole-1-host" addresses.nameToIp.b1;
 
   # Test alias resolution for home-assistant
   haAliasTests =
@@ -104,15 +105,12 @@ let
     assertIn "hosts for router includes gateway" "gateway" addresses.hosts.${addresses.nameToIp.router} &&
     assertIn "hosts for router includes router" "router" addresses.hosts.${addresses.nameToIp.router} &&
     assertIn "hosts for router includes gateway FQDN" "gateway.home.gustafson.me" addresses.hosts.${addresses.nameToIp.router} &&
-    assertIn "hosts for router includes router FQDN" "router.home.gustafson.me" addresses.hosts.${addresses.nameToIp.router};
-
-  # Test hosts6 file format (pihole-1 has aliases: dhcp, dhcp-1, dns, dns-1, pihole, pihole-1)
-  hosts6Tests =
-    assertHasKey "hosts6 has pihole-1 entry" addresses.nameToIp6."pihole-1" addresses.hosts6 &&
-    assertIn "hosts6 for pihole-1 includes dhcp" "dhcp" addresses.hosts6.${addresses.nameToIp6."pihole-1"} &&
-    assertIn "hosts6 for pihole-1 includes pihole-1" "pihole-1" addresses.hosts6.${addresses.nameToIp6."pihole-1"} &&
-    assertIn "hosts6 for pihole-1 includes dhcp FQDN" "dhcp.home.gustafson.me" addresses.hosts6.${addresses.nameToIp6."pihole-1"} &&
-    assertIn "hosts6 for pihole-1 includes pihole-1 FQDN" "pihole-1.home.gustafson.me" addresses.hosts6.${addresses.nameToIp6."pihole-1"};
+    assertIn "hosts for router includes router FQDN" "router.home.gustafson.me" addresses.hosts.${addresses.nameToIp.router} &&
+    assertHasKey "hosts6 has pihole-1 entry" addresses.nameToIp6."pihole-1" addresses.hosts &&
+    assertIn "hosts6 for pihole-1 includes dhcp" "dhcp" addresses.hosts.${addresses.nameToIp6."pihole-1"} &&
+    assertIn "hosts6 for pihole-1 includes pihole-1" "pihole-1" addresses.hosts.${addresses.nameToIp6."pihole-1"} &&
+    assertIn "hosts6 for pihole-1 includes dhcp FQDN" "dhcp.home.gustafson.me" addresses.hosts.${addresses.nameToIp6."pihole-1"} &&
+    assertIn "hosts6 for pihole-1 includes pihole-1 FQDN" "pihole-1.home.gustafson.me" addresses.hosts.${addresses.nameToIp6."pihole-1"};
 
   # Test DHCP reservations
   routerReservation = lib.findFirst (r: r.name == "router") null addresses.dhcpReservations;
@@ -151,11 +149,6 @@ let
   containerHostsTests =
     assertEq "containerAddAllHosts is non-empty" true (length addresses.containerAddAllHosts > 0) &&
     assertNotNull "containerAddAllHosts includes router" routerHostEntry;
-
-  # Test ipToIp6 mapping
-  ipToIp6Tests =
-    assertHasKey "ipToIp6 has pihole-1 entry" addresses.records.pihole-1.ip addresses.ipToIp6 &&
-    assertEq "ipToIp6 mapping for pihole-1" addresses.nameToIp6."pihole-1" addresses.ipToIp6.${addresses.records.pihole-1.ip};
 
   # Test IOT entries
   iotTests =
@@ -201,11 +194,9 @@ dnsAliasTests &&
 haAliasTests &&
 serverNamesTests &&
 hostsTests &&
-hosts6Tests &&
 dhcpTests &&
 containerOptionsTests &&
 containerHostsTests &&
-ipToIp6Tests &&
 iotTests &&
 theaterPiTests &&
 haTests &&

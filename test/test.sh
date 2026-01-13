@@ -29,7 +29,7 @@ run_test() {
 
   echo -e "${YELLOW}Running${NC} ${test_file}..."
 
-  if nix-instantiate --eval --expr "import ${test_path}" > /dev/null 2>&1; then
+  if nix-instantiate --eval --expr "import ${test_path}"; then
     echo -e "${GREEN}✓${NC} ${test_file} passed"
     passed_count=$((passed_count + 1))
   else

@@ -1,6 +1,7 @@
 with builtins;
 { lib, myLib }:
 let
+  # === Configuration ===
   network = rec {
     prefix = "172.22.";
     prefixLength = 16;
@@ -8,6 +9,8 @@ let
     prefix6 = "2001:55d:b00b:1::";
     prefix6Length = 64;
     domain = "home.gustafson.me";
+    serviceMacPrefix = "00:24:0b:16:";
+    dnsServers = [ "pihole-1" "pihole-2" "pihole-3" ];
   };
   group = {
     network = 0;
@@ -130,9 +133,6 @@ let
       # Other
       minecraft = { id = 100; host = "c1-2"; };
     } //
-    mapAttrs (k: v: { g = group.vms; } // v) {
-      vm1 = { id = 1; host = "d1"; dns = "host"; };
-    } //
     mapAttrs (k: v: { g = group.admin; } // v) {
       c1-imc-1 = { id = 2; mac = "70:0f:6a:3b:46:01"; aliases = [ "c1-imc" ]; };
       c1-imc-2 = { id = 3; mac = "70:79:b3:09:49:16"; };
@@ -213,87 +213,120 @@ let
     doorbell-basement = { ip = "172.21.120.2"; };
   };
 
-  getIp = (name:
-    let r = (getAttr name records-conf); in
-    if (r ? dns) then (getIp (if (r.dns == "host") then r.host else r.dns)) else lib.concatStrings [ network.prefix (toString r.g) "." (toString r.id) ]
-  );
+  # === Helper Functions ===
+  toHex2 = x: lib.strings.fixedWidthString 2 "0" (lib.strings.toLower (lib.trivial.toHexString x));
+
+  nameAndFqdn = name: [ name "${name}.${network.domain}" ];
+
+  # === Complete Records ===
+  # Set default ip, mac, and ip6 addresses; add IoT records
   records = (mapAttrs
     (k: v:
-      { ip = getIp k; }
-        //
-        (if (v ? dns) then { } else
-        let
-          toHex2 = x: lib.strings.fixedWidthString 2 "0" (lib.strings.toLower (lib.trivial.toHexString x));
-          mac = if (v ? mac) then v.mac else (lib.concatStrings [ "00:24:0b:16:" (toHex2 v.g) ":" (toHex2 v.id) ]);
-          ip6 = myLib.macToIp6 network.prefix6 mac;
-        in
-        { inherit mac ip6; }
-        )
-        //
-        v
+      rec {
+        ip = "${network.prefix}${toString v.g}.${toString v.id}";
+        mac = "${network.serviceMacPrefix}${toHex2 v.g}:${toHex2 v.id}";
+        ip6 = myLib.macToIp6 network.prefix6 mac;
+      } // v
     )
     records-conf) // iot;
+
+  # === Alias Resolution ===
+  # Lists of records that have a host attribute (ie hosted services)
   hostedNames = filter (n: (getAttr n records) ? host) (attrNames records);
-  assignedAliasList = lib.lists.flatten (map (n: let r = (getAttr n records); in (if (r ? aliases) then (map (a: { name = a; value = n; }) r.aliases) else [ ])) (attrNames records));
-  hostAliasList = map (n: let r = (getAttr n records); in { name = "${n}-host"; value = r.host; }) hostedNames;
+
+  # Map alias -> canonical name, for auto-generated host aliases (e.g. pihole-1-host -> b1)
+  hostAliasList = map
+    (n:
+      {
+        name = "${n}-host";
+        value = records.${n}.host;
+      }
+    )
+    hostedNames;
+
+  # Map alias -> canonical name, for explicitly assigned aliases
+  assignedAliasList = lib.lists.flatten (map
+    (n: map (a: { name = a; value = n; }) (records.${n}.aliases or [ ]))
+    (attrNames records)
+  );
+
+  # Map alias -> canonical name
   aliases = listToAttrs (assignedAliasList ++ hostAliasList);
-  realNameToIp = listToAttrs (lib.lists.flatten (map
-    (k:
-      let r = (getAttr k records); in
-      [{ name = k; value = r.ip; }] ++ (if (r ? aliases) then (map (a: { name = a; value = r.ip; }) r.aliases) else [ ])
-    )
-    (attrNames records)));
-  nameToIp = realNameToIp // (mapAttrs (k: v: getAttr v realNameToIp) aliases);
-  realNameToIp6 = listToAttrs (lib.lists.flatten (map
-    (k:
-      let r = (getAttr k records); in
-      if (r ? ip6) then ([{ name = k; value = r.ip6; }] ++ (if (r ? aliases) then (map (a: { name = a; value = r.ip6; }) r.aliases) else [ ])) else [ ]
-    )
-    (attrNames records)));
-  nameToIp6 = realNameToIp6 // (mapAttrs (k: v: getAttr v realNameToIp6) aliases);
-  names = attrNames nameToIp;
-  names6 = attrNames nameToIp6;
-  serverNames = filter (n: (hasAttr n records) && (records."${n}" ? g) && (records."${n}".g == 1)) (attrNames records);
-  ipToNames = lib.lists.groupBy (n: getAttr n nameToIp) names;
-  ip6ToNames = lib.lists.groupBy (n: getAttr n nameToIp6) names6;
-  hosts = mapAttrs (key: value: lib.lists.flatten (map (e: [ e (e + "." + network.domain) ]) value)) ipToNames;
-  hosts6 = mapAttrs (key: value: lib.lists.flatten (map (e: [ e (e + "." + network.domain) ]) value)) ip6ToNames;
-  ipToIp6 = listToAttrs (lib.lists.flatten (map
-    (k:
-      let r = (getAttr k records); in
-      if (r ? ip6) then [{ name = r.ip; value = r.ip6; }] else [ ]
-    )
-    (attrNames records)));
-  dhcpReservations = lib.lists.flatten [
-    (map
+
+  # === Name -> Attribute Mapping ===
+  # Map canonical name -> attribute (given by attrName)
+  # Only includes items where the attribute exists on the given record
+  buildNameToAttr = attrName:
+    listToAttrs (lib.lists.flatten (map
       (k:
-        let
-          r = (getAttr k records);
-        in
-        if (r ? mac) then [{ name = k; ip = r.ip; mac = r.mac; }] else [ ]
+        let r = records.${k}; in
+        lib.optional (hasAttr attrName r) [{ name = k; value = r.${attrName}; }]
       )
-      (attrNames records)
+      (attrNames records)));
+
+  # buildNameToAttr, with aliases too
+  buildAliasToAttr = attrName:
+    let
+      nameToAttr = buildNameToAttr attrName;
+    in
+    nameToAttr // (mapAttrs (k: v: getAttr v nameToAttr) aliases);
+
+  # === Name <-> IP Mappings ===
+  nameToIp = buildAliasToAttr "ip";
+  nameToIp6 = buildAliasToAttr "ip6";
+
+  # All names with an associated ip address
+  names = attrNames nameToIp;
+
+  # All names with an associated ip6 address (everything but IoT)
+  names6 = attrNames nameToIp6;
+
+  # IP (4 or 6) -> list of names
+  ipToNames = (lib.lists.groupBy (n: getAttr n nameToIp) names) // (lib.lists.groupBy (n: getAttr n nameToIp6) names6);
+
+  # IP (4 or 6) -> list of names, includinh FQDNs, suitable for /etc/hosts generation
+  hosts = mapAttrs (key: value: lib.lists.flatten (map nameAndFqdn value)) ipToNames;
+
+  # Names of physical servers
+  serverNames = filter (n: (hasAttr n records) && (records."${n}" ? g) && (records."${n}".g == 1)) (attrNames records);
+
+  # List of name/ip/mac records, suitable for generating a dhcp reservation list
+  dhcpReservations = lib.lists.flatten (map
+    (k:
+      let
+        r = (getAttr k records);
+      in
+      lib.optional (r ? mac) { name = k; ip = r.ip; mac = r.mac; }
     )
-  ];
+    (attrNames records)
+  );
+
+  # Network options to be added to every container service
   containerOptions = service: [
     "--network=macvlan"
-    "--mac-address=${records."${service}".mac}"
+    "--mac-address=${records.${service}.mac}"
     "--hostname=${service}"
-    "--ip=${records."${service}".ip}"
-    "--ip6=${records."${service}".ip6}"
-    "--dns=${records.pihole-1.ip}"
-    "--dns=${records.pihole-2.ip}"
-    "--dns=${records.pihole-3.ip}"
+    "--ip=${records.${service}.ip}"
+    "--ip6=${records.${service}.ip6}"
     "--dns-search=${network.domain}"
+  ] ++ map (name: "--dns=${records.${name}.ip}") network.dnsServers;
+
+  # Exhaustive host records, for DNS containers
+  containerAddAllHosts = lib.lists.flatten [
+    (map (n: map (name: "--add-host=${name}:${getAttr n nameToIp}") (nameAndFqdn n)) names)
+    (map (n: map (name: "--add-host=${name}:${getAttr n nameToIp6}") (nameAndFqdn n)) names6)
   ];
-  containerAddAllHosts =
-    (map (n: "--add-host=${n}:${getAttr n nameToIp}") names)
-    ++
-    (map (n: "--add-host=${n}.${network.domain}:${getAttr n nameToIp}") names)
-    ++
-    (map (n: "--add-host=${n}:${getAttr n nameToIp6}") names6)
-    ++
-    (map (n: "--add-host=${n}.${network.domain}:${getAttr n nameToIp6}") names6)
-  ;
 in
-{ inherit network group records nameToIp nameToIp6 ipToIp6 serverNames hosts hosts6 dhcpReservations containerOptions containerAddAllHosts; }
+{
+  inherit
+    network
+    group
+    records
+    nameToIp
+    nameToIp6
+    serverNames
+    hosts
+    dhcpReservations
+    containerOptions
+    containerAddAllHosts;
+}
