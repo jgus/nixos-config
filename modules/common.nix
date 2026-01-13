@@ -92,6 +92,7 @@
       automatic = true;
       persistent = true;
       options = "--delete-older-than 3d";
+      dates = "weekly";
     };
     extraOptions = ''
       download-buffer-size = ${toString (512*1024*1024)}

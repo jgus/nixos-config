@@ -44,12 +44,15 @@ let
       then
         echo "Update available for ${pullImage.finalImageName}:${pullImage.finalImageTag} in ${file}; pulling..."
         echo "${pullImage.finalImageName}:${pullImage.finalImageTag} in ${file}" >&3
-        ${pkgs.nix-prefetch-docker}/bin/nix-prefetch-docker --quiet --image-name ${pullImage.finalImageName} --image-tag ${pullImage.finalImageTag} > ${latestDir}/${file}
+        ${pkgs.nix-prefetch-docker}/bin/nix-prefetch-docker --quiet --image-name ${pullImage.finalImageName} --image-tag ${pullImage.finalImageTag} > ${latestDir}/${file} &
       fi
     '')
     allPullImages))
   +
   ''
+
+    # Wait for any downloads to finish
+    wait
 
     # If any outdated images found, send email notification
     if [ -s /dev/fd/3 ]; then
@@ -81,7 +84,7 @@ in
       serviceConfig = {
         Type = "oneshot";
       };
-      startAt = "daily";
+      startAt = "05:00";
     };
   };
 }
