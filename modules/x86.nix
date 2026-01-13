@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... }:
+{ pkgs, ... }:
 {
   boot = {
     # Enable binfmt emulation for aarch64 to allow cross-building for Raspberry Pi
@@ -21,10 +21,6 @@
   };
 
   system = {
-    # autoUpgrade = {
-    #   enable = true;
-    #   allowReboot = true;
-    # };
     includeBuildDependencies = true;
     activationScripts = {
       syncBoot.text = ''

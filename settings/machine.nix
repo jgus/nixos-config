@@ -69,9 +69,7 @@ in
     x86 = "x86_64-linux";
   };
   fwupd = (machine.arch == "x86");
-  python = (machine.arch == "x86");
-}
-//
-lib.optionalAttrs (machine ? lan-interfaces) { lan-interface = "br0"; }
-  //
+  timeZone = "America/Denver";
+} //
+lib.optionalAttrs (machine ? lan-interfaces) { lan-interface = "br0"; } //
 machine

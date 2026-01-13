@@ -1,7 +1,5 @@
 { pkgs, ... }:
 {
-  # sops-nix module is now imported via flake inputs in configuration.nix
-
   environment = {
     systemPackages = with pkgs; [
       sops

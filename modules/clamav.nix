@@ -1,8 +1,6 @@
 with builtins;
-{ config, pkgs, ... }:
+{ pkgs, ... }:
 {
-  imports = [ ./msmtp.nix ];
-
   services = {
     clamav = {
       daemon.enable = false; # use clamscan instead of clamdscan

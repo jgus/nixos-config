@@ -64,11 +64,12 @@
               };
               modules = [
                 ./machine/${machine.hostName}/hardware-configuration.nix
-                ./modules/common.nix
                 ./modules/${machine.arch}.nix
-                ./modules/host.nix
-                ./modules/users.nix
+                ./modules/common.nix
+                ./modules/network.nix
                 ./modules/sops.nix
+                ./modules/users.nix
+                ./modules/msmtp.nix
                 ./modules/vscode.nix
                 ./modules/storage.nix
                 ./modules/services.nix
@@ -80,7 +81,6 @@
               ++ nixpkgs.lib.optional machine.nvidia ./modules/nvidia.nix
               ++ nixpkgs.lib.optional machine.zfs ./modules/zfs.nix
               ++ nixpkgs.lib.optional machine.clamav ./modules/clamav.nix
-              ++ nixpkgs.lib.optional machine.python ./modules/python.nix
               ++ machine.imports;
             };
         in

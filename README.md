@@ -88,7 +88,6 @@ The project provides a script for managing cross-machine deployments:
 │   ├── msmtp.nix            # Email sending
 │   ├── nebula-sync.nix      # Nebula DNS sync
 │   ├── nvidia.nix           # NVIDIA GPU support
-│   ├── python.nix           # Python development
 │   ├── rpi.nix              # Raspberry Pi specific
 │   ├── services.nix         # Service orchestration
 │   ├── sops.nix             # SOPS secrets management
