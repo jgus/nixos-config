@@ -1,7 +1,7 @@
 {
   imageName = "lscr.io/linuxserver/qbittorrent";
-  imageDigest = "sha256:e0cedcadd62f809efdeddfd32e4d1192f9a74e6e64ed6753bfc6e2c3ed4a714a";
-  hash = "sha256-TjzNLqHpXDwCiBQ5LG+qkg4tMaFolhUG2s0PT0uMF4E=";
+  imageDigest = "sha256:95114034a7f74672b76f795f6938921b0ca795f85b59b48691035dc66714f34c";
+  hash = "sha256-2nj0V9JmUOGQxgIeeskauMdtY/LSz4Ky5oX9Q5PwLw8=";
   finalImageName = "lscr.io/linuxserver/qbittorrent";
   finalImageTag = "latest";
 }

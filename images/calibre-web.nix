@@ -1,7 +1,7 @@
 {
   imageName = "lscr.io/linuxserver/calibre-web";
-  imageDigest = "sha256:6436b96fca0c08d37f5f62991ac7e4b0b9717fb3073d8769cd8cfd91f3d39122";
-  hash = "sha256-TwM1nvlVoQzR2wUZQsAy6dCrofJlzCpPL7Oqp//5RFI=";
+  imageDigest = "sha256:38e1cd557dea7f7816849feb30364141dab7f819e2dbdfa652ce19b948162896";
+  hash = "sha256-908NbLoZHV4QPe/pUXxJOq+67osZYioIHlK5qxzhqdA=";
   finalImageName = "lscr.io/linuxserver/calibre-web";
   finalImageTag = "latest";
 }

@@ -1,7 +1,7 @@
 {
   imageName = "redis";
-  imageDigest = "sha256:b0637889625b89ff449612d5729da2b99adafeda9b2c16faa5428f2dbd310685";
-  hash = "sha256-MJGq50IuW4Q5mzooCaSmyseVnPhlsAv2RdFZnYb+yss=";
+  imageDigest = "sha256:4ca9827b05f7e99986f378e94fa7ab5f6efbe3ff0cc5fa4f3fb21ad74d29ec1a";
+  hash = "sha256-yL//HyF4dE0C3jamgcP0d3drsVXiNiHRBc5lG4MJlwQ=";
   finalImageName = "redis";
   finalImageTag = "6";
 }

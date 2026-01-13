@@ -1,7 +1,7 @@
 {
   imageName = "ghcr.io/sillytavern/sillytavern";
-  imageDigest = "sha256:67ad5ac946babd1234458679ec5e10791820d68d9c67f81a43db1a6c3f609164";
-  hash = "sha256-74syOlWVTyIv7qhpQASupHsIvPO+5wTpHqpz7d2y8E4=";
+  imageDigest = "sha256:cb3ba4d156b959299a7fed08451413ba140d60a046e0e12a1282b5d43f4eeb39";
+  hash = "sha256-2mmgMJYwhVidaWsGbT07xUZSuaPQ945PemL+zf3Aia8=";
   finalImageName = "ghcr.io/sillytavern/sillytavern";
   finalImageTag = "latest";
 }
