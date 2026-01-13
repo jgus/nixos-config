@@ -3,5 +3,8 @@
         "*.yaml": "yaml"
     },
     "nixEnvSelector.suggestion": false,
-    "continue.enableConsole": true
+    "continue.enableConsole": true,
+    "nix.hiddenLanguageServerErrors": [
+        "textDocument/definition"
+    ]
 }
