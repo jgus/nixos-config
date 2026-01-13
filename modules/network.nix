@@ -91,7 +91,7 @@ in
             Table = 200;
           }
         ];
-        # Source-based policy routing rules - declarative, no oneshot service needed!
+        # Source-based policy routing rules
         routingPolicyRules = [
           {
             # Traffic FROM this host's IP uses the lan0 routing table

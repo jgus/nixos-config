@@ -139,15 +139,11 @@ let
       c1-bmc-1 = { id = 12; mac = "b4:de:31:bd:a8:be"; };
       c1-bmc-2 = { id = 13; mac = "00:be:75:e0:a2:3e"; };
       d1-bmc = { id = 4; mac = "18:66:da:b6:45:d8"; };
-      d2-bmc = { id = 100; mac = "84:2b:2b:57:53:84"; };
-      d3-bmc = { id = 101; mac = "00:26:b9:49:cb:ff"; };
       josh-pc-bmc = { id = 5; mac = "18:31:bf:cf:20:0b"; };
       server-ups = { id = 6; mac = "28:29:86:7f:bf:21"; };
     } //
     mapAttrs (k: v: { g = group.office; } // v) {
       josh-pc = { id = 1; mac = "3c:fd:fe:e1:b9:d6"; };
-      snap-mac = { id = 6; mac = "a4:fc:14:0d:f0:ea"; };
-      snap-laptop = { id = 20; mac = "08:92:04:6e:38:61"; };
     } //
     mapAttrs (k: v: { g = group.study; } // v) {
       printer = { id = 2; mac = "f4:81:39:e4:0a:83"; };
