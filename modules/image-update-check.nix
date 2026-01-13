@@ -2,7 +2,7 @@ with builtins;
 { pkgs, lib, ... }:
 let
   # Inline image extractor logic
-  imagesDir = ./../../images;
+  imagesDir = ./../images;
   imageFiles = builtins.readDir imagesDir;
 
   nixFiles = builtins.filter
@@ -85,4 +85,3 @@ in
     };
   };
 }
-

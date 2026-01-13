@@ -2,7 +2,7 @@ with builtins;
 let
   storagePath = name: "/service/${name}";
   storageBackupPath = name: "/storage/service/${name}";
-  serviceDir = readDir ./services;
+  serviceDir = readDir ../services;
 in
 args@{ pkgs, lib, myLib, machine, addresses, container, ... }:
 let
@@ -261,7 +261,7 @@ let
     if (machine.hostName == addresses.records.${name}.host) then serviceConfig else { };
   importService = n:
     let
-      i = (import ./services/${n}.nix) args;
+      i = (import ../services/${n}.nix) args;
     in
     if (isList i) then (map (f: homelabService f) i) else (homelabService ({ name = n; } // i));
 in

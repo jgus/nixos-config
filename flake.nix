@@ -64,23 +64,23 @@
               };
               modules = [
                 ./machine/${machine.hostName}/hardware-configuration.nix
-                ./common.nix
-                ./${machine.arch}.nix
-                ./host.nix
-                ./users.nix
-                ./sops.nix
-                ./vscode.nix
-                ./storage.nix
-                ./services.nix
-                ./status2mqtt.nix
-                ./systemctl-mqtt.nix
+                ./modules/common.nix
+                ./modules/${machine.arch}.nix
+                ./modules/host.nix
+                ./modules/users.nix
+                ./modules/sops.nix
+                ./modules/vscode.nix
+                ./modules/storage.nix
+                ./modules/services.nix
+                ./modules/status2mqtt.nix
+                ./modules/systemctl-mqtt.nix
                 sops-nix.nixosModules.sops
                 nix-index-database.nixosModules.nix-index
               ]
-              ++ nixpkgs.lib.optional machine.nvidia ./nvidia.nix
-              ++ nixpkgs.lib.optional machine.zfs ./zfs.nix
-              ++ nixpkgs.lib.optional machine.clamav ./clamav.nix
-              ++ nixpkgs.lib.optional machine.python ./python.nix
+              ++ nixpkgs.lib.optional machine.nvidia ./modules/nvidia.nix
+              ++ nixpkgs.lib.optional machine.zfs ./modules/zfs.nix
+              ++ nixpkgs.lib.optional machine.clamav ./modules/clamav.nix
+              ++ nixpkgs.lib.optional machine.python ./modules/python.nix
               ++ machine.imports;
             };
         in

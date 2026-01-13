@@ -14,7 +14,7 @@
 
   # https://dl.thalheim.io/
   sops = {
-    defaultSopsFile = ./secrets/passwords.yaml;
+    defaultSopsFile = ../secrets/passwords.yaml;
     age = {
       keyFile = "/etc/ssh/age-host-key.txt";
       sshKeyPaths = [ ];

@@ -68,29 +68,51 @@ The project provides a script for managing cross-machine deployments:
 
 ```
 .
-├── configuration.nix          # Main configuration
-├── settings/                 # Configuration settings
-│   ├── machine.nix          # Machine definitions
-│   ├── addresses.nix        # Network addressing
-│   └── container.nix        # Container configuration
-├── services.nix              # Service orchestration
-├── services/                 # Individual service configurations
-│   ├── home-assistant.nix
-│   ├── jellyfin.nix
-│   ├── pihole.nix
-│   └── ...
-├── machine/                  # Machine-specific configurations
+├── flake.nix                # Configuration entry point
+├── machine/                 # Machine-specific configurations
 │   ├── b1/
 │   ├── c1-1/
 │   ├── c1-2/
 │   ├── d1/
 │   └── pi-67cba1/
-├── bin/                      # Deployment scripts
-│   ├── nixos-deploy-all.sh
-│   ├── nixos-rebuild-all.sh
+├── settings/                # Configuration settings
+│   ├── machine.nix          # Machine definitions
+│   ├── addresses.nix        # Network addressing
+│   └── container.nix        # Container configuration
+├── modules/                 # NixOS modules
+│   ├── cec.nix              # CEC support (RPi)
+│   ├── clamav.nix           # ClamAV antivirus
+│   ├── common.nix           # Common configuration
+│   ├── host.nix             # Host configuration
+│   ├── image-update-check.nix  # Container image updates
+│   ├── msmtp.nix            # Email sending
+│   ├── nebula-sync.nix      # Nebula DNS sync
+│   ├── nvidia.nix           # NVIDIA GPU support
+│   ├── python.nix           # Python development
+│   ├── rpi.nix              # Raspberry Pi specific
+│   ├── services.nix         # Service orchestration
+│   ├── sops.nix             # SOPS secrets management
+│   ├── status2mqtt.nix      # Status to MQTT bridge
+│   ├── storage.nix          # Storage configuration
+│   ├── systemctl-mqtt.nix   # Systemctl to MQTT bridge
+│   ├── ups.nix              # UPS monitoring
+│   ├── users.nix            # User configuration
+│   ├── vscode.nix           # VSCode remote server
+│   ├── x86.nix              # x86 specific
+│   ├── zfs.nix              # ZFS filesystem
 │   └── ...
-├── storage.nix               # Storage configuration
-├── backup.nix                # Backup configuration
+├── services/                # Individual service configurations
+│   ├── home-assistant.nix
+│   ├── jellyfin.nix
+│   ├── pihole.nix
+│   └── ...
+├── images/                   # Container image definitions
+├── bin/                      # Various scripts
+│   ├── nixos-deploy-all.sh
+│   └── ...
+├── install/                  # Installation scripts
+├── secrets/                  # Encrypted secrets (SOPS)
+├── pubkeys/                  # Public keys
 └── ...
 ```
 

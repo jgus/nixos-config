@@ -26,8 +26,7 @@ let
       nvidia = true;
       zfs-pools = [ "d" "f" ];
       imports = [
-        #../machine/vm-vm1.nix
-        ../machine/d1/image-update-check.nix
+        ../modules/image-update-check.nix
       ];
       numaCpus = [
         [ 0 2 4 6 8 10 12 14 16 18 20 22 24 26 28 30 32 34 36 38 40 42 44 46 48 50 52 54 56 58 60 62 64 66 68 70 ]
@@ -53,14 +52,14 @@ let
       lan-interface = "enp1s0";
       zfs-pools = [ ];
       imports = [
-        ../machine/b1/nebula-sync.nix
-        ../machine/b1/ups.nix
+        ../modules/nebula-sync.nix
+        ../modules/ups.nix
       ];
     };
     pi-67cba1 = rpi // {
       stateVersion = "23.05";
       hostId = "62c05afa";
-      imports = [ ../cec.nix ];
+      imports = [ ../modules/cec.nix ];
     };
   });
 in
