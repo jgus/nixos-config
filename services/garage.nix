@@ -1,4 +1,4 @@
-{ pkgs, addresses, ... }:
+{ addresses, myLib, ... }:
 let
   configuration = {
     metadata_dir = "/var/lib/garage/meta";
@@ -40,7 +40,7 @@ in
     pullImage = import ../images/garage.nix;
     readOnly = true;
     volumes = [
-      "${(pkgs.formats.toml { }).generate "garage.toml" configuration}:/etc/garage.toml:ro"
+      "${myLib.prettyToml configuration}:/etc/garage.toml:ro"
       "/storage/garage/meta:/var/lib/garage/meta"
       "/storage/garage/data:/var/lib/garage/data"
     ];

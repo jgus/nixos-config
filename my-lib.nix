@@ -21,7 +21,9 @@ with builtins;
     in
     "${prefixBase}:${suffix}";
 
-  prettyYaml = x: (readFile ((pkgs.formats.yaml { }).generate "yaml" x));
+  prettyJson = x: ((pkgs.formats.json { }).generate "json" x);
+  prettyToml = x: ((pkgs.formats.toml { }).generate "toml" x);
+  prettyYaml = x: ((pkgs.formats.yaml { }).generate "yaml" x);
 
   # Convert values to string for debugging in test assertions
   toDebugStr = x:

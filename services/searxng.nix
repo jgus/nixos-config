@@ -1,3 +1,4 @@
+with builtins;
 { addresses, config, myLib, ... }:
 let
   settings = {
@@ -28,7 +29,7 @@ in
   extraConfig = {
     sops = {
       secrets.searxng = { };
-      templates."searxng/config.yml".content = myLib.prettyYaml settings;
+      templates."searxng/config.yml".content = readFile (myLib.prettyYaml settings);
     };
   };
 }

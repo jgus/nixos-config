@@ -315,7 +315,7 @@ in
         "mqtt/frigate" = { };
         frigate_plus = { };
       };
-      templates."frigate/config.yml".content = myLib.prettyYaml configuration;
+      templates."frigate/config.yml".content = readFile (myLib.prettyYaml configuration);
     };
   };
 }
