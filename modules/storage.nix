@@ -135,21 +135,21 @@ in
 
   environment.systemPackages = with pkgs; [
     nfs-utils
-    (pkgs.writeShellScriptBin "restic-cloud" ''
+    (writeShellScriptBin "restic-cloud" ''
       set -a
       source ${config.sops.secrets."restic/cloud/env".path}
       set +a
       export RESTIC_PASSWORD_FILE=${config.sops.secrets."restic/cloud/password".path}
       export RESTIC_REPOSITORY="${s3Urls.cloud}"
-      exec ${pkgs.restic}/bin/restic "$@"
+      exec ${restic}/bin/restic "$@"
     '')
-    (pkgs.writeShellScriptBin "restic-garage" ''
+    (writeShellScriptBin "restic-garage" ''
       set -a
       source ${config.sops.secrets."restic/garage/env".path}
       set +a
       export RESTIC_PASSWORD_FILE=${config.sops.secrets."restic/garage/password".path}
       export RESTIC_REPOSITORY="${s3Urls.garage}"
-      exec ${pkgs.restic}/bin/restic "$@"
+      exec ${restic}/bin/restic "$@"
     '')
   ];
 

@@ -7,7 +7,6 @@
 ### Coding Standards for Nix Files ###
 
 - Don't use `with` at the top of a file, _except_ `with builtins`.
-- Generally, scope `with`, `let`, and function arguments to the smallest scope where they apply.
 - Sort arguments declarations alphabetically, as well as anything else without an intrinsic order, or a logical organizational order
 - Functions/modules should be organized like this:
   - `with builtins;` as the _first_ line of the file, iff builtins are used
@@ -15,7 +14,7 @@
   - arguments, sorted alphabetically
   - let block with definitions that _do_ depend on arguments
   - function body
-- Prefer `lib.optional` instead of `if ... then [ ... ] else [ ]`; similarly with `lib.mkIf` and `lib.mkMerge`, etc.
+- Prefer `lib.optional` instead of `if ... then [ ... ] else [ ]`; similarly with `lib.attrsets.optionalAttrs`, etc.
 - Comments should be only for non-obvious things. Avoid especially "Look I did what you asked!" comments.
 - Prefer `inherit x;` over `x = x;`
 - In contianer volume specifications, ensure secrets are always mounted with `:ro`

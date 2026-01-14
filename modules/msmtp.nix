@@ -1,4 +1,4 @@
-{ addresses, config, ... }:
+{ config, addresses, ... }:
 {
   programs.msmtp = {
     enable = true;

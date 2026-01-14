@@ -1,4 +1,4 @@
-{ addresses, config, pkgs, lib, machine, ... }:
+{ addresses, config, lib, machine, pkgs, ... }:
 {
   systemd.services = {
     status2mqtt-will = {

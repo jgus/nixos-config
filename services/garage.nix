@@ -1,3 +1,4 @@
+# TODO: Use SOPS for secrets (rpc_secret, admin_token, metrics_token)
 { addresses, myLib, ... }:
 let
   configuration = {

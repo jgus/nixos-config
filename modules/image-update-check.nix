@@ -3,16 +3,16 @@ with builtins;
 let
   # Inline image extractor logic
   imagesDir = ./../images;
-  imageFiles = builtins.readDir imagesDir;
+  imageFiles = readDir imagesDir;
 
-  nixFiles = builtins.filter
+  nixFiles = filter
     (
       name:
       imageFiles.${name} == "regular"
       && lib.strings.hasSuffix ".nix" name
       && !(lib.strings.hasPrefix "." name)
     )
-    (builtins.attrNames imageFiles);
+    (attrNames imageFiles);
 
   pullImagesInFile = name:
     [{
@@ -37,7 +37,7 @@ let
 
   ''
   +
-  (builtins.concatStringsSep "\n" (map
+  (concatStringsSep "\n" (map
     ({ pullImage, file }: ''
       echo "Checking ${pullImage.finalImageName}:${pullImage.finalImageTag} from ${file}..."
       if [ "$(skopeo inspect docker://${pullImage.finalImageName}:${pullImage.finalImageTag} --format '{{.Digest}}')" != "${pullImage.imageDigest}" ]

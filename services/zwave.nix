@@ -14,7 +14,6 @@ let
       ];
       configVolume = "/usr/src/app/store";
     };
-  }
-  ;
+  };
 in
 map zwave-area [ "basement" "main" "north" "upstairs" ]

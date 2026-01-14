@@ -1,6 +1,6 @@
 # Large Model Proxy - manages multiple resource-heavy LLMs on the same machine
 # https://github.com/perk11/large-model-proxy
-{ pkgs, lib, machine, myLib, container, ... }:
+{ container, lib, machine, myLib, pkgs, ... }:
 let
   numaCpusStrs = map (cpuSet: lib.concatMapStringsSep "," toString cpuSet) machine.numaCpus;
   numaCpusNearGpu1 = (builtins.elemAt numaCpusStrs 1);
@@ -35,10 +35,10 @@ let
     # Tests require the built binary during check phase, which doesn't exist yet
     doCheck = false;
 
-    meta = with pkgs.lib; {
+    meta = {
       description = "Proxy for managing multiple resource-heavy Large Models";
       homepage = "https://github.com/perk11/large-model-proxy";
-      license = licenses.mit;
+      license = pkgs.lib.licenses.mit;
     };
   };
 

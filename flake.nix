@@ -25,14 +25,14 @@
   };
 
   outputs =
-    { self
+    { devshell
+    , flake-utils
+    , nix-index-database
+    , nixos-hardware
     , nixpkgs
     , nixpkgs-unstable
-    , nixos-hardware
     , sops-nix
-    , nix-index-database
-    , devshell
-    , flake-utils
+    , self
     , ...
     } @ inputs: {
       # NixOS configurations for each machine

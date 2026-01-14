@@ -1,4 +1,4 @@
-{ pkgs, lib, options, machine, addresses, ... }:
+{ addresses, lib, machine, options, pkgs, ... }:
 {
   boot = {
     tmp.useTmpfs = true;

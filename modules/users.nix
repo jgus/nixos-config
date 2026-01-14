@@ -1,4 +1,4 @@
-{ config, container, ... }:
+{ container, config, ... }:
 {
   users = {
     mutableUsers = false;
@@ -69,7 +69,7 @@
   };
 
   sops.secrets = {
-    "users/root" = { neededForUsers = true; };
     "users/josh" = { neededForUsers = true; };
+    "users/root" = { neededForUsers = true; };
   };
 }

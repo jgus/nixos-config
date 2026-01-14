@@ -3,13 +3,10 @@
   nixpkgs.overlays = [
     (self: super: {
       libcec = super.libcec.override { withLibraspberrypi = true; };
-    }
-    )
+    })
   ];
 
-  environment.systemPackages = [
-    pkgs.libcec
-  ];
+  environment.systemPackages = [ pkgs.libcec ];
 
   networking.firewall = {
     allowedUDPPorts = [ 9526 ];
