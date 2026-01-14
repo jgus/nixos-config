@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ addresses, config, pkgs, ... }:
 let
   systemctlMqttPackage =
     { buildPythonApplication
@@ -40,7 +40,7 @@ in
         (pkgs.python3.pkgs.callPackage systemctlMqttPackage { })
       ];
       script = ''
-        systemctl-mqtt --mqtt-host mqtt.home.gustafson.me --mqtt-disable-tls --mqtt-username server --mqtt-password $(cat ${config.sops.secrets."mqtt/server".path}) $(systemctl list-unit-files --all --full --plain --no-legend --output=short homelab-*.service | sed 's/^homelab-//' | awk '{print "--monitor-system-unit " $1 " --control-system-unit " $1}')
+        systemctl-mqtt --mqtt-host mqtt.${addresses.network.domain} --mqtt-disable-tls --mqtt-username server --mqtt-password $(cat ${config.sops.secrets."mqtt/server".path}) $(systemctl list-unit-files --all --full --plain --no-legend --output=short homelab-*.service | sed 's/^homelab-//' | awk '{print "--monitor-system-unit " $1 " --control-system-unit " $1}')
       '';
       serviceConfig = {
         Type = "simple";

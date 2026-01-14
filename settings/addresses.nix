@@ -11,6 +11,7 @@ let
     domain = "home.gustafson.me";
     serviceMacPrefix = "00:24:0b:16:";
     dnsServers = [ "pihole-1" "pihole-2" "pihole-3" ];
+    publicDomain = "gustafson.me";
   };
   group = {
     network = 0;

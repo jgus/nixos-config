@@ -1,5 +1,5 @@
 with builtins;
-{ config, myLib, ... }:
+{ addresses, config, myLib, ... }:
 let
   detector = "coral";
   # detector = "onnx";
@@ -161,7 +161,7 @@ let
     version = "0.16-0";
     # logger.default = "debug";
     mqtt = {
-      host = "mqtt.home.gustafson.me";
+      host = "mqtt.${addresses.network.domain}";
       user = "frigate";
       password = config.sops.placeholder."mqtt/frigate";
     };
@@ -231,18 +231,18 @@ let
             if (value.detectStream == 0) then
               [
                 {
-                  path = "rtsp://${value.user}:${value.password}@${key}.home.gustafson.me:554/cam/realmonitor?channel=1&subtype=0";
+                  path = "rtsp://${value.user}:${value.password}@${key}.${addresses.network.domain}:554/cam/realmonitor?channel=1&subtype=0";
                   roles = [ "detect" "audio" "record" ];
                 }
               ]
             else
               [
                 {
-                  path = "rtsp://${value.user}:${value.password}@${key}.home.gustafson.me:554/cam/realmonitor?channel=1&subtype=${toString value.detectStream}";
+                  path = "rtsp://${value.user}:${value.password}@${key}.${addresses.network.domain}:554/cam/realmonitor?channel=1&subtype=${toString value.detectStream}";
                   roles = [ "detect" "audio" ];
                 }
                 {
-                  path = "rtsp://${value.user}:${value.password}@${key}.home.gustafson.me:554/cam/realmonitor?channel=1&subtype=0";
+                  path = "rtsp://${value.user}:${value.password}@${key}.${addresses.network.domain}:554/cam/realmonitor?channel=1&subtype=0";
                   roles = [ "record" ];
                 }
               ];
@@ -267,7 +267,7 @@ let
       )
       cameras;
     go2rtc.streams = mapAttrs
-      (key: value: [ "rtsp://${value.user}:${value.password}@${key}.home.gustafson.me:554/cam/realmonitor?channel=1&subtype=2" ])
+      (key: value: [ "rtsp://${value.user}:${value.password}@${key}.${addresses.network.domain}:554/cam/realmonitor?channel=1&subtype=2" ])
       cameras;
   };
 in

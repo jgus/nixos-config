@@ -3,7 +3,7 @@ with builtins;
 let
   s3Urls = {
     cloud = "s3:https://s3.us-west-004.backblazeb2.com/jgus-backup";
-    garage = "s3:http://garage.home.gustafson.me:3900/backup";
+    garage = "s3:http://garage.${addresses.network.domain}:3900/backup";
   };
   mapping =
     (listToAttrs (map

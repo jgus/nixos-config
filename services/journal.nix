@@ -1,4 +1,4 @@
-{ config, ... }:
+{ addresses, config, ... }:
 [
   {
     name = "journal-db";
@@ -22,8 +22,8 @@
         WORDPRESS_DB_HOST = "journal-db";
         WORDPRESS_TABLE_PREFIX = "journal_";
         # WORDPRESS_ENVIRONMENT_TYPE = "production";
-        WORDPRESS_HOME = "http://journal.gustafson.me/";
-        WORDPRESS_SITEURL = "http://journal.gustafson.me/";
+        WORDPRESS_HOME = "http://journal.${addresses.network.publicDomain}/";
+        WORDPRESS_SITEURL = "http://journal.${addresses.network.publicDomain}/";
       };
       environmentFiles = [ config.sops.secrets."journal/env".path ];
     };

@@ -15,8 +15,8 @@ in
       dependsOn = [ "owncloud-db" "owncloud-redis" ];
       environment = {
         OWNCLOUD_VERSION = "10.15";
-        OWNCLOUD_DOMAIN = "drive.gustafson.me";
-        OWNCLOUD_TRUSTED_DOMAINS = "drive.gustafson.me,owncloud.${addresses.network.domain}";
+        OWNCLOUD_DOMAIN = "drive.${addresses.network.publicDomain}";
+        OWNCLOUD_TRUSTED_DOMAINS = "drive.${addresses.network.publicDomain},owncloud.${addresses.network.domain}";
         OWNCLOUD_DB_TYPE = "mysql";
         OWNCLOUD_DB_NAME = dbName;
         OWNCLOUD_DB_USERNAME = dbUser;

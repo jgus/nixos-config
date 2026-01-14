@@ -1,4 +1,4 @@
-{ config, pkgs, lib, machine, ... }:
+{ addresses, config, pkgs, lib, machine, ... }:
 {
   systemd.services = {
     status2mqtt-will = {
@@ -59,11 +59,11 @@
       '' + ''
 
         PAYLOAD_JSON="{\"dev\":{\"ids\":\"server_${machine.hostName}\",\"name\":\"Server ${machine.hostName}\"},\"o\":{\"name\":\"status2mqtt\",\"sw\":\"1.0\"},\"cmps\":{$SENSORS_JSON}}"
-        ${pkgs.mosquitto}/bin/mosquitto_pub -V 5 -h mqtt.home.gustafson.me -u server -P $(cat ${config.sops.secrets."mqtt/server".path}) -t homeassistant/device/server_${machine.hostName}/config -r -m "$PAYLOAD_JSON"
+        ${pkgs.mosquitto}/bin/mosquitto_pub -V 5 -h mqtt.${addresses.network.domain} -u server -P $(cat ${config.sops.secrets."mqtt/server".path}) -t homeassistant/device/server_${machine.hostName}/config -r -m "$PAYLOAD_JSON"
 
         systemctl start status2mqtt.service
 
-        mosquitto_sub -V 5 -h mqtt.home.gustafson.me -u server -P $(cat ${config.sops.secrets."mqtt/server".path}) -t server/${machine.hostName} --will-topic server/${machine.hostName}/availability --will-retain --will-payload offline
+        mosquitto_sub -V 5 -h mqtt.${addresses.network.domain} -u server -P $(cat ${config.sops.secrets."mqtt/server".path}) -t server/${machine.hostName} --will-topic server/${machine.hostName}/availability --will-retain --will-payload offline
       '';
       serviceConfig = {
         Type = "simple";
@@ -82,7 +82,7 @@
         pub() {
           local TOPIC="$1"
           local PAYLOAD="$2"
-          mosquitto_pub -V 5 -h mqtt.home.gustafson.me -u server -P $(cat ${config.sops.secrets."mqtt/server".path}) -t server/${machine.hostName}/''${TOPIC} -r -m "''${PAYLOAD}"
+          mosquitto_pub -V 5 -h mqtt.${addresses.network.domain} -u server -P $(cat ${config.sops.secrets."mqtt/server".path}) -t server/${machine.hostName}/''${TOPIC} -r -m "''${PAYLOAD}"
         }
 
         pub availability online

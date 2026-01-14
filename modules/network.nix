@@ -18,7 +18,7 @@ in
     tempAddresses = "disabled";
     domain = addresses.network.domain;
     nameservers = [ addresses.records.pihole-1.ip addresses.records.pihole-2.ip addresses.records.pihole-3.ip "1.1.1.1" "1.0.0.1" ];
-    timeServers = [ "ntp.home.gustafson.me" ];
+    timeServers = [ "ntp.${addresses.network.domain}" ];
     hosts = addresses.hosts;
   };
 

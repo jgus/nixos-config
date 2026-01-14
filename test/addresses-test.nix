@@ -104,13 +104,13 @@ let
     assertHasKey "hosts has router entry" addresses.nameToIp.router addresses.hosts &&
     assertIn "hosts for router includes gateway" "gateway" addresses.hosts.${addresses.nameToIp.router} &&
     assertIn "hosts for router includes router" "router" addresses.hosts.${addresses.nameToIp.router} &&
-    assertIn "hosts for router includes gateway FQDN" "gateway.home.gustafson.me" addresses.hosts.${addresses.nameToIp.router} &&
-    assertIn "hosts for router includes router FQDN" "router.home.gustafson.me" addresses.hosts.${addresses.nameToIp.router} &&
+    assertIn "hosts for router includes gateway FQDN" "gateway.${addresses.network.domain}" addresses.hosts.${addresses.nameToIp.router} &&
+    assertIn "hosts for router includes router FQDN" "router.${addresses.network.domain}" addresses.hosts.${addresses.nameToIp.router} &&
     assertHasKey "hosts6 has pihole-1 entry" addresses.nameToIp6."pihole-1" addresses.hosts &&
     assertIn "hosts6 for pihole-1 includes dhcp" "dhcp" addresses.hosts.${addresses.nameToIp6."pihole-1"} &&
     assertIn "hosts6 for pihole-1 includes pihole-1" "pihole-1" addresses.hosts.${addresses.nameToIp6."pihole-1"} &&
-    assertIn "hosts6 for pihole-1 includes dhcp FQDN" "dhcp.home.gustafson.me" addresses.hosts.${addresses.nameToIp6."pihole-1"} &&
-    assertIn "hosts6 for pihole-1 includes pihole-1 FQDN" "pihole-1.home.gustafson.me" addresses.hosts.${addresses.nameToIp6."pihole-1"};
+    assertIn "hosts6 for pihole-1 includes dhcp FQDN" "dhcp.${addresses.network.domain}" addresses.hosts.${addresses.nameToIp6."pihole-1"} &&
+    assertIn "hosts6 for pihole-1 includes pihole-1 FQDN" "pihole-1.${addresses.network.domain}" addresses.hosts.${addresses.nameToIp6."pihole-1"};
 
   # Test DHCP reservations
   routerReservation = lib.findFirst (r: r.name == "router") null addresses.dhcpReservations;
@@ -139,7 +139,7 @@ let
     assertIn "containerOptions includes --hostname" "--hostname=pihole-1" piholeOptions &&
     assertIn "containerOptions includes --ip" "--ip=${addresses.records.pihole-1.ip}" piholeOptions &&
     assertIn "containerOptions includes --ip6" "--ip6=${addresses.records.pihole-1.ip6}" piholeOptions &&
-    assertIn "containerOptions includes --dns-search" "--dns-search=home.gustafson.me" piholeOptions &&
+    assertIn "containerOptions includes --dns-search" "--dns-search=${addresses.network.domain}" piholeOptions &&
     assertEq "plex containerOptions has correct --hostname" "--hostname=plex" (elemAt plexOptions 2) &&
     assertEq "plex containerOptions has correct --ip" "--ip=${addresses.records.plex.ip}" (elemAt plexOptions 3);
 

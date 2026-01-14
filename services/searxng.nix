@@ -1,9 +1,9 @@
-{ config, myLib, ... }:
+{ addresses, config, myLib, ... }:
 let
   settings = {
     use_default_settings = true;
     server = {
-      base_url = "https://search.gustafson.me";
+      base_url = "https://search.${addresses.network.publicDomain}";
       port = "8080";
       bind_address = "0.0.0.0";
       secret_key = config.sops.placeholder.searxng;
