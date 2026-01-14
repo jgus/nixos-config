@@ -1,7 +1,91 @@
 with builtins;
 { lib, pkgs, ... }:
 {
-  # Convert MAC address to EUI-64 IPv6 interface identifier 
+  # Create complete macvlan setup including netdev, parent attachment, and network config
+  # This encapsulates the entire pattern used in both network.nix and services.nix
+  mkMacvlanSetup =
+    { interfaceName
+    , mac
+    , ipv4Address
+    , ipv6Address
+    , parentInterface
+    , netdevPriority
+    , networkPriority
+    , ipv4Prefix
+    , ipv4PrefixLength
+    , ipv6Prefix
+    , ipv6PrefixLength
+    , defaultGateway
+    , mainTableMetric
+    , policyTableId
+    , policyPriority
+    , addPrefixRoute ? true
+    , requiredForOnline ? "no"
+    }:
+    let
+      # Generate route entries for both IPv4 and IPv6 prefixes
+      mkRoutesForPrefix = { ipv4Prefix, ipv4PrefixLength, ipv6Prefix, ipv6PrefixLength, metric, table ? null }:
+        let
+          baseRoutes = [
+            { Destination = "${ipv4Prefix}0.0/${toString ipv4PrefixLength}"; Metric = metric; }
+            { Destination = "${ipv6Prefix}/${toString ipv6PrefixLength}"; Metric = metric; }
+          ];
+        in
+        if table == null then baseRoutes else
+        map (r: r // { Table = table; }) baseRoutes;
+
+      mainTableRoutes = mkRoutesForPrefix {
+        inherit ipv4Prefix ipv4PrefixLength ipv6Prefix ipv6PrefixLength;
+        metric = mainTableMetric;
+      };
+      policyTableRoutes = mkRoutesForPrefix {
+        inherit ipv4Prefix ipv4PrefixLength ipv6Prefix ipv6PrefixLength;
+        metric = mainTableMetric;
+        table = policyTableId;
+      };
+      defaultRoute = {
+        Destination = "0.0.0.0/0";
+        Gateway = defaultGateway;
+        Table = policyTableId;
+      };
+      networkBase = {
+        matchConfig.Name = interfaceName;
+        networkConfig = {
+          DHCP = "no";
+          IPv6AcceptRA = "yes";
+          LinkLocalAddressing = "ipv6";
+        };
+        addresses = [
+          { Address = "${ipv4Address}/${toString ipv4PrefixLength}"; AddPrefixRoute = addPrefixRoute; }
+          { Address = "${ipv6Address}/${toString ipv6PrefixLength}"; AddPrefixRoute = addPrefixRoute; }
+        ];
+        gateway = [ defaultGateway ];
+        routes = mainTableRoutes ++ policyTableRoutes ++ [ defaultRoute ];
+        routingPolicyRules = map
+          (a: {
+            From = a;
+            Table = policyTableId;
+            Priority = policyPriority;
+          }) [ ipv4Address ipv6Address ];
+        linkConfig.RequiredForOnline = requiredForOnline;
+      };
+    in
+    {
+      netdevs."${netdevPriority}-${interfaceName}" = {
+        netdevConfig = {
+          Kind = "macvlan";
+          Name = interfaceName;
+          MACAddress = mac;
+        };
+        macvlanConfig.Mode = "bridge";
+      };
+
+      networks."05-${parentInterface}".macvlan = [ interfaceName ];
+
+      networks."${networkPriority}-${interfaceName}" = networkBase;
+    };
+
+  # Convert MAC address to EUI-64 IPv6 interface identifier
   # Takes a prefix argument like "2001:55d:b00b:1::"
   macToIp6 = prefix: mac:
     let

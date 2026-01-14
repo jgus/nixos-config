@@ -139,88 +139,27 @@ let
         let
           useMacvlan = systemd.macvlan or false;
           macvlanInterfaceName = "mv${toString serviceRecord.g}x${toString serviceRecord.id}";
-          macvlanNetwork =
-            let
-              # Routing table ID: base offset of 1000 avoids reserved tables (253-255)
-              # g * 256 ensures no overlap since id is 0-255
-              routeTableId = 1000 + serviceRecord.g * 256 + serviceRecord.id;
-            in
-            {
-              # Create the macvlan netdev
-              netdevs."30-${macvlanInterfaceName}" = {
-                netdevConfig = {
-                  Kind = "macvlan";
-                  Name = macvlanInterfaceName;
-                  MACAddress = serviceRecord.mac;
-                };
-                macvlanConfig = {
-                  Mode = "bridge";
-                };
-              };
-
-              # Attach macvlan to physical interface
-              networks."05-${machine.lan-interface}".macvlan = [ macvlanInterfaceName ];
-
-              # Configure the macvlan network
-              networks."40-${macvlanInterfaceName}" = {
-                matchConfig.Name = macvlanInterfaceName;
-                networkConfig = {
-                  DHCP = "no";
-                  IPv6AcceptRA = "yes";
-                  LinkLocalAddressing = "ipv6";
-                };
-                # Use AddPrefixRoute=false to prevent auto-generated kernel routes
-                # This ensures lan0 (host) routes are preferred over service macvlan routes
-                addresses = [
-                  {
-                    Address = "${serviceRecord.ip}/${toString addresses.network.prefixLength}";
-                    AddPrefixRoute = false;
-                  }
-                  {
-                    Address = "${serviceRecord.ip6}/${toString addresses.network.prefix6Length}";
-                    AddPrefixRoute = false;
-                  }
-                ];
-                routes = [
-                  # Routes in main table (for direct connectivity)
-                  {
-                    Destination = "${addresses.network.prefix}0.0/${toString addresses.network.prefixLength}";
-                    Metric = 1000;
-                  }
-                  {
-                    Destination = "${addresses.network.prefix6}/${toString addresses.network.prefix6Length}";
-                    Metric = 1000;
-                  }
-                  # Routes in custom table for source-based policy routing
-                  {
-                    Destination = "${addresses.network.prefix}0.0/${toString addresses.network.prefixLength}";
-                    Table = routeTableId;
-                  }
-                  {
-                    Destination = "0.0.0.0/0";
-                    Gateway = addresses.network.defaultGateway;
-                    Table = routeTableId;
-                  }
-                  {
-                    Destination = "${addresses.network.prefix6}/${toString addresses.network.prefix6Length}";
-                    Table = routeTableId;
-                  }
-                ];
-                # Source-based policy routing rules - declarative!
-                routingPolicyRules = [
-                  {
-                    From = serviceRecord.ip;
-                    Table = routeTableId;
-                    Priority = 200;
-                  }
-                  {
-                    From = serviceRecord.ip6;
-                    Table = routeTableId;
-                    Priority = 200;
-                  }
-                ];
-              };
-            };
+          # Routing table ID: base offset of 1000 avoids reserved tables (253-255)
+          # g * 256 ensures no overlap since id is 0-255
+          routeTableId = 1000 + serviceRecord.g * 256 + serviceRecord.id;
+          macvlanNetwork = myLib.mkMacvlanSetup {
+            interfaceName = macvlanInterfaceName;
+            mac = serviceRecord.mac;
+            ipv4Address = serviceRecord.ip;
+            ipv6Address = serviceRecord.ip6;
+            parentInterface = machine.lan-interface;
+            netdevPriority = "30";
+            networkPriority = "40";
+            ipv4Prefix = addresses.network.prefix;
+            ipv4PrefixLength = addresses.network.prefixLength;
+            ipv6Prefix = addresses.network.prefix6;
+            ipv6PrefixLength = addresses.network.prefix6Length;
+            defaultGateway = addresses.network.defaultGateway;
+            mainTableMetric = 1000;
+            policyTableId = routeTableId;
+            policyPriority = 200;
+            addPrefixRoute = false;
+          };
         in
         {
           imports = [ extraConfig ] ++ map homelabServiceStorage storageNames;
