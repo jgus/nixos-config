@@ -1,6 +1,6 @@
 {
   imageName = "postgres";
-  imageDigest = "sha256:847bda540f8f074eff6423c31daed38c652e0ddd25d47c13cc86d0d83d8ca3d4";
+  imageDigest = "sha256:2f00e0eddfad1f7a32a1e73fd8873654c1e6a979913a8cfcb5fefae102ed0f68";
   hash = "sha256-KPLxy0UPHNwNF09tMM/u+abgtuio/m2OH4zRN8MVw08=";
   finalImageName = "postgres";
   finalImageTag = "14";

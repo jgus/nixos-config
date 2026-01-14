@@ -1,7 +1,7 @@
 {
   imageName = "ollama/ollama";
-  imageDigest = "sha256:2c9595c555fd70a28363489ac03bd5bf9e7c5bdf2890373c3a830ffd7252ce6d";
-  hash = "sha256-syi7Of+G+vceyOL91S18LonmHqp+iEwtvH277XW++2U=";
+  imageDigest = "sha256:4d1c3ff8badca57327c1eb35e1842f7a28f3578ef40c8488a58854e083f53a1b";
+  hash = "sha256-n5XDQ343sym8RrzSQPRAYs9+tyQI1V98NzWV1aK3fZo=";
   finalImageName = "ollama/ollama";
   finalImageTag = "latest";
 }
