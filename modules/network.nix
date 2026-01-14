@@ -23,111 +23,108 @@ in
   };
 
   # systemd-networkd configuration
-  systemd.network = lib.recursiveUpdate
-    {
-      enable = true;
+  systemd.network = {
+    enable = true;
 
-      # Create the lan0 macvlan device on the effective LAN interface
-      netdevs."10-lan0" = {
-        netdevConfig = {
-          Kind = "macvlan";
-          Name = "lan0";
-          MACAddress = hostRecord.mac;
-        };
-        macvlanConfig = {
-          Mode = "bridge";
-        };
+    # Create the br0 bridge device
+    netdevs."00-br0" = lib.mkIf (machine ? lan-interfaces) {
+      netdevConfig = {
+        Kind = "bridge";
+        Name = "br0";
       };
+    };
 
-      # Configure the effective LAN interface (physical or bridge) to be the parent for macvlans
-      networks."05-${machine.lan-interface}" = {
-        matchConfig.Name = machine.lan-interface;
-        networkConfig = {
-          # Don't configure IP on this interface - only on macvlans
-          LinkLocalAddressing = "no";
-          DHCP = "no";
-        };
-        linkConfig.RequiredForOnline = "carrier";
-        # Attach the lan0 macvlan
-        macvlan = [ "lan0" ];
+    # Create the lan0 macvlan device on the effective LAN interface
+    netdevs."10-lan0" = {
+      netdevConfig = {
+        Kind = "macvlan";
+        Name = "lan0";
+        MACAddress = hostRecord.mac;
       };
+      macvlanConfig = {
+        Mode = "bridge";
+      };
+    };
 
-      # Configure the lan0 macvlan interface (host's main interface)
-      networks."20-lan0" = {
-        matchConfig.Name = "lan0";
-        networkConfig = {
-          DHCP = "no";
-          IPv6AcceptRA = "yes";
-          LinkLocalAddressing = "ipv6";
-        };
-        linkConfig.RequiredForOnline = "routable";
-        address = [
-          "${hostRecord.ip}/${toString addresses.network.prefixLength}"
-          "${hostRecord.ip6}/${toString addresses.network.prefix6Length}"
-        ];
-        gateway = [ addresses.network.defaultGateway ];
-        # Routes in main table
-        routes = [
-          {
-            Destination = "${addresses.network.prefix}0.0/${toString addresses.network.prefixLength}";
-            Metric = 100;
-          }
-          {
-            Destination = "${addresses.network.prefix6}/${toString addresses.network.prefix6Length}";
-            Metric = 100;
-          }
-          # Routes in lan0 routing table (200) for source-based policy routing
-          {
-            Destination = "${addresses.network.prefix}0.0/${toString addresses.network.prefixLength}";
-            Table = 200;
-          }
-          {
-            Destination = "0.0.0.0/0";
-            Gateway = addresses.network.defaultGateway;
-            Table = 200;
-          }
-          {
-            Destination = "${addresses.network.prefix6}/${toString addresses.network.prefix6Length}";
-            Table = 200;
-          }
-        ];
-        # Source-based policy routing rules
-        routingPolicyRules = [
-          {
-            # Traffic FROM this host's IP uses the lan0 routing table
-            From = hostRecord.ip;
-            Table = 200;
-            Priority = 100;
-          }
-          {
-            # IPv6 rule
-            From = hostRecord.ip6;
-            Table = 200;
-            Priority = 100;
-          }
-        ];
+    # Configure each member interface to join the bridge
+    networks."01-bridge-members" = lib.mkIf (machine ? lan-interfaces) {
+      matchConfig.Name = lib.concatStringsSep " " machine.lan-interfaces;
+      networkConfig = {
+        Bridge = "br0";
+        LinkLocalAddressing = "no";
       };
-    }
-    (if (machine ? lan-interfaces) then {
-      # Bridge configuration for multi-interface machines
-      # Create the br0 bridge device
-      netdevs."00-br0" = {
-        netdevConfig = {
-          Kind = "bridge";
-          Name = "br0";
-        };
-      };
+      linkConfig.RequiredForOnline = "enslaved";
+    };
 
-      # Configure each member interface to join the bridge
-      networks."01-bridge-members" = {
-        matchConfig.Name = lib.concatStringsSep " " machine.lan-interfaces;
-        networkConfig = {
-          Bridge = "br0";
-          LinkLocalAddressing = "no";
-        };
-        linkConfig.RequiredForOnline = "enslaved";
+    # Configure the effective LAN interface (physical or bridge) to be the parent for macvlans
+    networks."05-${machine.lan-interface}" = {
+      matchConfig.Name = machine.lan-interface;
+      networkConfig = {
+        # Don't configure IP on this interface - only on macvlans
+        LinkLocalAddressing = "no";
+        DHCP = "no";
       };
-    } else { });
+      linkConfig.RequiredForOnline = "carrier";
+      # Attach the lan0 macvlan
+      macvlan = [ "lan0" ];
+    };
+
+    # Configure the lan0 macvlan interface (host's main interface)
+    networks."20-lan0" = {
+      matchConfig.Name = "lan0";
+      networkConfig = {
+        DHCP = "no";
+        IPv6AcceptRA = "yes";
+        LinkLocalAddressing = "ipv6";
+      };
+      linkConfig.RequiredForOnline = "routable";
+      address = [
+        "${hostRecord.ip}/${toString addresses.network.prefixLength}"
+        "${hostRecord.ip6}/${toString addresses.network.prefix6Length}"
+      ];
+      gateway = [ addresses.network.defaultGateway ];
+      # Routes in main table
+      routes = [
+        {
+          Destination = "${addresses.network.prefix}0.0/${toString addresses.network.prefixLength}";
+          Metric = 100;
+        }
+        {
+          Destination = "${addresses.network.prefix6}/${toString addresses.network.prefix6Length}";
+          Metric = 100;
+        }
+        # Routes in lan0 routing table (200) for source-based policy routing
+        {
+          Destination = "${addresses.network.prefix}0.0/${toString addresses.network.prefixLength}";
+          Table = 200;
+        }
+        {
+          Destination = "0.0.0.0/0";
+          Gateway = addresses.network.defaultGateway;
+          Table = 200;
+        }
+        {
+          Destination = "${addresses.network.prefix6}/${toString addresses.network.prefix6Length}";
+          Table = 200;
+        }
+      ];
+      # Source-based policy routing rules
+      routingPolicyRules = [
+        {
+          # Traffic FROM this host's IP uses the lan0 routing table
+          From = hostRecord.ip;
+          Table = 200;
+          Priority = 100;
+        }
+        {
+          # IPv6 rule
+          From = hostRecord.ip6;
+          Table = 200;
+          Priority = 100;
+        }
+      ];
+    };
+  };
 
   # Boot kernel networking settings (related to ARP flux for macvlan)
   boot.kernel.sysctl = {
