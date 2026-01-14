@@ -1,4 +1,4 @@
-{ pkgs, machine, ... }:
+{ config, pkgs, machine, ... }:
 {
   boot = {
     # kernelPackages = config.boot.zfs.package.latestCompatibleLinuxPackages;
@@ -31,7 +31,7 @@
       zfs-pool-status = {
         path = with pkgs; [ hostname zfs sharutils msmtp ];
         script = ''
-          EMAIL_TO=("j@gustafson.me")
+          EMAIL_TO=($(cat ${config.sops.secrets.admin_email.path}))
           if zpool status | grep DEGRADED
           then
             for to in "''${EMAIL_TO[@]}"
@@ -47,4 +47,6 @@
       };
     };
   };
+
+  sops.secrets.admin_email = { };
 }

@@ -1,5 +1,5 @@
 with builtins;
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 {
   services = {
     clamav = {
@@ -40,7 +40,7 @@ with builtins;
               EXCLUDE_ARGS+=(--exclude-dir=^''${SCAN_MOUNT}''${f})
           done
 
-          EMAIL_TO=("j@gustafson.me")
+          EMAIL_TO=($(cat ${config.sops.secrets.admin_email.path}))
           SCAN_MOUNT=/mnt/clam-scan
 
           [ -d /var/lib/clamav ] || freshclam
@@ -156,5 +156,7 @@ with builtins;
       };
     };
   };
+
+  sops.secrets.admin_email = { };
 }
 

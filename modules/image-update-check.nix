@@ -1,5 +1,5 @@
 with builtins;
-{ pkgs, lib, ... }:
+{ config, pkgs, lib, ... }:
 let
   # Inline image extractor logic
   imagesDir = ./../images;
@@ -62,7 +62,7 @@ let
         echo "The following container images have updates available:"
         echo ""
         cat /dev/fd/3
-      } | ${pkgs.msmtp}/bin/msmtp "j@gustafson.me"
+      } | ${pkgs.msmtp}/bin/msmtp $(cat ${config.sops.secrets.admin_email.path})
     else
       echo "All Container images are up to date."
     fi
@@ -87,4 +87,6 @@ in
       startAt = "05:00";
     };
   };
+
+  sops.secrets.admin_email = { };
 }
