@@ -17,11 +17,11 @@ in
     ];
     configVolume = "/config";
     tmpFs = [
-      "/.cache"
-      "/.local"
-      "/cache"
-      "/config/.esphome/build"
-      "/config/.esphome/external_components"
+      "/.cache:exec,mode=0777"
+      "/.local:exec,mode=0777"
+      "/cache:exec,mode=0777"
+      "/config/.esphome/build:exec,mode=0777"
+      "/config/.esphome/external_components:exec,mode=0777"
     ];
   };
 }

@@ -123,7 +123,7 @@ let
             (container.extraOptions or [ ]) ++
               containerOptions ++
               lib.optional (container.readOnly or false) "--read-only" ++
-              (map (value: "--tmpfs=${value}:exec,mode=0777") (container.tmpFs or [ ]));
+              (map (value: "--tmpfs=${value}") (container.tmpFs or [ ]));
           entrypoint = container.entrypoint or null;
           cmd = container.entrypointOptions or [ ];
         }
