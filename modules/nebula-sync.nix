@@ -1,5 +1,5 @@
 with builtins;
-{ config, addresses, container, ... }:
+{ config, container, myLib, ... }:
 let
   image = "ghcr.io/lovelaze/nebula-sync:latest";
 in
@@ -21,9 +21,9 @@ in
         -e SYNC_GRAVITY_CLIENT=true \
         -e SYNC_GRAVITY_CLIENT_BY_GROUP=true \
         -e TZ="${config.time.timeZone}" \
-        --add-host=pihole-1:${getAttr "pihole-1" addresses.nameToIp} \
-        --add-host=pihole-2:${getAttr "pihole-2" addresses.nameToIp} \
-        --add-host=pihole-3:${getAttr "pihole-3" addresses.nameToIp} \
+        --add-host=pihole-1:${getAttr "pihole-1" myLib.nameToIp} \
+        --add-host=pihole-2:${getAttr "pihole-2" myLib.nameToIp} \
+        --add-host=pihole-3:${getAttr "pihole-3" myLib.nameToIp} \
         ${image}
       '';
       serviceConfig = {

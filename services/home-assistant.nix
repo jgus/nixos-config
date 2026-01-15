@@ -57,7 +57,7 @@ let
     "light.upstairs_hall_north_switch_virtual_s" = "1c74e3a6baf321724a557775e3c20cbc";
   };
 in
-{ config, pkgs, lib, myLib, addresses, ... }:
+{ config, pkgs, lib, myLib, ... }:
 let
   windows =
     map
@@ -87,10 +87,10 @@ let
   httpYaml = myLib.prettyYaml {
     use_x_forwarded_for = true;
     trusted_proxies = [
-      addresses.nameToIp.web
-      addresses.nameToIp6.web
-      addresses.nameToIp.cloudflared
-      addresses.nameToIp6.cloudflared
+      myLib.nameToIp.web
+      myLib.nameToIp6.web
+      myLib.nameToIp.cloudflared
+      myLib.nameToIp6.cloudflared
     ];
   };
 

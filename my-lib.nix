@@ -1,89 +1,10 @@
 with builtins;
-{ lib, pkgs, ... }:
-{
-  # Create complete macvlan setup including netdev, parent attachment, and network config
-  # This encapsulates the entire pattern used in both network.nix and services.nix
-  mkMacvlanSetup =
-    { interfaceName
-    , mac
-    , ipv4Address
-    , ipv6Address
-    , parentInterface
-    , netdevPriority
-    , networkPriority
-    , ipv4Prefix
-    , ipv4PrefixLength
-    , ipv6Prefix
-    , ipv6PrefixLength
-    , defaultGateway
-    , mainTableMetric
-    , policyTableId
-    , policyPriority
-    , addPrefixRoute ? true
-    , requiredForOnline ? "no"
-    }:
-    let
-      # Generate route entries for both IPv4 and IPv6 prefixes
-      mkRoutesForPrefix = { ipv4Prefix, ipv4PrefixLength, ipv6Prefix, ipv6PrefixLength, metric, table ? null }:
-        let
-          baseRoutes = [
-            { Destination = "${ipv4Prefix}0.0/${toString ipv4PrefixLength}"; Metric = metric; }
-            { Destination = "${ipv6Prefix}/${toString ipv6PrefixLength}"; Metric = metric; }
-          ];
-        in
-        if table == null then baseRoutes else
-        map (r: r // { Table = table; }) baseRoutes;
+{ addresses, lib, machine, pkgs, ... }:
+let
+  # === Helper Functions ===
+  toHex2 = x: lib.strings.fixedWidthString 2 "0" (lib.strings.toLower (lib.trivial.toHexString x));
 
-      mainTableRoutes = mkRoutesForPrefix {
-        inherit ipv4Prefix ipv4PrefixLength ipv6Prefix ipv6PrefixLength;
-        metric = mainTableMetric;
-      };
-      policyTableRoutes = mkRoutesForPrefix {
-        inherit ipv4Prefix ipv4PrefixLength ipv6Prefix ipv6PrefixLength;
-        metric = mainTableMetric;
-        table = policyTableId;
-      };
-      defaultRoute = {
-        Destination = "0.0.0.0/0";
-        Gateway = defaultGateway;
-        Table = policyTableId;
-      };
-      networkBase = {
-        matchConfig.Name = interfaceName;
-        networkConfig = {
-          DHCP = "no";
-          IPv6AcceptRA = "yes";
-          LinkLocalAddressing = "ipv6";
-        };
-        addresses = [
-          { Address = "${ipv4Address}/${toString ipv4PrefixLength}"; AddPrefixRoute = addPrefixRoute; }
-          { Address = "${ipv6Address}/${toString ipv6PrefixLength}"; AddPrefixRoute = addPrefixRoute; }
-        ];
-        gateway = [ defaultGateway ];
-        routes = mainTableRoutes ++ policyTableRoutes ++ [ defaultRoute ];
-        routingPolicyRules = map
-          (a: {
-            From = a;
-            Table = policyTableId;
-            Priority = policyPriority;
-          }) [ ipv4Address ipv6Address ];
-        linkConfig.RequiredForOnline = requiredForOnline;
-      };
-    in
-    {
-      netdevs."${netdevPriority}-${interfaceName}" = {
-        netdevConfig = {
-          Kind = "macvlan";
-          Name = interfaceName;
-          MACAddress = mac;
-        };
-        macvlanConfig.Mode = "bridge";
-      };
-
-      networks."05-${parentInterface}".macvlan = [ interfaceName ];
-
-      networks."${networkPriority}-${interfaceName}" = networkBase;
-    };
+  nameAndFqdn = name: [ name "${name}.${addresses.network.domain}" ];
 
   # Convert MAC address to EUI-64 IPv6 interface identifier
   # Takes a prefix argument like "2001:55d:b00b:1::"
@@ -105,15 +26,190 @@ with builtins;
     in
     "${prefixBase}:${suffix}";
 
+  # === Complete Records ===
+  # Set default ip, mac, and ip6 addresses; add IoT records
+  records = (mapAttrs
+    (k: v:
+      rec {
+        ip = "${addresses.network.prefix}${toString v.g}.${toString v.id}";
+        mac = "${addresses.network.serviceMacPrefix}${toHex2 v.g}:${toHex2 v.id}";
+        ip6 = macToIp6 addresses.network.prefix6 mac;
+      } // v
+    )
+    addresses.records-conf) // addresses.iot;
+
+  # === Alias Resolution ===
+  # Lists of records that have a host attribute (ie hosted services)
+  hostedNames = filter (n: (getAttr n records) ? host) (attrNames records);
+
+  # Map alias -> canonical name, for auto-generated host aliases (e.g. pihole-1-host -> b1)
+  hostAliasList = map
+    (n:
+      {
+        name = "${n}-host";
+        value = records.${n}.host;
+      }
+    )
+    hostedNames;
+
+  # Map alias -> canonical name, for explicitly assigned aliases
+  assignedAliasList = lib.lists.flatten (map
+    (n: map (a: { name = a; value = n; }) (records.${n}.aliases or [ ]))
+    (attrNames records)
+  );
+
+  # Map alias -> canonical name
+  aliases = listToAttrs (assignedAliasList ++ hostAliasList);
+
+  # === Name -> Attribute Mapping ===
+  # Map canonical name -> attribute (given by attrName)
+  # Only includes items where the attribute exists on the given record
+  buildNameToAttr = attrName:
+    listToAttrs (lib.lists.flatten (map
+      (k:
+        let r = records.${k}; in
+        lib.optional (hasAttr attrName r) [{ name = k; value = r.${attrName}; }]
+      )
+      (attrNames records)));
+
+  # buildNameToAttr, with aliases too
+  buildAliasToAttr = attrName:
+    let
+      nameToAttr = buildNameToAttr attrName;
+    in
+    nameToAttr // (mapAttrs (k: v: getAttr v nameToAttr) aliases);
+in
+rec {
+  inherit
+    macToIp6;
+
+  # === Name <-> IP Mappings ===
+  nameToMac = buildAliasToAttr "mac";
+  nameToIp = buildAliasToAttr "ip";
+  nameToIp6 = buildAliasToAttr "ip6";
+  nameToHost = buildAliasToAttr "host";
+  nameToIdMajor = buildAliasToAttr "g";
+  nameToIdMinor = buildAliasToAttr "id";
+
+  # Formats the given nix expression as JSON, Toml, or YAML. Returns a file path.
   prettyJson = x: ((pkgs.formats.json { }).generate "json" x);
   prettyToml = x: ((pkgs.formats.toml { }).generate "toml" x);
   prettyYaml = x: ((pkgs.formats.yaml { }).generate "yaml" x);
 
   # Convert values to string for debugging in test assertions
   toDebugStr = x:
-    if isString x then x
-    else if isInt x || isBool x then toString x
-    else if isList x then toJSON x
-    else if isAttrs x then toJSON x
+    if isList x || isAttrs x then toJSON x
     else toString x;
+
+  # === Addresses Library Functions ===
+
+  # IP (4 or 6) -> list of names, including FQDNs, suitable for /etc/hosts generation
+  hosts =
+    let
+      # IP (4 or 6) -> list of names
+      ipToNames = (lib.lists.groupBy (n: getAttr n nameToIp) (attrNames nameToIp)) // (lib.lists.groupBy (n: getAttr n nameToIp6) (attrNames nameToIp6));
+    in
+    mapAttrs (key: value: lib.lists.flatten (map nameAndFqdn value)) ipToNames;
+
+  # Names of physical servers
+  serverNames = filter (n: (hasAttr n records) && (records."${n}" ? g) && (records."${n}".g == 1)) (attrNames records);
+
+  # List of name/ip/mac records, suitable for generating a dhcp reservation list
+  dhcpReservations = lib.lists.flatten (map
+    (k:
+      let
+        r = (getAttr k records);
+      in
+      lib.optional (r ? mac) { name = k; ip = r.ip; mac = r.mac; }
+    )
+    (attrNames records)
+  );
+
+  # Network options to be added to every container service
+  containerOptions = service: [
+    "--network=macvlan"
+    "--mac-address=${records.${service}.mac}"
+    "--hostname=${service}"
+    "--ip=${records.${service}.ip}"
+    "--ip6=${records.${service}.ip6}"
+    "--dns-search=${addresses.network.domain}"
+  ] ++ map (name: "--dns=${records.${name}.ip}") addresses.network.dnsServers;
+
+  # Exhaustive host records, for DNS containers
+  containerAddAllHosts = lib.lists.flatten [
+    (map (n: map (name: "--add-host=${name}:${getAttr n nameToIp}") (nameAndFqdn n)) (attrNames nameToIp))
+    (map (n: map (name: "--add-host=${name}:${getAttr n nameToIp6}") (nameAndFqdn n)) (attrNames nameToIp6))
+  ];
+
+  # Create complete macvlan setup including netdev, parent attachment, and network config
+  # This encapsulates the entire pattern used in both network.nix and services.nix
+  mkMacvlanSetup =
+    { hostName
+    , interfaceName
+    , netdevPriority
+    , networkPriority
+    , mainTableMetric
+    , policyTableId
+    , policyPriority
+    , addPrefixRoute ? true
+    , requiredForOnline ? "no"
+    }:
+    let
+      # Generate route entries for both IPv4 and IPv6 prefixes
+      mkRoutesForPrefix = { metric, table ? null }:
+        let
+          baseRoutes = [
+            { Destination = "${addresses.network.prefix}0.0/${toString addresses.network.prefixLength}"; Metric = metric; }
+            { Destination = "${addresses.network.prefix6}/${toString addresses.network.prefix6Length}"; Metric = metric; }
+          ];
+        in
+        if table == null then baseRoutes else
+        map (r: r // { Table = table; }) baseRoutes;
+    in
+    {
+      netdevs."${netdevPriority}-${interfaceName}" = {
+        netdevConfig = {
+          Kind = "macvlan";
+          Name = interfaceName;
+          MACAddress = nameToMac.${hostName};
+        };
+        macvlanConfig.Mode = "bridge";
+      };
+
+      networks."05-${machine.lan-interface}".macvlan = [ interfaceName ];
+
+      networks."${networkPriority}-${interfaceName}" = {
+        matchConfig.Name = interfaceName;
+        networkConfig = {
+          DHCP = "no";
+          IPv6AcceptRA = "yes";
+          LinkLocalAddressing = "ipv6";
+        };
+        addresses = [
+          { Address = "${nameToIp.${hostName}}/${toString addresses.network.prefixLength}"; AddPrefixRoute = addPrefixRoute; }
+          { Address = "${nameToIp6.${hostName}}/${toString addresses.network.prefix6Length}"; AddPrefixRoute = addPrefixRoute; }
+        ];
+        gateway = [ addresses.network.defaultGateway ];
+        routes = (mkRoutesForPrefix {
+          # Main table routes
+          metric = mainTableMetric;
+        }) ++ (mkRoutesForPrefix {
+          # Policy table routes
+          metric = mainTableMetric;
+          table = policyTableId;
+        }) ++ [{
+          # Default route
+          Destination = "0.0.0.0/0";
+          Gateway = addresses.network.defaultGateway;
+          Table = policyTableId;
+        }];
+        routingPolicyRules = map
+          (a: {
+            From = a;
+            Table = policyTableId;
+            Priority = policyPriority;
+          }) [ nameToIp.${hostName} nameToIp6.${hostName} ];
+        linkConfig.RequiredForOnline = requiredForOnline;
+      };
+    };
 }

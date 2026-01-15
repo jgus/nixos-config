@@ -4,7 +4,7 @@ let
   storageBackupPath = name: "/storage/service/${name}";
   serviceDir = readDir ../services;
 in
-args@{ pkgs, lib, myLib, machine, addresses, container, ... }:
+args@{ addresses, container, lib, machine, myLib, pkgs, ... }:
 let
   containerImport = container;
   serviceNames = map (n: lib.strings.removeSuffix ".nix" n) (filter (n: serviceDir.${n} == "regular" && (lib.strings.hasSuffix ".nix" n) && !(lib.strings.hasPrefix "." n)) (attrNames serviceDir));
@@ -57,14 +57,13 @@ let
       serviceRequires = requires;
       uid = toString config.users.users.${user}.uid;
       gid = toString config.users.groups.${group}.gid;
-      serviceRecord = addresses.records.${name};
       storageNames = extraStorage ++ lib.optional configStorage name;
       argsContainer = args.container or { };
       container = argsContainer // (if argsContainer ? pullImage then {
         image = "${argsContainer.pullImage.finalImageName}:${argsContainer.pullImage.finalImageTag}";
         imageFile = pkgs.dockerTools.pullImage argsContainer.pullImage;
       } else { });
-      containerOptions = addresses.containerOptions name;
+      containerOptions = myLib.containerOptions name;
       isContainer = container ? image;
 
       # Shared service components used by both container and systemd configs
@@ -138,25 +137,16 @@ let
       systemdConfig =
         let
           useMacvlan = systemd.macvlan or false;
-          macvlanInterfaceName = "mv${toString serviceRecord.g}x${toString serviceRecord.id}";
-          # Routing table ID: base offset of 1000 avoids reserved tables (253-255)
-          # g * 256 ensures no overlap since id is 0-255
-          routeTableId = 1000 + serviceRecord.g * 256 + serviceRecord.id;
+          macvlanInterfaceName = "mv${toString myLib.nameToIdMajor.${name}}x${toString myLib.nameToIdMinor.${name}}";
           macvlanNetwork = myLib.mkMacvlanSetup {
+            hostName = name;
             interfaceName = macvlanInterfaceName;
-            mac = serviceRecord.mac;
-            ipv4Address = serviceRecord.ip;
-            ipv6Address = serviceRecord.ip6;
-            parentInterface = machine.lan-interface;
             netdevPriority = "30";
             networkPriority = "40";
-            ipv4Prefix = addresses.network.prefix;
-            ipv4PrefixLength = addresses.network.prefixLength;
-            ipv6Prefix = addresses.network.prefix6;
-            ipv6PrefixLength = addresses.network.prefix6Length;
-            defaultGateway = addresses.network.defaultGateway;
             mainTableMetric = 1000;
-            policyTableId = routeTableId;
+            # Routing table ID: base offset of 1000 avoids reserved tables (253-255)
+            # g * 256 ensures no overlap since id is 0-255
+            policyTableId = 1000 + myLib.nameToIdMajor.${name} * 256 + myLib.nameToIdMinor.${name};
             policyPriority = 200;
             addPrefixRoute = false;
           };
@@ -181,8 +171,8 @@ let
                 script = lib.optionalString (systemd ? script) (systemd.script {
                   inherit name uid gid storagePath containerOptions;
                   interface = if useMacvlan then macvlanInterfaceName else null;
-                  ip = serviceRecord.ip;
-                  ip6 = serviceRecord.ip6;
+                  ip = myLib.nameToIp.${name};
+                  ip6 = myLib.nameToIp6.${name};
                 });
                 postStop = "systemctl restart ${name}-backup";
               };
@@ -197,7 +187,7 @@ let
         };
       serviceConfig = if isContainer then containerConfig else systemdConfig;
     in
-    if (machine.hostName == addresses.records.${name}.host) then serviceConfig else { };
+    lib.optionalAttrs (machine.hostName == myLib.nameToHost.${name}) serviceConfig;
   importService = n:
     let
       i = (import ../services/${n}.nix) args;

@@ -1,7 +1,4 @@
-{ lib, myLib, machine, addresses, ... }:
-let
-  hostRecord = addresses.records.${machine.hostName};
-in
+{ addresses, lib, machine, myLib, ... }:
 {
   # Use systemd-networkd for network configuration
   # This provides native support for routing policy rules without oneshot service hacks
@@ -17,9 +14,9 @@ in
     useDHCP = false;
     tempAddresses = "disabled";
     domain = addresses.network.domain;
-    nameservers = [ addresses.records.pihole-1.ip addresses.records.pihole-2.ip addresses.records.pihole-3.ip "1.1.1.1" "1.0.0.1" ];
+    nameservers = (map (n: myLib.nameToIp.${n}) addresses.network.dnsServers) ++ [ "1.1.1.1" "1.0.0.1" ];
     timeServers = [ "ntp.${addresses.network.domain}" ];
-    hosts = addresses.hosts;
+    hosts = myLib.hosts;
   };
 
   # systemd-networkd configuration
@@ -57,18 +54,10 @@ in
 
     # Configure the lan0 macvlan interface (host's main interface)
   } // myLib.mkMacvlanSetup {
+    hostName = machine.hostName;
     interfaceName = "lan0";
-    mac = hostRecord.mac;
-    ipv4Address = hostRecord.ip;
-    ipv6Address = hostRecord.ip6;
-    parentInterface = machine.lan-interface;
     netdevPriority = "10";
     networkPriority = "20";
-    ipv4Prefix = addresses.network.prefix;
-    ipv4PrefixLength = addresses.network.prefixLength;
-    ipv6Prefix = addresses.network.prefix6;
-    ipv6PrefixLength = addresses.network.prefix6Length;
-    defaultGateway = addresses.network.defaultGateway;
     mainTableMetric = 100;
     policyTableId = 200;
     policyPriority = 100;

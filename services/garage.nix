@@ -9,7 +9,7 @@ let
     replication_factor = 1;
 
     rpc_bind_addr = "[::]:3901";
-    rpc_public_addr = "${addresses.nameToIp.garage}:3901";
+    rpc_public_addr = "${myLib.nameToIp.garage}:3901";
     rpc_secret = "e1464e7a73d8642c5f8abe0e7928262e56654bed1eb6aed5c038d9a6ade61ad2"; # openssl rand -hex 32
 
     s3_api = {

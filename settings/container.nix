@@ -1,5 +1,5 @@
-{ lib, pkgs, machine, addresses, ... }:
-let
+{ addresses, lib, machine, pkgs, ... }:
+rec {
   executable = "podman";
   package = pkgs.podman;
   group = "podman";
@@ -43,7 +43,4 @@ let
       };
     };
   };
-in
-{
-  inherit executable package group config;
 }
