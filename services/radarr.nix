@@ -2,7 +2,28 @@ let
   user = "josh";
   group = "media";
 in
-{ config, ... }:
+{ config, myLib, ... }:
+let
+  configuration = {
+    Config = {
+      ApiKey = config.sops.placeholder.radarr;
+      AuthenticationMethod = "External";
+      AuthenticationRequired = "Enabled";
+      BindAddress = "*";
+      Branch = "master";
+      EnableSsl = "False";
+      InstanceName = "Radarr";
+      LaunchBrowser = "False";
+      LogLevel = "info";
+      Port = "7878";
+      SslCertPassword = "";
+      SslCertPath = "";
+      SslPort = "9898";
+      UpdateMechanism = "Docker";
+      UrlBase = "";
+    };
+  };
+in
 {
   requires = [ "storage-media.mount" "storage-scratch.mount" ];
   container = {
@@ -18,9 +39,19 @@ in
     ];
     configVolume = "/config";
     volumes = [
+      "${config.sops.templates."radarr/config.xml".path}:/config/config.xml:ro"
       "/storage/scratch/torrent:/torrent"
       "/storage/scratch/usenet:/usenet"
       "/storage/media:/media"
     ];
+  };
+  extraConfig = {
+    sops = {
+      secrets.radarr = { };
+      templates."radarr/config.xml" = {
+        content = builtins.readFile (myLib.prettyXml configuration);
+        owner = user;
+      };
+    };
   };
 }

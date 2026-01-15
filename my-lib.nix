@@ -91,10 +91,11 @@ rec {
   nameToIdMajor = buildAliasToAttr "g";
   nameToIdMinor = buildAliasToAttr "id";
 
-  # Formats the given nix expression as JSON, Toml, or YAML. Returns a file path.
+  # Formats the given nix expression as JSON, Toml, YAML, or XML. Returns a file path.
   prettyJson = x: ((pkgs.formats.json { }).generate "json" x);
   prettyToml = x: ((pkgs.formats.toml { }).generate "toml" x);
   prettyYaml = x: ((pkgs.formats.yaml { }).generate "yaml" x);
+  prettyXml = x: ((pkgs.formats.xml { }).generate "xml" x);
 
   # Convert values to string for debugging in test assertions
   toDebugStr = x:
