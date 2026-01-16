@@ -2,32 +2,33 @@ let
   user = "josh";
   group = "media";
 in
-{ config, myLib, ... }:
+{ config, ... }:
 let
-  configuration = {
-    Config = {
-      ApiKey = config.sops.placeholder.lidarr;
-      AuthenticationMethod = "External";
-      AuthenticationRequired = "Enabled";
-      BindAddress = "*";
-      Branch = "master";
-      EnableSsl = "False";
-      InstanceName = "Lidarr";
-      LaunchBrowser = "False";
-      LogLevel = "info";
-      Port = "8686";
-      SslCertPassword = "";
-      SslCertPath = "";
-      SslPort = "6868";
-      UpdateMechanism = "Docker";
-      UrlBase = "";
-    };
-  };
+  configuration = ''
+    <?xml version="1.0" encoding="utf-8"?>
+    <Config>
+      <ApiKey>${config.sops.placeholder.lidarr}</ApiKey>
+      <AuthenticationMethod>External</AuthenticationMethod>
+      <AuthenticationRequired>Enabled</AuthenticationRequired>
+      <BindAddress>*</BindAddress>
+      <Branch>master</Branch>
+      <EnableSsl>False</EnableSsl>
+      <InstanceName>Lidarr</InstanceName>
+      <LaunchBrowser>False</LaunchBrowser>
+      <LogLevel>info</LogLevel>
+      <Port>8686</Port>
+      <SslCertPassword></SslCertPassword>
+      <SslCertPath></SslCertPath>
+      <SslPort>6868</SslPort>
+      <UpdateMechanism>Docker</UpdateMechanism>
+      <UrlBase></UrlBase>
+    </Config>
+  '';
 in
 {
+  # inherit user group;
   requires = [ "storage-media.mount" "storage-scratch.mount" ];
   container = {
-    readOnly = false;
     pullImage = import ../images/lidarr.nix;
     environment = {
       PUID = toString config.users.users.${user}.uid;
@@ -49,7 +50,7 @@ in
     sops = {
       secrets.lidarr = { };
       templates."lidarr/config.xml" = {
-        content = builtins.readFile (myLib.prettyXml configuration);
+        content = configuration;
         owner = user;
       };
     };

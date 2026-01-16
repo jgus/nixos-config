@@ -2,27 +2,28 @@ let
   user = "josh";
   group = "media";
 in
-{ config, myLib, ... }:
+{ config, ... }:
 let
-  configuration = {
-    Config = {
-      ApiKey = config.sops.placeholder.sonarr;
-      AuthenticationMethod = "External";
-      AuthenticationRequired = "Enabled";
-      BindAddress = "*";
-      Branch = "main";
-      EnableSsl = "False";
-      InstanceName = "Sonarr";
-      LaunchBrowser = "False";
-      LogLevel = "info";
-      Port = "8989";
-      SslCertPassword = "";
-      SslCertPath = "";
-      SslPort = "9898";
-      UpdateMechanism = "Docker";
-      UrlBase = "";
-    };
-  };
+  configuration = ''
+    <?xml version="1.0" encoding="utf-8"?>
+    <Config>
+      <ApiKey>${config.sops.placeholder.sonarr}</ApiKey>
+      <AuthenticationMethod>External</AuthenticationMethod>
+      <AuthenticationRequired>Enabled</AuthenticationRequired>
+      <BindAddress>*</BindAddress>
+      <Branch>main</Branch>
+      <EnableSsl>False</EnableSsl>
+      <InstanceName>Sonarr</InstanceName>
+      <LaunchBrowser>False</LaunchBrowser>
+      <LogLevel>info</LogLevel>
+      <Port>8989</Port>
+      <SslCertPassword></SslCertPassword>
+      <SslCertPath></SslCertPath>
+      <SslPort>9898</SslPort>
+      <UpdateMechanism>Docker</UpdateMechanism>
+      <UrlBase></UrlBase>
+    </Config>
+  '';
 in
 {
   requires = [ "storage-media.mount" "storage-scratch.mount" ];
@@ -49,7 +50,7 @@ in
     sops = {
       secrets.sonarr = { };
       templates."sonarr/config.xml" = {
-        content = builtins.readFile (myLib.prettyXml configuration);
+        content = configuration;
         owner = user;
       };
     };
