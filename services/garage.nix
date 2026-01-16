@@ -1,5 +1,5 @@
-# TODO: Use SOPS for secrets (rpc_secret, admin_token, metrics_token)
-{ addresses, myLib, ... }:
+with builtins;
+{ addresses, config, myLib, ... }:
 let
   configuration = {
     metadata_dir = "/var/lib/garage/meta";
@@ -10,7 +10,7 @@ let
 
     rpc_bind_addr = "[::]:3901";
     rpc_public_addr = "${myLib.nameToIp.garage}:3901";
-    rpc_secret = "e1464e7a73d8642c5f8abe0e7928262e56654bed1eb6aed5c038d9a6ade61ad2"; # openssl rand -hex 32
+    rpc_secret = config.sops.placeholder."garage/rpc_secret";
 
     s3_api = {
       s3_region = "garage";
@@ -30,8 +30,8 @@ let
 
     admin = {
       api_bind_addr = "[::]:3903";
-      admin_token = "EnLZ8Bjmk6Qtzid9AlixUZ/FCT1/INyWyMJh3jlASXk="; # openssl rand -base64 32
-      metrics_token = "aL+UfvF2d+ufInYxJg9Dks0HXNK6VNck+uyXc88E3Ak="; # openssl rand -base64 32
+      admin_token = config.sops.placeholder."garage/admin_token";
+      metrics_token = config.sops.placeholder."garage/metrics_token";
     };
   };
 in
@@ -41,9 +41,19 @@ in
     pullImage = import ../images/garage.nix;
     readOnly = true;
     volumes = [
-      "${myLib.prettyToml configuration}:/etc/garage.toml:ro"
+      "${config.sops.templates."garage/garage.toml".path}:/etc/garage.toml:ro"
       "/storage/garage/meta:/var/lib/garage/meta"
       "/storage/garage/data:/var/lib/garage/data"
     ];
+  };
+  extraConfig = {
+    sops = {
+      secrets = {
+        "garage/rpc_secret" = { };
+        "garage/admin_token" = { };
+        "garage/metrics_token" = { };
+      };
+      templates."garage/garage.toml".content = readFile (myLib.prettyToml configuration);
+    };
   };
 }
