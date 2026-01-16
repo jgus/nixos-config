@@ -39,7 +39,6 @@ in
   configStorage = false;
   container = {
     pullImage = import ../images/garage.nix;
-    readOnly = true;
     volumes = [
       "${config.sops.templates."garage/garage.toml".path}:/etc/garage.toml:ro"
       "/storage/garage/meta:/var/lib/garage/meta"

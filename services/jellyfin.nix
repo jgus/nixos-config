@@ -3,18 +3,13 @@ let
   group = "media";
 in
 { addresses, config, ... }:
-let
-  uid = toString config.users.users.${user}.uid;
-  gid = toString config.users.groups.${group}.gid;
-in
 {
   requires = [ "storage-media.mount" "storage-photos.mount" ];
   container = {
-    readOnly = false;
     pullImage = import ../images/jellyfin.nix;
     environment = {
-      PUID = uid;
-      PGID = gid;
+      PUID = toString config.users.users.${user}.uid;
+      PGID = toString config.users.groups.${group}.gid;
       TZ = config.time.timeZone;
       JELLYFIN_PublishedServerUrl = "http://jellyfin.${addresses.network.domain}:8096";
       # NVIDIA_VISIBLE_DEVICES = "GPU-35f1dd5f-a7af-1980-58e4-61bec60811dd";
