@@ -6,7 +6,7 @@ let
     server = {
       base_url = "https://search.${addresses.network.publicDomain}";
       port = "8080";
-      bind_address = "0.0.0.0";
+      bind_address = "[::]";
       secret_key = config.sops.placeholder.searxng;
     };
     search = {
@@ -16,7 +16,6 @@ let
 in
 {
   container = {
-    readOnly = false;
     pullImage = import ../images/searxng.nix;
     ports = [
       "8080"

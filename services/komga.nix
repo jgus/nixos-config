@@ -7,7 +7,6 @@ in
   inherit user group;
   requires = [ "storage-media.mount" ];
   container = {
-    readOnly = false;
     pullImage = import ../images/komga.nix;
     environment = {
       TZ = config.time.timeZone;

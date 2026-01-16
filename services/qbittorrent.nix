@@ -6,7 +6,6 @@ in
 {
   requires = [ "storage-scratch.mount" ];
   container = {
-    readOnly = false;
     pullImage = import ../images/qbittorrent.nix;
     environment = {
       PUID = toString config.users.users.${user}.uid;
