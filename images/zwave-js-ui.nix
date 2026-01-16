@@ -1,7 +1,7 @@
 {
   imageName = "zwavejs/zwave-js-ui";
-  imageDigest = "sha256:aae07eff1b47d5d1d897658dcbf816d921ffc5cc63df31a86a73e55c8d69e129";
-  hash = "sha256-fS/MlztxnCP09SvXz51CTdb6B15GL30oQBDqE4gaE40=";
+  imageDigest = "sha256:d38bee896a9d99dd6d558c258c9935656ea73e58b7ebf1cae5479a73f6e0553e";
+  hash = "sha256-T8SMdlvz0lsawuG4jyjdlxmb3k0pku0g168jysdvaco=";
   finalImageName = "zwavejs/zwave-js-ui";
   finalImageTag = "latest";
 }
