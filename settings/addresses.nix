@@ -127,7 +127,6 @@ rec {
       ollama = { id = 81; host = "d1"; };
       qdrant = { id = 82; host = "d1"; };
       open-webui = { id = 88; host = "d1"; };
-      sillytavern = { id = 89; host = "d1"; };
 
       # Other
       minecraft = { id = 100; host = "c1-2"; };
