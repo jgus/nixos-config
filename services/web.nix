@@ -3,10 +3,10 @@
 let
   domain = addresses.network.domain;
   publicDomain = addresses.network.publicDomain;
-  securityHeaders = { frameOptions ? "DENY", ... }: ''
+  securityHeaders = { frameOptionsDeny ? true, ... }: ''
     header {
       Strict-Transport-Security "max-age=31536000; includeSubDomains"
-      X-Frame-Options "${frameOptions}"
+      ${if frameOptionsDeny then "X-Frame-Options \"DENY\"" else ""}
       X-Content-Type-Options "nosniff"
       Permissions-Policy "interest-cohort=()"
       Referrer-Policy "strict-origin-when-cross-origin"
@@ -37,11 +37,11 @@ let
     }
     office.${publicDomain} {
       reverse_proxy onlyoffice.${domain}:80
-      ${securityHeaders { frameOptions = "SAMEORIGIN"; }}
+      ${securityHeaders { frameOptionsDeny = false; }}
     }
     drive.${publicDomain} {
       reverse_proxy owncloud.${domain}:8080
-      ${securityHeaders { frameOptions = "SAMEORIGIN"; }}
+      ${securityHeaders { frameOptionsDeny = false; }}
     }
     audiobookshelf.${publicDomain} {
       reverse_proxy audiobookshelf.${domain}:80
