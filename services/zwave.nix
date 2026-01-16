@@ -12,6 +12,9 @@ let
         "3000"
       ];
       configVolume = "/usr/src/app/store";
+      environment = {
+        TRUST_PROXY = "true";
+      };
     };
   };
 in
