@@ -2,6 +2,7 @@
 {
   requires = [ "storage-media.mount" ];
   container = {
+    readOnly = false;
     pullImage = import ../images/audiobookshelf.nix;
     environment = {
       TZ = config.time.timeZone;

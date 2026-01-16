@@ -6,6 +6,7 @@ in
 {
   inherit user group;
   container = {
+    readOnly = false;
     pullImage = import ../images/esphome.nix;
     environment = {
       PLATFORMIO_CORE_DIR = "/cache/.plattformio";

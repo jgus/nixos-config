@@ -274,6 +274,7 @@ in
 {
   requires = [ "storage-frigate.mount" "zfs-import-f.service" ];
   container = {
+    readOnly = false;
     pullImage = import ../images/frigate.nix;
     environment = {
       FRIGATE_RTSP_PASSWORD = "password";

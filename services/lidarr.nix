@@ -29,6 +29,7 @@ in
   # inherit user group;
   requires = [ "storage-media.mount" "storage-scratch.mount" ];
   container = {
+    readOnly = false;
     pullImage = import ../images/lidarr.nix;
     environment = {
       PUID = toString config.users.users.${user}.uid;

@@ -3,6 +3,7 @@
   {
     name = "joyfulsong-db";
     container = {
+      readOnly = false;
       pullImage = import ../images/mariadb.nix;
       configVolume = "/var/lib/mysql";
       environment = {
@@ -19,6 +20,7 @@
   {
     name = "joyfulsong";
     container = {
+      readOnly = false;
       pullImage = import ../images/wordpress.nix;
       dependsOn = [ "joyfulsong-db" ];
       configVolume = "/var/www/html";

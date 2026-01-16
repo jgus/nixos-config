@@ -28,6 +28,7 @@ in
 {
   requires = [ "storage-media.mount" "storage-scratch.mount" ];
   container = {
+    readOnly = false;
     pullImage = import ../images/radarr.nix;
     environment = {
       PUID = toString config.users.users.${user}.uid;

@@ -2,6 +2,7 @@
 {
   requires = [ "storage-media.mount" "storage-scratch.mount" ];
   container = {
+    readOnly = false;
     pullImage = import ../images/kapowarr.nix;
     ports = [
       "5656"

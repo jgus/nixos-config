@@ -122,7 +122,7 @@ let
           extraOptions =
             (container.extraOptions or [ ]) ++
               containerOptions ++
-              lib.optional (container.readOnly or false) "--read-only" ++
+              (lib.optional (container.readOnly or true) "--read-only") ++
               (map (value: "--tmpfs=${value}") (container.tmpFs or [ ]));
           entrypoint = container.entrypoint or null;
           cmd = container.entrypointOptions or [ ];

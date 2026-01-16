@@ -6,6 +6,7 @@ in
 {
   requires = [ "storage-scratch.mount" ];
   container = {
+    readOnly = false;
     pullImage = import ../images/sabnzbd.nix;
     environment = {
       PUID = toString config.users.users.${user}.uid;
