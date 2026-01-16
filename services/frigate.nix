@@ -181,7 +181,7 @@ let
       onnx1 = { type = "onnx"; device = "1"; };
     } else { });
     model = (if (detector == "coral") then {
-      path = "plus://d5ceaa014cdcd47352e8cfc6ab0326fa"; # custom 10/18/2025
+      path = "plus://701053b23d693f044f497fff96dab6df"; # custom 1/16/2026
     } else if (detector == "onnx") then {
       # path = "plus://717c77b1c548a9f5371b44e1ec8466fd"; # stock 2025.2
       path = "plus://e6a3aa40b94b1494f5beac6f427343cb"; # custom 8/13/2025
