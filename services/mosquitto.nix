@@ -44,7 +44,6 @@ in
       "${aclFile}:/mosquitto/config/acl_file.conf:ro"
       "${configFile}:/mosquitto/config/mosquitto.conf:ro"
     ];
-    readOnly = true;
   };
   extraConfig = {
     sops.secrets."mqtt/file" = {

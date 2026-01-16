@@ -1,7 +1,6 @@
 { config, ... }:
 {
   container = {
-    readOnly = false;
     pullImage = import ../images/node-red.nix;
     configVolume = "/data";
     environment = {
