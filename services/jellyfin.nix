@@ -30,7 +30,7 @@ in
     ];
     tmpFs = [
       "/tmp"
-      "/config/cache/transcodes"
+      "/config/cache/transcodes:exec,mode=0777"
     ];
   };
 }
