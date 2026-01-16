@@ -51,7 +51,6 @@ in
   {
     name = "owncloud-db";
     container = {
-      readOnly = false;
       pullImage = import ../images/mariadb.nix;
       environment = {
         MYSQL_USER = dbUser;
@@ -76,7 +75,6 @@ in
   {
     name = "owncloud-redis";
     container = {
-      readOnly = false;
       pullImage = import ../images/redis.nix;
       configVolume = "/data";
     };
