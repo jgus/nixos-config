@@ -39,58 +39,66 @@
     , sops-nix
     , self
     , ...
-    } @ inputs: {
+    } @ inputs:
+    let
+      machineIds = [ "b1" "c1-1" "c1-2" "d1" "pi-67cba1" ];
+
+      mkSpecialArgs = machineId:
+        let
+          machine = import ./settings/machine.nix { inherit machineId; lib = nixpkgs.lib; };
+          pkgs = import nixpkgs { inherit (machine) system; };
+          libNet = (import nixpkgs {
+            inherit (machine) system;
+            overlays = [ nixos-extra-modules.overlays.default ];
+          }).lib;
+          addresses = import ./settings/addresses.nix { lib = libNet; };
+          container = import ./settings/container.nix {
+            inherit addresses machine pkgs;
+            lib = libNet;
+          };
+          libExt = libNet // (import ./lib-ext.nix {
+            inherit addresses machine pkgs;
+            lib = libNet;
+          });
+          lib = libExt;
+        in
+        {
+          inherit addresses container lib machine;
+        };
+
+      mkMachine = machineId:
+        let
+          specialArgs = mkSpecialArgs machineId;
+          machine = specialArgs.machine;
+        in
+        nixpkgs.lib.nixosSystem {
+          inherit (machine) system;
+          specialArgs = specialArgs // { inherit inputs; };
+          modules = [
+            ./machine/${machine.hostName}/hardware-configuration.nix
+            ./modules/${machine.arch}.nix
+            ./modules/common.nix
+            ./modules/network.nix
+            ./modules/sops.nix
+            ./modules/users.nix
+            ./modules/msmtp.nix
+            ./modules/vscode.nix
+            ./modules/storage.nix
+            ./modules/services.nix
+            ./modules/status2mqtt.nix
+            ./modules/systemctl-mqtt.nix
+            sops-nix.nixosModules.sops
+            nix-index-database.nixosModules.nix-index
+          ]
+          ++ nixpkgs.lib.optional machine.nvidia ./modules/nvidia.nix
+          ++ nixpkgs.lib.optional machine.zfs ./modules/zfs.nix
+          ++ nixpkgs.lib.optional machine.clamav ./modules/clamav.nix
+          ++ machine.imports;
+        };
+    in
+    {
       # NixOS configurations for each machine
       nixosConfigurations =
-        let
-          machineIds = [ "b1" "c1-1" "c1-2" "d1" "pi-67cba1" ];
-
-          mkMachine = machineId:
-            let
-              machine = import ./settings/machine.nix { inherit machineId; lib = nixpkgs.lib; };
-              pkgs = import nixpkgs { inherit (machine) system; };
-              libNet = (import nixpkgs {
-                inherit (machine) system;
-                overlays = [ nixos-extra-modules.overlays.default ];
-              }).lib;
-              addresses = import ./settings/addresses.nix { lib = libNet; };
-              container = import ./settings/container.nix {
-                inherit addresses machine pkgs;
-                lib = libNet;
-              };
-              libExt = libNet // (import ./lib-ext.nix {
-                inherit addresses machine pkgs;
-                lib = libNet;
-              });
-              lib = libExt;
-            in
-            nixpkgs.lib.nixosSystem {
-              inherit (machine) system;
-              specialArgs = {
-                inherit addresses container inputs lib machine;
-              };
-              modules = [
-                ./machine/${machine.hostName}/hardware-configuration.nix
-                ./modules/${machine.arch}.nix
-                ./modules/common.nix
-                ./modules/network.nix
-                ./modules/sops.nix
-                ./modules/users.nix
-                ./modules/msmtp.nix
-                ./modules/vscode.nix
-                ./modules/storage.nix
-                ./modules/services.nix
-                ./modules/status2mqtt.nix
-                ./modules/systemctl-mqtt.nix
-                sops-nix.nixosModules.sops
-                nix-index-database.nixosModules.nix-index
-              ]
-              ++ nixpkgs.lib.optional machine.nvidia ./modules/nvidia.nix
-              ++ nixpkgs.lib.optional machine.zfs ./modules/zfs.nix
-              ++ nixpkgs.lib.optional machine.clamav ./modules/clamav.nix
-              ++ machine.imports;
-            };
-        in
         nixpkgs.lib.listToAttrs (map
           (machineId: {
             name = machineId;
