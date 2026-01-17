@@ -20,49 +20,50 @@
   };
 
   # systemd-networkd configuration
-  systemd.network = {
-    enable = true;
+  systemd.network = lib.recursiveUpdate
+    {
+      enable = true;
 
-    # Create the br0 bridge device
-    netdevs."00-br0" = lib.mkIf (machine ? lan-interfaces) {
-      netdevConfig = {
-        Kind = "bridge";
-        Name = "br0";
+      # Create the br0 bridge device
+      netdevs."00-br0" = lib.mkIf (machine ? lan-interfaces) {
+        netdevConfig = {
+          Kind = "bridge";
+          Name = "br0";
+        };
       };
-    };
 
-    # Configure each member interface to join the bridge
-    networks."01-bridge-members" = lib.mkIf (machine ? lan-interfaces) {
-      matchConfig.Name = lib.concatStringsSep " " machine.lan-interfaces;
-      networkConfig = {
-        Bridge = "br0";
-        LinkLocalAddressing = "no";
+      # Configure each member interface to join the bridge
+      networks."01-bridge-members" = lib.mkIf (machine ? lan-interfaces) {
+        matchConfig.Name = lib.concatStringsSep " " machine.lan-interfaces;
+        networkConfig = {
+          Bridge = "br0";
+          LinkLocalAddressing = "no";
+        };
+        linkConfig.RequiredForOnline = "enslaved";
       };
-      linkConfig.RequiredForOnline = "enslaved";
-    };
 
-    # Configure the effective LAN interface (physical or bridge) to be the parent for macvlans
-    networks."05-${machine.lan-interface}" = {
-      matchConfig.Name = machine.lan-interface;
-      networkConfig = {
-        # Don't configure IP on this interface - only on macvlans
-        LinkLocalAddressing = "no";
-        DHCP = "no";
+      # Configure the effective LAN interface (physical or bridge) to be the parent for macvlans
+      networks."05-${machine.lan-interface}" = {
+        matchConfig.Name = machine.lan-interface;
+        networkConfig = {
+          # Don't configure IP on this interface - only on macvlans
+          LinkLocalAddressing = "no";
+          DHCP = "no";
+        };
+        linkConfig.RequiredForOnline = "carrier";
       };
-      linkConfig.RequiredForOnline = "carrier";
-    };
-
+    }
     # Configure the lan0 macvlan interface (host's main interface)
-  } // myLib.mkMacvlanSetup {
-    hostName = machine.hostName;
-    interfaceName = "lan0";
-    netdevPriority = "10";
-    networkPriority = "20";
-    mainTableMetric = 100;
-    policyTableId = 200;
-    policyPriority = 100;
-    requiredForOnline = "routable";
-  };
+    (myLib.mkMacvlanSetup {
+      hostName = machine.hostName;
+      interfaceName = "lan0";
+      netdevPriority = "10";
+      networkPriority = "20";
+      mainTableMetric = 100;
+      policyTableId = 200;
+      policyPriority = 100;
+      requiredForOnline = "routable";
+    });
 
   # Boot kernel networking settings (related to ARP flux for macvlan)
   boot.kernel.sysctl = {
