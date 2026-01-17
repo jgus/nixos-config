@@ -5,17 +5,26 @@
 with builtins;
 
 let
-  lib = import <nixpkgs/lib>;
+  flake = builtins.getFlake (toString ../.);
+  nixos-extra-modules = flake.inputs.nixos-extra-modules;
+
+  machine = import ../settings/machine.nix { machineId = "b1"; lib = flake.inputs.nixpkgs.lib; };
+
+  pkgs = import flake.inputs.nixpkgs {
+    inherit (machine) system;
+    overlays = [ nixos-extra-modules.overlays.default ];
+  };
+
+  lib = pkgs.lib;
+
+  addresses = import ../settings/addresses.nix { inherit lib; };
+
+  myLib = import ../my-lib.nix {
+    inherit lib addresses machine pkgs;
+  };
 
   testLib = import ./test-lib.nix {
     inherit lib myLib;
-  };
-
-  addresses = import ../settings/addresses.nix;
-
-  myLib = import ../my-lib.nix {
-    inherit lib addresses;
-    pkgs = import <nixpkgs> { };
   };
 
   inherit (testLib) assertEq assertIn assertHasKey assertNotNull;

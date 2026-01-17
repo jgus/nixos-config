@@ -113,7 +113,7 @@ let
     ];
   nfsExport = name:
     let m = getAttr name mapping; in ''
-      ${m.path} ${addresses.network.prefix}${toString addresses.group.servers}.0/24(rw,crossmnt,no_root_squash)
+      ${m.path} ${lib.net.cidr.subnet 8 addresses.group.servers addresses.network.net4}(rw,crossmnt,no_root_squash)
     '';
   backupPath = name: (lib.lists.flatten (map (i: if ((isLocal i) && (mapping.${i} ? backup) && (elem name mapping.${i}.backup)) then [ (target i) ] else [ ]) (attrNames mapping)));
   backupPaths = {

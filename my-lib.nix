@@ -7,8 +7,8 @@ let
   nameAndFqdn = name: [ name "${name}.${addresses.network.domain}" ];
 
   # Convert MAC address to EUI-64 IPv6 interface identifier
-  # Takes a prefix argument like "2001:55d:b00b:1::"
-  macToIp6 = prefix: mac:
+  # Takes a net6 argument like "2001:55d:b00b:1::/64"
+  macToIp6 = net6: mac:
     let
       octets = lib.splitString ":" mac;
       o = map lib.trivial.fromHexString octets;
@@ -22,18 +22,17 @@ let
         (toHex4 (elemAt eui64 4) (elemAt eui64 5))
         (toHex4 (elemAt eui64 6) (elemAt eui64 7))
       ];
-      prefixBase = lib.strings.removeSuffix "::" prefix;
     in
-    "${prefixBase}:${suffix}";
+    lib.net.cidr.host "::${suffix}" net6;
 
   # === Complete Records ===
   # Set default ip, mac, and ip6 addresses; add IoT records
   records = (mapAttrs
     (k: v:
       rec {
-        ip = "${addresses.network.prefix}${toString v.g}.${toString v.id}";
-        mac = "${addresses.network.serviceMacPrefix}${toHex2 v.g}:${toHex2 v.id}";
-        ip6 = macToIp6 addresses.network.prefix6 mac;
+        ip = lib.net.cidr.host (v.g * 256 + v.id) addresses.network.net4;
+        mac = lib.net.mac.add (v.g * 256 + v.id) addresses.network.serviceMacBase;
+        ip6 = macToIp6 addresses.network.net6 mac;
       } // v
     )
     addresses.records-conf) // addresses.iot;
@@ -80,9 +79,6 @@ let
     nameToAttr // (mapAttrs (k: v: getAttr v nameToAttr) aliases);
 in
 rec {
-  inherit
-    macToIp6;
-
   # === Name <-> IP Mappings ===
   nameToMac = buildAliasToAttr "mac";
   nameToIp = buildAliasToAttr "ip";
@@ -160,8 +156,8 @@ rec {
       mkRoutesForPrefix = { metric, table ? null }:
         let
           baseRoutes = [
-            { Destination = "${addresses.network.prefix}0.0/${toString addresses.network.prefixLength}"; Metric = metric; }
-            { Destination = "${addresses.network.prefix6}/${toString addresses.network.prefix6Length}"; Metric = metric; }
+            { Destination = "${addresses.network.net4}"; Metric = metric; }
+            { Destination = "${addresses.network.net6}"; Metric = metric; }
           ];
         in
         if table == null then baseRoutes else
@@ -187,8 +183,8 @@ rec {
           LinkLocalAddressing = "ipv6";
         };
         addresses = [
-          { Address = "${nameToIp.${hostName}}/${toString addresses.network.prefixLength}"; AddPrefixRoute = addPrefixRoute; }
-          { Address = "${nameToIp6.${hostName}}/${toString addresses.network.prefix6Length}"; AddPrefixRoute = addPrefixRoute; }
+          { Address = "${nameToIp.${hostName}}/${toString (lib.net.cidr.length addresses.network.net4)}"; AddPrefixRoute = addPrefixRoute; }
+          { Address = "${nameToIp6.${hostName}}/${toString (lib.net.cidr.length addresses.network.net6)}"; AddPrefixRoute = addPrefixRoute; }
         ];
         gateway = [ addresses.network.defaultGateway ];
         routes = (mkRoutesForPrefix {

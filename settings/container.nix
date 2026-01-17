@@ -32,7 +32,7 @@ rec {
         podman-configure = {
           path = [ package ];
           script = ''
-            ${executable} network ls --format "{{.Name}}" | grep "^macvlan$" || ${executable} network create -d macvlan --ipv6 --subnet=${addresses.network.prefix}0.0/16 --gateway=${addresses.network.prefix}0.1 --subnet=${addresses.network.prefix6}/${toString addresses.network.prefix6Length} -o parent=${machine.lan-interface} macvlan
+            ${executable} network ls --format "{{.Name}}" | grep "^macvlan$" || ${executable} network create -d macvlan --ipv6 --subnet=${addresses.network.net4} --gateway=${addresses.network.defaultGateway} --subnet=${addresses.network.net6} -o parent=${machine.lan-interface} macvlan
           '';
           serviceConfig = {
             Type = "oneshot";

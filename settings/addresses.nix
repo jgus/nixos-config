@@ -1,13 +1,12 @@
 with builtins;
+{ lib, ... }:
 rec {
   network = rec {
-    prefix = "172.22.";
-    prefixLength = 16;
-    defaultGateway = prefix + "0.1";
-    prefix6 = "2001:55d:b00b:1::";
-    prefix6Length = 64;
+    net4 = "172.22.0.0/16";
+    defaultGateway = lib.net.cidr.host 1 net4;
+    net6 = "2001:55d:b00b:1::/64";
     domain = "home.gustafson.me";
-    serviceMacPrefix = "00:24:0b:16:";
+    serviceMacBase = "00:24:0b:16:00:00";
     dnsServers = [ "pihole-1" "pihole-2" "pihole-3" ];
     publicDomain = "gustafson.me";
   };

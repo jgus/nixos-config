@@ -18,6 +18,10 @@
       url = "github:nix-community/nix-index-database";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nixos-extra-modules = {
+      url = "github:oddlama/nixos-extra-modules";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     # Dev shell
     devshell.url = "github:numtide/devshell";
@@ -29,6 +33,7 @@
     , flake-utils
     , nix-index-database
     , nixos-hardware
+    , nixos-extra-modules
     , nixpkgs
     , nixpkgs-unstable
     , sops-nix
@@ -43,22 +48,26 @@
           mkMachine = machineId:
             let
               machine = import ./settings/machine.nix { inherit machineId; lib = nixpkgs.lib; };
-              addresses = import ./settings/addresses.nix;
+              pkgs = import nixpkgs {
+                inherit (machine) system;
+                overlays = [ nixos-extra-modules.overlays.default ];
+              };
+              addresses = import ./settings/addresses.nix { lib = pkgs.lib; };
               container = import ./settings/container.nix {
                 inherit machine addresses;
-                pkgs = nixpkgs.legacyPackages.${machine.system};
-                lib = nixpkgs.lib;
+                inherit pkgs;
+                lib = pkgs.lib;
               };
               myLib = import ./my-lib.nix {
-                lib = nixpkgs.lib;
-                pkgs = nixpkgs.legacyPackages.${machine.system};
-                inherit addresses machine;
+                inherit pkgs addresses machine;
+                lib = pkgs.lib;
               };
             in
             nixpkgs.lib.nixosSystem {
               inherit (machine) system;
               specialArgs = {
                 inherit inputs machine addresses myLib container;
+                lib = pkgs.lib;
               };
               modules = [
                 ./machine/${machine.hostName}/hardware-configuration.nix

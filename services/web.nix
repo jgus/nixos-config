@@ -68,7 +68,7 @@ let
       ${securityHeaders {}}
     }
     esphome.${publicDomain} {
-      @internal client_ip private_ranges ${addresses.network.prefix6}/64
+      @internal client_ip private_ranges ${addresses.network.net6}
       handle @internal {
         reverse_proxy esphome.${domain}:6052
         ${securityHeaders {}}
@@ -78,7 +78,7 @@ let
       }
     }
     zwave-main.${publicDomain} {
-      @internal client_ip private_ranges ${addresses.network.prefix6}/64
+      @internal client_ip private_ranges ${addresses.network.net6}
       handle @internal {
         reverse_proxy zwave-main.${domain}:8091
         ${securityHeaders {}}
@@ -88,7 +88,7 @@ let
       }
     }
     zwave-upstairs.${publicDomain} {
-      @internal client_ip private_ranges ${addresses.network.prefix6}/64
+      @internal client_ip private_ranges ${addresses.network.net6}
       handle @internal {
         reverse_proxy zwave-upstairs.${domain}:8091
         ${securityHeaders {}}
@@ -98,7 +98,7 @@ let
       }
     }
     zwave-basement.${publicDomain} {
-      @internal client_ip private_ranges ${addresses.network.prefix6}/64
+      @internal client_ip private_ranges ${addresses.network.net6}
       handle @internal {
         reverse_proxy zwave-basement.${domain}:8091
         ${securityHeaders {}}
@@ -108,7 +108,7 @@ let
       }
     }
     zwave-north.${publicDomain} {
-      @internal client_ip private_ranges ${addresses.network.prefix6}/64
+      @internal client_ip private_ranges ${addresses.network.net6}
       handle @internal {
         reverse_proxy zwave-north.${domain}:8091
         ${securityHeaders {}}
