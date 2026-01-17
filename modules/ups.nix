@@ -1,4 +1,4 @@
-{ config, machine, myLib, ... }:
+{ config, machine, lib, ... }:
 {
   power.ups = {
     enable = true;
@@ -24,8 +24,8 @@
       enable = true;
       listen = [
         { address = "localhost"; }
-        { address = myLib.nameToIp.${machine.hostName}; }
-        { address = myLib.nameToIp6.${machine.hostName}; }
+        { address = lib.ext.nameToIp.${machine.hostName}; }
+        { address = lib.ext.nameToIp6.${machine.hostName}; }
       ];
     };
     upsmon.enable = false;

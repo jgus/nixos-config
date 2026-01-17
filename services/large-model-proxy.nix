@@ -1,6 +1,6 @@
 # Large Model Proxy - manages multiple resource-heavy LLMs on the same machine
 # https://github.com/perk11/large-model-proxy
-{ container, lib, machine, myLib, pkgs, ... }:
+{ container, lib, machine, pkgs, ... }:
 let
   numaCpusStrs = map (cpuSet: lib.concatMapStringsSep "," toString cpuSet) machine.numaCpus;
   numaCpusNearGpu1 = (builtins.elemAt numaCpusStrs 1);
@@ -552,7 +552,7 @@ in
       fi
 
       cd ${storagePath name}
-      exec large-model-proxy -c ${myLib.prettyJson (configuration { hostIp = ip; hostIp6 = ip6; })}
+      exec large-model-proxy -c ${lib.ext.prettyJson (configuration { hostIp = ip; hostIp6 = ip6; })}
     '';
   };
   extraConfig = {

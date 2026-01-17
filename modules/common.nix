@@ -1,4 +1,4 @@
-{ lib, machine, myLib, options, pkgs, ... }:
+{ lib, machine, options, pkgs, ... }:
 {
   boot = {
     tmp.useTmpfs = true;
@@ -25,8 +25,8 @@
       nixpkgs-fmt
     ];
     variables = {
-      SERVER_NAMES = builtins.concatStringsSep " " myLib.serverNames;
-      OTHER_SERVER_NAMES = builtins.concatStringsSep " " (lib.lists.remove machine.hostName myLib.serverNames);
+      SERVER_NAMES = builtins.concatStringsSep " " lib.ext.serverNames;
+      OTHER_SERVER_NAMES = builtins.concatStringsSep " " (lib.lists.remove machine.hostName lib.ext.serverNames);
     };
   };
 

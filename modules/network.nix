@@ -1,4 +1,4 @@
-{ addresses, lib, machine, myLib, ... }:
+{ addresses, lib, machine, ... }:
 {
   # Use systemd-networkd for network configuration
   # This provides native support for routing policy rules without oneshot service hacks
@@ -14,9 +14,9 @@
     useDHCP = false;
     tempAddresses = "disabled";
     domain = addresses.network.domain;
-    nameservers = (map (n: myLib.nameToIp.${n}) addresses.network.dnsServers) ++ [ "1.1.1.1" "1.0.0.1" ];
+    nameservers = (map (n: lib.ext.nameToIp.${n}) addresses.network.dnsServers) ++ [ "1.1.1.1" "1.0.0.1" ];
     timeServers = [ "ntp.${addresses.network.domain}" ];
-    hosts = myLib.hosts;
+    hosts = lib.ext.hosts;
   };
 
   # systemd-networkd configuration
@@ -54,7 +54,7 @@
       };
     }
     # Configure the lan0 macvlan interface (host's main interface)
-    (myLib.mkMacvlanSetup {
+    (lib.ext.mkMacvlanSetup {
       hostName = machine.hostName;
       interfaceName = "lan0";
       netdevPriority = "10";

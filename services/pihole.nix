@@ -1,5 +1,5 @@
 with builtins;
-{ addresses, config, myLib, pkgs, ... }:
+{ addresses, config, lib, pkgs, ... }:
 let
   tftpFiles = {
     "netboot.xyz.kpxe" = fetchurl {
@@ -11,7 +11,7 @@ let
       sha256 = "0zqqq8d10gn9hy5rbxg5c46q8cjlmg6kv7gkwx3yabka53n7aizj";
     };
   };
-  dhcpHosts = (map (r: r.mac + "," + r.ip + "," + r.name + ",infinite") myLib.dhcpReservations);
+  dhcpHosts = (map (r: r.mac + "," + r.ip + "," + r.name + ",infinite") lib.ext.dhcpReservations);
   upstream = [
     "1.1.1.1"
     "1.0.0.1"
@@ -27,23 +27,23 @@ map
     name = "pihole-${toString n}";
     dnsmasqConf = {
       config = ''
-        dhcp-option=option:dns-server,${myLib.nameToIp.dns-1},${myLib.nameToIp.dns-2},${myLib.nameToIp.dns-3}
-        dhcp-option=option:ntp-server,${myLib.nameToIp.ntp}
+        dhcp-option=option:dns-server,${lib.ext.nameToIp.dns-1},${lib.ext.nameToIp.dns-2},${lib.ext.nameToIp.dns-3}
+        dhcp-option=option:ntp-server,${lib.ext.nameToIp.ntp}
 
         enable-tftp
         tftp-root=/tftp
         dhcp-match=set:bios,60,PXEClient:Arch:00000
-        dhcp-boot=tag:bios,netboot.xyz.kpxe,,${myLib.nameToIp.${name}}
+        dhcp-boot=tag:bios,netboot.xyz.kpxe,,${lib.ext.nameToIp.${name}}
         dhcp-match=set:efi32,60,PXEClient:Arch:00002
-        dhcp-boot=tag:efi32,netboot.xyz.efi,,${myLib.nameToIp.${name}}
+        dhcp-boot=tag:efi32,netboot.xyz.efi,,${lib.ext.nameToIp.${name}}
         dhcp-match=set:efi32-1,60,PXEClient:Arch:00006
-        dhcp-boot=tag:efi32-1,netboot.xyz.efi,,${myLib.nameToIp.${name}}
+        dhcp-boot=tag:efi32-1,netboot.xyz.efi,,${lib.ext.nameToIp.${name}}
         dhcp-match=set:efi64,60,PXEClient:Arch:00007
-        dhcp-boot=tag:efi64,netboot.xyz.efi,,${myLib.nameToIp.${name}}
+        dhcp-boot=tag:efi64,netboot.xyz.efi,,${lib.ext.nameToIp.${name}}
         dhcp-match=set:efi64-1,60,PXEClient:Arch:00008
-        dhcp-boot=tag:efi64-1,netboot.xyz.efi,,${myLib.nameToIp.${name}}
+        dhcp-boot=tag:efi64-1,netboot.xyz.efi,,${lib.ext.nameToIp.${name}}
         dhcp-match=set:efi64-2,60,PXEClient:Arch:00009
-        dhcp-boot=tag:efi64-2,netboot.xyz.efi,,${myLib.nameToIp.${name}}
+        dhcp-boot=tag:efi64-2,netboot.xyz.efi,,${lib.ext.nameToIp.${name}}
       '';
     };
   in
@@ -96,7 +96,7 @@ map
       ++
       (map (x: "--dns=${x}") upstream)
       ++
-      myLib.containerAddAllHosts
+      lib.ext.containerAddAllHosts
       ;
       tmpFs = [
         "/etc/pihole"

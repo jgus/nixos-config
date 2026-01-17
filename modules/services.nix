@@ -4,7 +4,7 @@ let
   storageBackupPath = name: "/storage/service/${name}";
   serviceDir = readDir ../services;
 in
-args@{ addresses, container, lib, machine, myLib, pkgs, ... }:
+args@{ addresses, container, lib, machine, pkgs, ... }:
 let
   containerImport = container;
   serviceNames = map (n: lib.strings.removeSuffix ".nix" n) (filter (n: serviceDir.${n} == "regular" && (lib.strings.hasSuffix ".nix" n) && !(lib.strings.hasPrefix "." n)) (attrNames serviceDir));
@@ -63,7 +63,7 @@ let
         image = "${argsContainer.pullImage.finalImageName}:${argsContainer.pullImage.finalImageTag}";
         imageFile = pkgs.dockerTools.pullImage argsContainer.pullImage;
       } else { });
-      containerOptions = myLib.containerOptions name;
+      containerOptions = lib.ext.containerOptions name;
       isContainer = container ? image;
 
       # Shared service components used by both container and systemd configs
@@ -137,8 +137,8 @@ let
       systemdConfig =
         let
           useMacvlan = systemd.macvlan or false;
-          macvlanInterfaceName = "mv${toString myLib.nameToIdMajor.${name}}x${toString myLib.nameToIdMinor.${name}}";
-          macvlanNetwork = myLib.mkMacvlanSetup {
+          macvlanInterfaceName = "mv${toString lib.ext.nameToIdMajor.${name}}x${toString lib.ext.nameToIdMinor.${name}}";
+          macvlanNetwork = lib.ext.mkMacvlanSetup {
             hostName = name;
             interfaceName = macvlanInterfaceName;
             netdevPriority = "30";
@@ -146,7 +146,7 @@ let
             mainTableMetric = 1000;
             # Routing table ID: base offset of 1000 avoids reserved tables (253-255)
             # g * 256 ensures no overlap since id is 0-255
-            policyTableId = 1000 + myLib.nameToIdMajor.${name} * 256 + myLib.nameToIdMinor.${name};
+            policyTableId = 1000 + lib.ext.nameToIdMajor.${name} * 256 + lib.ext.nameToIdMinor.${name};
             policyPriority = 200;
             addPrefixRoute = false;
           };
@@ -171,8 +171,8 @@ let
                 script = lib.optionalString (systemd ? script) (systemd.script {
                   inherit name uid gid storagePath containerOptions;
                   interface = if useMacvlan then macvlanInterfaceName else null;
-                  ip = myLib.nameToIp.${name};
-                  ip6 = myLib.nameToIp6.${name};
+                  ip = lib.ext.nameToIp.${name};
+                  ip6 = lib.ext.nameToIp6.${name};
                 });
                 postStop = "systemctl restart ${name}-backup";
               };
@@ -187,7 +187,7 @@ let
         };
       serviceConfig = if isContainer then containerConfig else systemdConfig;
     in
-    lib.optionalAttrs (machine.hostName == myLib.nameToHost.${name}) serviceConfig;
+    lib.optionalAttrs (machine.hostName == lib.ext.nameToHost.${name}) serviceConfig;
   importService = n:
     let
       i = (import ../services/${n}.nix) args;

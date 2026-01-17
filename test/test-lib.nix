@@ -1,15 +1,15 @@
 # Test library with assertion helper functions
-# Takes lib and myLib as inputs
+# Takes lib and lib.ext as inputs
 
 with builtins;
 
-{ lib, myLib }:
+{ lib }:
 {
   # Assert two values are equal, with helpful error message on failure
   assertEq = msg: expected: actual:
     if expected == actual then true
     else
-      throw "Assertion failed: ${msg}\n  Expected: ${myLib.toDebugStr expected}\n  Actual: ${myLib.toDebugStr actual}";
+      throw "Assertion failed: ${msg}\n  Expected: ${lib.ext.toDebugStr expected}\n  Actual: ${lib.ext.toDebugStr actual}";
 
   # Assert a value is in a list
   assertIn = msg: needle: haystack:

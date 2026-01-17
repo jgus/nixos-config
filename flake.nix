@@ -48,26 +48,26 @@
           mkMachine = machineId:
             let
               machine = import ./settings/machine.nix { inherit machineId; lib = nixpkgs.lib; };
-              pkgs = import nixpkgs {
+              pkgs = import nixpkgs { inherit (machine) system; };
+              libNet = (import nixpkgs {
                 inherit (machine) system;
                 overlays = [ nixos-extra-modules.overlays.default ];
-              };
-              addresses = import ./settings/addresses.nix { lib = pkgs.lib; };
+              }).lib;
+              addresses = import ./settings/addresses.nix { lib = libNet; };
               container = import ./settings/container.nix {
-                inherit machine addresses;
-                inherit pkgs;
-                lib = pkgs.lib;
+                inherit addresses machine pkgs;
+                lib = libNet;
               };
-              myLib = import ./my-lib.nix {
-                inherit pkgs addresses machine;
-                lib = pkgs.lib;
-              };
+              libExt = libNet // (import ./lib-ext.nix {
+                inherit addresses machine pkgs;
+                lib = libNet;
+              });
+              lib = libExt;
             in
             nixpkgs.lib.nixosSystem {
               inherit (machine) system;
               specialArgs = {
-                inherit inputs machine addresses myLib container;
-                lib = pkgs.lib;
+                inherit addresses container inputs lib machine;
               };
               modules = [
                 ./machine/${machine.hostName}/hardware-configuration.nix
