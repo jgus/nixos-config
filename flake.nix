@@ -61,9 +61,10 @@
             lib = libNet;
           });
           lib = libExt;
+          testResults = import ./test/lib-ext-test.nix { inherit lib; };
         in
         {
-          inherit addresses container lib machine;
+          inherit addresses container lib machine testResults;
         };
 
       mkMachine = machineId:
@@ -75,6 +76,7 @@
           inherit (machine) system;
           specialArgs = specialArgs // { inherit inputs; };
           modules = [
+            ./modules/assert-test-results.nix
             ./machine/${machine.hostName}/hardware-configuration.nix
             ./modules/${machine.arch}.nix
             ./modules/common.nix
