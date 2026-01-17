@@ -23,7 +23,9 @@
   ];
   boot.initrd.kernelModules = [ ];
   boot.kernelModules = [ "kvm-intel" ];
-  boot.extraModulePackages = [ ];
+  boot.extraModulePackages = [
+    config.boot.kernelPackages.gasket # Coral
+  ];
   boot.swraid.enable = true;
   boot.swraid.mdadmConf = ''
     ARRAY /dev/md/s  metadata=1.2 UUID=a2edf378:c1efcb74:731a6323:d961e11d

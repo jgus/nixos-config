@@ -307,7 +307,6 @@ in
     ];
   };
   extraConfig = {
-    boot.extraModulePackages = with config.boot.kernelPackages; [ gasket ];
     sops = {
       secrets = {
         camera = { };
