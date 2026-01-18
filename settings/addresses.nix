@@ -10,6 +10,25 @@ rec {
     dnsServers = [ "pihole-1" "pihole-2" "pihole-3" ];
     publicDomain = "gustafson.me";
   };
+  vlans = {
+    iot = rec {
+      vlanId = 3;
+      net4 = "172.21.0.0/16";
+      defaultGateway = lib.net.cidr.host 1 net4;
+    };
+    download = rec {
+      vlanId = 4;
+      net4 = "172.20.0.0/16";
+      defaultGateway = lib.net.cidr.host 1 net4;
+      net6 = "2001:55d:b00b:4::/64";
+    };
+    dmz = rec {
+      vlanId = 5;
+      net4 = "172.19.0.0/16";
+      defaultGateway = lib.net.cidr.host 1 net4;
+      net6 = "2001:55d:b00b:5::/64";
+    };
+  };
   group = {
     network = 0;
     servers = 1;
@@ -112,14 +131,14 @@ rec {
       audiobookshelf = { id = 65; host = "c1-2"; };
 
       # Download
-      sabnzbd = { id = 70; host = "c1-2"; };
-      qbittorrent = { id = 71; host = "c1-2"; };
-      prowlarr = { id = 72; host = "c1-2"; };
-      sonarr = { id = 73; host = "c1-2"; };
-      radarr = { id = 74; host = "c1-2"; };
-      lidarr = { id = 75; host = "c1-2"; };
-      kapowarr = { id = 76; host = "c1-2"; };
-      flaresolverr = { id = 77; host = "c1-2"; };
+      sabnzbd = { id = 70; host = "c1-2"; vlan = "download"; };
+      qbittorrent = { id = 71; host = "c1-2"; vlan = "download"; };
+      prowlarr = { id = 72; host = "c1-2"; vlan = "download"; };
+      sonarr = { id = 73; host = "c1-2"; vlan = "download"; };
+      radarr = { id = 74; host = "c1-2"; vlan = "download"; };
+      lidarr = { id = 75; host = "c1-2"; vlan = "download"; };
+      kapowarr = { id = 76; host = "c1-2"; vlan = "download"; };
+      flaresolverr = { id = 77; host = "c1-2"; vlan = "download"; };
 
       # AI
       large-model-proxy = { id = 80; host = "d1"; aliases = [ "comfyui" ]; };
