@@ -138,7 +138,6 @@ in
     ];
 
     # Create complete macvlan setup including netdev, parent attachment, and network config
-    # This encapsulates the entire pattern used in both network.nix and services.nix
     mkMacvlanSetup =
       { hostName
       , interfaceName
@@ -150,18 +149,6 @@ in
       , addPrefixRoute ? true
       , requiredForOnline ? "no"
       }:
-      let
-        # Generate route entries for both IPv4 and IPv6 prefixes
-        mkRoutesForPrefix = { metric, table ? null }:
-          let
-            baseRoutes = [
-              { Destination = "${addresses.network.net4}"; Metric = metric; }
-              { Destination = "${addresses.network.net6}"; Metric = metric; }
-            ];
-          in
-          if table == null then baseRoutes else
-          map (r: r // { Table = table; }) baseRoutes;
-      in
       {
         netdevs."${toString netdevPriority}-${interfaceName}" = {
           netdevConfig = {
@@ -182,23 +169,30 @@ in
             LinkLocalAddressing = "ipv6";
           };
           addresses = [
-            { Address = "${nameToIp.${hostName}}/${toString (lib.net.cidr.length addresses.network.net4)}"; AddPrefixRoute = addPrefixRoute; }
-            { Address = "${nameToIp6.${hostName}}/${toString (lib.net.cidr.length addresses.network.net6)}"; AddPrefixRoute = addPrefixRoute; }
+            {
+              Address = "${nameToIp.${hostName}}/${toString (lib.net.cidr.length addresses.network.net4)}";
+              AddPrefixRoute = addPrefixRoute;
+            }
+            {
+              Address = "${nameToIp6.${hostName}}/${toString (lib.net.cidr.length addresses.network.net6)}";
+              AddPrefixRoute = addPrefixRoute;
+            }
           ];
           gateway = [ addresses.network.defaultGateway ];
-          routes = (mkRoutesForPrefix {
-            # Main table routes
-            metric = mainTableMetric;
-          }) ++ (mkRoutesForPrefix {
-            # Policy table routes
-            metric = mainTableMetric;
-            table = policyTableId;
-          }) ++ [{
+          routes = [
             # Default route
-            Destination = "0.0.0.0/0";
-            Gateway = addresses.network.defaultGateway;
-            Table = policyTableId;
-          }];
+            {
+              Destination = "0.0.0.0/0";
+              Gateway = addresses.network.defaultGateway;
+              Table = policyTableId;
+            }
+            # Main table routes
+            { Destination = "${addresses.network.net4}"; Metric = mainTableMetric; }
+            { Destination = "${addresses.network.net6}"; Metric = mainTableMetric; }
+            # Policy table routes
+            { Destination = "${addresses.network.net4}"; Metric = mainTableMetric; Table = policyTableId; }
+            { Destination = "${addresses.network.net6}"; Metric = mainTableMetric; Table = policyTableId; }
+          ];
           routingPolicyRules = map
             (a: {
               From = a;
