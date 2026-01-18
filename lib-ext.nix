@@ -123,7 +123,7 @@ in
 
     # Network options to be added to every container service
     containerOptions = service: [
-      "--network=macvlan"
+      "--network=hostlan"
       "--mac-address=${records.${service}.mac}"
       "--hostname=${service}"
       "--ip=${records.${service}.ip}"

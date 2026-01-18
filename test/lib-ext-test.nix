@@ -235,8 +235,8 @@ lib.debug.throwTestFailures {
       expr = length (lib.ext.containerOptions "pihole-1");
       expected = 9;
     };
-    test_container_options_has_macvlan = {
-      expr = hasContainerOption "pihole-1" "--network=macvlan";
+    test_container_options_has_hostlan = {
+      expr = hasContainerOption "pihole-1" "--network=hostlan";
       expected = true;
     };
     test_container_options_has_hostname = {
