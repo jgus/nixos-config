@@ -141,8 +141,8 @@ let
           macvlanNetwork = lib.ext.mkMacvlanSetup {
             hostName = name;
             interfaceName = macvlanInterfaceName;
-            netdevPriority = "30";
-            networkPriority = "40";
+            netdevPriority = 30;
+            networkPriority = 40;
             mainTableMetric = 1000;
             # Routing table ID: base offset of 1000 avoids reserved tables (253-255)
             # g * 256 ensures no overlap since id is 0-255

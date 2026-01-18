@@ -57,8 +57,8 @@
     (lib.ext.mkMacvlanSetup {
       hostName = machine.hostName;
       interfaceName = "lan0";
-      netdevPriority = "10";
-      networkPriority = "20";
+      netdevPriority = 10;
+      networkPriority = 20;
       mainTableMetric = 100;
       policyTableId = 200;
       policyPriority = 100;

@@ -29,7 +29,7 @@ let
     (k: v:
       rec {
         ip = lib.net.cidr.host (v.g * 256 + v.id) addresses.network.net4;
-        mac = lib.net.mac.add (v.g * 256 + v.id) addresses.network.serviceMacBase;
+        mac = lib.net.mac.add (v.g * 256 + v.id) addresses.network.assignedMacBase;
         ip6 = macToIp6 addresses.network.net6 mac;
       } // v
     )
@@ -163,7 +163,7 @@ in
           map (r: r // { Table = table; }) baseRoutes;
       in
       {
-        netdevs."${netdevPriority}-${interfaceName}" = {
+        netdevs."${toString netdevPriority}-${interfaceName}" = {
           netdevConfig = {
             Kind = "macvlan";
             Name = interfaceName;
@@ -174,7 +174,7 @@ in
 
         networks."05-${machine.lan-interface}".macvlan = [ interfaceName ];
 
-        networks."${networkPriority}-${interfaceName}" = {
+        networks."${toString networkPriority}-${interfaceName}" = {
           matchConfig.Name = interfaceName;
           networkConfig = {
             DHCP = "no";

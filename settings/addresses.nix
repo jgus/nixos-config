@@ -6,7 +6,7 @@ rec {
     defaultGateway = lib.net.cidr.host 1 net4;
     net6 = "2001:55d:b00b:1::/64";
     domain = "home.gustafson.me";
-    serviceMacBase = "00:24:0b:16:00:00";
+    assignedMacBase = "00:24:0b:16:00:00";
     dnsServers = [ "pihole-1" "pihole-2" "pihole-3" ];
     publicDomain = "gustafson.me";
   };

@@ -399,8 +399,8 @@ lib.debug.throwTestFailures {
     b1MacvlanSetup = (lib.ext.mkMacvlanSetup {
       hostName = "b1";
       interfaceName = "mv-test";
-      netdevPriority = "10";
-      networkPriority = "20";
+      netdevPriority = 10;
+      networkPriority = 20;
       mainTableMetric = 100;
       policyTableId = 100;
       policyPriority = 1000;
@@ -479,8 +479,8 @@ lib.debug.throwTestFailures {
     c1_1MacvlanSetup = (lib.ext.mkMacvlanSetup {
       hostName = "c1-1";
       interfaceName = "mv-test";
-      netdevPriority = "10";
-      networkPriority = "20";
+      netdevPriority = 10;
+      networkPriority = 20;
       mainTableMetric = 100;
       policyTableId = 100;
       policyPriority = 1000;
