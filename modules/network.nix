@@ -25,7 +25,7 @@
       enable = true;
 
       # Create the br0 bridge device
-      netdevs."00-br0" = lib.mkIf (machine ? lan-interfaces) {
+      netdevs."00-br0" = {
         netdevConfig = {
           Kind = "bridge";
           Name = "br0";
@@ -33,7 +33,7 @@
       };
 
       # Configure each member interface to join the bridge
-      networks."01-bridge-members" = lib.mkIf (machine ? lan-interfaces) {
+      networks."01-bridge-members" = {
         matchConfig.Name = lib.concatStringsSep " " machine.lan-interfaces;
         networkConfig = {
           Bridge = "br0";
@@ -43,8 +43,8 @@
       };
 
       # Configure the effective LAN interface (physical or bridge) to be the parent for macvlans
-      networks."05-${machine.lan-interface}" = {
-        matchConfig.Name = machine.lan-interface;
+      networks."05-br0" = {
+        matchConfig.Name = "br0";
         networkConfig = {
           # Don't configure IP on this interface - only on macvlans
           LinkLocalAddressing = "no";

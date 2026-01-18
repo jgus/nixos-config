@@ -4,7 +4,7 @@ with builtins;
 let
   rpi = {
     arch = "rpi";
-    lan-interface = "end0";
+    lan-interfaces = [ "end0" ];
     zfs = false;
     clamav = false;
   };
@@ -22,7 +22,7 @@ let
       stateVersion = "23.05";
       hostId = "2bec4b05";
       # lan-interfaces = [ "eno1" "eno2" "eno3" "eno4" "enp5s0" ];
-      lan-interface = "enp131s0d1";
+      lan-interfaces = [ "enp131s0d1" ];
       nvidia = true;
       zfs-pools = [ "d" "f" ];
       imports = [
@@ -49,7 +49,7 @@ let
     b1 = {
       stateVersion = "24.05";
       hostId = "8f150749";
-      lan-interface = "enp1s0";
+      lan-interfaces = [ "enp1s0" ];
       zfs-pools = [ ];
       imports = [
         ../modules/nebula-sync.nix
@@ -71,5 +71,4 @@ in
   fwupd = (machine.arch == "x86");
   timeZone = "America/Denver";
 } //
-lib.optionalAttrs (machine ? lan-interfaces) { lan-interface = "br0"; } //
 machine

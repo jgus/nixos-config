@@ -159,7 +159,7 @@ in
           macvlanConfig.Mode = "bridge";
         };
 
-        networks."05-${machine.lan-interface}".macvlan = [ interfaceName ];
+        networks."05-br0".macvlan = [ interfaceName ];
 
         networks."${toString networkPriority}-${interfaceName}" = {
           matchConfig.Name = interfaceName;
