@@ -1,7 +1,6 @@
+with builtins;
 { addresses, lib, machine, ... }:
 {
-  # Use systemd-networkd for network configuration
-  # This provides native support for routing policy rules without oneshot service hacks
   networking = {
     hostName = machine.hostName;
     hostId = machine.hostId;
@@ -19,20 +18,24 @@
     hosts = lib.ext.hosts;
   };
 
-  # systemd-networkd configuration
-  systemd.network = lib.recursiveUpdate
+  systemd.network = lib.ext.recursiveUpdates [
+    # Base Config
     {
       enable = true;
 
-      # Create the br0 bridge device
+      # Create the br0 bridge device for all physical interfaces
       netdevs."00-br0" = {
         netdevConfig = {
           Kind = "bridge";
           Name = "br0";
         };
+        bridgeConfig = {
+          VLANFiltering = true;
+          DefaultPVID = 1;
+        };
       };
 
-      # Configure each member interface to join the bridge
+      # Configure each member interface to join the bridge with VLANs
       networks."01-bridge-members" = {
         matchConfig.Name = lib.concatStringsSep " " machine.lan-interfaces;
         networkConfig = {
@@ -40,6 +43,12 @@
           LinkLocalAddressing = "no";
         };
         linkConfig.RequiredForOnline = "enslaved";
+        # Configure VLANs: VLAN 1 (untagged, PVID) plus all VLANs from addresses.vlans
+        bridgeVLANs =
+          # VLAN 1 as PVID and untagged
+          [{ VLAN = 1; PVID = 1; EgressUntagged = 1; }] ++
+          # All other VLANs as tagged
+          (map (vlan: { VLAN = vlan.vlanId; }) (attrValues addresses.vlans));
       };
 
       # Configure the effective LAN interface (physical or bridge) to be the parent for macvlans
@@ -50,10 +59,39 @@
           LinkLocalAddressing = "no";
           DHCP = "no";
         };
+        vlan = (map (vlan: "br0.${toString vlan.vlanId}") (attrValues addresses.vlans));
         linkConfig.RequiredForOnline = "carrier";
       };
     }
-    # Configure the lan0 macvlan interface (host's main interface)
+
+    # VLANs
+    {
+      netdevs = lib.mapAttrs'
+        (name: vlan:
+          lib.nameValuePair "02-br0.${toString vlan.vlanId}" {
+            netdevConfig = {
+              Kind = "vlan";
+              Name = "br0.${toString vlan.vlanId}";
+            };
+            vlanConfig.Id = vlan.vlanId;
+          }
+        )
+        addresses.vlans;
+      networks = lib.mapAttrs'
+        (name: vlan:
+          lib.nameValuePair "03-br0.${toString vlan.vlanId}" {
+            matchConfig.Name = "br0.${toString vlan.vlanId}";
+            networkConfig = {
+              LinkLocalAddressing = "no";
+              DHCP = "no";
+            };
+            linkConfig.RequiredForOnline = "carrier";
+          }
+        )
+        addresses.vlans;
+    }
+
+    # Host MacVLANs
     (lib.ext.mkMacvlanSetup {
       hostName = machine.hostName;
       interfaceName = "lan0";
@@ -63,7 +101,8 @@
       policyTableId = 200;
       policyPriority = 100;
       requiredForOnline = "routable";
-    });
+    })
+  ];
 
   # Boot kernel networking settings (related to ARP flux for macvlan)
   boot.kernel.sysctl = {
