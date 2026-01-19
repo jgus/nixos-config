@@ -52,10 +52,7 @@
             overlays = [ nixos-extra-modules.overlays.default ];
           }).lib;
           addresses = import ./settings/addresses.nix { lib = libNet; };
-          container = import ./settings/container.nix {
-            inherit addresses machine pkgs;
-            lib = libNet;
-          };
+          container = import ./settings/container.nix { inherit pkgs; };
           libExt = libNet // (import ./lib-ext.nix {
             inherit addresses machine pkgs;
             lib = libNet;
@@ -86,6 +83,7 @@
             ./modules/msmtp.nix
             ./modules/vscode.nix
             ./modules/storage.nix
+            ./modules/container.nix
             ./modules/services.nix
             ./modules/status2mqtt.nix
             ./modules/systemctl-mqtt.nix

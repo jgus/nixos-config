@@ -4,9 +4,8 @@ let
   storageBackupPath = name: "/storage/service/${name}";
   serviceDir = readDir ../services;
 in
-args@{ addresses, container, lib, machine, pkgs, ... }:
+args@{ addresses, lib, machine, pkgs, ... }:
 let
-  containerImport = container;
   serviceNames = map (n: lib.strings.removeSuffix ".nix" n) (filter (n: serviceDir.${n} == "regular" && (lib.strings.hasSuffix ".nix" n) && !(lib.strings.hasPrefix "." n)) (attrNames serviceDir));
   homelabServiceStorage = name:
     let
@@ -85,9 +84,10 @@ let
 
       containerConfig = {
         imports = [
-          containerImport.config
           extraConfig
         ] ++ map homelabServiceStorage storageNames;
+
+        ext.container.enable = true;
 
         systemd = {
           targets."${name}-requires" = requiresTarget;
