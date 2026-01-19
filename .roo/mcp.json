@@ -1,1 +1,1 @@
-{"mcpServers":{"search":{"url":"https://search-mcp.gustafson.me/sse","alwaysAllow":["search","web"],"timeout":30}}}
+{"mcpServers":{"search":{"url":"https://search-mcp.gustafson.me/sse","alwaysAllow":["search","web"],"timeout":30},"context7":{"type":"streamable-http","url":"https://mcp.context7.com/mcp","alwaysAllow":["resolve-library-id","query-docs"]}}}
