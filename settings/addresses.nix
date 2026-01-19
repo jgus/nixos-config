@@ -5,29 +5,36 @@ rec {
     net4 = "172.22.0.0/16";
     defaultGateway = lib.net.cidr.host 1 net4;
     net6 = "2001:55d:b00b:1::/64";
+    local6 = "2001:55d:b00b::/48";
     domain = "home.gustafson.me";
     assignedMacBase = "00:24:0b:16:00:00";
     dnsServers = [ "pihole-1" "pihole-2" "pihole-3" ];
     publicDomain = "gustafson.me";
   };
   vlans = {
-    iot = rec {
-      vlanId = 3;
-      net4 = "172.21.0.0/16";
-      defaultGateway = lib.net.cidr.host 1 net4;
-    };
-    download = rec {
-      vlanId = 4;
-      net4 = "172.20.0.0/16";
-      defaultGateway = lib.net.cidr.host 1 net4;
-      net6 = "2001:55d:b00b:4::/64";
-    };
-    dmz = rec {
-      vlanId = 5;
-      net4 = "172.19.0.0/16";
-      defaultGateway = lib.net.cidr.host 1 net4;
-      net6 = "2001:55d:b00b:5::/64";
-    };
+    iot =
+      let
+        vlanId = 3;
+        net4 = "172.21.0.0/16";
+        defaultGateway = lib.net.cidr.host 1 net4;
+      in
+      { inherit vlanId net4 defaultGateway; };
+    download =
+      let
+        vlanId = 4;
+        net4 = "172.20.0.0/16";
+        defaultGateway = lib.net.cidr.host 1 net4;
+        net6 = "2001:55d:b00b:4::/64";
+      in
+      { inherit vlanId net4 defaultGateway net6; };
+    dmz =
+      let
+        vlanId = 5;
+        net4 = "172.19.0.0/16";
+        defaultGateway = lib.net.cidr.host 1 net4;
+        net6 = "2001:55d:b00b:5::/64";
+      in
+      { inherit vlanId net4 defaultGateway net6; };
   };
   group = {
     network = 0;

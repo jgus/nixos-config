@@ -31,16 +31,17 @@ with builtins;
         } // {
         podman-configure = lib.mkOverride 1500 {
           path = [ pkgs.podman ];
-          script =
-            let
-              suffixes = lib.concatStringsSep " " (map (vlan: ".${toString vlan.vlanId}") (attrValues addresses.vlans));
-            in
-            ''
-              for SUFFIX in "" ${suffixes}
-              do
-                podman network ls --format "{{.Name}}" | grep "^hostlan''${SUFFIX}$" || podman network create -d macvlan --ipv6 --subnet=${addresses.network.net4} --gateway=${addresses.network.defaultGateway} --subnet=${addresses.network.net6} -o parent=br0''${SUFFIX} hostlan''${SUFFIX}
-              done
-            '';
+          script = lib.concatStringsSep "\n" (map
+            (vlan:
+
+              let
+                suffix = if vlan ? vlanId then ".${toString vlan.vlanId}" else "";
+              in
+              ''
+                podman network ls --format "{{.Name}}" | grep "^hostlan${suffix}$" || podman network create -d macvlan --ipv6 --subnet=${vlan.net4} --gateway=${vlan.defaultGateway} ${lib.optionalString (vlan ? net6) "--subnet=${vlan.net6}"} -o parent=br0${suffix} hostlan${suffix}
+              ''
+            )
+            ([ addresses.network ] ++ (attrValues addresses.vlans)));
           serviceConfig = {
             Type = "oneshot";
           };

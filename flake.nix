@@ -54,7 +54,7 @@
           addresses = import ./settings/addresses.nix { lib = libNet; };
           container = import ./settings/container.nix { inherit pkgs; };
           libExt = libNet // (import ./lib-ext.nix {
-            inherit addresses machine pkgs;
+            inherit addresses pkgs;
             lib = libNet;
           });
           lib = libExt;

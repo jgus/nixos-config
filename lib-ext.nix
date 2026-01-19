@@ -1,5 +1,5 @@
 with builtins;
-{ addresses, lib, machine, pkgs, ... }:
+{ addresses, lib, pkgs, ... }:
 let
   # === Helper Functions ===
   nameAndFqdn = name: [ name "${name}.${addresses.network.domain}" ];
@@ -27,10 +27,13 @@ let
   # Set default ip, mac, and ip6 addresses; add IoT records
   records = (mapAttrs
     (k: v:
+      let
+        vlan = if v ? vlan then addresses.vlans.${v.vlan} else addresses.network;
+      in
       rec {
-        ip = lib.net.cidr.host (v.g * 256 + v.id) addresses.network.net4;
+        ip = lib.net.cidr.host (v.g * 256 + v.id) vlan.net4;
         mac = lib.net.mac.add (v.g * 256 + v.id) addresses.network.assignedMacBase;
-        ip6 = macToIp6 addresses.network.net6 mac;
+        ip6 = macToIp6 vlan.net6 mac;
       } // v
     )
     addresses.records-conf) // addresses.iot;
@@ -126,14 +129,19 @@ in
     );
 
     # Network options to be added to every container service
-    containerOptions = service: [
-      "--network=hostlan"
-      "--mac-address=${records.${service}.mac}"
-      "--hostname=${service}"
-      "--ip=${records.${service}.ip}"
-      "--ip6=${records.${service}.ip6}"
-      "--dns-search=${addresses.network.domain}"
-    ] ++ map (name: "--dns=${records.${name}.ip}") addresses.network.dnsServers;
+    containerOptions = service:
+      let
+        vlan = if records.${service} ? vlan then addresses.vlans.${records.${service}.vlan} else addresses.network;
+        suffix = if vlan ? vlanId then ".${toString vlan.vlanId}" else "";
+      in
+      [
+        "--network=hostlan${suffix}"
+        "--mac-address=${records.${service}.mac}"
+        "--hostname=${service}"
+        "--ip=${records.${service}.ip}"
+        "--ip6=${records.${service}.ip6}"
+        "--dns-search=${addresses.network.domain}"
+      ] ++ map (name: "--dns=${records.${name}.ip}") addresses.network.dnsServers;
 
     # Exhaustive host records, for DNS containers
     containerAddAllHosts = lib.lists.flatten [
@@ -153,6 +161,9 @@ in
       , addPrefixRoute ? true
       , requiredForOnline ? "no"
       }:
+      let
+        vlan = if records.${hostName} ? vlan then addresses.vlans.${records.${hostName}.vlan} else addresses.network;
+      in
       {
         netdevs."${toString netdevPriority}-${interfaceName}" = {
           netdevConfig = {
@@ -172,16 +183,13 @@ in
             IPv6AcceptRA = "yes";
             LinkLocalAddressing = "ipv6";
           };
-          addresses = [
-            {
-              Address = "${nameToIp.${hostName}}/${toString (lib.net.cidr.length addresses.network.net4)}";
-              AddPrefixRoute = addPrefixRoute;
-            }
-            {
-              Address = "${nameToIp6.${hostName}}/${toString (lib.net.cidr.length addresses.network.net6)}";
-              AddPrefixRoute = addPrefixRoute;
-            }
-          ];
+          addresses = [{
+            Address = "${nameToIp.${hostName}}/${toString (lib.net.cidr.length vlan.net4)}";
+            AddPrefixRoute = addPrefixRoute;
+          }] ++ lib.optional (vlan ? net6) {
+            Address = "${nameToIp6.${hostName}}/${toString (lib.net.cidr.length vlan.net6)}";
+            AddPrefixRoute = addPrefixRoute;
+          };
           gateway = [ addresses.network.defaultGateway ];
           routes = [
             # Default route
@@ -191,12 +199,13 @@ in
               Table = policyTableId;
             }
             # Main table routes
-            { Destination = "${addresses.network.net4}"; Metric = mainTableMetric; }
-            { Destination = "${addresses.network.net6}"; Metric = mainTableMetric; }
+            { Destination = "${vlan.net4}"; Metric = mainTableMetric; }
+
             # Policy table routes
-            { Destination = "${addresses.network.net4}"; Metric = mainTableMetric; Table = policyTableId; }
-            { Destination = "${addresses.network.net6}"; Metric = mainTableMetric; Table = policyTableId; }
-          ];
+            { Destination = "${vlan.net4}"; Metric = mainTableMetric; Table = policyTableId; }
+          ]
+          ++ lib.optional (vlan ? net6) { Destination = "${vlan.net6}"; Metric = mainTableMetric; }
+          ++ lib.optional (vlan ? net6) { Destination = "${vlan.net6}"; Metric = mainTableMetric; Table = policyTableId; };
           routingPolicyRules = map
             (a: {
               From = a;
