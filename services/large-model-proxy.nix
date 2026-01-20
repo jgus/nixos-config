@@ -296,6 +296,23 @@ let
           "--special"
         ];
       }
+
+      # https://unsloth.ai/docs/models/glm-4.7-flash
+      {
+        name = "glm-4.7-flash";
+        displayName = "GLM 4.7 Flash";
+        model = "unsloth/GLM-4.7-Flash-GGUF:Q4_K_XL";
+        gpu = true;
+        resourceRequirements = {
+          VRAM-1 = 22;
+        };
+        contextSize = 128 * 1024;
+        extraLlamaCppArgs = [
+          # Sampling Parameters
+          "--temp 0.7"
+          "--top-p 1.0"
+        ];
+      }
     ]
     ++
     (map
