@@ -140,10 +140,10 @@ in
         "--mac-address=${record.mac}"
         "--hostname=${service}"
         "--ip=${record.ip}"
-        (lib.optionalString (record ? ip6) "--ip6=${record.ip6}")
         "--dns-search=${addresses.network.domain}"
       ]
       ++ map (name: "--dns=${records.${name}.ip}") addresses.network.dnsServers
+      ++ lib.optional (record ? ip6) "--ip6=${record.ip6}"
       ++ (if (record ? ip6) then (map (name: "--dns=${records.${name}.ip6}") addresses.network.dnsServers) else [ ]);
 
     # Exhaustive host records, for DNS containers

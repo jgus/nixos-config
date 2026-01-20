@@ -126,7 +126,6 @@ rec {
       plex = { id = 60; host = "d1"; };
       jellyfin = { id = 61; host = "d1"; };
       komga = { id = 62; host = "c1-2"; };
-      lazylibrarian = { id = 63; host = "c1-2"; };
       calibre = { id = 64; host = "c1-2"; };
       audiobookshelf = { id = 65; host = "c1-2"; };
 
@@ -139,6 +138,7 @@ rec {
       lidarr = { id = 75; host = "c1-2"; vlan = "download"; };
       kapowarr = { id = 76; host = "c1-2"; vlan = "download"; };
       flaresolverr = { id = 77; host = "c1-2"; vlan = "download"; };
+      lazylibrarian = { id = 78; host = "c1-2"; vlan = "download"; };
 
       # AI
       large-model-proxy = { id = 80; host = "d1"; aliases = [ "comfyui" ]; };
