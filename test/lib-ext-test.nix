@@ -233,7 +233,7 @@ lib.debug.throwTestFailures {
     hasContainerOption = service: opt: elem opt (lib.ext.containerOptions service);
     test_pihole_container_options_length = {
       expr = length (lib.ext.containerOptions "pihole-1");
-      expected = 9;
+      expected = 12;
     };
     test_container_options_has_hostlan = {
       expr = hasContainerOption "pihole-1" "--network=hostlan";
@@ -265,7 +265,7 @@ lib.debug.throwTestFailures {
     };
     test_plex_container_options = {
       expr = length (lib.ext.containerOptions "plex");
-      expected = 9;
+      expected = 12;
     };
 
     # === containerAddAllHosts Tests ===

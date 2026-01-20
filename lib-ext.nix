@@ -131,17 +131,20 @@ in
     # Network options to be added to every container service
     containerOptions = service:
       let
-        vlan = if records.${service} ? vlan then addresses.vlans.${records.${service}.vlan} else addresses.network;
+        record = records.${service};
+        vlan = if record ? vlan then addresses.vlans.${record.vlan} else addresses.network;
         suffix = if vlan ? vlanId then ".${toString vlan.vlanId}" else "";
       in
       [
         "--network=hostlan${suffix}"
-        "--mac-address=${records.${service}.mac}"
+        "--mac-address=${record.mac}"
         "--hostname=${service}"
-        "--ip=${records.${service}.ip}"
-        "--ip6=${records.${service}.ip6}"
+        "--ip=${record.ip}"
+        (lib.optionalString (record ? ip6) "--ip6=${record.ip6}")
         "--dns-search=${addresses.network.domain}"
-      ] ++ map (name: "--dns=${records.${name}.ip}") addresses.network.dnsServers;
+      ]
+      ++ map (name: "--dns=${records.${name}.ip}") addresses.network.dnsServers
+      ++ (if (record ? ip6) then (map (name: "--dns=${records.${name}.ip6}") addresses.network.dnsServers) else [ ]);
 
     # Exhaustive host records, for DNS containers
     containerAddAllHosts = lib.lists.flatten [
