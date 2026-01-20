@@ -1,7 +1,7 @@
 {
   imageName = "caddy";
-  imageDigest = "sha256:86d2ab93167b0c24f9f86e8a4214dee0ba25f86808002bfd29a78677824a2483";
-  hash = "sha256-w2dNPIEQUltUSn/CfcPGxKib7fOYwKwH3LiAE2dfM1U=";
+  imageDigest = "sha256:2adb640cdc0ce1d8870887c30af1e21edfb3cdfd8433431b2a15f40119a7d654";
+  hash = "sha256-TZWsnDrdPzHFi9EWrpMG0mV20myrv/m96sa8TrCeYT4=";
   finalImageName = "caddy";
   finalImageTag = "latest";
 }

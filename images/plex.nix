@@ -1,7 +1,7 @@
 {
   imageName = "lscr.io/linuxserver/plex";
-  imageDigest = "sha256:1720efa8e919a724ff3003cce7c1c0ae91a54e097ca3c8f6713a780c6fd73432";
-  hash = "sha256-rwEr4bCiOkmjjV6AdZzofxBceWOOrL5yg+bleAsQGHo=";
+  imageDigest = "sha256:b19a5e34c6f8dd42abf88556b8aa5c8987c0c34820aaeaa320a02d8c17fdaab3";
+  hash = "sha256-WMQr77B3ctQnJlVJyqP9CG7mHkh/CwyIhr4x9V/OlQc=";
   finalImageName = "lscr.io/linuxserver/plex";
   finalImageTag = "latest";
 }

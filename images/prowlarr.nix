@@ -1,7 +1,7 @@
 {
   imageName = "lscr.io/linuxserver/prowlarr";
-  imageDigest = "sha256:67a8aaedcfd6989f3030b937a6a07007310b1dfc7ee8df16d2cbfa48d1c1158c";
-  hash = "sha256-sUFMy1onFMWo/S1Ms81D8mJFXQEtxZmRcfgM6jwFrVQ=";
+  imageDigest = "sha256:d3e9307b320b6772749a2cf8fc2712e9e824c4930b034680ad4d08a9e2f25884";
+  hash = "sha256-ejhr7TVh1lroW+KUSP2/oaVH3lYN4xEJUNrMhKYW5eM=";
   finalImageName = "lscr.io/linuxserver/prowlarr";
   finalImageTag = "latest";
 }

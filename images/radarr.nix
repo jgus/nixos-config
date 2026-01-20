@@ -1,7 +1,7 @@
 {
   imageName = "lscr.io/linuxserver/radarr";
-  imageDigest = "sha256:6c0948b42c149e36bb3dbc0b64d36c77b2d3c9dccf1b424c4f72af1e57ba0c21";
-  hash = "sha256-HKzZmwlnC0sFjn48f5hTLX3Hi5bCwaFMBk7Y8vQI9jk=";
+  imageDigest = "sha256:270f25698624b57b86ca119cc95399d7ff15be8297095b4e1223fd5b549b732c";
+  hash = "sha256-nhcO482giy8fjhr9u5ICuzqm5zg5CaDF3kiGJi7KAKY=";
   finalImageName = "lscr.io/linuxserver/radarr";
   finalImageTag = "latest";
 }
