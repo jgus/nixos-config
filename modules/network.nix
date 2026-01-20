@@ -43,12 +43,6 @@ with builtins;
           LinkLocalAddressing = "no";
         };
         linkConfig.RequiredForOnline = "enslaved";
-        # Configure VLANs: VLAN 1 (untagged, PVID) plus all VLANs from addresses.vlans
-        bridgeVLANs =
-          # VLAN 1 as PVID and untagged
-          [{ VLAN = 1; PVID = 1; EgressUntagged = 1; }] ++
-          # All other VLANs as tagged
-          (map (vlan: { VLAN = vlan.vlanId; }) (attrValues addresses.vlans));
       };
 
       # Configure the effective LAN interface (physical or bridge) to be the parent for macvlans
@@ -59,6 +53,12 @@ with builtins;
           LinkLocalAddressing = "no";
           DHCP = "no";
         };
+        # Configure VLANs: VLAN 1 (untagged, PVID) plus all VLANs from addresses.vlans
+        bridgeVLANs =
+          # VLAN 1 as PVID and untagged
+          [{ VLAN = 1; PVID = 1; EgressUntagged = 1; }] ++
+          # All other VLANs as tagged
+          (map (vlan: { VLAN = vlan.vlanId; }) (attrValues addresses.vlans));
         vlan = (map (vlan: "br0.${toString vlan.vlanId}") (attrValues addresses.vlans));
         linkConfig.RequiredForOnline = "carrier";
       };
