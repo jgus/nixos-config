@@ -46,7 +46,11 @@ done
 
 # Result directory for GC roots (keeps builds from being garbage collected)
 RESULT_DIR="/etc/nixos/gcroots"
+rm -rf "${RESULT_DIR}"
 mkdir -p "${RESULT_DIR}"
+for machine in "${MACHINES[@]}"; do
+    mkdir "${RESULT_DIR}/${machine}"
+done
 
 echo "========================================"
 echo "Building configurations for all machines"
@@ -79,8 +83,8 @@ echo "=== Phase 1: Building all configurations ==="
 for machine in "${MACHINES[@]}"; do
     echo ""
     echo "--- Building configuration for ${machine} ---"
-    # Build and create a GC root symlink
-    nix build .#nixosConfigurations.${machine}.config.system.build.toplevel --out-link "${RESULT_DIR}/${machine}"
+    cd "${RESULT_DIR}/${machine}"
+    nixos-rebuild build --flake /etc/nixos#${machine} --target-host "${machine}"
     echo "✓ Build successful for ${machine}"
 done
 
@@ -95,13 +99,8 @@ echo "=== Phase 2: Testing all configurations ==="
 for machine in "${MACHINES[@]}"; do
     echo ""
     echo "--- Testing configuration for ${machine} ---"
-    if [[ "${machine}" == "${CURRENT_HOST}" ]]; then
-        # Local machine - no --target-host needed
-        nixos-rebuild test --flake .#${machine}
-    else
-        # Remote machine - use --target-host
-        nixos-rebuild test --flake .#${machine} --target-host "${machine}"
-    fi
+    cd "${RESULT_DIR}/${machine}"
+    nixos-rebuild test --flake /etc/nixos#${machine} --target-host "${machine}"
     echo "✓ Test successful for ${machine}"
 done
 
@@ -117,13 +116,8 @@ if [[ "${DO_SWITCH}" == "true" ]]; then
     for machine in "${MACHINES[@]}"; do
         echo ""
         echo "--- Switching configuration for ${machine} ---"
-        if [[ "${machine}" == "${CURRENT_HOST}" ]]; then
-            # Local machine - no --target-host needed
-            nixos-rebuild boot --flake .#${machine}
-        else
-            # Remote machine - use --target-host
-            nixos-rebuild boot --flake .#${machine} --target-host "${machine}"
-        fi
+        cd "${RESULT_DIR}/${machine}"
+        nixos-rebuild boot --flake /etc/nixos#${machine} --target-host "${machine}"
         echo "✓ Switch successful for ${machine}"
     done
 
@@ -139,5 +133,3 @@ echo "========================================"
 echo "All machines successfully updated!"
 echo "========================================"
 echo ""
-echo "GC roots preserved in: ${RESULT_DIR}/"
-ls -la "${RESULT_DIR}/"
