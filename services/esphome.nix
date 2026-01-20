@@ -22,8 +22,8 @@ in
       "/config/.esphome/build:exec,mode=0777"
       "/config/.esphome/external_components:exec,mode=0777"
     ];
-    extraOptions = [
-      "--cap-add=NET_RAW"
-    ];
+    capabilities = {
+      NET_RAW = true;
+    };
   };
 }

@@ -58,9 +58,9 @@ with builtins;
       "/home:/home"
       "/storage:/storage"
     ];
-    extraOptions = [
-      "--cap-add=NET_ADMIN"
-    ];
+    capabilities = {
+      NET_ADMIN = true;
+    };
   };
   extraConfig = {
     sops.secrets."samba" = { };

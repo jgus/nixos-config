@@ -34,8 +34,8 @@ with builtins;
     volumes = [
       "/service/joyfulsong:/service/joyfulsong"
     ];
-    extraOptions = [
-      "--cap-add=NET_ADMIN"
-    ];
+    capabilities = {
+      NET_ADMIN = true;
+    };
   };
 }

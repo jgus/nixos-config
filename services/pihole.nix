@@ -86,20 +86,22 @@ map
       ]
       ++ (map (n: "${pkgs.writeText "50-nixos-${n}.conf" dnsmasqConf.${n}}:/etc/dnsmasq.d/50-nixos-${n}.conf") (attrNames dnsmasqConf))
       ++ (map (n: "${tftpFiles.${n}}:/tftp/${n}") (attrNames tftpFiles));
+      tmpFs = [
+        "/etc/pihole"
+      ];
+      capabilities = {
+        NET_ADMIN = true;
+        NET_RAW = true;
+        SYS_NICE = true;
+      };
       extraOptions = [
         "--shm-size=1g"
-        "--cap-add=NET_ADMIN"
-        "--cap-add=NET_RAW"
-        "--cap-add=SYS_NICE"
       ]
       ++
       (map (x: "--dns=${x}") upstream)
       ++
       lib.ext.containerAddAllHosts
       ;
-      tmpFs = [
-        "/etc/pihole"
-      ];
     };
     extraConfig = {
       sops.secrets.pihole = { };

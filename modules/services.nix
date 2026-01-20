@@ -113,7 +113,6 @@ let
         };
         virtualisation.oci-containers.containers.${name} = {
           serviceName = name;
-          image = container.image;
           autoStart = autoStart;
           user = "${uid}:${gid}";
           volumes =
@@ -124,7 +123,6 @@ let
               ++ containerOptions
               ++ (lib.optional (container.readOnly or true) "--read-only")
               ++ (map (value: "--tmpfs=${value}") (container.tmpFs or [ ]));
-          entrypoint = container.entrypoint or null;
           cmd = container.entrypointOptions or [ ];
           environment = {
             TZ = config.time.timeZone;
@@ -136,8 +134,10 @@ let
             "capabilities"
             "dependsOn"
             "devices"
+            "entrypoint"
             "environmentFiles"
             "hostname"
+            "image"
             "imageFile"
             "imageStream"
             "labels"
