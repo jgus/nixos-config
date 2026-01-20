@@ -130,11 +130,32 @@ let
             TZ = config.time.timeZone;
           } // (container.environment or { });
         }
-        // lib.optionalAttrs (container ? imageFile) { inherit (container) imageFile; }
-        // lib.optionalAttrs (container ? imageStream) { inherit (container) imageStream; }
-        // lib.optionalAttrs (container ? dependsOn) { inherit (container) dependsOn; }
-        // lib.optionalAttrs (container ? environmentFiles) { inherit (container) environmentFiles; }
-        // lib.optionalAttrs (container ? ports) { inherit (container) ports; };
+        // lib.pipe
+          [
+            "autoRemoveOnStop"
+            "capabilities"
+            "dependsOn"
+            "devices"
+            "environmentFiles"
+            "hostname"
+            "imageFile"
+            "imageStream"
+            "labels"
+            "log-driver"
+            "login"
+            "networks"
+            "podman"
+            "ports"
+            "preRunExtraOptions"
+            "privileged"
+            "pull"
+            "workdir"
+          ]
+          [
+            (lib.filter (n: builtins.hasAttr n container))
+            (lib.map (n: lib.nameValuePair n container.${n}))
+            lib.listToAttrs
+          ];
       };
       systemdConfig =
         let
