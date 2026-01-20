@@ -1,4 +1,4 @@
-{ config, ... }:
+{ ... }:
 {
   configStorage = false;
   container = {
@@ -7,8 +7,5 @@
     ports = [
       "8191"
     ];
-    environment = {
-      TZ = config.time.timeZone;
-    };
   };
 }

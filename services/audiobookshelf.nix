@@ -1,11 +1,8 @@
-{ config, ... }:
+{ ... }:
 {
   requires = [ "storage-media.mount" ];
   container = {
     pullImage = import ../images/audiobookshelf.nix;
-    environment = {
-      TZ = config.time.timeZone;
-    };
     ports = [ "80" ];
     configVolume = "/config";
     extraStorage = [ "audiobookshelf_metadata" ];

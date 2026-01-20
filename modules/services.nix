@@ -120,17 +120,19 @@ let
             (let v = container.volumes or [ ]; in if isFunction v then v storagePath else v) ++
               lib.optional configStorage "${storagePath name}:${container.configVolume}";
           extraOptions =
-            (container.extraOptions or [ ]) ++
-              containerOptions ++
-              (lib.optional (container.readOnly or true) "--read-only") ++
-              (map (value: "--tmpfs=${value}") (container.tmpFs or [ ]));
+            (container.extraOptions or [ ])
+              ++ containerOptions
+              ++ (lib.optional (container.readOnly or true) "--read-only")
+              ++ (map (value: "--tmpfs=${value}") (container.tmpFs or [ ]));
           entrypoint = container.entrypoint or null;
           cmd = container.entrypointOptions or [ ];
+          environment = {
+            TZ = config.time.timeZone;
+          } // (container.environment or { });
         }
         // lib.optionalAttrs (container ? imageFile) { inherit (container) imageFile; }
         // lib.optionalAttrs (container ? imageStream) { inherit (container) imageStream; }
         // lib.optionalAttrs (container ? dependsOn) { inherit (container) dependsOn; }
-        // lib.optionalAttrs (container ? environment) { inherit (container) environment; }
         // lib.optionalAttrs (container ? environmentFiles) { inherit (container) environmentFiles; }
         // lib.optionalAttrs (container ? ports) { inherit (container) ports; };
       };

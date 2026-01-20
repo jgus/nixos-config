@@ -54,7 +54,6 @@ map
       readOnly = false;
       pullImage = import ../images/pihole.nix;
       environment = {
-        TZ = config.time.timeZone;
         FTLCONF_dns_upstreams = concatStringsSep ";" upstream;
         FTLCONF_dns_domainNeeded = "true";
         FTLCONF_dns_expandHosts = "true";

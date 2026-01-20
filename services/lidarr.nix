@@ -34,7 +34,6 @@ in
     environment = {
       PUID = toString config.users.users.${user}.uid;
       PGID = toString config.users.groups.${group}.gid;
-      TZ = config.time.timeZone;
     };
     ports = [
       "8686"

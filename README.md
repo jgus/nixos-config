@@ -191,7 +191,6 @@ For services running in Container containers:
     environment = {
       PUID = toString config.users.users.josh.uid;
       PGID = toString config.users.groups.media.gid;
-      TZ = config.time.timeZone;
     };
     ports = [ "8989" ];
   };
@@ -208,9 +207,6 @@ When you need to use the `storagePath` function to mount extra storage paths, us
   requires = [ "storage-media.mount" ];
   container = {
     image = "ghcr.io/advplyr/audiobookshelf";
-    environment = {
-      TZ = config.time.timeZone;
-    };
     ports = [ "80" ];
     configVolume = "/config";
     extraStorage = [ "audiobookshelf_metadata" ];  # Define extra storage
