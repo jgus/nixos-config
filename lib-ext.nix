@@ -29,12 +29,12 @@ let
     (k: v:
       let
         vlan = if v ? vlan then addresses.vlans.${v.vlan} else addresses.network;
-      in
-      rec {
-        ip = lib.net.cidr.host (v.g * 256 + v.id) vlan.net4;
         mac = lib.net.mac.add (v.g * 256 + v.id) addresses.network.assignedMacBase;
-        ip6 = macToIp6 vlan.net6 mac;
-      } // v
+      in
+      {
+        ip = lib.net.cidr.host (v.g * 256 + v.id) vlan.net4;
+        inherit mac;
+      } // lib.optionalAttrs (vlan ? net6) { ip6 = macToIp6 vlan.net6 mac; } // v
     )
     addresses.records-conf) // addresses.iot;
 

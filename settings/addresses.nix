@@ -12,29 +12,22 @@ rec {
     publicDomain = "gustafson.me";
   };
   vlans = {
-    iot =
-      let
-        vlanId = 3;
-        net4 = "172.21.0.0/16";
-        defaultGateway = lib.net.cidr.host 1 net4;
-      in
-      { inherit vlanId net4 defaultGateway; };
-    download =
-      let
-        vlanId = 4;
-        net4 = "172.20.0.0/16";
-        defaultGateway = lib.net.cidr.host 1 net4;
-        net6 = "2001:55d:b00b:4::/64";
-      in
-      { inherit vlanId net4 defaultGateway net6; };
-    dmz =
-      let
-        vlanId = 5;
-        net4 = "172.19.0.0/16";
-        defaultGateway = lib.net.cidr.host 1 net4;
-        net6 = "2001:55d:b00b:5::/64";
-      in
-      { inherit vlanId net4 defaultGateway net6; };
+    iot = rec {
+      vlanId = 3;
+      net4 = "172.21.0.0/16";
+      defaultGateway = lib.net.cidr.host 1 net4;
+    };
+    download = rec {
+      vlanId = 4;
+      net4 = "172.20.0.0/16";
+      defaultGateway = lib.net.cidr.host 1 net4;
+    };
+    dmz = rec {
+      vlanId = 5;
+      net4 = "172.19.0.0/16";
+      defaultGateway = lib.net.cidr.host 1 net4;
+      net6 = "2001:55d:b00b:5::/64";
+    };
   };
   group = {
     network = 0;
