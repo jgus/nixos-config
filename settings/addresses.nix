@@ -148,6 +148,7 @@ rec {
 
       # Other
       minecraft = { id = 100; host = "c1-2"; };
+      code-server = { id = 101; host = "c1-2"; };
     } //
     mapAttrs (k: v: { g = group.admin; } // v) {
       c1-imc-1 = { id = 2; mac = "70:0f:6a:3b:46:01"; aliases = [ "c1-imc" ]; };

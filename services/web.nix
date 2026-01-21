@@ -117,6 +117,16 @@ let
         respond "Access denied" 403
       }
     }
+    code.${publicDomain} {
+      @internal client_ip private_ranges ${addresses.network.local6}
+      handle @internal {
+        reverse_proxy code-server.${domain}:8443
+        ${securityHeaders {}}
+      }
+      handle {
+        respond "Access denied" 403
+      }
+    }
   '';
 in
 {
