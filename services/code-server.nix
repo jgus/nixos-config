@@ -18,6 +18,9 @@ in
     environmentFiles = [
       config.sops.secrets."code/env".path
     ];
+    volumes = storagePath: [
+      "${storagePath "code-server"}/nix:/nix"
+    ];
   };
   extraConfig = {
     sops.secrets."code/env" = { };

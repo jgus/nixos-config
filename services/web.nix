@@ -67,6 +67,10 @@ let
       reverse_proxy jellyfin.${domain}:8096
       ${securityHeaders {}}
     }
+    code.${publicDomain} {
+      reverse_proxy code-server.${domain}:8443
+      ${securityHeaders { frameOptionsDeny = false; }}
+    }
     esphome.${publicDomain} {
       @internal client_ip private_ranges ${addresses.network.local6}
       handle @internal {
@@ -111,16 +115,6 @@ let
       @internal client_ip private_ranges ${addresses.network.local6}
       handle @internal {
         reverse_proxy zwave-north.${domain}:8091
-        ${securityHeaders {}}
-      }
-      handle {
-        respond "Access denied" 403
-      }
-    }
-    code.${publicDomain} {
-      @internal client_ip private_ranges ${addresses.network.local6}
-      handle @internal {
-        reverse_proxy code-server.${domain}:8443
         ${securityHeaders {}}
       }
       handle {
