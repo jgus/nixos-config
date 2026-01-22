@@ -15,7 +15,7 @@
     users = {
       root = {
         hashedPasswordFile = config.sops.secrets."users/josh".path;
-        openssh.authorizedKeys.keyFiles = [ ../pubkeys/josh-ed25519 ../pubkeys/josh-rsa ];
+        openssh.authorizedKeys.keyFiles = [ ../pubkeys/josh/id_ed25519 ../pubkeys/josh/id_rsa ];
       };
 
       media = {
@@ -52,7 +52,7 @@
         isNormalUser = true;
         extraGroups = [ "wheel" "www" container.group "libvirtd" "davfs2" ];
         hashedPasswordFile = config.sops.secrets."users/josh".path;
-        openssh.authorizedKeys.keyFiles = [ ../pubkeys/josh-ed25519 ../pubkeys/josh-rsa ];
+        openssh.authorizedKeys.keyFiles = [ ../pubkeys/josh/id_ed25519 ../pubkeys/josh/id_rsa ];
       };
 
       nathaniel = {
