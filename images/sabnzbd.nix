@@ -1,7 +1,7 @@
 {
   imageName = "lscr.io/linuxserver/sabnzbd";
-  imageDigest = "sha256:a46e75d861e6b26d7ee263b22743d6fdaaa4a5ccd42168b6ea563a2f047d9438";
-  hash = "sha256-SV8ebeKPG59LPLLbjI6w7vbvlSenzwFfrN+1gRjGxH0=";
+  imageDigest = "sha256:fba727f777f6b2633fcdeaea94abc85d73148f2a6b19a8158907bdd5b6e145d0";
+  hash = "sha256-2KTQUE2gH63Va5R4Tx5DXstAE/EWxgPaLRd+xMohMhg=";
   finalImageName = "lscr.io/linuxserver/sabnzbd";
   finalImageTag = "latest";
 }
