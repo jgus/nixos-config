@@ -122,7 +122,8 @@ let
             (container.extraOptions or [ ])
               ++ containerOptions
               ++ (lib.optional (container.readOnly or true) "--read-only")
-              ++ (map (value: "--tmpfs=${value}") (container.tmpFs or [ ]));
+              ++ (map (value: "--tmpfs=${value}") (container.tmpFs or [ ]))
+              ++ [ "--no-healthcheck" ];
           cmd = container.entrypointOptions or [ ];
           environment = {
             TZ = config.time.timeZone;
