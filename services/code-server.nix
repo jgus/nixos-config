@@ -25,6 +25,10 @@ in
       "${../pubkeys/josh/id_rsa}:/config/.ssh/id_rsa.pub:ro"
       "${storagePath "code-server"}/nix:/nix"
     ];
+    tmpFs = [
+      "/tmp"
+      "/config/tmp:mode=0777"
+    ];
   };
   extraConfig = {
     sops.secrets."code/env" = { };
