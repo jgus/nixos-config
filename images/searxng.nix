@@ -1,7 +1,7 @@
 {
   imageName = "docker.io/searxng/searxng";
-  imageDigest = "sha256:b1d1e80c75adda484544b6162ee12b790813905430ac6f0d2ca3da83fe4de846";
-  hash = "sha256-oX4fPKWtebbiNUuqWLH6+w3i5RwmxfCSDLSMOo5u0lE=";
+  imageDigest = "sha256:d7fa033c5d77a9d2d8a114fa21a62754f095aaf252dfb41bbe3f7b3591669eaf";
+  hash = "sha256-YeWU0xlYOpIvNhZzL+vkBfOl2DEzbINuDZ1o5BqTHOA=";
   finalImageName = "docker.io/searxng/searxng";
   finalImageTag = "latest";
 }
