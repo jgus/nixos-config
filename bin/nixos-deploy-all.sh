@@ -10,6 +10,8 @@
 
 set -euo pipefail
 
+: ${NIXOS_CONFIG_ROOT:?"NIXOS_CONFIG_ROOT must be set"}
+
 # Parse arguments
 DO_SWITCH=false
 for arg in "$@"; do
@@ -45,7 +47,7 @@ for machine in "${ALL_MACHINES[@]}"; do
 done
 
 # Result directory for GC roots (keeps builds from being garbage collected)
-RESULT_DIR="/etc/nixos/gcroots"
+RESULT_DIR="${NIXOS_CONFIG_ROOT}/gcroots"
 rm -rf "${RESULT_DIR}"
 mkdir -p "${RESULT_DIR}"
 for machine in "${MACHINES[@]}"; do
@@ -54,6 +56,7 @@ done
 
 echo "========================================"
 echo "Building configurations for all machines"
+echo "NixOS Configuration: ${NIXOS_CONFIG_ROOT}"
 echo "Current machine: ${CURRENT_HOST}"
 echo "Machine order: ${MACHINES[*]}"
 echo "Switch phase: ${DO_SWITCH}"
@@ -84,7 +87,7 @@ for machine in "${MACHINES[@]}"; do
     echo ""
     echo "--- Building configuration for ${machine} ---"
     cd "${RESULT_DIR}/${machine}"
-    nixos-rebuild build --flake /etc/nixos#${machine} --target-host "${machine}"
+    nixos-rebuild build --flake ${NIXOS_CONFIG_ROOT}#${machine} --target-host "${machine}"
     echo "✓ Build successful for ${machine}"
 done
 
@@ -100,7 +103,7 @@ for machine in "${MACHINES[@]}"; do
     echo ""
     echo "--- Testing configuration for ${machine} ---"
     cd "${RESULT_DIR}/${machine}"
-    nixos-rebuild test --flake /etc/nixos#${machine} --target-host "${machine}"
+    nixos-rebuild test --flake ${NIXOS_CONFIG_ROOT}#${machine} --target-host "${machine}"
     echo "✓ Test successful for ${machine}"
 done
 
@@ -117,7 +120,7 @@ if [[ "${DO_SWITCH}" == "true" ]]; then
         echo ""
         echo "--- Switching configuration for ${machine} ---"
         cd "${RESULT_DIR}/${machine}"
-        nixos-rebuild boot --flake /etc/nixos#${machine} --target-host "${machine}"
+        nixos-rebuild boot --flake ${NIXOS_CONFIG_ROOT}#${machine} --target-host "${machine}"
         echo "✓ Switch successful for ${machine}"
     done
 

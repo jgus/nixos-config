@@ -3,6 +3,8 @@
 
 set -euo pipefail
 
+: ${NIXOS_CONFIG_ROOT:?"NIXOS_CONFIG_ROOT must be set"}
+
 # Helper function to check if a value is in a list
 in_list() {
     local needle="$1"
@@ -37,8 +39,8 @@ for machine in "${MACHINES[@]}"; do
         SSH_CMD="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=10 ${machine}"
     fi
     
-    # 1. Verify public host keys match /etc/nixos/pubkeys
-    PUBKEY_DIR="/etc/nixos/pubkeys/${machine}"
+    # 1. Verify public host keys match ${NIXOS_CONFIG_ROOT}/pubkeys
+    PUBKEY_DIR="${NIXOS_CONFIG_ROOT}/pubkeys/${machine}"
     if [[ ! -d "${PUBKEY_DIR}" ]]; then
         echo "  ✗ Public key directory missing: ${PUBKEY_DIR}"
         RET=1
@@ -88,7 +90,7 @@ for machine in "${MACHINES[@]}"; do
     fi
     
     # 2. Verify private SSH keys match secret backups
-    SECRET_SSH_DIR="/etc/nixos/secrets/${machine}/ssh"
+    SECRET_SSH_DIR="${NIXOS_CONFIG_ROOT}/secrets/${machine}/ssh"
     if [[ ! -d "${SECRET_SSH_DIR}" ]]; then
         echo "  ✗ Secret SSH directory missing: ${SECRET_SSH_DIR}"
         RET=1
@@ -139,7 +141,7 @@ for machine in "${MACHINES[@]}"; do
     fi
     
     # 3. Verify vkey matches (backup exists iff vkey exists on host)
-    SECRET_VKEY_FILE="/etc/nixos/secrets/${machine}/vkey"
+    SECRET_VKEY_FILE="${NIXOS_CONFIG_ROOT}/secrets/${machine}/vkey"
     
     if [[ -f "${SECRET_VKEY_FILE}" ]]; then
         # Local backup exists - verify remote key exists and matches
