@@ -1,4 +1,8 @@
-## Searchin the Web ##
+## Searching APIs and Frameworks ##
+
+- You have access to the `context7` tool. This is an _excellent_ source of current information on APIs and frameworks. Consult it for the latest information even for things you are familiar with.
+
+## Searching the Web ##
 
 - You have access to the searxng `search` tool. If there is _any_ doubt about the veracity or currency of your knowledge, use the searxng `search` tool to find authoritative information. If you make _any_ mistakes, use the `search` tool to verify your understanding.
 - Similarly, when you need to fetch a web page, use the `web` tool for that. It can translate to markdown which will be easier for you to digest. 
