@@ -4,6 +4,7 @@ pkgs.mkShellNoCC {
   buildInputs = with pkgs; [
     (writeScriptBin "nixos-deploy-all" (builtins.readFile ./bin/nixos-deploy-all.sh))
     (writeScriptBin "verify-sops-backups" (builtins.readFile ./bin/verify-sops-backups.sh))
+    (writeScriptBin "update-images" (builtins.readFile ./bin/update-images.sh))
     git
     sops
     age

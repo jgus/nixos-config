@@ -1,72 +1,71 @@
 with builtins;
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 let
   # Inline image extractor logic
   imagesDir = ./../images;
   imageFiles = readDir imagesDir;
 
-  nixFiles = filter
-    (
-      name:
-      imageFiles.${name} == "regular"
-      && lib.strings.hasSuffix ".nix" name
-      && !(lib.strings.hasPrefix "." name)
-    )
-    (attrNames imageFiles);
+  nixFiles = filter (
+    name:
+    imageFiles.${name} == "regular"
+    && lib.strings.hasSuffix ".nix" name
+    && !(lib.strings.hasPrefix "." name)
+  ) (attrNames imageFiles);
 
-  pullImagesInFile = name:
-    [{
+  pullImagesInFile = name: [
+    {
       pullImage = import (imagesDir + "/${name}");
       file = name;
-    }];
+    }
+  ];
 
   allPullImages = lib.concatMap pullImagesInFile nixFiles;
 
-  latestDir = "/etc/nixos/images/latest";
+  script = pkgs.writeShellScript "image-update-check" (
+    ''
+      set -e
 
-  script = pkgs.writeShellScript "image-update-check" (''
-    set -e
-    
-    echo "Checking Container images for updates..."
+      echo "Checking Container images for updates..."
 
-    tmpfile=$(${pkgs.coreutils}/bin/mktemp)
-    exec 3<>"$tmpfile"
-    rm "$tmpfile"
+      tmpfile=$(${pkgs.coreutils}/bin/mktemp)
+      exec 3<>"$tmpfile"
+      rm "$tmpfile"
 
-    mkdir -p ${latestDir}
+    ''
+    + (concatStringsSep "\n" (
+      map (
+        { pullImage, file }:
+        ''
+          echo "Checking ${pullImage.finalImageName}:${pullImage.finalImageTag} from ${file}..."
+          if [ "$(skopeo inspect docker://${pullImage.finalImageName}:${pullImage.finalImageTag} --format '{{.Digest}}')" != "${pullImage.imageDigest}" ]
+          then
+            echo "Update available for ${pullImage.finalImageName}:${pullImage.finalImageTag} in ${file}"
+            echo "${pullImage.finalImageName}:${pullImage.finalImageTag} in ${file}" >&3
+          fi
+        ''
+      ) allPullImages
+    ))
+    + ''
 
-  ''
-  +
-  (concatStringsSep "\n" (map
-    ({ pullImage, file }: ''
-      echo "Checking ${pullImage.finalImageName}:${pullImage.finalImageTag} from ${file}..."
-      if [ "$(skopeo inspect docker://${pullImage.finalImageName}:${pullImage.finalImageTag} --format '{{.Digest}}')" != "${pullImage.imageDigest}" ]
-      then
-        echo "Update available for ${pullImage.finalImageName}:${pullImage.finalImageTag} in ${file}; pulling..."
-        echo "${pullImage.finalImageName}:${pullImage.finalImageTag} in ${file}" >&3
-        ${pkgs.nix-prefetch-docker}/bin/nix-prefetch-docker --quiet --image-name ${pullImage.finalImageName} --image-tag ${pullImage.finalImageTag} > ${latestDir}/${file} &
+      # If any outdated images found, send email notification
+      if [ -s /dev/fd/3 ]; then
+        {
+          echo "subject: Container Image Updates Available"
+          echo ""
+          echo "The following container images have updates available:"
+          echo ""
+          cat /dev/fd/3
+        } | ${pkgs.msmtp}/bin/msmtp $(cat ${config.sops.secrets.admin_email.path})
+      else
+        echo "All Container images are up to date."
       fi
-    '')
-    allPullImages))
-  +
-  ''
-
-    # Wait for any downloads to finish
-    wait
-
-    # If any outdated images found, send email notification
-    if [ -s /dev/fd/3 ]; then
-      {
-        echo "subject: Container Image Updates Available"
-        echo ""
-        echo "The following container images have updates available:"
-        echo ""
-        cat /dev/fd/3
-      } | ${pkgs.msmtp}/bin/msmtp $(cat ${config.sops.secrets.admin_email.path})
-    else
-      echo "All Container images are up to date."
-    fi
-  '');
+    ''
+  );
 in
 {
   systemd.services = {
