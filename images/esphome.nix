@@ -1,7 +1,7 @@
 {
   imageName = "ghcr.io/esphome/esphome";
-  imageDigest = "sha256:4935613e12d91028ff7e4d711906879d5e4e36f927f5db6509442fc45909cdd0";
-  hash = "sha256-0lyL4v3wudkFcxCG9/blbcZZHpnHb8AZqyuU9o01SgI=";
+  imageDigest = "sha256:c9583f3073d3708c0eb4f602aa0fbaa5a8caf32d313d0558728eb3b75f840304";
+  hash = "sha256-DrtUYAUl63xLfS77h24XRUJ/GSHeNhXUQtJ2V9rbe0U=";
   finalImageName = "ghcr.io/esphome/esphome";
   finalImageTag = "latest";
 }

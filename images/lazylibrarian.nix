@@ -1,7 +1,7 @@
 {
   imageName = "lscr.io/linuxserver/lazylibrarian";
-  imageDigest = "sha256:b24e6c8136b107ee0281d2928f76cfb01f34239e9de043d13059deee84d106fd";
-  hash = "sha256-R5Nb9HjvChyMuomrYjrrOc3K4Rzju8/aMgClE9J05vo=";
+  imageDigest = "sha256:7446e5014577a411540ed2d27131698e185815ddfa1fb7d6fc2cd5b3739c437b";
+  hash = "sha256-25TtIqf6o74YfuGxdLRywvb/LRyOKCJTEw5rk+QjepE=";
   finalImageName = "lscr.io/linuxserver/lazylibrarian";
   finalImageTag = "latest";
 }
