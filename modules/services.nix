@@ -60,7 +60,7 @@ let
       argsContainer = args.container or { };
       container = argsContainer // (if argsContainer ? pullImage then {
         image = "${argsContainer.pullImage.finalImageName}:${argsContainer.pullImage.finalImageTag}";
-        imageFile = pkgs.dockerTools.pullImage argsContainer.pullImage;
+        imageFile = lib.ext.pullImage argsContainer.pullImage;
       } else { });
       containerOptions = lib.ext.containerOptions name;
       isContainer = container ? image;

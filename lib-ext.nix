@@ -218,5 +218,63 @@ in
           linkConfig.RequiredForOnline = requiredForOnline;
         };
       };
+
+    # This is a version of pkgs.dockerTools.pullImage
+    # https://github.com/NixOS/nixpkgs/blob/d33f940b617cb63dc0652b174d11517046c664c6/pkgs/build-support/docker/default.nix#L141
+    # This adds REGISTRY_AUTH_FILE to bypass a Skopeo bug where it uses getpid() instead of getuid() when XDG_RUNTIME_DIR is unset, causing /run/containers/<PID>/auth.json permission errors.
+    pullImage =
+      let
+        fixName = name: replaceStrings [ "/" ":" ] [ "-" "-" ] name;
+        defaultArchitecture = pkgs.go.GOARCH;
+      in
+      lib.fetchers.withNormalizedHash { } (
+        { imageName
+        , # To find the digest of an image, you can use skopeo:
+          # see doc/functions.xml
+          imageDigest
+        , outputHash
+        , outputHashAlgo
+        , os ? "linux"
+        , # Image architecture, defaults to the architecture of the `hostPlatform` when unset
+          arch ? defaultArchitecture
+        , # This is used to set name to the pulled image
+          finalImageName ? imageName
+        , # This used to set a tag to the pulled image
+          finalImageTag ? "latest"
+        , # This is used to disable TLS certificate verification, allowing access to http registries on (hopefully) trusted networks
+          tlsVerify ? true
+        , name ? fixName "docker-image-${finalImageName}-${finalImageTag}.tar"
+        ,
+        }:
+
+        pkgs.runCommand name
+          {
+            inherit imageDigest;
+            imageName = finalImageName;
+            imageTag = finalImageTag;
+            impureEnvVars = lib.fetchers.proxyImpureEnvVars;
+
+            inherit outputHash outputHashAlgo;
+            outputHashMode = "flat";
+
+            nativeBuildInputs = [ pkgs.skopeo ];
+            SSL_CERT_FILE = "${pkgs.cacert.out}/etc/ssl/certs/ca-bundle.crt";
+            REGISTRY_AUTH_FILE = "$TMPDIR/auth.json";
+
+            sourceURL = "docker://${imageName}@${imageDigest}";
+            destNameTag = "${finalImageName}:${finalImageTag}";
+          }
+          ''
+            skopeo \
+              --insecure-policy \
+              --tmpdir=$TMPDIR \
+              --override-os ${os} \
+              --override-arch ${arch} \
+              copy \
+              --src-tls-verify=${lib.boolToString tlsVerify} \
+              "$sourceURL" "docker-archive://$out:$destNameTag" \
+              | cat  # pipe through cat to force-disable progress bar
+          ''
+      );
   };
 }
