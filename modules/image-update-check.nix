@@ -1,21 +1,22 @@
 with builtins;
-{
-  config,
-  pkgs,
-  lib,
-  ...
+{ config
+, pkgs
+, lib
+, ...
 }:
 let
   # Inline image extractor logic
   imagesDir = ./../images;
   imageFiles = readDir imagesDir;
 
-  nixFiles = filter (
-    name:
-    imageFiles.${name} == "regular"
-    && lib.strings.hasSuffix ".nix" name
-    && !(lib.strings.hasPrefix "." name)
-  ) (attrNames imageFiles);
+  nixFiles = filter
+    (
+      name:
+      imageFiles.${name} == "regular"
+      && lib.strings.hasSuffix ".nix" name
+      && !(lib.strings.hasPrefix "." name)
+    )
+    (attrNames imageFiles);
 
   pullImagesInFile = name: [
     {
@@ -38,17 +39,19 @@ let
 
     ''
     + (concatStringsSep "\n" (
-      map (
-        { pullImage, file }:
-        ''
-          echo "Checking ${pullImage.finalImageName}:${pullImage.finalImageTag} from ${file}..."
-          if [ "$(skopeo inspect docker://${pullImage.finalImageName}:${pullImage.finalImageTag} --format '{{.Digest}}')" != "${pullImage.imageDigest}" ]
-          then
-            echo "Update available for ${pullImage.finalImageName}:${pullImage.finalImageTag} in ${file}"
-            echo "${pullImage.finalImageName}:${pullImage.finalImageTag} in ${file}" >&3
-          fi
-        ''
-      ) allPullImages
+      map
+        (
+          { pullImage, file }:
+          ''
+            echo "Checking ${pullImage.finalImageName}:${pullImage.finalImageTag} from ${file}..."
+            if [ "$(skopeo inspect docker://${pullImage.finalImageName}:${pullImage.finalImageTag} --format '{{.Digest}}')" != "${pullImage.imageDigest}" ]
+            then
+              echo "Update available for ${pullImage.finalImageName}:${pullImage.finalImageTag} in ${file}"
+              echo "${pullImage.finalImageName}:${pullImage.finalImageTag} in ${file}" >&3
+            fi
+          ''
+        )
+        allPullImages
     ))
     + ''
 
