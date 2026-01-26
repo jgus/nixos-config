@@ -1,24 +1,18 @@
 # hostId: head -c4 /dev/urandom | od -A none -t x4
-with builtins;
-{ lib, machineId, ... }:
+{ machineId, ... }:
 let
-  rpi = {
-    arch = "rpi";
-    lan-interfaces = [ "end0" ];
-    zfs = false;
-    clamav = false;
-  };
-  machine = {
-    # Defaults
+  defaults = {
+    system = "x86_64-linux";
     hostName = machineId;
-    arch = "x86";
     nvidia = false;
     zfs = true;
     zfs-pools = [ ];
     clamav = true;
-    imports = [ ];
-  } // (getAttr machineId {
-    d1 = {
+    fwupd = true;
+    timeZone = "America/Denver";
+  };
+  machines = {
+    d1 = defaults // {
       stateVersion = "23.05";
       hostId = "2bec4b05";
       # lan-interfaces = [ "eno1" "eno2" "eno3" "eno4" "enp5s0" ];
@@ -26,6 +20,7 @@ let
       nvidia = true;
       zfs-pools = [ "d" "f" ];
       imports = [
+        ../modules/x86.nix
         ../modules/image-update-check.nix
       ];
       numaCpus = [
@@ -33,42 +28,48 @@ let
         [ 1 3 5 7 9 11 13 15 17 19 21 23 25 27 29 31 33 35 37 39 41 43 45 47 49 51 53 55 57 59 61 63 65 67 69 71 ]
       ];
     };
-    c1-1 = {
+    c1-1 = defaults // {
       stateVersion = "24.05";
       hostId = "dfc92a33";
       lan-interfaces = [ "eno1" "eno2" ];
       zfs-pools = [ "d" "m" ];
-      imports = [ ];
+      imports = [
+        ../modules/x86.nix
+      ];
     };
-    c1-2 = {
+    c1-2 = defaults // {
       stateVersion = "24.05";
       hostId = "39810e52";
       lan-interfaces = [ "eno1" "eno2" ];
       zfs-pools = [ ];
+      imports = [
+        ../modules/x86.nix
+      ];
     };
-    b1 = {
+    b1 = defaults // {
       stateVersion = "24.05";
       hostId = "8f150749";
       lan-interfaces = [ "enp1s0" ];
       zfs-pools = [ ];
       imports = [
+        ../modules/x86.nix
         ../modules/nebula-sync.nix
         ../modules/ups.nix
       ];
     };
-    pi-67cba1 = rpi // {
+    pi-67cba1 = defaults // {
+      system = "aarch64-linux";
+      lan-interfaces = [ "end0" ];
+      zfs = false;
+      clamav = false;
+      fwupd = true;
       stateVersion = "23.05";
       hostId = "62c05afa";
-      imports = [ ../modules/cec.nix ];
+      imports = [
+        ../modules/hardware/rpi.nix
+        ../modules/cec.nix
+      ];
     };
-  });
-in
-{
-  system = getAttr machine.arch {
-    rpi = "aarch64-linux";
-    x86 = "x86_64-linux";
   };
-  fwupd = (machine.arch == "x86");
-  timeZone = "America/Denver";
-} //
-machine
+in
+machines.${machineId}

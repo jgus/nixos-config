@@ -75,7 +75,6 @@
           modules = [
             ./modules/assert-test-results.nix
             ./machine/${machine.hostName}/hardware-configuration.nix
-            ./modules/${machine.arch}.nix
             ./modules/common.nix
             ./modules/network.nix
             ./modules/sops.nix
