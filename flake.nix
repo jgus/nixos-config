@@ -41,8 +41,6 @@
     , ...
     } @ inputs:
     let
-      machineIds = [ "b1" "c1-1" "c1-2" "d1" "pi-67cba1" ];
-
       mkSpecialArgs = machineId:
         let
           machine = import ./settings/machine.nix { inherit machineId; lib = nixpkgs.lib; };
@@ -97,13 +95,13 @@
     in
     {
       # NixOS configurations for each machine
-      nixosConfigurations =
-        nixpkgs.lib.listToAttrs (map
-          (machineId: {
-            name = machineId;
-            value = mkMachine machineId;
-          })
-          machineIds);
+      nixosConfigurations = {
+        "b1" = mkMachine "b1";
+        "c1-1" = mkMachine "c1-1";
+        "c1-2" = mkMachine "c1-2";
+        "d1" = mkMachine "d1";
+        "pi-67cba1" = mkMachine "pi-67cba1";
+      };
 
       # Development shell
       devShells.x86_64-linux.default = nixpkgs.legacyPackages.x86_64-linux.mkShellNoCC {
