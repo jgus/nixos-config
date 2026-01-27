@@ -59,7 +59,7 @@
           testResults = import ./test/lib-homelab-test.nix { inherit lib; };
         in
         {
-          inherit addresses container lib machine testResults;
+          inherit addresses container lib machine self testResults;
         };
 
       mkMachine = machineId:
@@ -69,11 +69,12 @@
         in
         nixpkgs.lib.nixosSystem {
           inherit (machine) system;
-          specialArgs = specialArgs // { inherit inputs; };
+          inherit specialArgs;
           modules = [
             ./modules/assert-test-results.nix
             ./machine/${machine.hostName}/hardware-configuration.nix
             ./modules/common.nix
+            ./modules/label.nix
             ./modules/network.nix
             ./modules/sops.nix
             ./modules/users.nix

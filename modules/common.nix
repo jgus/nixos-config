@@ -1,5 +1,5 @@
 with builtins;
-{ config, inputs, lib, machine, options, pkgs, ... }:
+{ config, lib, machine, options, pkgs, ... }:
 {
   boot = {
     tmp.useTmpfs = true;
@@ -86,23 +86,6 @@ with builtins;
     # Before changing this value read the documentation for this option
     # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
     stateVersion = machine.stateVersion; # Did you read the comment?
-
-    nixos.label =
-      let
-        buildDateTime = lib.strings.removeSuffix "\n" (readFile (pkgs.runCommand "build-date"
-          {
-            nativeBuildInputs = [ pkgs.tzdata ];
-          }
-          ''
-            TZ=${config.time.timeZone} TZDIR="${pkgs.tzdata}/share/zoneinfo" date "+%Y-%m-%d_%H:%M_%Z" -d @${toString (inputs.self.lastModified or 0)} > $out
-          ''));
-        gitHash = inputs.self.shortRev or inputs.self.dirtyShortRev or "unknown";
-      in
-      lib.concatStringsSep "__" [
-        buildDateTime
-        gitHash
-        machine.hostName
-      ];
   };
 
   nix = {
