@@ -1,6 +1,6 @@
-{
-  pkgs ? import <nixpkgs> { },
-  hostname,
+{ pkgs ? import <nixpkgs> { }
+, hostname
+,
 }:
 let
   deployAll =
@@ -18,6 +18,5 @@ pkgs.mkShellNoCC {
   ];
 
   shellHook = ''
-    echo "direnv shell on ${hostname}"
   '';
 }
