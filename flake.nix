@@ -29,17 +29,13 @@
   };
 
   outputs =
-    { devshell
-    , flake-utils
-    , nix-index-database
-    , nixos-hardware
+    { nix-index-database
     , nixos-extra-modules
     , nixpkgs
-    , nixpkgs-unstable
     , sops-nix
     , self
     , ...
-    } @ inputs:
+    }:
     let
       mkSpecialArgs = machineId:
         let
@@ -71,8 +67,9 @@
           inherit (machine) system;
           inherit specialArgs;
           modules = [
+            { networking.hostName = machineId; }
             ./modules/assert-test-results.nix
-            ./machine/${machine.hostName}/hardware-configuration.nix
+            ./machine/${machineId}/hardware-configuration.nix
             ./modules/common.nix
             ./modules/label.nix
             ./modules/network.nix

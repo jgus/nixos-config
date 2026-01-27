@@ -1,5 +1,5 @@
 with builtins;
-{ lib, machine, options, pkgs, ... }:
+{ config, lib, machine, options, pkgs, ... }:
 {
   boot = {
     tmp.useTmpfs = true;
@@ -27,7 +27,7 @@ with builtins;
     ];
     variables = {
       SERVER_NAMES = concatStringsSep " " lib.homelab.serverNames;
-      OTHER_SERVER_NAMES = concatStringsSep " " (lib.lists.remove machine.hostName lib.homelab.serverNames);
+      OTHER_SERVER_NAMES = concatStringsSep " " (lib.lists.remove config.networking.hostName lib.homelab.serverNames);
     };
   };
 

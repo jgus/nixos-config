@@ -24,8 +24,8 @@
       enable = true;
       listen = [
         { address = "localhost"; }
-        { address = lib.homelab.nameToIp.${machine.hostName}; }
-        { address = lib.homelab.nameToIp6.${machine.hostName}; }
+        { address = lib.homelab.nameToIp.${config.networking.hostName}; }
+        { address = lib.homelab.nameToIp6.${config.networking.hostName}; }
       ];
     };
     upsmon.enable = false;

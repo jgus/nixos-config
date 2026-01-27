@@ -16,9 +16,9 @@
           local SENSOR_JSON="\"$UNIQUE_ID\":{"
           SENSOR_JSON="$SENSOR_JSON\"p\":\"sensor\","
           SENSOR_JSON="$SENSOR_JSON\"name\":\"$NAME\","
-          SENSOR_JSON="$SENSOR_JSON\"state_topic\":\"server/${machine.hostName}/$TOPIC\","
-          SENSOR_JSON="$SENSOR_JSON\"unique_id\":\"server_${machine.hostName}_$UNIQUE_ID\","
-          SENSOR_JSON="$SENSOR_JSON\"availability_topic\":\"server/${machine.hostName}/availability\""
+          SENSOR_JSON="$SENSOR_JSON\"state_topic\":\"server/${config.networking.hostName}/$TOPIC\","
+          SENSOR_JSON="$SENSOR_JSON\"unique_id\":\"server_${config.networking.hostName}_$UNIQUE_ID\","
+          SENSOR_JSON="$SENSOR_JSON\"availability_topic\":\"server/${config.networking.hostName}/availability\""
           if [[ "x$UNIT" != "x" ]]; then
             SENSOR_JSON="$SENSOR_JSON,\"unit_of_measurement\":\"$UNIT\""
           fi
@@ -58,12 +58,12 @@
         done
       '' + ''
 
-        PAYLOAD_JSON="{\"dev\":{\"ids\":\"server_${machine.hostName}\",\"name\":\"Server ${machine.hostName}\"},\"o\":{\"name\":\"status2mqtt\",\"sw\":\"1.0\"},\"cmps\":{$SENSORS_JSON}}"
-        ${pkgs.mosquitto}/bin/mosquitto_pub -V 5 -h mqtt.${addresses.network.domain} -u server -P $(cat ${config.sops.secrets."mqtt/server".path}) -t homeassistant/device/server_${machine.hostName}/config -r -m "$PAYLOAD_JSON"
+        PAYLOAD_JSON="{\"dev\":{\"ids\":\"server_${config.networking.hostName}\",\"name\":\"Server ${config.networking.hostName}\"},\"o\":{\"name\":\"status2mqtt\",\"sw\":\"1.0\"},\"cmps\":{$SENSORS_JSON}}"
+        ${pkgs.mosquitto}/bin/mosquitto_pub -V 5 -h mqtt.${addresses.network.domain} -u server -P $(cat ${config.sops.secrets."mqtt/server".path}) -t homeassistant/device/server_${config.networking.hostName}/config -r -m "$PAYLOAD_JSON"
 
         systemctl start status2mqtt.service
 
-        mosquitto_sub -V 5 -h mqtt.${addresses.network.domain} -u server -P $(cat ${config.sops.secrets."mqtt/server".path}) -t server/${machine.hostName} --will-topic server/${machine.hostName}/availability --will-retain --will-payload offline
+        mosquitto_sub -V 5 -h mqtt.${addresses.network.domain} -u server -P $(cat ${config.sops.secrets."mqtt/server".path}) -t server/${config.networking.hostName} --will-topic server/${config.networking.hostName}/availability --will-retain --will-payload offline
       '';
       serviceConfig = {
         Type = "simple";
@@ -82,7 +82,7 @@
         pub() {
           local TOPIC="$1"
           local PAYLOAD="$2"
-          mosquitto_pub -V 5 -h mqtt.${addresses.network.domain} -u server -P $(cat ${config.sops.secrets."mqtt/server".path}) -t server/${machine.hostName}/''${TOPIC} -r -m "''${PAYLOAD}"
+          mosquitto_pub -V 5 -h mqtt.${addresses.network.domain} -u server -P $(cat ${config.sops.secrets."mqtt/server".path}) -t server/${config.networking.hostName}/''${TOPIC} -r -m "''${PAYLOAD}"
         }
 
         pub availability online

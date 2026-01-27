@@ -1,8 +1,7 @@
 with builtins;
-{ addresses, lib, machine, ... }:
+{ addresses, config, lib, machine, ... }:
 {
   networking = {
-    hostName = machine.hostName;
     hostId = machine.hostId;
     useNetworkd = true;
     firewall = {
@@ -93,7 +92,7 @@ with builtins;
 
     # Host MacVLANs
     (lib.homelab.mkMacvlanSetup {
-      hostName = machine.hostName;
+      hostName = config.networking.hostName;
       interfaceName = "lan0";
       netdevPriority = 10;
       networkPriority = 20;

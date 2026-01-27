@@ -69,7 +69,7 @@ let
         path = "/storage/frigate";
       };
     };
-  isLocal = name: let m = getAttr name mapping; in (m.machine == machine.hostName);
+  isLocal = name: let m = getAttr name mapping; in (m.machine == config.networking.hostName);
   target = name: let m = getAttr name mapping; in (if (m ? target) then m.target else "/storage/" + name);
   bindMount = name:
     let m = getAttr name mapping; in (if ((target name) == m.path) then [ ] else [

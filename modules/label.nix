@@ -15,6 +15,6 @@ with builtins;
     lib.concatStringsSep "__" [
       buildDateTime
       gitHash
-      machine.hostName
+      config.networking.hostName
     ];
 }
