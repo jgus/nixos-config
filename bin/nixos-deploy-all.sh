@@ -87,6 +87,7 @@ for machine in "${MACHINES[@]}"; do
     echo ""
     echo "--- Building configuration for ${machine} ---"
     cd "${RESULT_DIR}/${machine}"
+    nixos-rebuild build --flake ${NIXOS_CONFIG_ROOT}#${machine}
     nixos-rebuild build --flake ${NIXOS_CONFIG_ROOT}#${machine} --target-host "${machine}"
     echo "✓ Build successful for ${machine}"
 done
