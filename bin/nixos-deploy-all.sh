@@ -46,14 +46,6 @@ for machine in "${ALL_MACHINES[@]}"; do
     fi
 done
 
-# Result directory for GC roots (keeps builds from being garbage collected)
-RESULT_DIR="${NIXOS_CONFIG_ROOT}/gcroots"
-rm -rf "${RESULT_DIR}"
-mkdir -p "${RESULT_DIR}"
-for machine in "${MACHINES[@]}"; do
-    mkdir "${RESULT_DIR}/${machine}"
-done
-
 echo "========================================"
 echo "Building configurations for all machines"
 echo "NixOS Configuration: ${NIXOS_CONFIG_ROOT}"
@@ -63,10 +55,7 @@ echo "Switch phase: ${DO_SWITCH}"
 echo "========================================"
 echo ""
 
-#
-# Phase 0: Verify SSH and vkey backups for all machines
-#
-echo "=== Phase 0: Verifying SSH and vkey backups ==="
+echo "=== Verifying SSH and vkey backups ==="
 echo ""
 
 # Call verification script (try PATH first for packaged case, then fall back to relative path)
@@ -78,16 +67,11 @@ fi
 
 echo ""
 
-#
-# Phase 1: Build all configurations locally
-#
-echo "=== Phase 1: Building all configurations ==="
+echo "=== Building all configurations ==="
 
 for machine in "${MACHINES[@]}"; do
     echo ""
     echo "--- Building configuration for ${machine} ---"
-    cd "${RESULT_DIR}/${machine}"
-    nixos-rebuild build --flake ${NIXOS_CONFIG_ROOT}#${machine}
     nixos-rebuild build --flake ${NIXOS_CONFIG_ROOT}#${machine} --target-host "${machine}"
     echo "✓ Build successful for ${machine}"
 done
@@ -96,14 +80,10 @@ echo ""
 echo "=== All builds successful ==="
 echo ""
 
-#
-# Phase 2: Test all configurations
-#
-echo "=== Phase 2: Testing all configurations ==="
+echo "=== Testing all configurations ==="
 for machine in "${MACHINES[@]}"; do
     echo ""
     echo "--- Testing configuration for ${machine} ---"
-    cd "${RESULT_DIR}/${machine}"
     nixos-rebuild test --flake ${NIXOS_CONFIG_ROOT}#${machine} --target-host "${machine}"
     echo "✓ Test successful for ${machine}"
 done
@@ -112,21 +92,38 @@ echo ""
 echo "=== All tests successful ==="
 echo ""
 
-#
-# Phase 3: Switch all configurations (only if --switch was passed)
-#
 if [[ "${DO_SWITCH}" == "true" ]]; then
-    echo "=== Phase 3: Switching all configurations ==="
+    echo "=== Switching all configurations ==="
     for machine in "${MACHINES[@]}"; do
         echo ""
         echo "--- Switching configuration for ${machine} ---"
-        cd "${RESULT_DIR}/${machine}"
         nixos-rebuild boot --flake ${NIXOS_CONFIG_ROOT}#${machine} --target-host "${machine}"
         echo "✓ Switch successful for ${machine}"
     done
 
     echo ""
     echo "=== All switches successful ==="
+    echo ""
+
+    echo "=== Saving GC roots ==="
+
+    RESULT_DIR="${NIXOS_CONFIG_ROOT}/gcroots"
+    rm -rf "${RESULT_DIR}"
+    mkdir -p "${RESULT_DIR}"
+    for machine in "${MACHINES[@]}"; do
+        mkdir "${RESULT_DIR}/${machine}"
+    done
+
+    for machine in "${MACHINES[@]}"; do
+        echo ""
+        echo "--- Building configuration for ${machine} ---"
+        cd "${RESULT_DIR}/${machine}"
+        nixos-rebuild build --flake ${NIXOS_CONFIG_ROOT}#${machine}
+        echo "✓ GC root saved for ${machine}"
+    done
+
+    echo ""
+    echo "=== All GC roots saved ==="
     echo ""
 else
     echo "=== Skipping switch phase (use --switch to enable) ==="
