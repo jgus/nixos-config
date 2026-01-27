@@ -13,12 +13,12 @@ with builtins;
     useDHCP = false;
     tempAddresses = "disabled";
     domain = addresses.network.domain;
-    nameservers = (map (n: lib.ext.nameToIp.${n}) addresses.network.dnsServers) ++ [ "1.1.1.1" "1.0.0.1" ];
+    nameservers = (map (n: lib.homelab.nameToIp.${n}) addresses.network.dnsServers) ++ [ "1.1.1.1" "1.0.0.1" ];
     timeServers = [ "ntp.${addresses.network.domain}" ];
-    hosts = lib.ext.hosts;
+    hosts = lib.homelab.hosts;
   };
 
-  systemd.network = lib.ext.recursiveUpdates [
+  systemd.network = lib.homelab.recursiveUpdates [
     # Base Config
     {
       enable = true;
@@ -92,7 +92,7 @@ with builtins;
     }
 
     # Host MacVLANs
-    (lib.ext.mkMacvlanSetup {
+    (lib.homelab.mkMacvlanSetup {
       hostName = machine.hostName;
       interfaceName = "lan0";
       netdevPriority = 10;

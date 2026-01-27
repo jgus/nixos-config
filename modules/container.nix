@@ -1,9 +1,9 @@
 with builtins;
 { addresses, config, lib, machine, pkgs, ... }:
 {
-  options.ext.container.enable = lib.mkEnableOption "Enable Contianer Support";
+  options.homelab.container.enable = lib.mkEnableOption "Enable Contianer Support";
 
-  config = lib.mkIf config.ext.container.enable {
+  config = lib.mkIf config.homelab.container.enable {
     virtualisation = {
       podman = {
         enable = true;

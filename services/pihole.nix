@@ -11,7 +11,7 @@ let
       sha256 = "0zqqq8d10gn9hy5rbxg5c46q8cjlmg6kv7gkwx3yabka53n7aizj";
     };
   };
-  dhcpHosts = (map (r: r.mac + "," + r.ip + "," + r.name + ",infinite") lib.ext.dhcpReservations);
+  dhcpHosts = (map (r: r.mac + "," + r.ip + "," + r.name + ",infinite") lib.homelab.dhcpReservations);
   upstream = [
     "1.1.1.1"
     "1.0.0.1"
@@ -27,23 +27,23 @@ map
     name = "pihole-${toString n}";
     dnsmasqConf = {
       config = ''
-        dhcp-option=option:dns-server,${lib.ext.nameToIp.dns-1},${lib.ext.nameToIp.dns-2},${lib.ext.nameToIp.dns-3}
-        dhcp-option=option:ntp-server,${lib.ext.nameToIp.ntp}
+        dhcp-option=option:dns-server,${lib.homelab.nameToIp.dns-1},${lib.homelab.nameToIp.dns-2},${lib.homelab.nameToIp.dns-3}
+        dhcp-option=option:ntp-server,${lib.homelab.nameToIp.ntp}
 
         enable-tftp
         tftp-root=/tftp
         dhcp-match=set:bios,60,PXEClient:Arch:00000
-        dhcp-boot=tag:bios,netboot.xyz.kpxe,,${lib.ext.nameToIp.${name}}
+        dhcp-boot=tag:bios,netboot.xyz.kpxe,,${lib.homelab.nameToIp.${name}}
         dhcp-match=set:efi32,60,PXEClient:Arch:00002
-        dhcp-boot=tag:efi32,netboot.xyz.efi,,${lib.ext.nameToIp.${name}}
+        dhcp-boot=tag:efi32,netboot.xyz.efi,,${lib.homelab.nameToIp.${name}}
         dhcp-match=set:efi32-1,60,PXEClient:Arch:00006
-        dhcp-boot=tag:efi32-1,netboot.xyz.efi,,${lib.ext.nameToIp.${name}}
+        dhcp-boot=tag:efi32-1,netboot.xyz.efi,,${lib.homelab.nameToIp.${name}}
         dhcp-match=set:efi64,60,PXEClient:Arch:00007
-        dhcp-boot=tag:efi64,netboot.xyz.efi,,${lib.ext.nameToIp.${name}}
+        dhcp-boot=tag:efi64,netboot.xyz.efi,,${lib.homelab.nameToIp.${name}}
         dhcp-match=set:efi64-1,60,PXEClient:Arch:00008
-        dhcp-boot=tag:efi64-1,netboot.xyz.efi,,${lib.ext.nameToIp.${name}}
+        dhcp-boot=tag:efi64-1,netboot.xyz.efi,,${lib.homelab.nameToIp.${name}}
         dhcp-match=set:efi64-2,60,PXEClient:Arch:00009
-        dhcp-boot=tag:efi64-2,netboot.xyz.efi,,${lib.ext.nameToIp.${name}}
+        dhcp-boot=tag:efi64-2,netboot.xyz.efi,,${lib.homelab.nameToIp.${name}}
       '';
     };
   in
@@ -100,7 +100,7 @@ map
       ++
       (map (x: "--dns=${x}") upstream)
       ++
-      lib.ext.containerAddAllHosts
+      lib.homelab.containerAddAllHosts
       ;
     };
     extraConfig = {

@@ -28,7 +28,7 @@ in
   extraConfig = {
     sops = {
       secrets.searxng = { };
-      templates."searxng/config.yml".content = readFile (lib.ext.prettyYaml settings);
+      templates."searxng/config.yml".content = readFile (lib.homelab.prettyYaml settings);
     };
   };
 }

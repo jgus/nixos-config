@@ -53,12 +53,12 @@
           }).lib;
           addresses = import ./settings/addresses.nix { lib = libNet; };
           container = import ./settings/container.nix { inherit pkgs; };
-          libExt = libNet // (import ./lib-ext.nix {
+          libExt = libNet // (import ./lib-homelab.nix {
             inherit addresses pkgs;
             lib = libNet;
           });
           lib = libExt;
-          testResults = import ./test/lib-ext-test.nix { inherit lib; };
+          testResults = import ./test/lib-homelab-test.nix { inherit lib; };
         in
         {
           inherit addresses container lib machine testResults;

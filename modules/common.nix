@@ -26,8 +26,8 @@ with builtins;
       nixpkgs-fmt
     ];
     variables = {
-      SERVER_NAMES = concatStringsSep " " lib.ext.serverNames;
-      OTHER_SERVER_NAMES = concatStringsSep " " (lib.lists.remove machine.hostName lib.ext.serverNames);
+      SERVER_NAMES = concatStringsSep " " lib.homelab.serverNames;
+      OTHER_SERVER_NAMES = concatStringsSep " " (lib.lists.remove machine.hostName lib.homelab.serverNames);
     };
   };
 

@@ -84,18 +84,18 @@ let
       (lib.lists.drop 1 (lib.lists.remove "" (lib.strings.splitString "\n" (readFile ./home-assistant/windows.csv))));
 
   # HTTP Configuration
-  httpYaml = lib.ext.prettyYaml {
+  httpYaml = lib.homelab.prettyYaml {
     use_x_forwarded_for = true;
     trusted_proxies = [
-      lib.ext.nameToIp.web
-      lib.ext.nameToIp6.web
-      lib.ext.nameToIp.cloudflared
-      lib.ext.nameToIp6.cloudflared
+      lib.homelab.nameToIp.web
+      lib.homelab.nameToIp6.web
+      lib.homelab.nameToIp.cloudflared
+      lib.homelab.nameToIp6.cloudflared
     ];
   };
 
   # Device ID Verification Automation
-  verifyDeviceIdsYaml = lib.ext.prettyYaml {
+  verifyDeviceIdsYaml = lib.homelab.prettyYaml {
     id = "verify_device_ids";
     alias = "Verify Nix Device ID Map";
     mode = "single";
@@ -159,7 +159,7 @@ let
         }
         {
           name = "automation/${w.shade_name}_auto_set.yaml";
-          path = lib.ext.prettyYaml {
+          path = lib.homelab.prettyYaml {
             alias = "${w.shade_name} auto set";
             id = "${w.shade_name}_auto_set";
             mode = "restart";
@@ -260,7 +260,7 @@ let
       [
         {
           name = "light/${group_id}.yaml";
-          path = lib.ext.prettyYaml {
+          path = lib.homelab.prettyYaml {
             platform = "group";
             unique_id = "${group_id}";
             name = "${k} Light Group";
@@ -270,7 +270,7 @@ let
         }
         {
           name = "automation/${group_id}.yaml";
-          path = lib.ext.prettyYaml {
+          path = lib.homelab.prettyYaml {
             id = "${group_id}";
             alias = "${k} Light Group";
             mode = "restart";

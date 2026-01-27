@@ -60,9 +60,9 @@ let
       argsContainer = args.container or { };
       container = argsContainer // (if argsContainer ? pullImage then {
         image = "${argsContainer.pullImage.finalImageName}:${argsContainer.pullImage.finalImageTag}";
-        imageFile = lib.ext.pullImage argsContainer.pullImage;
+        imageFile = lib.homelab.pullImage argsContainer.pullImage;
       } else { });
-      containerOptions = lib.ext.containerOptions name;
+      containerOptions = lib.homelab.containerOptions name;
       isContainer = container ? image;
 
       # Shared service components used by both container and systemd configs
@@ -87,7 +87,7 @@ let
           extraConfig
         ] ++ map homelabServiceStorage storageNames;
 
-        ext.container.enable = true;
+        homelab.container.enable = true;
 
         systemd = {
           targets."${name}-requires" = requiresTarget;
@@ -164,8 +164,8 @@ let
       systemdConfig =
         let
           useMacvlan = systemd.macvlan or false;
-          macvlanInterfaceName = "mv${toString lib.ext.nameToIdMajor.${name}}x${toString lib.ext.nameToIdMinor.${name}}";
-          macvlanNetwork = lib.ext.mkMacvlanSetup {
+          macvlanInterfaceName = "mv${toString lib.homelab.nameToIdMajor.${name}}x${toString lib.homelab.nameToIdMinor.${name}}";
+          macvlanNetwork = lib.homelab.mkMacvlanSetup {
             hostName = name;
             interfaceName = macvlanInterfaceName;
             netdevPriority = 30;
@@ -173,7 +173,7 @@ let
             mainTableMetric = 1000;
             # Routing table ID: base offset of 1000 avoids reserved tables (253-255)
             # g * 256 ensures no overlap since id is 0-255
-            policyTableId = 1000 + lib.ext.nameToIdMajor.${name} * 256 + lib.ext.nameToIdMinor.${name};
+            policyTableId = 1000 + lib.homelab.nameToIdMajor.${name} * 256 + lib.homelab.nameToIdMinor.${name};
             policyPriority = 200;
             addPrefixRoute = false;
           };
@@ -198,8 +198,8 @@ let
                 script = lib.optionalString (systemd ? script) (systemd.script {
                   inherit name uid gid storagePath containerOptions;
                   interface = if useMacvlan then macvlanInterfaceName else null;
-                  ip = lib.ext.nameToIp.${name};
-                  ip6 = lib.ext.nameToIp6.${name};
+                  ip = lib.homelab.nameToIp.${name};
+                  ip6 = lib.homelab.nameToIp6.${name};
                 });
                 postStop = "systemctl restart ${name}-backup";
               };
@@ -214,7 +214,7 @@ let
         };
       serviceConfig = if isContainer then containerConfig else systemdConfig;
     in
-    lib.optionalAttrs (machine.hostName == lib.ext.nameToHost.${name}) serviceConfig;
+    lib.optionalAttrs (machine.hostName == lib.homelab.nameToHost.${name}) serviceConfig;
   importService = n:
     let
       i = (import ../services/${n}.nix) args;

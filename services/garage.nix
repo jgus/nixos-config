@@ -9,7 +9,7 @@ let
     replication_factor = 1;
 
     rpc_bind_addr = "[::]:3901";
-    rpc_public_addr = "${lib.ext.nameToIp.garage}:3901";
+    rpc_public_addr = "${lib.homelab.nameToIp.garage}:3901";
     rpc_secret = config.sops.placeholder."garage/rpc_secret";
 
     s3_api = {
@@ -52,7 +52,7 @@ in
         "garage/admin_token" = { };
         "garage/metrics_token" = { };
       };
-      templates."garage/garage.toml".content = readFile (lib.ext.prettyToml configuration);
+      templates."garage/garage.toml".content = readFile (lib.homelab.prettyToml configuration);
     };
   };
 }

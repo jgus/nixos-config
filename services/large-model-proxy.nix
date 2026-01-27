@@ -569,7 +569,7 @@ in
       fi
 
       cd ${storagePath name}
-      exec large-model-proxy -c ${lib.ext.prettyJson (configuration { hostIp = ip; hostIp6 = ip6; })}
+      exec large-model-proxy -c ${lib.homelab.prettyJson (configuration { hostIp = ip; hostIp6 = ip6; })}
     '';
   };
   extraConfig = {

@@ -80,7 +80,7 @@ let
     nameToAttr // (mapAttrs (k: v: getAttr v nameToAttr) aliases);
 in
 {
-  ext = rec {
+  homelab = rec {
     # Merge multiple attribute sets recursively
     recursiveUpdates = listOfSets:
       lib.fold (attrs: acc: lib.recursiveUpdate attrs acc) { } listOfSets;
