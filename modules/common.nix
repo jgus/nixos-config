@@ -1,4 +1,5 @@
-{ lib, machine, options, pkgs, ... }:
+with builtins;
+{ lib, inputs, machine, options, pkgs, ... }:
 {
   boot = {
     tmp.useTmpfs = true;
@@ -25,8 +26,8 @@
       nixpkgs-fmt
     ];
     variables = {
-      SERVER_NAMES = builtins.concatStringsSep " " lib.ext.serverNames;
-      OTHER_SERVER_NAMES = builtins.concatStringsSep " " (lib.lists.remove machine.hostName lib.ext.serverNames);
+      SERVER_NAMES = concatStringsSep " " lib.ext.serverNames;
+      OTHER_SERVER_NAMES = concatStringsSep " " (lib.lists.remove machine.hostName lib.ext.serverNames);
     };
   };
 
@@ -85,6 +86,18 @@
     # Before changing this value read the documentation for this option
     # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
     stateVersion = machine.stateVersion; # Did you read the comment?
+
+    nixos.label =
+      let
+        buildDateTime = lib.strings.removeSuffix "\n" (readFile (pkgs.runCommand "build-date" { }
+          ''date "+%Y-%m-%d_%H:%M:%S" -d @${toString inputs.self.lastModified} > $out''));
+        gitHash = inputs.self.shortRev or inputs.self.dirtyShortRev or "unknown";
+      in
+      lib.concatStringsSep "__" [
+        buildDateTime
+        gitHash
+        machine.hostName
+      ];
   };
 
   nix = {
