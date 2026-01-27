@@ -1,5 +1,5 @@
 with builtins;
-{ config, lib, machine, options, pkgs, ... }:
+{ lib, machine, options, pkgs, ... }:
 {
   boot = {
     tmp.useTmpfs = true;
@@ -22,7 +22,7 @@ with builtins;
   environment = {
     systemPackages = with pkgs; [
       clang-tools # TODO
-      nixd
+      nil
       nixpkgs-fmt
     ];
     variables = {
