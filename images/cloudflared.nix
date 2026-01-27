@@ -1,7 +1,7 @@
 {
   imageName = "cloudflare/cloudflared";
-  imageDigest = "sha256:5bb6a0870686742d00e171f36c892ba91e5994631bc363d808b9ba822262dad6";
-  hash = "sha256-qfA6rY0y9c9E0+LgzRjJJ/ayvpRLh7mpDcxfPmoksSI=";
+  imageDigest = "sha256:e9bcb2ef08d25632ff74344e73a025f4f4bf12718335b196fa0e670cacace8c5";
+  hash = "sha256-etjp/A6RHmMJ+N4iVRVEt3Fh0mfqDrCD9ZFQLfmaI2E=";
   finalImageName = "cloudflare/cloudflared";
   finalImageTag = "latest";
 }
