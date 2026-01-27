@@ -14,6 +14,7 @@ in
     environment = {
       PUID = toString config.users.users.${user}.uid;
       PGID = toString config.users.groups.${group}.gid;
+      USER = "abc";
     };
     environmentFiles = [
       config.sops.secrets."code/env".path
