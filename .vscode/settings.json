@@ -4,7 +4,4 @@
     },
     "nixEnvSelector.suggestion": false,
     "continue.enableConsole": true,
-    "nix.hiddenLanguageServerErrors": [
-        "textDocument/definition"
-    ]
 }
