@@ -116,8 +116,9 @@ let
           autoStart = autoStart;
           user = "${uid}:${gid}";
           volumes =
-            (let v = container.volumes or [ ]; in if isFunction v then v storagePath else v) ++
-              lib.optional configStorage "${storagePath name}:${container.configVolume}";
+            [ "${pkgs.tzdata}/share/zoneinfo:/etc/zoneinfo:ro" ]
+              ++ (let v = container.volumes or [ ]; in if isFunction v then v storagePath else v)
+              ++ lib.optional configStorage "${storagePath name}:${container.configVolume}";
           extraOptions =
             (container.extraOptions or [ ])
               ++ containerOptions
@@ -128,6 +129,7 @@ let
           cmd = container.entrypointOptions or [ ];
           environment = {
             TZ = config.time.timeZone;
+            TZDIR = "/etc/zoneinfo";
           } // (container.environment or { });
         }
         // lib.pipe
