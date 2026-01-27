@@ -1,0 +1,8 @@
+{
+    "recommendations": [
+        "jnoortheen.nix-ide",
+        "rooveterinaryinc.roo-cline",
+        "mhutchie.git-graph",
+        "signageos.signageos-vscode-sops"
+    ]
+}
