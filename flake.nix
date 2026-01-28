@@ -30,6 +30,7 @@
 
   outputs =
     { nix-index-database
+    , nixos-hardware
     , nixos-extra-modules
     , nixpkgs
     , sops-nix
@@ -55,7 +56,7 @@
           testResults = import ./test/lib-homelab-test.nix { inherit lib; };
         in
         {
-          inherit addresses container lib machine self testResults;
+          inherit addresses container lib machine nixos-hardware self testResults;
         };
 
       mkMachine = machineId:
