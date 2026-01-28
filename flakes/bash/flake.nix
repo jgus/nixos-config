@@ -46,7 +46,7 @@
       nixosModules.bash = { config, pkgs, lib, ... }: {
         programs.bash = {
           enable = true;
-          interactiveShellInit = promptConfig;
+          promptInit = promptConfig;
         };
       };
 
