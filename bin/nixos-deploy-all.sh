@@ -93,18 +93,6 @@ echo "=== All tests successful ==="
 echo ""
 
 if [[ "${DO_SWITCH}" == "true" ]]; then
-    echo "=== Switching all configurations ==="
-    for machine in "${MACHINES[@]}"; do
-        echo ""
-        echo "--- Switching configuration for ${machine} ---"
-        nixos-rebuild boot --flake ${NIXOS_CONFIG_ROOT}#${machine} --target-host "${machine}"
-        echo "✓ Switch successful for ${machine}"
-    done
-
-    echo ""
-    echo "=== All switches successful ==="
-    echo ""
-
     echo "=== Saving GC roots ==="
 
     RESULT_DIR="${NIXOS_CONFIG_ROOT}/gcroots"
@@ -124,6 +112,18 @@ if [[ "${DO_SWITCH}" == "true" ]]; then
 
     echo ""
     echo "=== All GC roots saved ==="
+    echo ""
+
+    echo "=== Switching all configurations ==="
+    for machine in "${MACHINES[@]}"; do
+        echo ""
+        echo "--- Switching configuration for ${machine} ---"
+        nixos-rebuild boot --flake ${NIXOS_CONFIG_ROOT}#${machine} --target-host "${machine}"
+        echo "✓ Switch successful for ${machine}"
+    done
+
+    echo ""
+    echo "=== All switches successful ==="
     echo ""
 else
     echo "=== Skipping switch phase (use --switch to enable) ==="
