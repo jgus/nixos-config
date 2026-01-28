@@ -26,10 +26,13 @@
     # Dev shell
     devshell.url = "github:numtide/devshell";
     flake-utils.url = "github:numtide/flake-utils";
+
+    bash.url = "path:./flakes/bash";
   };
 
   outputs =
-    { nix-index-database
+    { bash
+    , nix-index-database
     , nixos-hardware
     , nixos-extra-modules
     , nixpkgs
@@ -84,6 +87,7 @@
             ./modules/systemctl-mqtt.nix
             sops-nix.nixosModules.sops
             nix-index-database.nixosModules.nix-index
+            bash.nixosModules.bash
           ]
           ++ nixpkgs.lib.optional machine.nvidia ./modules/nvidia.nix
           ++ nixpkgs.lib.optional machine.zfs ./modules/zfs.nix

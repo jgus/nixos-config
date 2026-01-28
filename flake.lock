@@ -1,5 +1,16 @@
 {
   "nodes": {
+    "bash": {
+      "locked": {
+        "path": "./flakes/bash",
+        "type": "path"
+      },
+      "original": {
+        "path": "./flakes/bash",
+        "type": "path"
+      },
+      "parent": []
+    },
     "blank": {
       "locked": {
         "lastModified": 1625557891,
@@ -753,6 +764,7 @@
     },
     "root": {
       "inputs": {
+        "bash": "bash",
         "devshell": "devshell",
         "flake-utils": "flake-utils",
         "nix-index-database": "nix-index-database",
