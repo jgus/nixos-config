@@ -24,7 +24,7 @@ in
 map
   (n:
   let
-    name = "pihole-${toString n}";
+    serviceName = "pihole-${toString n}";
     dnsmasqConf = {
       config = ''
         dhcp-option=option:dns-server,${lib.homelab.nameToIp.dns-1},${lib.homelab.nameToIp.dns-2},${lib.homelab.nameToIp.dns-3}
@@ -33,22 +33,22 @@ map
         enable-tftp
         tftp-root=/tftp
         dhcp-match=set:bios,60,PXEClient:Arch:00000
-        dhcp-boot=tag:bios,netboot.xyz.kpxe,,${lib.homelab.nameToIp.${name}}
+        dhcp-boot=tag:bios,netboot.xyz.kpxe,,${lib.homelab.nameToIp.${serviceName}}
         dhcp-match=set:efi32,60,PXEClient:Arch:00002
-        dhcp-boot=tag:efi32,netboot.xyz.efi,,${lib.homelab.nameToIp.${name}}
+        dhcp-boot=tag:efi32,netboot.xyz.efi,,${lib.homelab.nameToIp.${serviceName}}
         dhcp-match=set:efi32-1,60,PXEClient:Arch:00006
-        dhcp-boot=tag:efi32-1,netboot.xyz.efi,,${lib.homelab.nameToIp.${name}}
+        dhcp-boot=tag:efi32-1,netboot.xyz.efi,,${lib.homelab.nameToIp.${serviceName}}
         dhcp-match=set:efi64,60,PXEClient:Arch:00007
-        dhcp-boot=tag:efi64,netboot.xyz.efi,,${lib.homelab.nameToIp.${name}}
+        dhcp-boot=tag:efi64,netboot.xyz.efi,,${lib.homelab.nameToIp.${serviceName}}
         dhcp-match=set:efi64-1,60,PXEClient:Arch:00008
-        dhcp-boot=tag:efi64-1,netboot.xyz.efi,,${lib.homelab.nameToIp.${name}}
+        dhcp-boot=tag:efi64-1,netboot.xyz.efi,,${lib.homelab.nameToIp.${serviceName}}
         dhcp-match=set:efi64-2,60,PXEClient:Arch:00009
-        dhcp-boot=tag:efi64-2,netboot.xyz.efi,,${lib.homelab.nameToIp.${name}}
+        dhcp-boot=tag:efi64-2,netboot.xyz.efi,,${lib.homelab.nameToIp.${serviceName}}
       '';
     };
   in
   {
-    inherit name;
+    inherit serviceName;
     configStorage = false;
     container = {
       readOnly = false;

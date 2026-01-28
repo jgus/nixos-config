@@ -1,7 +1,7 @@
 { ... }:
 let
   zwave-area = area: {
-    name = "zwave-${area}";
+    serviceName = "zwave-${area}";
     container = {
       pullImage = import ../images/zwave-js-ui.nix;
       ports = [

@@ -1,4 +1,4 @@
-{ ... }:
+{ lib, ... }:
 {
   requires = [ "storage-media.mount" ];
   container = {
@@ -6,9 +6,9 @@
     ports = [ "80" ];
     configVolume = "/config";
     extraStorage = [ "audiobookshelf_metadata" ];
-    volumes = storagePath: [
+    volumes = [
       "/storage/media:/media"
-      "${storagePath "audiobookshelf_metadata"}:/metadata"
+      "${lib.homelab.storagePath "audiobookshelf_metadata"}:/metadata"
     ];
   };
 }

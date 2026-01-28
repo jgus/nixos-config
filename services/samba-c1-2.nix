@@ -1,5 +1,5 @@
 with builtins;
-{ ... }:
+{ lib, ... }:
 {
   configStorage = false;
   container = {
@@ -32,7 +32,7 @@ with builtins;
         ACCOUNT_joyfulsong = "joyfulsong";
       };
     volumes = [
-      "/service/joyfulsong:/service/joyfulsong"
+      "${lib.homelab.storagePath "joyfulsong"}:/service/joyfulsong"
     ];
     capabilities = {
       NET_ADMIN = true;

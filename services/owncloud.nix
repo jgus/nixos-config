@@ -6,7 +6,7 @@ let
 in
 [
   {
-    name = "owncloud";
+    serviceName = "owncloud";
     configStorage = false;
     requires = [ "storage-owncloud.mount" ];
     container = {
@@ -49,7 +49,7 @@ in
     };
   }
   {
-    name = "owncloud-db";
+    serviceName = "owncloud-db";
     container = {
       pullImage = import ../images/mariadb.nix;
       environment = {
@@ -73,7 +73,7 @@ in
     };
   }
   {
-    name = "owncloud-redis";
+    serviceName = "owncloud-redis";
     container = {
       pullImage = import ../images/redis.nix;
       configVolume = "/data";

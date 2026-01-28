@@ -1,7 +1,7 @@
 { config, ... }:
 [
   {
-    name = "joyfulsong-db";
+    serviceName = "joyfulsong-db";
     container = {
       pullImage = import ../images/mariadb.nix;
       configVolume = "/var/lib/mysql";
@@ -17,7 +17,7 @@
     };
   }
   {
-    name = "joyfulsong";
+    serviceName = "joyfulsong";
     container = {
       pullImage = import ../images/wordpress.nix;
       dependsOn = [ "joyfulsong-db" ];

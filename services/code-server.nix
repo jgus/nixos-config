@@ -2,7 +2,7 @@ let
   user = "josh";
   group = "users";
 in
-{ config, ... }:
+{ config, lib, ... }:
 {
   container = {
     readOnly = false;
@@ -19,12 +19,12 @@ in
     environmentFiles = [
       config.sops.secrets."code/env".path
     ];
-    volumes = storagePath: [
+    volumes = [
       "${config.sops.secrets."josh/ssh/id_ed25519".path}:/config/.ssh/id_ed25519:ro"
       "${../pubkeys/josh/id_ed25519}:/config/.ssh/id_ed25519.pub:ro"
       "${config.sops.secrets."josh/ssh/id_rsa".path}:/config/.ssh/id_rsa:ro"
       "${../pubkeys/josh/id_rsa}:/config/.ssh/id_rsa.pub:ro"
-      "${storagePath "code-server"}/nix:/nix"
+      "${lib.homelab.storagePath "code-server"}/nix:/nix"
     ];
     tmpFs = [
       "/tmp"

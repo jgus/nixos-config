@@ -1,14 +1,14 @@
 { addresses, config, ... }:
 [
   {
-    name = "journal-db";
+    serviceName = "journal-db";
     container = {
       pullImage = import ../images/mysql.nix;
       configVolume = "/var/lib/mysql";
     };
   }
   {
-    name = "journal";
+    serviceName = "journal";
     container = {
       pullImage = import ../images/wordpress.nix;
       dependsOn = [ "journal-db" ];

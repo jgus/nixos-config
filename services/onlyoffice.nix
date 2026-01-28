@@ -1,7 +1,7 @@
 { config, pkgs, ... }:
 [
   {
-    name = "onlyoffice";
+    serviceName = "onlyoffice";
     container = {
       readOnly = false;
       pullImage = import ../images/documentserver.nix;

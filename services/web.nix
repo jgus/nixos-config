@@ -1,5 +1,5 @@
 # Manage DNS records for the below at: https://dash.cloudflare.com/4863ad256b1367a5598b6b30306133d8/home/domains
-{ addresses, pkgs, ... }:
+{ addresses, lib, pkgs, ... }:
 let
   domain = addresses.network.domain;
   publicDomain = addresses.network.publicDomain;
@@ -124,7 +124,7 @@ let
   '';
 in
 {
-  name = "web";
+  serviceName = "web";
   extraStorage = [ "web_data" ];
   container = {
     pullImage = import ../images/caddy.nix;
@@ -133,8 +133,8 @@ in
       "443"
     ];
     configVolume = "/config";
-    volumes = storagePath: [
-      "${storagePath "web_data"}:/data"
+    volumes = [
+      "${lib.homelab.storagePath "web_data"}:/data"
       "${pkgs.writeText "Caddyfile" caddyFile}:/etc/caddy/Caddyfile:ro"
       "/storage/service/www:/usr/share/caddy"
     ];

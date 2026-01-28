@@ -219,6 +219,10 @@ in
         };
       };
 
+    # === Name -> Attribute Mapping ===
+    storagePath = serviceName: "/service/${serviceName}";
+    storageBackupPath = serviceName: "/storage/service/${serviceName}";
+
     # This is a version of pkgs.dockerTools.pullImage
     # https://github.com/NixOS/nixpkgs/blob/d33f940b617cb63dc0652b174d11517046c664c6/pkgs/build-support/docker/default.nix#L141
     # This adds REGISTRY_AUTH_FILE to bypass a Skopeo bug where it uses getpid() instead of getuid() when XDG_RUNTIME_DIR is unset, causing /run/containers/<PID>/auth.json permission errors.

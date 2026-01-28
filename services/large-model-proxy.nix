@@ -574,7 +574,7 @@ in
   };
   extraConfig = {
     fileSystems = {
-      "/service/large-model-proxy/logs".fsType = "tmpfs";
+      "${lib.homelab.storagePath "large-model-proxy"}/logs".fsType = "tmpfs";
       "/storage/comfyui" = {
         device = "/s/comfyui";
         fsType = "none";
