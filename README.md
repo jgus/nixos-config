@@ -146,9 +146,7 @@ Note that any given service maybe be _either_ a container service (contains the 
 #### Container Service Options
 - **`container.image`**: Container image URI
 - **`container.configVolume`**: Container path for config storage
-- **`container.volumes`**: Additional volume mounts. Can be either:
-  - A list of volume specifications (format: `"host:container[:options]"`)
-  - A function that receives the `storagePath` function and returns a list of volume specifications
+- **`container.volumes`**: Additional volume mounts. A list of volume specifications (format: `"host:container[:options]"`)
 - **`container.environment`**: Environment variables
 - **`container.extraOptions`**: Additional Container CLI options
 - **`container.entrypoint`**: Custom container entrypoint
@@ -162,15 +160,7 @@ Note that any given service maybe be _either_ a container service (contains the 
 - **`systemd.tcpPorts`**: Open TCP ports
 - **`systemd.udpPorts`**: Open UDP ports
 - **`systemd.path`**: List of Nix packages to add to PATH (e.g., `[ pkgs.socat pkgs.curl ]`)
-- **`systemd.script`**: Service startup script. This is a function that receives a context object containing:
-  - `name`: Service name
-  - `uid`: User ID
-  - `gid`: Group ID
-  - `ip`: IPv4 address
-  - `ip6`: IPv6 address
-  - `interface`: Network interface name (if macvlan enabled)
-  - `storagePath`: Function to get storage path for a service
-  - `containerOptions`: Additional Container options
+- **`systemd.script`**: Service startup script.
 
 ### Container Service Examples
 
@@ -193,27 +183,6 @@ For services running in Container containers:
       PGID = toString config.users.groups.media.gid;
     };
     ports = [ "8989" ];
-  };
-}
-```
-
-#### Container Service with Dynamic Volumes
-
-When you need to use the `storagePath` function to mount extra storage paths, use the function form:
-
-```nix
-{ config, ... }:
-{
-  requires = [ "storage-media.mount" ];
-  container = {
-    image = "ghcr.io/advplyr/audiobookshelf";
-    ports = [ "80" ];
-    configVolume = "/config";
-    extraStorage = [ "audiobookshelf_metadata" ];  # Define extra storage
-    volumes = storagePath: [
-      "/storage/media:/media"
-      "${storagePath "audiobookshelf_metadata"}:/metadata"  # Use storagePath for extra storage
-    ];
   };
 }
 ```

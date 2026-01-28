@@ -158,7 +158,7 @@ let
       systemdConfig =
         let
           useMacvlan = systemd.macvlan or false;
-          macvlanInterfaceName = "mv${toString lib.homelab.nameToIdMajor.${serviceName}}x${toString lib.homelab.nameToIdMinor.${serviceName}}";
+          macvlanInterfaceName = lib.homelab.macvlanInterfaceName serviceName;
           macvlanNetwork = lib.homelab.mkMacvlanSetup {
             hostName = serviceName;
             interfaceName = macvlanInterfaceName;
@@ -189,12 +189,7 @@ let
                   lib.optional useMacvlan "sys-subsystem-net-devices-${macvlanInterfaceName}.device";
                 after = requires;
                 path = systemd.path or [ ];
-                script = lib.optionalString (systemd ? script) (systemd.script {
-                  inherit serviceName uid gid storagePath containerOptions;
-                  interface = if useMacvlan then macvlanInterfaceName else null;
-                  ip = lib.homelab.nameToIp.${serviceName};
-                  ip6 = lib.homelab.nameToIp6.${serviceName};
-                });
+                script = systemd.script;
                 postStop = "systemctl restart ${serviceName}-backup";
               };
               "${serviceName}-backup" = backupService;

@@ -152,6 +152,8 @@ in
       (map (n: map (name: "--add-host=${name}:${getAttr n nameToIp6}") (nameAndFqdn n)) (attrNames nameToIp6))
     ];
 
+    macvlanInterfaceName = serviceName: "mv${toString nameToIdMajor.${serviceName}}x${toString nameToIdMinor.${serviceName}}";
+
     # Create complete macvlan setup including netdev, parent attachment, and network config
     mkMacvlanSetup =
       { hostName
