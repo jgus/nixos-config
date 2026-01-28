@@ -65,7 +65,6 @@
           machine = specialArgs.machine;
         in
         nixpkgs.lib.nixosSystem {
-          inherit (machine) system;
           inherit specialArgs;
           modules = [
             { networking.hostName = machineId; }
