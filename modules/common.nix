@@ -6,6 +6,8 @@ with builtins;
     supportedFilesystems = [ "ntfs" ];
   };
 
+  hardware.enableAllFirmware = true;
+
   zramSwap.enable = true;
 
   time.timeZone = machine.timeZone;
