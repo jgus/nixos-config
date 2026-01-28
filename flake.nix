@@ -111,8 +111,8 @@
               ${./bin/nixos-deploy-all.sh} "$@"
             fi
           '')
-          (writeScriptBin "verify-sops-backups" (builtins.readFile ./bin/verify-sops-backups.sh))
-          (writeScriptBin "update-images" (builtins.readFile ./bin/update-images.sh))
+          (writeScriptBin "verify-sops-backups" ''${./bin/verify-sops-backups.sh} "$@"'')
+          (writeScriptBin "update-images" ''${./bin/update-images.sh} "$@"'')
           git
           sops
           age
@@ -120,7 +120,7 @@
         ];
 
         shellHook = ''
-          echo "Using default devShell"
+          # echo "devShell activated"
         '';
       };
     };
