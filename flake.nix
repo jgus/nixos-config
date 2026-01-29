@@ -18,9 +18,9 @@
       url = "github:nix-community/nix-index-database";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nixos-extra-modules = {
+    nixos-extra-modules-src = {
       url = "github:oddlama/nixos-extra-modules";
-      inputs.nixpkgs.follows = "nixpkgs";
+      flake = false;
     };
 
     # Dev shell
@@ -34,21 +34,40 @@
     { bash
     , nix-index-database
     , nixos-hardware
-    , nixos-extra-modules
+    , nixos-extra-modules-src
     , nixpkgs
     , sops-nix
     , self
     , ...
     }:
     let
+      overlayNet = pkgs:
+        let
+          pkgsLibOverlay = pkgs: lib: pkgs // {
+            lib = pkgs.lib // lib;
+          };
+          # import netu.nix - it's a module with a .lib
+          netu = (import (nixos-extra-modules-src + "/lib/netu.nix") { inherit (pkgs) lib; });
+          # Create a pkgs-like structure with netu included in lib
+          pkgsNetu = pkgsLibOverlay pkgs netu.lib;
+          # Import misc.nix - it's an overlay: inputs: final: prev:
+          misc = import (nixos-extra-modules-src + "/lib/misc.nix") { inherit nixpkgs; };
+          # Create a pkgs-like structure with misc included in lib
+          pkgsMisc = pkgsLibOverlay pkgsNetu (misc pkgsNetu pkgsNetu).lib;
+          # Import net.nix - it's an overlay: inputs: final: prev:
+          net = import (nixos-extra-modules-src + "/lib/net.nix") { inherit nixpkgs; };
+          # Create a pkgs-like structure with net included in lib
+          netPkgs = pkgsLibOverlay pkgsMisc (net pkgsMisc pkgsMisc).lib;
+        in
+        netPkgs.lib;
+
       mkSpecialArgs = machineId:
         let
           machine = import ./settings/machine.nix { inherit machineId; lib = nixpkgs.lib; };
-          pkgs = import nixpkgs { inherit (machine) system; };
-          libNet = (import nixpkgs {
+          pkgs = import nixpkgs {
             inherit (machine) system;
-            overlays = [ nixos-extra-modules.overlays.default ];
-          }).lib;
+          };
+          libNet = overlayNet nixpkgs;
           addresses = import ./settings/addresses.nix { lib = libNet; };
           container = import ./settings/container.nix { inherit pkgs; };
           libExt = libNet // (import ./lib-homelab.nix {
