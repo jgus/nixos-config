@@ -41,7 +41,7 @@
     , ...
     }:
     let
-      overlayNet = pkgs:
+      overlayNetLib = pkgs:
         let
           pkgsLibOverlay = pkgs: lib: pkgs // {
             lib = pkgs.lib // lib;
@@ -64,10 +64,8 @@
       mkSpecialArgs = machineId:
         let
           machine = import ./settings/machine.nix { inherit machineId; lib = nixpkgs.lib; };
-          pkgs = import nixpkgs {
-            inherit (machine) system;
-          };
-          libNet = overlayNet nixpkgs;
+          pkgs = nixpkgs.legacyPackages.${machine.system};
+          libNet = overlayNetLib nixpkgs;
           addresses = import ./settings/addresses.nix { lib = libNet; };
           container = import ./settings/container.nix { inherit pkgs; };
           libExt = libNet // (import ./lib-homelab.nix {
