@@ -20,7 +20,7 @@
         LAST_EXIT=0
 
         # PROMPT_COMMAND runs before PS1 is rendered
-        PROMPT_COMMAND='LAST_EXIT=$?; git update-index -q --refresh 2>/dev/null'
+        PROMPT_COMMAND='LAST_EXIT=$?; '"''${PROMPT_COMMAND}"
 
         # Function to get git branch
         git_branch() {
