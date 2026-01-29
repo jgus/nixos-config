@@ -75,10 +75,9 @@
             lib = libNet;
           });
           lib = libExt;
-          testResults = import ./test/lib-homelab-test.nix { inherit lib; };
         in
         {
-          inherit addresses container lib machine nixos-hardware self testResults;
+          inherit addresses container lib machine nixos-hardware self;
         };
 
       mkMachine = machineId:
@@ -90,7 +89,7 @@
           inherit specialArgs;
           modules = [
             { networking.hostName = machineId; }
-            ./modules/assert-test-results.nix
+            ./test/tests.nix
             ./machine/${machineId}/hardware-configuration.nix
             ./modules/common.nix
             ./modules/label.nix
