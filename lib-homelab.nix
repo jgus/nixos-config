@@ -81,6 +81,8 @@ let
 in
 {
   homelab = rec {
+    inherit macToIp6;
+
     # Merge multiple attribute sets recursively
     recursiveUpdates = listOfSets:
       lib.fold (attrs: acc: lib.recursiveUpdate attrs acc) { } listOfSets;

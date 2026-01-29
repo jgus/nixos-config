@@ -92,6 +92,7 @@
             ./modules/common.nix
             ./modules/label.nix
             ./modules/network.nix
+            ./modules/addresses.nix
             ./modules/sops.nix
             ./modules/users.nix
             ./modules/msmtp.nix

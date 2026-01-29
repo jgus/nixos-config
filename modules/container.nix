@@ -1,26 +1,26 @@
 with builtins;
 { addresses, config, lib, machine, pkgs, ... }:
 {
-  options.homelab.container = {
+  options.homelab.container = with lib.types; {
     enable = lib.mkEnableOption "Enable Contianer Support";
     engine = lib.mkOption {
-      type = lib.types.enum [ "docker" "podman" ];
+      type = enum [ "docker" "podman" ];
       default = "docker";
       description = "Container engine to use (docker or podman)";
     };
 
     executable = lib.mkOption {
-      type = lib.types.str;
+      type = str;
       default = config.homelab.container.engine;
       readOnly = true;
     };
     package = lib.mkOption {
-      type = lib.types.package;
+      type = package;
       default = pkgs.${config.homelab.container.engine};
       readOnly = true;
     };
     group = lib.mkOption {
-      type = lib.types.str;
+      type = str;
       default = config.homelab.container.engine;
       readOnly = true;
     };
