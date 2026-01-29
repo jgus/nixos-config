@@ -1,6 +1,7 @@
-{ pkgs, ... }:
+{ ... }:
 {
-  executable = "podman";
-  package = pkgs.podman;
-  group = "podman";
+  homelab.container = {
+    enable = true;
+    engine = "podman";
+  };
 }

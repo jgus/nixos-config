@@ -1,16 +1,16 @@
 with builtins;
-{ config, container, lib, ... }:
+{ config, lib, ... }:
 let
   image = "ghcr.io/lovelaze/nebula-sync:latest";
 in
 {
   systemd.services = {
     nebula-sync = {
-      path = [ container.package ];
+      path = [ config.homelab.container.package ];
       script = ''
         export PW="$(cat ${config.sops.secrets.pihole.path})"
-        ${container.executable} pull ${image}
-        ${container.executable} run --rm \
+        ${config.homelab.container.executable} pull ${image}
+        ${config.homelab.container.executable} run --rm \
         --name nebula-sync \
         -e PRIMARY="http://pihole-1|''${PW}" \
         -e REPLICAS="http://pihole-2|''${PW},http://pihole-3|''${PW}" \

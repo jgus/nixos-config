@@ -67,7 +67,6 @@
           pkgs = nixpkgs.legacyPackages.${machine.system};
           libNet = overlayNetLib nixpkgs;
           addresses = import ./settings/addresses.nix { lib = libNet; };
-          container = import ./settings/container.nix { inherit pkgs; };
           libExt = libNet // (import ./lib-homelab.nix {
             inherit addresses pkgs;
             lib = libNet;
@@ -75,7 +74,7 @@
           lib = libExt;
         in
         {
-          inherit addresses container lib machine nixos-hardware self;
+          inherit addresses lib machine nixos-hardware self;
         };
 
       mkMachine = machineId:
@@ -87,6 +86,7 @@
           inherit specialArgs;
           modules = [
             { networking.hostName = machineId; }
+            ./settings/container.nix
             ./test/tests.nix
             ./machine/${machineId}/hardware-configuration.nix
             ./modules/common.nix

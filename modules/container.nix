@@ -1,16 +1,40 @@
 with builtins;
 { addresses, config, lib, machine, pkgs, ... }:
 {
-  options.homelab.container.enable = lib.mkEnableOption "Enable Contianer Support";
+  options.homelab.container = {
+    enable = lib.mkEnableOption "Enable Contianer Support";
+    engine = lib.mkOption {
+      type = lib.types.enum [ "docker" "podman" ];
+      default = "docker";
+      description = "Container engine to use (docker or podman)";
+    };
+
+    executable = lib.mkOption {
+      type = lib.types.str;
+      default = config.homelab.container.engine;
+      readOnly = true;
+    };
+    package = lib.mkOption {
+      type = lib.types.package;
+      default = pkgs.${config.homelab.container.engine};
+      readOnly = true;
+    };
+    group = lib.mkOption {
+      type = lib.types.str;
+      default = config.homelab.container.engine;
+      readOnly = true;
+    };
+  };
 
   config = lib.mkIf config.homelab.container.enable {
     virtualisation = {
-      podman = {
+      docker = lib.optionalAttrs (config.homelab.container.engine == "docker") (throw "Not Implemented");
+      podman = lib.mkIf (config.homelab.container.engine == "podman") {
         enable = true;
         autoPrune.enable = true;
       };
       oci-containers = {
-        backend = "podman";
+        backend = config.homelab.container.engine;
       };
     };
 
@@ -33,7 +57,6 @@ with builtins;
           path = [ pkgs.podman ];
           script = lib.concatStringsSep "\n" (map
             (vlan:
-
               let
                 suffix = if vlan ? vlanId then ".${toString vlan.vlanId}" else "";
               in
