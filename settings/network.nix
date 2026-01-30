@@ -297,6 +297,16 @@
   assertions =
     with config.homelab.network;
     [
+      # Network-level Tests
+      {
+        assertion = defaultGateway == "172.22.0.1";
+        message = "network.defaultGateway";
+      }
+      {
+        assertion = vlans.iot.defaultGateway == "172.21.0.1";
+        message = "vlan.defaultGateway";
+      }
+
       # Name Tests
       {
         assertion = hosts.servers.hosts.b1.name == "b1";
@@ -367,14 +377,18 @@
         message = "host.g: group inherited";
       }
 
-      # Network-level Tests
+      # allHosts Tests
       {
-        assertion = defaultGateway == "172.22.0.1";
-        message = "network.defaultGateway";
+        assertion = allHosts.router.ip4 == hosts.network.hosts.router.ip4;
+        message = "allHosts: primary network";
       }
       {
-        assertion = vlans.iot.defaultGateway == "172.21.0.1";
-        message = "vlan.defaultGateway";
+        assertion = allHosts.server-climate.ip4 == vlans.iot.hosts.other.hosts.server-climate.ip4;
+        message = "allHosts: VLAN";
+      }
+      {
+        assertion = allHosts.gateway.ip4 == allHosts.router.ip4;
+        message = "allHosts: Alias";
       }
     ];
 }

@@ -149,7 +149,9 @@ in
                       type = nullOr net.cidrv6;
                       default = null;
                     };
-                    hosts = mkHostGroupOption (config // { inherit (networkConfig) assignedMacBase; });
+                    hosts = mkHostGroupOption (config // {
+                      inherit (networkConfig) assignedMacBase domain;
+                    });
                   };
                 }));
               };
@@ -157,29 +159,21 @@ in
                 description = "Host aliases";
                 type = attrsOf str;
               };
+              allHosts = lib.mkOption {
+                description = "Aggregation of all hosts from all networks, and aliases";
+                type = attrs;
+                readOnly = true;
+                internal = true;
+                default =
+                  let
+                    allGroups = [ config.hosts ] ++ (lib.mapAttrsToList (_: v: v.hosts) config.vlans);
+                    groupHosts = groupSet: lib.concatMapAttrs (_: v: v.hosts) groupSet;
+                    allBaseHosts = foldl' (a: b: a // b) { } (map groupHosts allGroups);
+                  in
+                  allBaseHosts // (mapAttrs (_: v: allBaseHosts.${v}) config.aliases);
+              };
             };
           });
       };
   };
-
-  # # Temp test config
-  # config =
-  #   {
-  #     assertions = [
-  #       {
-  #         assertion =
-  #           let
-  #             vlanIds = lib.attrValues (lib.mapAttrs (name: vlan: vlan.vlanId) config.homelab.network.vlans);
-  #           in
-  #           length vlanIds == length (lib.unique vlanIds);
-  #         message = "Duplicate VLAN IDs detected in homelab.network.vlans";
-  #       }
-  #     ] ++ (lib.mapAttrsToList
-  #       (name: vlan: {
-  #         assertion = vlan.vlanId != null;
-  #         message = "homelab.network.vlans.${name}.vlanId must be set";
-  #       })
-  #       config.homelab.network.vlans) ++ [
-  #     ];
-  #   };
 }
