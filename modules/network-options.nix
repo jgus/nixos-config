@@ -75,11 +75,6 @@ let
                   type = nullOr str;
                   default = null;
                 };
-                alias = lib.mkOption {
-                  description = "Alias target - this host name is an alias for the given host";
-                  type = nullOr str;
-                  default = null;
-                };
               };
             }));
           };
@@ -157,6 +152,10 @@ in
                     hosts = mkHostGroupOption (config // { inherit (networkConfig) assignedMacBase; });
                   };
                 }));
+              };
+              aliases = lib.mkOption {
+                description = "Host aliases";
+                type = attrsOf str;
               };
             };
           });

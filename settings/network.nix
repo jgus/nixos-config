@@ -15,7 +15,6 @@
         id = 0;
         hosts = {
           router = { id = 1; mac = "d2:21:f9:d9:78:8c"; };
-          gateway = { alias = "router"; };
           switch-1g-poe = { id = 2; mac = "68:d7:9a:23:f1:70"; };
           switch-2g-poe = { id = 3; mac = "e4:38:83:e8:f3:b1"; };
           switch-10g = { id = 4; mac = "d8:b3:70:2b:3f:2f"; };
@@ -36,7 +35,6 @@
           switch-c = { id = 30; mac = "f8:c2:88:23:8c:10"; };
           switch-d = { id = 31; mac = "ec:f4:bb:fe:71:f8"; };
           pi-be4492 = { id = 101; mac = "dc:a6:32:be:44:92"; };
-          n-kvm = { alias = "pi-be4492"; };
         };
       };
 
@@ -50,8 +48,6 @@
           c1-2 = { id = 3; };
           d1 = { id = 4; };
           pi-67cba1 = { id = 65; };
-          theater-pi = { alias = "pi-67cba1"; };
-          theater-cec = { alias = "pi-67cba1"; };
         };
       };
 
@@ -75,33 +71,20 @@
         hosts = {
           # Network
           pihole-1 = { id = 1; host = "b1"; };
-          dhcp-1 = { alias = "pihole-1"; };
-          dns-1 = { alias = "pihole-1"; };
-          pihole = { alias = "pihole-1"; };
-          dhcp = { alias = "pihole-1"; };
-          dns = { alias = "pihole-1"; };
           ntp = { id = 2; host = "b1"; };
           pihole-2 = { id = 4; host = "c1-1"; };
-          dhcp-2 = { alias = "pihole-2"; };
-          dns-2 = { alias = "pihole-2"; };
           pihole-3 = { id = 5; host = "d1"; };
-          dhcp-3 = { alias = "pihole-3"; };
-          dns-3 = { alias = "pihole-3"; };
           cloudflared = { id = 6; host = "c1-2"; };
           echo = { id = 7; host = "d1"; };
 
           # Storage
           samba = { id = 10; host = "c1-1"; };
-          smb = { alias = "samba"; };
-          nas = { alias = "samba"; };
           samba-c1-2 = { id = 11; host = "c1-2"; };
           garage = { id = 12; host = "d1"; };
           owncloud = { id = 13; host = "c1-1"; };
-          drive = { alias = "owncloud"; };
           owncloud-db = { id = 14; host = "c1-1"; };
           owncloud-redis = { id = 15; host = "c1-1"; };
           onlyoffice = { id = 16; host = "c1-2"; };
-          office = { alias = "onlyoffice"; };
 
           # Web
           web = { id = 20; host = "c1-2"; };
@@ -114,13 +97,9 @@
 
           # Home Automation
           home-assistant = { id = 30; host = "b1"; };
-          homeassistant = { alias = "home-assistant"; };
-          ha = { alias = "home-assistant"; };
           esphome = { id = 31; host = "c1-2"; };
           mosquitto = { id = 32; host = "b1"; };
-          mqtt = { alias = "mosquitto"; };
           zigbee2mqtt = { id = 33; host = "b1"; };
-          z2m = { alias = "zigbee2mqtt"; };
           ipmi-server = { id = 34; host = "b1"; };
           node-red = { id = 35; host = "b1"; };
           zwave-main = { id = 40; host = "b1"; };
@@ -138,7 +117,6 @@
 
           # AI
           large-model-proxy = { id = 80; host = "d1"; };
-          comfyui = { alias = "large-model-proxy"; };
           ollama = { id = 81; host = "d1"; };
           qdrant = { id = 82; host = "d1"; };
           open-webui = { id = 88; host = "d1"; };
@@ -160,7 +138,6 @@
         id = 5;
         hosts = {
           c1-imc-1 = { id = 2; mac = "70:0f:6a:3b:46:01"; };
-          c1-imc = { alias = "c1-imc-1"; };
           c1-imc-2 = { id = 3; mac = "70:79:b3:09:49:16"; };
           c1-bmc-1 = { id = 12; mac = "b4:de:31:bd:a8:be"; };
           c1-bmc-2 = { id = 13; mac = "00:be:75:e0:a2:3e"; };
@@ -288,6 +265,32 @@
         net6 = "2001:55d:b00b:5::/64";
         hosts = { };
       };
+    };
+
+    aliases = {
+      gateway = "router";
+      n-kvm = "pi-be4492";
+      theater-pi = "pi-67cba1";
+      theater-cec = "pi-67cba1";
+      dhcp-1 = "pihole-1";
+      dns-1 = "pihole-1";
+      pihole = "pihole-1";
+      dhcp = "pihole-1";
+      dns = "pihole-1";
+      dhcp-2 = "pihole-2";
+      dns-2 = "pihole-2";
+      dhcp-3 = "pihole-3";
+      dns-3 = "pihole-3";
+      smb = "samba";
+      nas = "samba";
+      drive = "owncloud";
+      office = "onlyoffice";
+      homeassistant = "home-assistant";
+      ha = "home-assistant";
+      mqtt = "mosquitto";
+      z2m = "zigbee2mqtt";
+      comfyui = "large-model-proxy";
+      c1-imc = "c1-imc-1";
     };
   };
 
