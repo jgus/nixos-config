@@ -386,9 +386,21 @@
         assertion = allHosts.server-climate.ip4 == vlans.iot.hosts.other.hosts.server-climate.ip4;
         message = "allHosts: VLAN";
       }
+
+      # Alias Tests
       {
         assertion = allHosts.gateway.ip4 == allHosts.router.ip4;
         message = "allHosts: Alias";
+      }
+      {
+        assertion = allHosts.echo-host.ip4 == allHosts.d1.ip4;
+        message = "allHosts: Host alias";
+      }
+
+      # macvlanInterfaceName
+      {
+        assertion = allHosts.large-model-proxy.macvlanInterfaceName == "mv-large-model-";
+        message = "macvlanInterfaceName";
       }
     ];
 }

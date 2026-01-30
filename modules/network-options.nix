@@ -1,4 +1,4 @@
-{ config, lib, ... }:
+{ lib, ... }:
 with builtins;
 with lib.types;
 let
@@ -25,59 +25,73 @@ let
             type = bool;
             default = false;
           };
-          hosts = lib.mkOption {
-            description = "Host definitions";
-            type = attrsOf (submodule ({ name, config, ... }: {
-              options = {
-                name = lib.mkOption {
-                  description = "Short host name";
-                  type = str;
-                  default = name;
+          hosts = lib.mkOption
+            {
+              description = "Host definitions";
+              type = attrsOf (submodule ({ name, config, ... }: {
+                options = {
+                  name = lib.mkOption {
+                    description = "Short host name";
+                    type = str;
+                    default = name;
+                  };
+                  fqdn = lib.mkOption {
+                    description = "Fully-qualified domain name";
+                    type = str;
+                    default = "${name}.${networkConfig.domain}";
+                    readOnly = true;
+                  };
+                  g = lib.mkOption {
+                    description = "Group ID override";
+                    type = ints.u8;
+                    default = groupConfig.id;
+                  };
+                  id = lib.mkOption {
+                    description = "Host ID within group";
+                    type = ints.u8;
+                  };
+                  index = lib.mkOption {
+                    description = "Full ID Index";
+                    type = ints.u16;
+                    readOnly = true;
+                    internal = true;
+                    default = config.g * 256 + config.id;
+                  };
+                  ip4 = lib.mkOption {
+                    description = "IPv4 address";
+                    type = net.ipv4;
+                    default = lib.net.cidr.host (config.g * 256 + config.id) networkConfig.net4;
+                  };
+                  mac = lib.mkOption {
+                    description = "MAC address";
+                    type = nullOr net.mac;
+                    default =
+                      if (groupConfig.assignMac && networkConfig.assignedMacBase != null)
+                      then (lib.net.mac.add (config.g * 256 + config.id) networkConfig.assignedMacBase)
+                      else null;
+                  };
+                  ip6 = lib.mkOption {
+                    description = "IPv6 address";
+                    type = nullOr net.ipv6;
+                    default =
+                      if (groupConfig.assignIp6 && networkConfig.net6 != null && config.mac != null)
+                      then (lib.homelab.macToIp6 networkConfig.net6 config.mac)
+                      else null;
+                  };
+                  macvlanInterfaceName = lib.mkOption {
+                    description = "Interface name to be used by a macvlan systemd service";
+                    type = str;
+                    readOnly = true;
+                    default = substring 0 15 "mv-${config.name}";
+                  };
+                  host = lib.mkOption {
+                    description = "If this is a virtual service, this specifies its physical host";
+                    type = nullOr str;
+                    default = null;
+                  };
                 };
-                fqdn = lib.mkOption {
-                  description = "Fully-qualified domain name";
-                  type = str;
-                  default = "${name}.${networkConfig.domain}";
-                  readOnly = true;
-                };
-                g = lib.mkOption {
-                  description = "Group ID override";
-                  type = ints.u8;
-                  default = groupConfig.id;
-                };
-                id = lib.mkOption {
-                  description = "Host ID within group";
-                  type = ints.u8;
-                };
-                ip4 = lib.mkOption {
-                  description = "IPv4 address";
-                  type = net.ipv4;
-                  default = lib.net.cidr.host (config.g * 256 + config.id) networkConfig.net4;
-                };
-                mac = lib.mkOption {
-                  description = "MAC address";
-                  type = nullOr net.mac;
-                  default =
-                    if (groupConfig.assignMac && networkConfig.assignedMacBase != null)
-                    then (lib.net.mac.add (config.g * 256 + config.id) networkConfig.assignedMacBase)
-                    else null;
-                };
-                ip6 = lib.mkOption {
-                  description = "IPv6 address";
-                  type = nullOr net.ipv6;
-                  default =
-                    if (groupConfig.assignIp6 && networkConfig.net6 != null && config.mac != null)
-                    then (lib.homelab.macToIp6 networkConfig.net6 config.mac)
-                    else null;
-                };
-                host = lib.mkOption {
-                  description = "If this is a virtual service, this specifies its physical host";
-                  type = nullOr str;
-                  default = null;
-                };
-              };
-            }));
-          };
+              }));
+            };
         };
       }));
   };
@@ -169,8 +183,11 @@ in
                     allGroups = [ config.hosts ] ++ (lib.mapAttrsToList (_: v: v.hosts) config.vlans);
                     groupHosts = groupSet: lib.concatMapAttrs (_: v: v.hosts) groupSet;
                     allBaseHosts = foldl' (a: b: a // b) { } (map groupHosts allGroups);
+                    hostAliases = lib.attrsets.mapAttrs'
+                      (k: v: lib.attrsets.nameValuePair "${k}-host" v.host)
+                      (lib.attrsets.filterAttrs (_: v: v.host != null) allBaseHosts);
                   in
-                  allBaseHosts // (mapAttrs (_: v: allBaseHosts.${v}) config.aliases);
+                  allBaseHosts // (mapAttrs (_: v: allBaseHosts.${v}) (config.aliases // hostAliases));
               };
             };
           });
