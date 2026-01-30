@@ -29,6 +29,17 @@ let
             description = "Host definitions";
             type = attrsOf (submodule ({ name, config, ... }: {
               options = {
+                name = lib.mkOption {
+                  description = "Short host name";
+                  type = str;
+                  default = name;
+                };
+                fqdn = lib.mkOption {
+                  description = "Fully-qualified domain name";
+                  type = str;
+                  default = "${name}.${networkConfig.domain}";
+                  readOnly = true;
+                };
                 g = lib.mkOption {
                   description = "Group ID override";
                   type = ints.u8;

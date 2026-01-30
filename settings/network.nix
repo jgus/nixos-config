@@ -294,6 +294,16 @@
   assertions =
     with config.homelab.network;
     [
+      # Name Tests
+      {
+        assertion = hosts.servers.hosts.b1.name == "b1";
+        message = "host.name";
+      }
+      {
+        assertion = hosts.servers.hosts.b1.fqdn == "b1.home.gustafson.me";
+        message = "host.fqdn";
+      }
+
       # Host IP4 Tests
       {
         assertion = hosts.other.hosts.gr-tv.ip4 == "172.22.50.2";
