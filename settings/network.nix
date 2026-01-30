@@ -291,10 +291,77 @@
     };
   };
 
-  assertions = [
-    {
-      assertion = config.homelab.network.hosts.network.hosts.router.ip4 == "172.22.0.1";
-      message = "router IPv4";
-    }
-  ];
+  assertions =
+    with config.homelab.network;
+    [
+      # Host IP4 Tests
+      {
+        assertion = hosts.other.hosts.gr-tv.ip4 == "172.22.50.2";
+        message = "host.ip4: primary network, host g override";
+      }
+      {
+        assertion = hosts.servers.hosts.b1.ip4 == "172.22.1.1";
+        message = "host.ip4: primary network, group inherited";
+      }
+      {
+        assertion = vlans.iot.hosts.other.hosts.server-climate.ip4 == "172.21.1.20";
+        message = "host.ip4: VLAN, host g override";
+      }
+      {
+        assertion = vlans.download.hosts.services.hosts.sabnzbd.ip4 == "172.20.3.70";
+        message = "host.ip4: VLAN, group inherited";
+      }
+
+      # Host MAC Tests
+      {
+        assertion = hosts.servers.hosts.b1.mac == "00:24:0b:16:01:01";
+        message = "host.mac: assignMac=true, group inherited, computed";
+      }
+      {
+        assertion = hosts.other.hosts.gr-tv.mac == "64:e4:a5:61:30:0b";
+        message = "host.mac: assignMac=false (no assignMac), host g override, explicit";
+      }
+      {
+        assertion = hosts.network.hosts.router.mac == "d2:21:f9:d9:78:8c";
+        message = "host.mac: assignMac=false (no assignMac), group inherited, explicit";
+      }
+
+      # Host IP6 Tests
+      {
+        assertion = hosts.servers.hosts.b1.ip6 == "2001:55d:b00b:1:224:bff:fe16:101";
+        message = "host.ip6: primary network, assignIp6=true, mac computed";
+      }
+      {
+        assertion = hosts.home-automation.hosts.sensor-hub-1.ip6 == null;
+        message = "host.ip6: primary network, assignIp6=false, mac explicit";
+      }
+      {
+        assertion = hosts.network.hosts.router.ip6 == null;
+        message = "host.ip6: primary network, assignIp6=false, mac explicit";
+      }
+      {
+        assertion = vlans.iot.hosts.other.hosts.server-climate.ip6 == null;
+        message = "host.ip6: VLAN, no net6";
+      }
+
+      # Host G Tests
+      {
+        assertion = hosts.other.hosts.gr-tv.g == 50;
+        message = "host.g: host g override";
+      }
+      {
+        assertion = hosts.servers.hosts.b1.g == 1;
+        message = "host.g: group inherited";
+      }
+
+      # Network-level Tests
+      {
+        assertion = defaultGateway == "172.22.0.1";
+        message = "network.defaultGateway";
+      }
+      {
+        assertion = vlans.iot.defaultGateway == "172.21.0.1";
+        message = "vlan.defaultGateway";
+      }
+    ];
 }
