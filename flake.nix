@@ -87,12 +87,13 @@
           modules = [
             { networking.hostName = machineId; }
             ./settings/container.nix
+            ./settings/network.nix
             ./test/tests.nix
             ./machine/${machineId}/hardware-configuration.nix
             ./modules/common.nix
             ./modules/label.nix
             ./modules/network.nix
-            ./modules/addresses.nix
+            ./modules/network-options.nix
             ./modules/sops.nix
             ./modules/users.nix
             ./modules/msmtp.nix
