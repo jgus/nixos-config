@@ -218,50 +218,6 @@ with lib.types;
 let
   containerSubmodule = submodule ({ name, config, ... }: {
     options = {
-      capabilities = lib.mkOption {
-        description = "Linux capabilities to add to the container";
-        type = attrsOf bool;
-        default = { };
-      };
-      configVolume = lib.mkOption {
-        description = "Container path for config storage";
-        type = str;
-      };
-      dependsOn = lib.mkOption {
-        description = "Container dependencies (other containers this one depends on)";
-        type = listOf str;
-        default = [ ];
-      };
-      devices = lib.mkOption {
-        description = "Devices to pass through to the container";
-        type = listOf str;
-        default = [ ];
-      };
-      entrypoint = lib.mkOption {
-        description = "Custom container entrypoint";
-        type = nullOr str;
-        default = null;
-      };
-      entrypointOptions = lib.mkOption {
-        description = "Container command arguments";
-        type = listOf str;
-        default = [ ];
-      };
-      environment = lib.mkOption {
-        description = "Environment variables";
-        type = attrsOf str;
-        default = { };
-      };
-      environmentFiles = lib.mkOption {
-        description = "Environment files to load";
-        type = listOf path;
-        default = [ ];
-      };
-      extraOptions = lib.mkOption {
-        description = "Additional Container CLI options";
-        type = listOf str;
-        default = [ ];
-      };
       image = lib.mkOption {
         description = "Container image URI";
         type = nullOr str;
@@ -277,16 +233,6 @@ let
         type = nullOr path;
         default = null;
       };
-      ports = lib.mkOption {
-        description = "Exposed ports (format: 'port[:container_port][/protocol]')";
-        type = listOf str;
-        default = [ ];
-      };
-      privileged = lib.mkOption {
-        description = "Whether to run container in privileged mode";
-        type = bool;
-        default = false;
-      };
       pullImage = lib.mkOption {
         description = "Pull image configuration (see images/ directory)";
         type = nullOr attrs;
@@ -297,26 +243,89 @@ let
         type = bool;
         default = true;
       };
-      tmpFs = lib.mkOption {
-        description = "Temporary filesystem mounts";
+      privileged = lib.mkOption {
+        description = "Whether to run container in privileged mode";
+        type = bool;
+        default = false;
+      };
+      capabilities = lib.mkOption {
+        description = "Linux capabilities to add to the container";
+        type = attrsOf bool;
+        default = { };
+      };
+      dependsOn = lib.mkOption {
+        description = "Container dependencies (other containers this one depends on)";
         type = listOf str;
         default = [ ];
+      };
+      devices = lib.mkOption {
+        description = "Devices to pass through to the container";
+        type = listOf str;
+        default = [ ];
+      };
+      environment = lib.mkOption {
+        description = "Environment variables";
+        type = attrsOf str;
+        default = { };
+      };
+      environmentFiles = lib.mkOption {
+        description = "Environment files to load";
+        type = listOf path;
+        default = [ ];
+      };
+      configVolume = lib.mkOption {
+        description = "Container path for config storage";
+        type = str;
       };
       volumes = lib.mkOption {
         description = "Volume mounts (format: 'host:container[:options]')";
         type = listOf str;
         default = [ ];
       };
+      tmpFs = lib.mkOption {
+        description = "Temporary filesystem mounts";
+        type = listOf str;
+        default = [ ];
+      };
+      extraOptions = lib.mkOption {
+        description = "Additional Container CLI options";
+        type = listOf str;
+        default = [ ];
+      };
+      entrypoint = lib.mkOption {
+        description = "Custom container entrypoint";
+        type = nullOr str;
+        default = null;
+      };
       workdir = lib.mkOption {
         description = "Container working directory";
         type = nullOr str;
         default = null;
+      };
+      entrypointOptions = lib.mkOption {
+        description = "Container command arguments";
+        type = listOf str;
+        default = [ ];
+      };
+      ports = lib.mkOption {
+        description = "Exposed ports (format: 'port[:container_port][/protocol]')";
+        type = listOf str;
+        default = [ ];
       };
     };
   });
 
   systemdSubmodule = submodule {
     options = {
+      path = lib.mkOption {
+        description = "List of Nix packages to add to PATH";
+        type = listOf path;
+        default = [ ];
+      };
+      script = lib.mkOption {
+        description = "Service startup script. Receives args: interface, ip, ip6, etc.";
+        type = lines;
+      };
       macvlan = lib.mkOption {
         description = "Use macvlan networking";
         type = bool;
@@ -331,15 +340,6 @@ let
         description = "Open UDP ports";
         type = listOf (ints.u16);
         default = [ ];
-      };
-      path = lib.mkOption {
-        description = "List of Nix packages to add to PATH";
-        type = listOf path;
-        default = [ ];
-      };
-      script = lib.mkOption {
-        description = "Service startup script. Receives args: interface, ip, ip6, etc.";
-        type = lines;
       };
     };
   };
@@ -551,10 +551,21 @@ in
 
   imports = [
     ./services/audiobookshelf.nix
+    ./services/calibre.nix
     ./services/cloudflared.nix
     ./services/code-server.nix
     ./services/echo.nix
+    ./services/esphome.nix
+    ./services/journal.nix
+    ./services/joyfulsong.nix
+    ./services/komga.nix
+    ./services/minecraft.nix
     ./services/ollama.nix
+    ./services/onlyoffice.nix
+    ./services/samba-c1-2.nix
+    ./services/searxng-mcp.nix
+    ./services/searxng.nix
+    ./services/web.nix
   ]
   ++ (lib.lists.flatten (map importService serviceFileBaseNames));
 

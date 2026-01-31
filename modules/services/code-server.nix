@@ -8,10 +8,6 @@ in
     container = {
       readOnly = false;
       pullImage = import ../../images/code-server.nix;
-      configVolume = "/config";
-      ports = [
-        "8443"
-      ];
       environment = {
         PUID = toString config.users.users.${user}.uid;
         PGID = toString config.users.groups.${group}.gid;
@@ -20,6 +16,7 @@ in
       environmentFiles = [
         config.sops.secrets."code/env".path
       ];
+      configVolume = "/config";
       volumes = [
         "${config.sops.secrets."josh/ssh/id_ed25519".path}:/config/.ssh/id_ed25519:ro"
         "${../../pubkeys/josh/id_ed25519}:/config/.ssh/id_ed25519.pub:ro"
@@ -31,6 +28,7 @@ in
         "/tmp"
         "/config/tmp:mode=0777"
       ];
+      ports = [ "8443" ];
     };
   };
 

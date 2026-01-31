@@ -124,19 +124,20 @@ let
   '';
 in
 {
-  serviceName = "web";
-  extraStorage = [ "web_data" ];
-  container = {
-    pullImage = import ../images/caddy.nix;
-    ports = [
-      "80"
-      "443"
-    ];
-    configVolume = "/config";
-    volumes = [
-      "${lib.homelab.storagePath "web_data"}:/data"
-      "${pkgs.writeText "Caddyfile" caddyFile}:/etc/caddy/Caddyfile:ro"
-      "/storage/service/www:/usr/share/caddy"
-    ];
+  homelab.services.web = {
+    extraStorage = [ "web_data" ];
+    container = {
+      pullImage = import ../../images/caddy.nix;
+      configVolume = "/config";
+      volumes = [
+        "${lib.homelab.storagePath "web_data"}:/data"
+        "${pkgs.writeText "Caddyfile" caddyFile}:/etc/caddy/Caddyfile:ro"
+        "/storage/service/www:/usr/share/caddy"
+      ];
+      ports = [
+        "80"
+        "443"
+      ];
+    };
   };
 }

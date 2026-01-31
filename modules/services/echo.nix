@@ -5,9 +5,6 @@
   homelab.services.echo = {
     configStorage = false;
     systemd = {
-      macvlan = true;
-      tcpPorts = [ 7 ];
-      udpPorts = [ 7 ];
       path = [ pkgs.socat ];
       script =
         let
@@ -32,6 +29,9 @@
           # Wait forever (until service is stopped)
           wait
         '';
+      macvlan = true;
+      tcpPorts = [ 7 ];
+      udpPorts = [ 7 ];
     };
   };
 }
