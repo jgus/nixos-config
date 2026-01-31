@@ -216,7 +216,7 @@ let
 in
 with lib.types;
 let
-  containerSubmodule = submodule {
+  containerSubmodule = submodule ({ name, config, ... }: {
     options = {
       capabilities = lib.mkOption {
         description = "Linux capabilities to add to the container";
@@ -265,12 +265,12 @@ let
       image = lib.mkOption {
         description = "Container image URI";
         type = nullOr str;
-        default = null;
+        default = if (config.pullImage != null) then ("${config.pullImage.finalImageName}:${config.pullImage.finalImageTag}") else null;
       };
       imageFile = lib.mkOption {
         description = "Container image file";
         type = nullOr path;
-        default = null;
+        default = if (config.pullImage != null) then (lib.homelab.pullImage config.pullImage) else null;
       };
       imageStream = lib.mkOption {
         description = "Container image stream";
@@ -313,7 +313,7 @@ let
         default = null;
       };
     };
-  };
+  });
 
   systemdSubmodule = submodule {
     options = {
@@ -403,13 +403,8 @@ let
       uid = toString config.users.users.${serviceConfig.user}.uid;
       gid = toString config.users.groups.${serviceConfig.group}.gid;
       storageNames = serviceConfig.extraStorage ++ lib.optional serviceConfig.configStorage serviceName;
-      argsContainer = serviceConfig.container or { };
-      container = argsContainer // (if argsContainer ? pullImage then {
-        image = "${argsContainer.pullImage.finalImageName}:${argsContainer.pullImage.finalImageTag}";
-        imageFile = lib.homelab.pullImage argsContainer.pullImage;
-      } else { });
       containerOptions = lib.homelab.containerOptions serviceName;
-      isContainer = container ? image;
+      isContainer = serviceConfig.container != null;
 
       # Shared service components used by both container and systemd configs
       requiresTarget = rec {
@@ -428,72 +423,76 @@ let
         startAt = "hourly";
       };
 
-      containerConfig = {
-        homelab.container.enable = true;
+      containerConfig =
+        let
+          container = serviceConfig.container;
+        in
+        {
+          homelab.container.enable = true;
 
-        systemd = {
-          targets."${serviceName}-requires" = requiresTarget;
-          services = {
-            "${serviceName}" = {
-              aliases = [ "homelab-${serviceName}.service" ];
-              serviceConfig.Restart = pkgs.lib.mkForce "no";
-              postStop = "systemctl restart ${serviceName}-backup";
+          systemd = {
+            targets."${serviceName}-requires" = requiresTarget;
+            services = {
+              "${serviceName}" = {
+                aliases = [ "homelab-${serviceName}.service" ];
+                serviceConfig.Restart = pkgs.lib.mkForce "no";
+                postStop = "systemctl restart ${serviceName}-backup";
+              };
+              "${serviceName}-update" = lib.mkIf (container.imageFile == null && container.imageStream == null && container.pullImage == null) {
+                path = [ containerConfig.package ];
+                script = ''
+                  if ${containerConfig.executable} pull ${container.image} | grep "Status: Downloaded"
+                  then
+                    systemctl restart ${serviceName}
+                  fi
+                '';
+                serviceConfig = { Type = "exec"; };
+                startAt = "hourly";
+              };
+              "${serviceName}-backup" = backupService;
             };
-            "${serviceName}-update" = lib.mkIf (!(container ? imageFile || container ? imageStream || container ? pullImage)) {
-              path = [ containerConfig.package ];
-              script = ''
-                if ${containerConfig.executable} pull ${container.image} | grep "Status: Downloaded"
-                then
-                  systemctl restart ${serviceName}
-                fi
-              '';
-              serviceConfig = { Type = "exec"; };
-              startAt = "hourly";
-            };
-            "${serviceName}-backup" = backupService;
           };
+          virtualisation.oci-containers.containers.${serviceName} = {
+            inherit serviceName;
+            autoStart = true;
+            user = "${uid}:${gid}";
+            volumes =
+              [ "${pkgs.tzdata}/share/zoneinfo:/etc/zoneinfo:ro" ]
+                ++ container.volumes
+                ++ lib.optional serviceConfig.configStorage "${lib.homelab.storagePath serviceName}:${container.configVolume}";
+            extraOptions =
+              container.extraOptions
+                ++ containerOptions
+                ++ (lib.optional container.readOnly "--read-only")
+                ++ (map (value: "--tmpfs=${value}") container.tmpFs)
+                ++ [ "--health-interval=disable" ]
+            ;
+            cmd = container.entrypointOptions;
+            environment = {
+              TZ = config.time.timeZone;
+              TZDIR = "/etc/zoneinfo";
+            } // container.environment;
+          }
+          // lib.pipe
+            [
+              "capabilities"
+              "dependsOn"
+              "devices"
+              "entrypoint"
+              "environmentFiles"
+              "image"
+              "imageFile"
+              "imageStream"
+              "ports"
+              "privileged"
+              "workdir"
+            ]
+            [
+              (lib.filter (n: hasAttr n container))
+              (lib.map (n: lib.nameValuePair n container.${n}))
+              lib.listToAttrs
+            ];
         };
-        virtualisation.oci-containers.containers.${serviceName} = {
-          inherit serviceName;
-          autoStart = true;
-          user = "${uid}:${gid}";
-          volumes =
-            [ "${pkgs.tzdata}/share/zoneinfo:/etc/zoneinfo:ro" ]
-              ++ (container.volumes or [ ])
-              ++ lib.optional serviceConfig.configStorage "${lib.homelab.storagePath serviceName}:${container.configVolume}";
-          extraOptions =
-            (container.extraOptions or [ ])
-              ++ containerOptions
-              ++ (lib.optional (container.readOnly or true) "--read-only")
-              ++ (map (value: "--tmpfs=${value}") (container.tmpFs or [ ]))
-              ++ [ "--health-interval=disable" ]
-          ;
-          cmd = container.entrypointOptions or [ ];
-          environment = {
-            TZ = config.time.timeZone;
-            TZDIR = "/etc/zoneinfo";
-          } // (container.environment or { });
-        }
-        // lib.pipe
-          [
-            "capabilities"
-            "dependsOn"
-            "devices"
-            "entrypoint"
-            "environmentFiles"
-            "image"
-            "imageFile"
-            "imageStream"
-            "ports"
-            "privileged"
-            "workdir"
-          ]
-          [
-            (lib.filter (n: hasAttr n container))
-            (lib.map (n: lib.nameValuePair n container.${n}))
-            lib.listToAttrs
-          ];
-      };
       systemdConfig =
         let
           useMacvlan = serviceConfig.systemd.macvlan or false;
@@ -516,7 +515,7 @@ let
             targets."${serviceName}-requires" = requiresTarget;
             services = {
               "${serviceName}" = rec {
-                inherit (serviceConfig) path script;
+                inherit (serviceConfig.systemd) path script;
                 aliases = [ "homelab-${serviceName}.service" ];
                 enable = true;
                 description = serviceName;
