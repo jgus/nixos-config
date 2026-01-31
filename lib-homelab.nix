@@ -87,7 +87,15 @@ in
     recursiveUpdates = listOfSets:
       lib.fold (attrs: acc: lib.recursiveUpdate attrs acc) { } listOfSets;
     mkMergeByAttributes = listOfAttributes: listOfSets:
-      recursiveUpdates (map (a: { ${a} = lib.mkMerge (map (s: s.a or { }) listOfSets); }) listOfAttributes);
+      recursiveUpdates (map
+        (path:
+          let
+            pathParts = lib.splitString "." path;
+          in
+          lib.attrsets.setAttrByPath pathParts
+            (lib.mkMerge (map (s: lib.attrByPath pathParts { } s) listOfSets))
+        )
+        listOfAttributes);
 
     # === Name <-> IP Mappings ===
     nameToMac = buildAliasToAttr "mac";

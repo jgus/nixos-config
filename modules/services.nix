@@ -1,6 +1,7 @@
 with builtins;
-args@{ config, lib, machine, pkgs, ... }:
+moduleArgs@{ config, lib, machine, pkgs, ... }:
 let
+  moduleConfig = config;
   homelabServiceStorage = serviceName:
     let
       path = lib.homelab.storagePath serviceName;
@@ -204,7 +205,7 @@ let
     lib.optionalAttrs (machine.hostName == lib.homelab.nameToHost.${serviceName}) serviceConfig;
   importService = n:
     let
-      i = (import ../services/${n}.nix) args;
+      i = (import ../services/${n}.nix) moduleArgs;
     in
     if (isList i) then (map (f: homelabService f) i) else (homelabService ({ serviceName = n; } // i));
   serviceFileBaseNames =
@@ -288,7 +289,7 @@ let
       };
       pullImage = lib.mkOption {
         description = "Pull image configuration (see images/ directory)";
-        type = nullOf attrs;
+        type = nullOr attrs;
         default = null;
       };
       readOnly = lib.mkOption {
@@ -348,7 +349,7 @@ let
       enable = lib.mkOption {
         description = "Whether to enable the ${name} service";
         type = bool;
-        default = false;
+        default = (moduleConfig.homelab.network.allHosts.${config.name}.host == moduleConfig.networking.hostName);
       };
       name = lib.mkOption {
         description = "Service name";
@@ -402,7 +403,7 @@ let
       uid = toString config.users.users.${serviceConfig.user}.uid;
       gid = toString config.users.groups.${serviceConfig.group}.gid;
       storageNames = serviceConfig.extraStorage ++ lib.optional serviceConfig.configStorage serviceName;
-      argsContainer = args.container or { };
+      argsContainer = serviceConfig.container or { };
       container = argsContainer // (if argsContainer ? pullImage then {
         image = "${argsContainer.pullImage.finalImageName}:${argsContainer.pullImage.finalImageTag}";
         imageFile = lib.homelab.pullImage argsContainer.pullImage;
@@ -537,9 +538,9 @@ let
           };
         };
     in
-    lib.homelab.recursiveUpdates [
+    lib.homelab.recursiveUpdates ([
       (if isContainer then containerConfig else systemdConfig)
-    ] ++ (map homelabServiceStorage storageNames);
+    ] ++ (map homelabServiceStorage storageNames));
 
 in
 {
@@ -562,14 +563,11 @@ in
     let
       configs = map mkServiceConfig (attrValues config.homelab.services);
       attrNames = [
-        "networking"
+        "homelab.container"
+        "networking.firewall"
         "systemd"
         "virtualisation"
       ];
     in
-    (lib.homelab.mkMergeByAttributes attrNames configs)
-    //
-    {
-      homelab.container.enable = lib.mkDefault (lib.any (x: lib.attrByPath [ "homelab" "container" "enable" ] false x) configs);
-    };
+    (lib.homelab.mkMergeByAttributes attrNames configs);
 }
