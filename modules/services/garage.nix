@@ -36,23 +36,24 @@ let
   };
 in
 {
-  configStorage = false;
-  container = {
-    pullImage = import ../images/garage.nix;
-    volumes = [
-      "${config.sops.templates."garage/garage.toml".path}:/etc/garage.toml:ro"
-      "/storage/garage/meta:/var/lib/garage/meta"
-      "/storage/garage/data:/var/lib/garage/data"
-    ];
-  };
-  extraConfig = {
-    sops = {
-      secrets = {
-        "garage/rpc_secret" = { };
-        "garage/admin_token" = { };
-        "garage/metrics_token" = { };
-      };
-      templates."garage/garage.toml".content = readFile (lib.homelab.prettyToml configuration);
+  homelab.services.garage = {
+    configStorage = false;
+    container = {
+      pullImage = import ../../images/garage.nix;
+      volumes = [
+        "${config.sops.templates."garage/garage.toml".path}:/etc/garage.toml:ro"
+        "/storage/garage/meta:/var/lib/garage/meta"
+        "/storage/garage/data:/var/lib/garage/data"
+      ];
     };
+  };
+
+  sops = lib.mkIf config.homelab.services.garage.enable {
+    secrets = {
+      "garage/rpc_secret" = { };
+      "garage/admin_token" = { };
+      "garage/metrics_token" = { };
+    };
+    templates."garage/garage.toml".content = readFile (lib.homelab.prettyToml configuration);
   };
 }

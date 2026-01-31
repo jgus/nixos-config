@@ -272,51 +272,52 @@ let
   };
 in
 {
-  requires = [ "storage-frigate.mount" "zfs-import-f.service" ];
-  container = {
-    readOnly = false;
-    pullImage = import ../images/frigate.nix;
-    environment = {
-      FRIGATE_RTSP_PASSWORD = "password";
-      # NVIDIA_VISIBLE_DEVICES = "GPU-35f1dd5f-a7af-1980-58e4-61bec60811dd";
-    };
-    ports = [
-      "5000"
-      "1935"
-      "1984" # go2rtc API
-      "8554" # go2rtc RTSP
-      "8555" # go2rtc WebRTC
-      "8555/udp"
-    ];
-    configVolume = "/config";
-    volumes = [
-      "${config.sops.templates."frigate/config.yml".path}:/config/config.yml:ro"
-      "${config.sops.secrets.frigate_plus.path}:/run/secrets/PLUS_API_KEY:ro"
-      "/storage/frigate/media:/media/frigate"
-      "/etc/localtime:/etc/localtime:ro"
-    ];
-    tmpFs = [
-      "/tmp"
-    ];
-    devices = [
-      "nvidia.com/gpu=GPU-35f1dd5f-a7af-1980-58e4-61bec60811dd"
-      "/dev/apex_0:/dev/apex_0"
-      "/dev/apex_1:/dev/apex_1"
-    ];
-    extraOptions = [
-      "--shm-size=4g"
-      "--pids-limit=-1"
-    ];
-  };
-  extraConfig = {
-    sops = {
-      secrets = {
-        camera = { };
-        doorbell = { };
-        "mqtt/frigate" = { };
-        frigate_plus = { };
+  homelab.services.frigate = {
+    requires = [ "storage-frigate.mount" "zfs-import-f.service" ];
+    container = {
+      pullImage = import ../../images/frigate.nix;
+      readOnly = false;
+      devices = [
+        "nvidia.com/gpu=GPU-35f1dd5f-a7af-1980-58e4-61bec60811dd"
+        "/dev/apex_0:/dev/apex_0"
+        "/dev/apex_1:/dev/apex_1"
+      ];
+      environment = {
+        FRIGATE_RTSP_PASSWORD = "password";
+        # NVIDIA_VISIBLE_DEVICES = "GPU-35f1dd5f-a7af-1980-58e4-61bec60811dd";
       };
-      templates."frigate/config.yml".content = readFile (lib.homelab.prettyYaml configuration);
+      configVolume = "/config";
+      volumes = [
+        "${config.sops.templates."frigate/config.yml".path}:/config/config.yml:ro"
+        "${config.sops.secrets.frigate_plus.path}:/run/secrets/PLUS_API_KEY:ro"
+        "/storage/frigate/media:/media/frigate"
+        "/etc/localtime:/etc/localtime:ro"
+      ];
+      tmpFs = [
+        "/tmp"
+      ];
+      extraOptions = [
+        "--shm-size=4g"
+        "--pids-limit=-1"
+      ];
+      ports = [
+        "5000"
+        "1935"
+        "1984" # go2rtc API
+        "8554" # go2rtc RTSP
+        "8555" # go2rtc WebRTC
+        "8555/udp"
+      ];
     };
+  };
+
+  sops = lib.mkIf config.homelab.services.frigate.enable {
+    secrets = {
+      camera = { };
+      doorbell = { };
+      "mqtt/frigate" = { };
+      frigate_plus = { };
+    };
+    templates."frigate/config.yml".content = readFile (lib.homelab.prettyYaml configuration);
   };
 }

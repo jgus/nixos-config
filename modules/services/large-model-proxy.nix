@@ -555,46 +555,47 @@ let
   };
 in
 {
-  configStorage = true;
-  systemd = {
-    extraStorage = [ "comfyui " ];
-    macvlan = true;
-    tcpPorts = [ 80 8080 8188 ];
-    path = [
-      largeModelProxyPackage
-      pkgs.curl
-      config.homelab.container.package
-      pkgs.bash
-    ];
-    script =
-      let
-        ip = lib.homelab.nameToIp.echo;
-        ip6 = lib.homelab.nameToIp6.echo;
-      in
-      ''
-        # Create dedicated Container network for LMP if it doesn't exist
-        if ! ${config.homelab.container.executable} network inspect ${containerNetworkName} >/dev/null 2>&1; then
-          echo "Creating Container network: ${containerNetworkName}"
-          ${config.homelab.container.executable} network create --driver=bridge --subnet=${containerNetworkPrefix}0/24 --gateway=${containerNetworkPrefix}1 ${containerNetworkName}
-        fi
+  homelab.services.large-model-proxy = {
+    configStorage = true;
+    extraStorage = [ "comfyui" ];
+    systemd = {
+      path = [
+        largeModelProxyPackage
+        pkgs.curl
+        config.homelab.container.package
+        pkgs.bash
+      ];
+      script =
+        let
+          ip = lib.homelab.nameToIp.large-model-proxy;
+          ip6 = lib.homelab.nameToIp6.large-model-proxy;
+        in
+        ''
+          # Create dedicated Container network for LMP if it doesn't exist
+          if ! ${config.homelab.container.executable} network inspect ${containerNetworkName} >/dev/null 2>&1; then
+            echo "Creating Container network: ${containerNetworkName}"
+            ${config.homelab.container.executable} network create --driver=bridge --subnet=${containerNetworkPrefix}0/24 --gateway=${containerNetworkPrefix}1 ${containerNetworkName}
+          fi
 
-        cd ${lib.homelab.storagePath "large-model-proxy"}
-        exec large-model-proxy -c ${lib.homelab.prettyJson (configuration { hostIp = ip; hostIp6 = ip6; })}
-      '';
+          cd ${lib.homelab.storagePath "large-model-proxy"}
+          exec large-model-proxy -c ${lib.homelab.prettyJson (configuration { hostIp = ip; hostIp6 = ip6; })}
+        '';
+      macvlan = true;
+      tcpPorts = [ 80 8080 8188 ];
+    };
   };
-  extraConfig = {
-    fileSystems = {
-      "${lib.homelab.storagePath "large-model-proxy"}/logs".fsType = "tmpfs";
-      "/storage/comfyui" = {
-        device = "/s/comfyui";
-        fsType = "none";
-        options = [ "bind" ];
-      };
-      "/storage/llama.cpp" = {
-        device = "/s/llama.cpp";
-        fsType = "none";
-        options = [ "bind" ];
-      };
+
+  fileSystems = lib.mkIf config.homelab.services.large-model-proxy.enable {
+    "${lib.homelab.storagePath "large-model-proxy"}/logs".fsType = "tmpfs";
+    "/storage/comfyui" = {
+      device = "/s/comfyui";
+      fsType = "none";
+      options = [ "bind" ];
+    };
+    "/storage/llama.cpp" = {
+      device = "/s/llama.cpp";
+      fsType = "none";
+      options = [ "bind" ];
     };
   };
 }

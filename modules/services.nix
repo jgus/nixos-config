@@ -556,12 +556,19 @@ in
     ./services/code-server.nix
     ./services/echo.nix
     ./services/esphome.nix
+    ./services/frigate.nix
+    ./services/garage.nix
+    ./services/jellyfin.nix
     ./services/journal.nix
     ./services/joyfulsong.nix
     ./services/komga.nix
+    ./services/large-model-proxy.nix
     ./services/minecraft.nix
     ./services/ollama.nix
     ./services/onlyoffice.nix
+    ./services/open-webui.nix
+    ./services/plex.nix
+    ./services/qdrant.nix
     ./services/samba-c1-2.nix
     ./services/searxng-mcp.nix
     ./services/searxng.nix
