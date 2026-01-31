@@ -558,5 +558,11 @@ in
   ]
   ++ (lib.lists.flatten (map importService serviceFileBaseNames));
 
-  config = lib.homelab.mkMergeByAttributes [ "systemd" ] (map mkServiceConfig (attrValues config.homelab.services));
+  config = lib.homelab.mkMergeByAttributes [
+    # "homelab"
+    "networking"
+    "systemd"
+    "virtualisation"
+  ]
+    (map mkServiceConfig (attrValues config.homelab.services));
 }
