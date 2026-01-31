@@ -97,100 +97,99 @@ let
   };
 in
 {
-  options.homelab = {
-    network = lib.mkOption
-      {
-        description = "Network configuration";
-        type = submodule ({ name, config, ... }:
-          let
-            networkConfig = config;
-          in
-          {
-            options = {
-              net4 = lib.mkOption {
-                description = "IPv4 network for LAN";
-                type = net.cidrv4;
-              };
-              defaultGateway = lib.mkOption {
-                description = "IPv4 default gateway";
-                type = net.ipv4;
-                default = lib.net.cidr.host 1 config.net4;
-              };
-              net6 = lib.mkOption {
-                description = "IPv6 network for LAN";
-                type = net.cidrv6;
-              };
-              local6 = lib.mkOption {
-                description = "IPv6 network for local site";
-                type = net.cidrv6;
-              };
-              domain = lib.mkOption {
-                description = "Local domain name";
-                type = str;
-              };
-              assignedMacBase = lib.mkOption {
-                description = "Base MAC address for assigned MACs";
-                type = net.mac;
-              };
-              dnsServers = lib.mkOption {
-                description = "DNS server hostnames";
-                type = listOf str;
-              };
-              publicDomain = lib.mkOption {
-                description = "Public domain name";
-                type = str;
-              };
-              hosts = mkHostGroupOption config;
-              vlans = lib.mkOption {
-                description = "VLAN definitions";
-                type = attrsOf (submodule ({ name, config, ... }: {
-                  options = {
-                    vlanId = lib.mkOption {
-                      description = "VLAN ID";
-                      type = addCheck ints.unsigned (x: 0 < x && x <= 4096);
-                    };
-                    net4 = lib.mkOption {
-                      description = "IPv4 network";
-                      type = net.cidrv4;
-                    };
-                    defaultGateway = lib.mkOption {
-                      description = "IPv4 default gateway";
-                      type = net.ipv4;
-                      default = lib.net.cidr.host 1 config.net4;
-                    };
-                    net6 = lib.mkOption {
-                      description = "IPv6 network";
-                      type = nullOr net.cidrv6;
-                      default = null;
-                    };
-                    hosts = mkHostGroupOption (config // {
-                      inherit (networkConfig) assignedMacBase domain;
-                    });
-                  };
-                }));
-              };
-              aliases = lib.mkOption {
-                description = "Host aliases";
-                type = attrsOf str;
-              };
-              allHosts = lib.mkOption {
-                description = "Aggregation of all hosts from all networks, and aliases";
-                type = attrs;
-                readOnly = true;
-                internal = true;
-                default =
-                  let
-                    allGroups = [ config.hosts ] ++ (lib.mapAttrsToList (_: v: v.hosts) config.vlans);
-                    groupHosts = groupSet: lib.concatMapAttrs (_: v: v.hosts) groupSet;
-                    allBaseHosts = foldl' (a: b: a // b) { } (map groupHosts allGroups);
-                    hostAliases = lib.attrsets.mapAttrs'
-                      (k: v: lib.attrsets.nameValuePair "${k}-host" v.host)
-                      (lib.attrsets.filterAttrs (_: v: v.host != null) allBaseHosts);
-                  in
-                  allBaseHosts // (mapAttrs (_: v: allBaseHosts.${v}) (config.aliases // hostAliases));
-              };
+  options.homelab.network = lib.mkOption
+    {
+      description = "Network configuration";
+      type = submodule ({ name, config, ... }:
+        let
+          networkConfig = config;
+        in
+        {
+          options = {
+            net4 = lib.mkOption {
+              description = "IPv4 network for LAN";
+              type = net.cidrv4;
             };
-          });
-      };
-  };
+            defaultGateway = lib.mkOption {
+              description = "IPv4 default gateway";
+              type = net.ipv4;
+              default = lib.net.cidr.host 1 config.net4;
+            };
+            net6 = lib.mkOption {
+              description = "IPv6 network for LAN";
+              type = net.cidrv6;
+            };
+            local6 = lib.mkOption {
+              description = "IPv6 network for local site";
+              type = net.cidrv6;
+            };
+            domain = lib.mkOption {
+              description = "Local domain name";
+              type = str;
+            };
+            assignedMacBase = lib.mkOption {
+              description = "Base MAC address for assigned MACs";
+              type = net.mac;
+            };
+            dnsServers = lib.mkOption {
+              description = "DNS server hostnames";
+              type = listOf str;
+            };
+            publicDomain = lib.mkOption {
+              description = "Public domain name";
+              type = str;
+            };
+            hosts = mkHostGroupOption config;
+            vlans = lib.mkOption {
+              description = "VLAN definitions";
+              type = attrsOf (submodule ({ name, config, ... }: {
+                options = {
+                  vlanId = lib.mkOption {
+                    description = "VLAN ID";
+                    type = addCheck ints.unsigned (x: 0 < x && x <= 4096);
+                  };
+                  net4 = lib.mkOption {
+                    description = "IPv4 network";
+                    type = net.cidrv4;
+                  };
+                  defaultGateway = lib.mkOption {
+                    description = "IPv4 default gateway";
+                    type = net.ipv4;
+                    default = lib.net.cidr.host 1 config.net4;
+                  };
+                  net6 = lib.mkOption {
+                    description = "IPv6 network";
+                    type = nullOr net.cidrv6;
+                    default = null;
+                  };
+                  hosts = mkHostGroupOption (config // {
+                    inherit (networkConfig) assignedMacBase domain;
+                  });
+                };
+              }));
+            };
+            aliases = lib.mkOption {
+              description = "Host aliases";
+              type = attrsOf str;
+            };
+            allHosts = lib.mkOption {
+              description = "Aggregation of all hosts from all networks, and aliases";
+              type = attrs;
+              readOnly = true;
+              internal = true;
+              default =
+                let
+                  allGroups = [ config.hosts ] ++ (lib.mapAttrsToList (_: v: v.hosts) config.vlans);
+                  groupHosts = groupSet: lib.concatMapAttrs (_: v: v.hosts) groupSet;
+                  allBaseHosts = foldl' (a: b: a // b) { } (map groupHosts allGroups);
+                  hostAliases = lib.attrsets.mapAttrs'
+                    (k: v: lib.attrsets.nameValuePair "${k}-host" v.host)
+                    (lib.attrsets.filterAttrs (_: v: v.host != null) allBaseHosts);
+                in
+                allBaseHosts // (mapAttrs (_: v: allBaseHosts.${v}) (config.aliases // hostAliases));
+            };
+          };
+        });
+    };
+
 }

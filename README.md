@@ -136,7 +136,6 @@ Each service definition record has the following possible attributes:
 - **`configStorage`**: Enable configuration storage (default: true)
 - **`extraStorage`**: Additional storage paths or configurations (e.g., filesystem mounts for systemd services)
 - **`requires`**: Service dependencies (systemd units or mount points)
-- **`autoStart`**: Whether to start automatically (default: true)
 - **`extraConfig`**: Additional Nix configuration (merged into the main config)
 - **`container`**: If present, this is a container-based service; see below for details
 - **`systemd`**: If present, this is _not_ a container-based service, but a more generic systemd service; see below for details
