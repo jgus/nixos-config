@@ -86,6 +86,8 @@ in
     # Merge multiple attribute sets recursively
     recursiveUpdates = listOfSets:
       lib.fold (attrs: acc: lib.recursiveUpdate attrs acc) { } listOfSets;
+    mkMergeByAttributes = listOfAttributes: listOfSets:
+      recursiveUpdates (map (a: { ${a} = lib.mkMerge (map (s: s.a or { }) listOfSets); }) listOfAttributes);
 
     # === Name <-> IP Mappings ===
     nameToMac = buildAliasToAttr "mac";

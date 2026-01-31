@@ -542,7 +542,6 @@ let
     ] ++ (map homelabServiceStorage storageNames);
 
 in
-# lib.mkMerge ([
 {
   options.homelab.services = lib.mkOption {
     description = "Homelab service configurations";
@@ -556,6 +555,8 @@ in
     ./services/code-server.nix
     ./services/echo.nix
     ./services/ollama.nix
-  ] ++ (lib.lists.flatten (map importService serviceFileBaseNames));
+  ]
+  ++ (lib.lists.flatten (map importService serviceFileBaseNames));
+
+  config = lib.homelab.mkMergeByAttributes [ "systemd" ] (map mkServiceConfig (attrValues config.homelab.services));
 }
-# ] ++ (map mkServiceConfig config.homelab.services))
