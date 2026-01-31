@@ -15,7 +15,7 @@
     };
   };
 
-  sops = lib.mkIf config.homelab.services.cloudflared.enabled {
+  sops = lib.mkIf config.homelab.services.cloudflared.enable {
     secrets."cloudflared/env" = { };
   };
 }

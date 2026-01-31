@@ -34,7 +34,7 @@ in
     };
   };
 
-  sops = lib.mkIf config.homelab.services.code-server.enabled {
+  sops = lib.mkIf config.homelab.services.code-server.enable {
     secrets."code/env" = { };
     secrets."josh/ssh/id_ed25519" = {
       format = "binary";

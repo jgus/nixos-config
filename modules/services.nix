@@ -345,7 +345,7 @@ let
 
   serviceSubmodule = submodule ({ name, config, ... }: {
     options = {
-      enabled = lib.mkOption {
+      enable = lib.mkOption {
         description = "Whether to enable the ${name} service";
         type = bool;
         default = false;
@@ -396,7 +396,7 @@ let
   mkServiceConfig = serviceConfig:
     if (serviceConfig.container == null && serviceConfig.systemd == null) then throw "`container` or `systemd` must be set" else
     if (serviceConfig.container != null && serviceConfig.systemd != null) then throw "`container` and `systemd` cannot both be set" else
-    if (!serviceConfig.enabled) then { } else
+    if (!serviceConfig.enable) then { } else
     let
       serviceName = serviceConfig.name;
       uid = toString config.users.users.${serviceConfig.user}.uid;
@@ -558,11 +558,18 @@ in
   ]
   ++ (lib.lists.flatten (map importService serviceFileBaseNames));
 
-  config = lib.homelab.mkMergeByAttributes [
-    # "homelab"
-    "networking"
-    "systemd"
-    "virtualisation"
-  ]
-    (map mkServiceConfig (attrValues config.homelab.services));
+  config =
+    let
+      configs = map mkServiceConfig (attrValues config.homelab.services);
+      attrNames = [
+        "networking"
+        "systemd"
+        "virtualisation"
+      ];
+    in
+    (lib.homelab.mkMergeByAttributes attrNames configs)
+    //
+    {
+      homelab.container.enable = lib.mkDefault (lib.any (x: lib.attrByPath [ "homelab" "container" "enable" ] false x) configs);
+    };
 }

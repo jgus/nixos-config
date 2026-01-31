@@ -14,7 +14,7 @@
     };
   };
 
-  fileSystems = lib.mkIf config.homelab.services.ollama.enabled {
+  fileSystems = lib.mkIf config.homelab.services.ollama.enable {
     "${lib.homelab.storagePath "ollama"}/models" = {
       device = "/s/ollama";
       fsType = "none";
