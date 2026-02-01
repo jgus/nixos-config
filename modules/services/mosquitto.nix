@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 let
   aclFile = pkgs.writeText "acl.conf" ''
     user ha
@@ -32,21 +32,23 @@ let
   '';
 in
 {
-  container = {
-    pullImage = import ../images/mosquitto.nix;
-    configVolume = "/mosquitto/data";
-    ports = [
-      "1883"
-      "9001"
-    ];
-    volumes = [
-      "${config.sops.secrets."mqtt/file".path}:/mosquitto/config/password_file.conf:ro"
-      "${aclFile}:/mosquitto/config/acl_file.conf:ro"
-      "${configFile}:/mosquitto/config/mosquitto.conf:ro"
-    ];
+  homelab.services.mosquitto = {
+    container = {
+      pullImage = import ../../images/mosquitto.nix;
+      configVolume = "/mosquitto/data";
+      volumes = [
+        "${config.sops.secrets."mqtt/file".path}:/mosquitto/config/password_file.conf:ro"
+        "${aclFile}:/mosquitto/config/acl_file.conf:ro"
+        "${configFile}:/mosquitto/config/mosquitto.conf:ro"
+      ];
+      ports = [
+        "1883"
+        "9001"
+      ];
+    };
   };
-  extraConfig = {
-    sops.secrets."mqtt/file" = {
+  sops = lib.mkIf config.homelab.services.home-assistant.enable {
+    secrets."mqtt/file" = {
       mode = "0444";
     };
   };

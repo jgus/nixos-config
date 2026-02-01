@@ -381,26 +381,26 @@ let
 
 in
 {
-  container = {
-    readOnly = false;
-    pullImage = import ../images/home-assistant.nix;
-    configVolume = "/config";
-    environment = {
-      PUID = toString config.users.users.${user}.uid;
-      PGID = toString config.users.groups.${group}.gid;
-      VERSION = "latest";
+  homelab.services.home-assistant = {
+    container = {
+      pullImage = import ../../images/home-assistant.nix;
+      readOnly = false;
+      environment = {
+        PUID = toString config.users.users.${user}.uid;
+        PGID = toString config.users.groups.${group}.gid;
+        VERSION = "latest";
+      };
+      configVolume = "/config";
+      volumes = [
+        "${haConfigFiles}:/config/generated:ro"
+        "${config.sops.templates."home-assistant/secrets.yaml".path}:/config/secrets.yaml:ro"
+      ];
     };
-    volumes = [
-      "${haConfigFiles}:/config/generated:ro"
-      "${config.sops.templates."home-assistant/secrets.yaml".path}:/config/secrets.yaml:ro"
-    ];
   };
-  extraConfig = {
-    sops = {
-      secrets.doorbell = { };
-      templates."home-assistant/secrets.yaml".content = ''
-        doorbell_password: ${config.sops.placeholder.doorbell}
-      '';
-    };
+  sops = lib.mkIf config.homelab.services.home-assistant.enable {
+    secrets.doorbell = { };
+    templates."home-assistant/secrets.yaml".content = ''
+      doorbell_password: ${config.sops.placeholder.doorbell}
+    '';
   };
 }

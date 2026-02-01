@@ -380,6 +380,8 @@ in
     ./services/flaresolverr.nix
     ./services/frigate.nix
     ./services/garage.nix
+    ./services/home-assistant.nix
+    ./services/ipmi-server.nix
     ./services/jellyfin.nix
     ./services/journal.nix
     ./services/joyfulsong.nix
@@ -389,10 +391,14 @@ in
     ./services/lazylibrarian.nix
     ./services/lidarr.nix
     ./services/minecraft.nix
+    ./services/mosquitto.nix
+    ./services/node-red.nix
+    ./services/ntp.nix
     ./services/ollama.nix
     ./services/onlyoffice.nix
     ./services/open-webui.nix
     ./services/owncloud.nix
+    ./services/pihole.nix
     ./services/plex.nix
     ./services/prowlarr.nix
     ./services/qbittorrent.nix
@@ -405,6 +411,8 @@ in
     ./services/searxng.nix
     ./services/sonarr.nix
     ./services/web.nix
+    ./services/zigbee2mqtt.nix
+    ./services/zwave.nix
   ];
 
   config =
