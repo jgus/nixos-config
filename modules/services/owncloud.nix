@@ -1,17 +1,16 @@
-{ config, addresses, ... }:
+{ addresses, config, lib, ... }:
 let
   adminUser = "admin";
   dbName = "owncloud";
   dbUser = "owncloud";
 in
-[
-  {
-    serviceName = "owncloud";
+{
+  homelab.services.owncloud = {
     configStorage = false;
     requires = [ "storage-owncloud.mount" ];
     container = {
+      pullImage = import ../../images/owncloud.nix;
       readOnly = false;
-      pullImage = import ../images/owncloud.nix;
       dependsOn = [ "owncloud-db" "owncloud-redis" ];
       environment = {
         OWNCLOUD_VERSION = "10.15";
@@ -33,25 +32,13 @@ in
       environmentFiles = [
         config.sops.templates."owncloud/env".path
       ];
-      ports = [ "8080" ];
       volumes = [ "/storage/owncloud:/mnt/data" ];
+      ports = [ "8080" ];
     };
-    extraConfig = {
-      sops = {
-        secrets."owncloud/admin" = { };
-        secrets."owncloud/db" = { };
-        templates."owncloud/env".content = ''
-          OWNCLOUD_DB_PASSWORD=${config.sops.placeholder."owncloud/db"}
-          OWNCLOUD_ADMIN_PASSWORD=${config.sops.placeholder."owncloud/admin"}
-          ADMIN_PASSWORD=${config.sops.placeholder."owncloud/admin"}
-        '';
-      };
-    };
-  }
-  {
-    serviceName = "owncloud-db";
+  };
+  homelab.services.owncloud-db = {
     container = {
-      pullImage = import ../images/mariadb.nix;
+      pullImage = import ../../images/mariadb.nix;
       environment = {
         MYSQL_USER = dbUser;
         MYSQL_DATABASE = dbName;
@@ -62,21 +49,30 @@ in
       ];
       configVolume = "/var/lib/mysql";
     };
-    extraConfig = {
-      sops = {
-        secrets."owncloud/db" = { };
-        templates."owncloud-db/env".content = ''
-          MYSQL_ROOT_PASSWORD=${config.sops.placeholder."owncloud/db"}
-          MYSQL_PASSWORD=${config.sops.placeholder."owncloud/db"}
-        '';
-      };
-    };
-  }
-  {
-    serviceName = "owncloud-redis";
+  };
+  homelab.services.owncloud-redis = {
     container = {
-      pullImage = import ../images/redis.nix;
+      pullImage = import ../../images/redis.nix;
       configVolume = "/data";
     };
-  }
-]
+  };
+
+  sops = lib.homelab.recursiveUpdates [
+    (lib.mkIf config.homelab.services.owncloud.enable {
+      secrets."owncloud/admin" = { };
+      secrets."owncloud/db" = { };
+      templates."owncloud/env".content = ''
+        OWNCLOUD_DB_PASSWORD=${config.sops.placeholder."owncloud/db"}
+        OWNCLOUD_ADMIN_PASSWORD=${config.sops.placeholder."owncloud/admin"}
+        ADMIN_PASSWORD=${config.sops.placeholder."owncloud/admin"}
+      '';
+    })
+    (lib.mkIf config.homelab.services.owncloud-db.enable {
+      secrets."owncloud/db" = { };
+      templates."owncloud-db/env".content = ''
+        MYSQL_ROOT_PASSWORD=${config.sops.placeholder."owncloud/db"}
+        MYSQL_PASSWORD=${config.sops.placeholder."owncloud/db"}
+      '';
+    })
+  ];
+}

@@ -556,22 +556,33 @@ in
     ./services/code-server.nix
     ./services/echo.nix
     ./services/esphome.nix
+    ./services/flaresolverr.nix
     ./services/frigate.nix
     ./services/garage.nix
     ./services/jellyfin.nix
     ./services/journal.nix
     ./services/joyfulsong.nix
+    ./services/kapowarr.nix
     ./services/komga.nix
     ./services/large-model-proxy.nix
+    ./services/lazylibrarian.nix
+    ./services/lidarr.nix
     ./services/minecraft.nix
     ./services/ollama.nix
     ./services/onlyoffice.nix
     ./services/open-webui.nix
+    ./services/owncloud.nix
     ./services/plex.nix
+    ./services/prowlarr.nix
+    ./services/qbittorrent.nix
     ./services/qdrant.nix
+    ./services/radarr.nix
+    ./services/sabnzbd.nix
     ./services/samba-c1-2.nix
+    ./services/samba.nix
     ./services/searxng-mcp.nix
     ./services/searxng.nix
+    ./services/sonarr.nix
     ./services/web.nix
   ]
   ++ (lib.lists.flatten (map importService serviceFileBaseNames));

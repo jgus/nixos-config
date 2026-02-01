@@ -2,7 +2,7 @@ let
   user = "josh";
   group = "media";
 in
-{ config, ... }:
+{ config, lib, ... }:
 let
   configuration = ''
     <?xml version="1.0" encoding="utf-8"?>
@@ -26,28 +26,28 @@ let
   '';
 in
 {
-  container = {
-    readOnly = false;
-    pullImage = import ../images/prowlarr.nix;
-    environment = {
-      PUID = toString config.users.users.${user}.uid;
-      PGID = toString config.users.groups.${group}.gid;
-    };
-    ports = [
-      "9696"
-    ];
-    configVolume = "/config";
-    volumes = [
-      "${config.sops.templates."prowlarr/config.xml".path}:/config/config.xml:ro"
-    ];
-  };
-  extraConfig = {
-    sops = {
-      secrets.prowlarr = { };
-      templates."prowlarr/config.xml" = {
-        content = configuration;
-        owner = user;
+  homelab.services.prowlarr = {
+    container = {
+      pullImage = import ../../images/prowlarr.nix;
+      readOnly = false;
+      environment = {
+        PUID = toString config.users.users.${user}.uid;
+        PGID = toString config.users.groups.${group}.gid;
       };
+      configVolume = "/config";
+      volumes = [
+        "${config.sops.templates."prowlarr/config.xml".path}:/config/config.xml:ro"
+      ];
+      ports = [
+        "9696"
+      ];
+    };
+  };
+  sops = lib.mkIf config.homelab.services.prowlarr.enable {
+    secrets.prowlarr = { };
+    templates."prowlarr/config.xml" = {
+      content = configuration;
+      owner = user;
     };
   };
 }
