@@ -61,7 +61,7 @@ with builtins;
                 suffix = if vlan ? vlanId then ".${toString vlan.vlanId}" else "";
               in
               ''
-                podman network ls --format "{{.Name}}" | grep "^hostlan${suffix}$" || podman network create -d macvlan --ipv6 --subnet=${vlan.net4} --gateway=${vlan.defaultGateway} ${lib.optionalString (vlan ? net6) "--subnet=${vlan.net6}"} -o parent=br0${suffix} hostlan${suffix}
+                podman network ls --format "{{.Name}}" | grep "^hostlan${suffix}$" || podman network create -d macvlan --subnet=${vlan.net4} --gateway=${vlan.defaultGateway} ${lib.optionalString (vlan ? net6) "--ipv6 --subnet=${vlan.net6}"} -o parent=br0${suffix} hostlan${suffix}
               ''
             )
             ([ addresses.network ] ++ (attrValues addresses.vlans)));

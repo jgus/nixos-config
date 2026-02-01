@@ -17,91 +17,96 @@ with builtins;
     hosts = lib.homelab.hosts;
   };
 
-  systemd.network = lib.homelab.recursiveUpdates [
-    # Base Config
-    {
-      enable = true;
+  systemd.network =
+    let
+      # Configure VLANs: VLAN 1 (untagged, PVID) plus all VLANs from addresses.vlans
+      bridgeVLANs =
+        # VLAN 1 as PVID and untagged
+        [{ VLAN = 1; PVID = 1; EgressUntagged = 1; }] ++
+        # All other VLANs as tagged
+        (map (vlan: { VLAN = vlan.vlanId; }) (attrValues addresses.vlans));
+    in
+    (lib.homelab.recursiveUpdates [
+      # Base Config
+      {
+        enable = true;
 
-      # Create the br0 bridge device for all physical interfaces
-      netdevs."00-br0" = {
-        netdevConfig = {
-          Kind = "bridge";
-          Name = "br0";
+        # Create the br0 bridge device for all physical interfaces
+        netdevs."00-br0" = {
+          netdevConfig = {
+            Kind = "bridge";
+            Name = "br0";
+          };
+          bridgeConfig = {
+            VLANFiltering = true;
+            DefaultPVID = 1;
+          };
         };
-        bridgeConfig = {
-          VLANFiltering = true;
-          DefaultPVID = 1;
+
+        # Configure each member interface to join the bridge with VLANs
+        networks."01-bridge-members" = {
+          matchConfig.Name = lib.concatStringsSep " " machine.lan-interfaces;
+          networkConfig = {
+            Bridge = "br0";
+            LinkLocalAddressing = "no";
+          };
+          inherit bridgeVLANs;
+          linkConfig.RequiredForOnline = "enslaved";
         };
-      };
 
-      # Configure each member interface to join the bridge with VLANs
-      networks."01-bridge-members" = {
-        matchConfig.Name = lib.concatStringsSep " " machine.lan-interfaces;
-        networkConfig = {
-          Bridge = "br0";
-          LinkLocalAddressing = "no";
+        # Configure the effective LAN interface (physical or bridge) to be the parent for macvlans
+        networks."05-br0" = {
+          matchConfig.Name = "br0";
+          networkConfig = {
+            # Don't configure IP on this interface - only on macvlans
+            LinkLocalAddressing = "no";
+            DHCP = "no";
+          };
+          inherit bridgeVLANs;
+          vlan = (map (vlan: "br0.${toString vlan.vlanId}") (attrValues addresses.vlans));
+          linkConfig.RequiredForOnline = "carrier";
         };
-        linkConfig.RequiredForOnline = "enslaved";
-      };
+      }
 
-      # Configure the effective LAN interface (physical or bridge) to be the parent for macvlans
-      networks."05-br0" = {
-        matchConfig.Name = "br0";
-        networkConfig = {
-          # Don't configure IP on this interface - only on macvlans
-          LinkLocalAddressing = "no";
-          DHCP = "no";
-        };
-        # Configure VLANs: VLAN 1 (untagged, PVID) plus all VLANs from addresses.vlans
-        bridgeVLANs =
-          # VLAN 1 as PVID and untagged
-          [{ VLAN = 1; PVID = 1; EgressUntagged = 1; }] ++
-          # All other VLANs as tagged
-          (map (vlan: { VLAN = vlan.vlanId; }) (attrValues addresses.vlans));
-        vlan = (map (vlan: "br0.${toString vlan.vlanId}") (attrValues addresses.vlans));
-        linkConfig.RequiredForOnline = "carrier";
-      };
-    }
+      # VLANs
+      {
+        netdevs = lib.mapAttrs'
+          (name: vlan:
+            lib.nameValuePair "02-br0.${toString vlan.vlanId}" {
+              netdevConfig = {
+                Kind = "vlan";
+                Name = "br0.${toString vlan.vlanId}";
+              };
+              vlanConfig.Id = vlan.vlanId;
+            }
+          )
+          addresses.vlans;
+        networks = lib.mapAttrs'
+          (name: vlan:
+            lib.nameValuePair "03-br0.${toString vlan.vlanId}" {
+              matchConfig.Name = "br0.${toString vlan.vlanId}";
+              networkConfig = {
+                LinkLocalAddressing = "no";
+                DHCP = "no";
+              };
+              linkConfig.RequiredForOnline = "carrier";
+            }
+          )
+          addresses.vlans;
+      }
 
-    # VLANs
-    {
-      netdevs = lib.mapAttrs'
-        (name: vlan:
-          lib.nameValuePair "02-br0.${toString vlan.vlanId}" {
-            netdevConfig = {
-              Kind = "vlan";
-              Name = "br0.${toString vlan.vlanId}";
-            };
-            vlanConfig.Id = vlan.vlanId;
-          }
-        )
-        addresses.vlans;
-      networks = lib.mapAttrs'
-        (name: vlan:
-          lib.nameValuePair "03-br0.${toString vlan.vlanId}" {
-            matchConfig.Name = "br0.${toString vlan.vlanId}";
-            networkConfig = {
-              LinkLocalAddressing = "no";
-              DHCP = "no";
-            };
-            linkConfig.RequiredForOnline = "carrier";
-          }
-        )
-        addresses.vlans;
-    }
-
-    # Host MacVLANs
-    (lib.homelab.mkMacvlanSetup {
-      hostName = config.networking.hostName;
-      interfaceName = "lan0";
-      netdevPriority = 10;
-      networkPriority = 20;
-      mainTableMetric = 100;
-      policyTableId = 200;
-      policyPriority = 100;
-      requiredForOnline = "routable";
-    })
-  ];
+      # Host MacVLANs
+      (lib.homelab.mkMacvlanSetup {
+        hostName = config.networking.hostName;
+        interfaceName = "lan0";
+        netdevPriority = 10;
+        networkPriority = 20;
+        mainTableMetric = 100;
+        policyTableId = 200;
+        policyPriority = 100;
+        requiredForOnline = "routable";
+      })
+    ]);
 
   # Boot kernel networking settings (related to ARP flux for macvlan)
   boot.kernel.sysctl = {
